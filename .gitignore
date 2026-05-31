@@ -4,3 +4,6 @@ node_modules/
 *.log
 .tmp/
 .od-plugin-forge/
+
+# template-harvest transient capture bundles (never shipped)
+.harvest/

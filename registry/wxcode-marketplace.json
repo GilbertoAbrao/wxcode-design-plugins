@@ -2,14 +2,14 @@
   "$schema": "https://open-design.ai/schemas/marketplace.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-design-plugins",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "owner": "GilbertoAbrao",
   "trust": "community",
   "metadata": {
     "title": "WXCode Design Plugins",
     "description": "First-party admin / dashboard / cockpit plugins curated by WXCode for Open Design daemons. Tenant VMs register this catalog as a marketplace source to consume plugins without rebuild.",
     "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins",
-    "updatedAt": "2026-05-28T13:13:50Z"
+    "updatedAt": "2026-05-31T21:44:20Z"
   },
   "plugins": [
     {
@@ -19,8 +19,11 @@
       "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-ai-copilot",
       "publisher": {
         "id": "wxcode",
+        "github": "GilbertoAbrao",
         "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
       },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-ai-copilot",
+      "license": "MIT",
       "capabilitiesSummary": [
         "prompt:inject",
         "fs:write"
@@ -40,8 +43,38 @@
         "chat-driven",
         "split-pane"
       ],
-      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-ai-copilot",
+      "mode": "prototype"
+    },
+    {
+      "name": "wxcode/admin-aurora-analytics",
+      "title": "Aurora Analytics Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-aurora-analytics",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-aurora-analytics",
       "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Aurora Analytics Admin is a polished light-mode dashboard for product and growth teams who need at-a-glance visibility into sessions, conversion, and retention. It pairs a fixed left sidebar with a top search bar, four live KPI tiles, an area chart of weekly sessions, a recent-sessions table, and a right-rail insights panel \u2014 all rendered in a single self-contained HTML file. Designed for clarity over decoration: indigo-violet accents on a crisp slate-and-white canvas.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "analytics",
+        "light-mode",
+        "indigo",
+        "clean-cards"
+      ],
       "mode": "prototype"
     },
     {
@@ -51,8 +84,11 @@
       "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-finance-terminal",
       "publisher": {
         "id": "wxcode",
+        "github": "GilbertoAbrao",
         "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
       },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-finance-terminal",
+      "license": "MIT",
       "capabilitiesSummary": [
         "prompt:inject",
         "fs:write"
@@ -72,8 +108,6 @@
         "monospace",
         "trading-terminal"
       ],
-      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-finance-terminal",
-      "license": "MIT",
       "mode": "prototype"
     },
     {
@@ -83,8 +117,11 @@
       "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-glassmorphism",
       "publisher": {
         "id": "wxcode",
+        "github": "GilbertoAbrao",
         "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
       },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-glassmorphism",
+      "license": "MIT",
       "capabilitiesSummary": [
         "prompt:inject",
         "fs:write"
@@ -103,8 +140,38 @@
         "frosted-glass",
         "modern"
       ],
-      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-glassmorphism",
+      "mode": "prototype"
+    },
+    {
+      "name": "wxcode/admin-midnight-ops",
+      "title": "Midnight Ops Console",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-midnight-ops",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-midnight-ops",
       "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "A production-grade dark-mode operations and observability dashboard built for on-call engineers and SRE teams. Features a compact left icon rail, four live metric tiles with inline trend sparklines, a time-series throughput chart, an active incidents table with severity pills, and a per-service health status list \u2014 all in a high-contrast teal-on-midnight palette optimised for 3 AM focus.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "observability",
+        "dark-mode",
+        "teal",
+        "ops-console"
+      ],
       "mode": "prototype"
     },
     {
@@ -114,8 +181,11 @@
       "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-neobrutal",
       "publisher": {
         "id": "wxcode",
+        "github": "GilbertoAbrao",
         "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
       },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-neobrutal",
+      "license": "MIT",
       "capabilitiesSummary": [
         "prompt:inject",
         "fs:write"
@@ -134,8 +204,6 @@
         "high-contrast",
         "pastel-blocks"
       ],
-      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-neobrutal",
-      "license": "MIT",
       "mode": "prototype"
     },
     {
@@ -145,8 +213,11 @@
       "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-saas-bestseller",
       "publisher": {
         "id": "wxcode",
+        "github": "GilbertoAbrao",
         "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
       },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-saas-bestseller",
+      "license": "MIT",
       "capabilitiesSummary": [
         "prompt:inject",
         "fs:write"
@@ -167,8 +238,38 @@
         "clean-cards",
         "polished"
       ],
-      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-saas-bestseller",
+      "mode": "prototype"
+    },
+    {
+      "name": "wxcode/admin-slate-commerce",
+      "title": "Slate Commerce Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-slate-commerce",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-slate-commerce",
       "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "A clean, light-mode e-commerce back-office dashboard with warm neutral surfaces, emerald accents, and amber highlights. Ships with a sidebar store switcher, topbar date range selector, four KPI cards with inline sparklines, a revenue bar chart, a recent orders table with status badges, and a top products list \u2014 everything a merchant needs at a glance.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "e-commerce",
+        "web",
+        "admin",
+        "back-office",
+        "light-mode",
+        "emerald",
+        "orders"
+      ],
       "mode": "prototype"
     }
   ]
