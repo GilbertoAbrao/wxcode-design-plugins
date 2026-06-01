@@ -1,0 +1,831 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bento Ops Overview — Veloxa</title>
+<style>
+  /* ─── Chromatic tokens ─────────────────────────────────────── */
+  :root {
+    --c-indigo:    #6366f1;
+    --c-indigo-d:  #4f46e5;
+    --c-indigo-lt: #eef2ff;
+    --c-teal:      #14b8a6;
+    --c-teal-d:    #0d9488;
+    --c-teal-lt:   #f0fdfa;
+    --c-amber:     #f59e0b;
+    --c-amber-d:   #d97706;
+    --c-amber-lt:  #fffbeb;
+    --c-rose:      #f43f5e;
+    --c-rose-d:    #e11d48;
+    --c-rose-lt:   #fff1f2;
+    --c-green:     #22c55e;
+    --c-green-lt:  #f0fdf4;
+  }
+
+  /* ─── Reset & base ─────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #f6f7f9;
+    color: #1e293b;
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ─── Header ───────────────────────────────────────────────── */
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 52px;
+    padding: 0 24px;
+    background: #ffffff;
+    border-bottom: 1px solid #e8eaee;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: -0.02em;
+    color: #1e293b;
+    flex-shrink: 0;
+  }
+  .header-brand svg { display: block; }
+  .header-period {
+    display: flex;
+    gap: 4px;
+    margin-left: 20px;
+  }
+  .period-chip {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid #e8eaee;
+    background: #ffffff;
+    color: #64748b;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    transition: background 0.15s;
+  }
+  .period-chip.active {
+    background: var(--c-indigo);
+    border-color: var(--c-indigo);
+    color: #ffffff;
+  }
+  .header-spacer { flex: 1; }
+  .header-sub {
+    font-size: 12px;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid #e8eaee;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    color: #64748b;
+  }
+  .notif-dot {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--c-rose);
+    border: 2px solid #fff;
+  }
+  .avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--c-indigo);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* ─── Bento grid ────────────────────────────────────────────── */
+  .bento {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-auto-rows: 88px;
+    gap: 14px;
+    padding: 20px 24px 32px;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  /* Tile base */
+  .tile {
+    background: #ffffff;
+    border: 1px solid #e8eaee;
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Tile spans */
+  .tile-hero    { grid-column: span 5; grid-row: span 2; }
+  .tile-chart   { grid-column: span 7; grid-row: span 3; }
+  .tile-kpi-a   { grid-column: span 3; grid-row: span 1; }
+  .tile-kpi-b   { grid-column: span 4; grid-row: span 1; }
+  .tile-activity { grid-column: span 5; grid-row: span 3; }
+  .tile-donut   { grid-column: span 4; grid-row: span 3; }
+  .tile-table   { grid-column: span 8; grid-row: span 3; }
+  .tile-status  { grid-column: span 4; grid-row: span 2; }
+
+  /* Tile internals */
+  .tile-inner { padding: 18px 20px; height: 100%; display: flex; flex-direction: column; }
+
+  .tile-label {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #94a3b8;
+    margin-bottom: 6px;
+  }
+
+  /* ─── Hero tile ─────────────────────────────────────────────── */
+  .hero-accent {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 5px;
+    background: linear-gradient(to bottom, var(--c-indigo), var(--c-indigo-d));
+    border-radius: 14px 0 0 14px;
+  }
+  .tile-hero .tile-inner { padding-left: 26px; }
+  .hero-value {
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: #1e293b;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .hero-sub {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 12px;
+  }
+  .delta-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .delta-up   { background: var(--c-green-lt); color: #16a34a; }
+  .delta-down { background: var(--c-rose-lt);  color: var(--c-rose-d); }
+  .hero-sparkline { margin-top: auto; }
+
+  /* ─── Chart tile ─────────────────────────────────────────────── */
+  .chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .chart-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+  }
+  .chart-tabs {
+    display: flex;
+    gap: 4px;
+  }
+  .chart-tab {
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #94a3b8;
+    cursor: pointer;
+  }
+  .chart-tab.active { background: var(--c-teal-lt); color: var(--c-teal-d); }
+  .chart-legend {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 10px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #64748b;
+  }
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  .chart-wrap { flex: 1; min-height: 0; }
+
+  /* ─── KPI tiles ─────────────────────────────────────────────── */
+  .kpi-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+  }
+  .kpi-value {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .kpi-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .kpi-amber .kpi-icon { background: var(--c-amber-lt); color: var(--c-amber-d); }
+  .kpi-rose  .kpi-icon { background: var(--c-rose-lt);  color: var(--c-rose-d); }
+
+  /* ─── Activity feed tile ─────────────────────────────────────── */
+  .feed-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 14px;
+  }
+  .feed-list { display: flex; flex-direction: column; gap: 12px; flex: 1; overflow: hidden; }
+  .feed-item { display: flex; align-items: flex-start; gap: 10px; }
+  .feed-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+  .feed-dot-info    { background: var(--c-teal); }
+  .feed-dot-warn    { background: var(--c-amber); }
+  .feed-dot-error   { background: var(--c-rose); }
+  .feed-dot-success { background: var(--c-green); }
+  .feed-text { font-size: 12.5px; color: #334155; line-height: 1.45; }
+  .feed-time { font-size: 11px; color: #94a3b8; display: block; margin-top: 1px; }
+  .tile-teal-border { border-top: 3px solid var(--c-teal); }
+
+  /* ─── Donut tile ─────────────────────────────────────────────── */
+  .donut-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 10px;
+  }
+  .donut-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    justify-content: center;
+    gap: 14px;
+  }
+  .donut-center {
+    position: relative;
+    display: inline-block;
+  }
+  .donut-label-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .donut-center-val {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: #1e293b;
+    display: block;
+    line-height: 1;
+  }
+  .donut-center-sub {
+    font-size: 10px;
+    color: #94a3b8;
+    display: block;
+  }
+  .donut-legend {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 14px;
+    width: 100%;
+  }
+  .donut-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #64748b;
+  }
+  .donut-legend-swatch {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .donut-legend-val {
+    margin-left: auto;
+    font-weight: 600;
+    color: #334155;
+    font-size: 11px;
+  }
+
+  /* ─── Mini-table tile ─────────────────────────────────────────── */
+  .table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .table-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+  }
+  .view-all {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--c-indigo);
+    cursor: pointer;
+    text-decoration: none;
+    letter-spacing: 0.01em;
+  }
+  .mini-table { width: 100%; border-collapse: collapse; }
+  .mini-table th {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #94a3b8;
+    text-align: left;
+    padding: 6px 10px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e8eaee;
+  }
+  .mini-table th:first-child { border-left: 3px solid var(--c-amber); }
+  .mini-table td {
+    padding: 8px 10px;
+    font-size: 12.5px;
+    color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+  }
+  .mini-table tr:last-child td { border-bottom: none; }
+  .mini-table tr:hover td { background: #f8fafc; }
+  .mini-table .entity { font-weight: 600; color: #1e293b; }
+  .pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .pill-ok     { background: #f0fdf4; color: #16a34a; }
+  .pill-warn   { background: var(--c-amber-lt); color: var(--c-amber-d); }
+  .pill-error  { background: var(--c-rose-lt); color: var(--c-rose-d); }
+  .pill-blue   { background: var(--c-indigo-lt); color: var(--c-indigo-d); }
+
+  /* ─── Status tile ─────────────────────────────────────────────── */
+  .status-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 12px;
+  }
+  .status-list { display: flex; flex-direction: column; gap: 10px; }
+  .status-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .status-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .status-dot-ok    { background: var(--c-green); box-shadow: 0 0 0 3px #dcfce7; }
+  .status-dot-warn  { background: var(--c-amber); box-shadow: 0 0 0 3px #fef9c3; }
+  .status-dot-error { background: var(--c-rose);  box-shadow: 0 0 0 3px #ffe4e6; }
+  .status-name { font-size: 12.5px; color: #334155; font-weight: 500; flex: 1; }
+  .status-uptime { font-size: 11.5px; color: #94a3b8; font-weight: 600; }
+  .tile-rose-border { border-top: 3px solid var(--c-rose); }
+</style>
+</head>
+<body>
+
+<!-- ─── Header ──────────────────────────────────────────────── -->
+<header class="header">
+  <div class="header-brand">
+    <!-- Veloxa monogram -->
+    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="30" height="30" rx="8" fill="var(--c-indigo)"/>
+      <path d="M8 9l4.5 12L15 14l2.5 7L22 9" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Veloxa Ops
+  </div>
+  <div class="header-period">
+    <button class="period-chip">Today</button>
+    <button class="period-chip active">7D</button>
+    <button class="period-chip">30D</button>
+    <button class="period-chip">Custom</button>
+  </div>
+  <div class="header-spacer"></div>
+  <div class="header-sub">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+    Mon 2 Jun 2025, 09:41 UTC
+  </div>
+  <div class="header-right">
+    <div class="icon-btn" aria-label="Notifications">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="notif-dot"></span>
+    </div>
+    <div class="avatar" title="Priya Nair">PN</div>
+  </div>
+</header>
+
+<!-- ─── Bento grid ───────────────────────────────────────────── -->
+<main class="bento">
+
+  <!-- Hero tile: GMV -->
+  <article class="tile tile-hero" aria-label="Gross Merchandise Volume">
+    <div class="hero-accent"></div>
+    <div class="tile-inner">
+      <p class="tile-label">Gross Merchandise Volume</p>
+      <div class="hero-value">$4.71M</div>
+      <p class="hero-sub">Past 7 days across all channels</p>
+      <div>
+        <span class="delta-chip delta-up">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="18 15 12 9 6 15"/></svg>
+          +12.4% vs last week
+        </span>
+      </div>
+      <!-- Sparkline -->
+      <div class="hero-sparkline">
+        <svg viewBox="0 0 220 48" width="100%" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="spk-fill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stop-color="var(--c-indigo)" stop-opacity="0.18"/>
+              <stop offset="100%" stop-color="var(--c-indigo)" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d="M0 38 L28 32 L56 36 L84 24 L112 28 L140 14 L168 18 L196 8 L220 4" fill="none" stroke="var(--c-indigo)" stroke-width="2" stroke-linecap="round"/>
+          <path d="M0 38 L28 32 L56 36 L84 24 L112 28 L140 14 L168 18 L196 8 L220 4 V48 H0 Z" fill="url(#spk-fill)"/>
+        </svg>
+      </div>
+    </div>
+  </article>
+
+  <!-- Chart tile: Throughput -->
+  <article class="tile tile-chart" aria-label="Order Throughput chart">
+    <div class="tile-inner">
+      <div class="chart-header">
+        <span class="chart-title">Order Throughput</span>
+        <div class="chart-tabs">
+          <span class="chart-tab">24H</span>
+          <span class="chart-tab active">7D</span>
+          <span class="chart-tab">30D</span>
+          <span class="chart-tab">YTD</span>
+        </div>
+      </div>
+      <div class="chart-legend">
+        <span class="legend-item">
+          <span class="legend-dot" style="background:var(--c-teal)"></span>Fulfilled
+        </span>
+        <span class="legend-item">
+          <span class="legend-dot" style="background:var(--c-amber)"></span>Pending
+        </span>
+        <span class="legend-item">
+          <span class="legend-dot" style="background:var(--c-rose)"></span>Cancelled
+        </span>
+      </div>
+      <div class="chart-wrap">
+        <svg viewBox="0 0 480 160" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="area-teal" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stop-color="var(--c-teal)" stop-opacity="0.22"/>
+              <stop offset="100%" stop-color="var(--c-teal)" stop-opacity="0"/>
+            </linearGradient>
+            <linearGradient id="area-amber" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stop-color="var(--c-amber)" stop-opacity="0.2"/>
+              <stop offset="100%" stop-color="var(--c-amber)" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <!-- grid lines -->
+          <line x1="0" y1="32"  x2="480" y2="32"  stroke="#e8eaee" stroke-width="1"/>
+          <line x1="0" y1="64"  x2="480" y2="64"  stroke="#e8eaee" stroke-width="1"/>
+          <line x1="0" y1="96"  x2="480" y2="96"  stroke="#e8eaee" stroke-width="1"/>
+          <line x1="0" y1="128" x2="480" y2="128" stroke="#e8eaee" stroke-width="1"/>
+          <!-- y axis labels -->
+          <text x="0" y="30"  font-size="9" fill="#94a3b8">2400</text>
+          <text x="0" y="62"  font-size="9" fill="#94a3b8">1800</text>
+          <text x="0" y="94"  font-size="9" fill="#94a3b8">1200</text>
+          <text x="0" y="126" font-size="9" fill="#94a3b8">600</text>
+          <!-- x axis labels -->
+          <text x="68"  y="155" font-size="9" fill="#94a3b8" text-anchor="middle">Mon</text>
+          <text x="136" y="155" font-size="9" fill="#94a3b8" text-anchor="middle">Tue</text>
+          <text x="204" y="155" font-size="9" fill="#94a3b8" text-anchor="middle">Wed</text>
+          <text x="272" y="155" font-size="9" fill="#94a3b8" text-anchor="middle">Thu</text>
+          <text x="340" y="155" font-size="9" fill="#94a3b8" text-anchor="middle">Fri</text>
+          <text x="408" y="155" font-size="9" fill="#94a3b8" text-anchor="middle">Sat</text>
+          <text x="468" y="155" font-size="9" fill="#94a3b8" text-anchor="middle">Sun</text>
+          <!-- Fulfilled area -->
+          <path d="M24 110 L92 90 L160 70 L228 56 L296 42 L364 34 L432 40 L468 36"
+                fill="none" stroke="var(--c-teal)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M24 110 L92 90 L160 70 L228 56 L296 42 L364 34 L432 40 L468 36 V145 H24 Z"
+                fill="url(#area-teal)"/>
+          <!-- Pending area -->
+          <path d="M24 130 L92 122 L160 118 L228 114 L296 112 L364 108 L432 116 L468 120"
+                fill="none" stroke="var(--c-amber)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4 2"/>
+          <!-- Dots on teal line -->
+          <circle cx="24"  cy="110" r="3" fill="var(--c-teal)" stroke="#fff" stroke-width="1.5"/>
+          <circle cx="228" cy="56"  r="3" fill="var(--c-teal)" stroke="#fff" stroke-width="1.5"/>
+          <circle cx="468" cy="36"  r="3" fill="var(--c-teal)" stroke="#fff" stroke-width="1.5"/>
+        </svg>
+      </div>
+    </div>
+  </article>
+
+  <!-- KPI tile A: Avg Latency -->
+  <article class="tile tile-kpi-a kpi-amber" aria-label="Average Latency">
+    <div class="tile-inner" style="justify-content:center;">
+      <div class="kpi-row">
+        <div>
+          <p class="tile-label">Avg Latency</p>
+          <div class="kpi-value" style="color:var(--c-amber-d)">184ms</div>
+          <span class="delta-chip delta-up" style="font-size:11px;padding:2px 7px;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="18 15 12 9 6 15"/></svg>
+            −8ms
+          </span>
+        </div>
+        <div class="kpi-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- KPI tile B: Error Rate -->
+  <article class="tile tile-kpi-b kpi-rose" aria-label="Error Rate">
+    <div class="tile-inner" style="justify-content:center;">
+      <div class="kpi-row">
+        <div>
+          <p class="tile-label">Error Rate</p>
+          <div class="kpi-value" style="color:var(--c-rose-d)">0.38%</div>
+          <span class="delta-chip delta-down" style="font-size:11px;padding:2px 7px;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            +0.05pp
+          </span>
+        </div>
+        <div class="kpi-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Activity feed tile -->
+  <article class="tile tile-activity tile-teal-border" aria-label="Recent activity feed">
+    <div class="tile-inner">
+      <p class="feed-title">Activity Feed</p>
+      <div class="feed-list">
+        <div class="feed-item">
+          <span class="feed-dot feed-dot-success"></span>
+          <div>
+            <span class="feed-text">Deployment <strong>v3.14.2</strong> promoted to production by <em>Keita Okafor</em>.</span>
+            <time class="feed-time">2 min ago</time>
+          </div>
+        </div>
+        <div class="feed-item">
+          <span class="feed-dot feed-dot-warn"></span>
+          <div>
+            <span class="feed-text">Queue depth on <strong>EMEA-order-processor</strong> exceeded 4 000 messages — auto-scaling triggered.</span>
+            <time class="feed-time">14 min ago</time>
+          </div>
+        </div>
+        <div class="feed-item">
+          <span class="feed-dot feed-dot-info"></span>
+          <div>
+            <span class="feed-text">New partner integration activated: <strong>Lumina Payments</strong> (webhook verified).</span>
+            <time class="feed-time">41 min ago</time>
+          </div>
+        </div>
+        <div class="feed-item">
+          <span class="feed-dot feed-dot-error"></span>
+          <div>
+            <span class="feed-text">Anomaly detected on <strong>catalog-sync</strong> job — 37 records failed validation. Incident #4921 open.</span>
+            <time class="feed-time">1 hr ago</time>
+          </div>
+        </div>
+        <div class="feed-item">
+          <span class="feed-dot feed-dot-success"></span>
+          <div>
+            <span class="feed-text">Daily backup of <strong>prod-db-primary</strong> completed (4.2 GB, 3 min 17 s).</span>
+            <time class="feed-time">3 hr ago</time>
+          </div>
+        </div>
+        <div class="feed-item">
+          <span class="feed-dot feed-dot-info"></span>
+          <div>
+            <span class="feed-text">Priya Nair added <strong>Elena Sorokina</strong> as on-call engineer for next rotation.</span>
+            <time class="feed-time">5 hr ago</time>
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Donut tile: Channel Mix -->
+  <article class="tile tile-donut" aria-label="Revenue channel mix donut chart">
+    <div class="tile-inner">
+      <p class="donut-title">Channel Mix</p>
+      <div class="donut-wrap">
+        <div class="donut-center">
+          <svg width="110" height="110" viewBox="0 0 110 110" aria-hidden="true">
+            <!-- Donut segments: r=38, circ≈238.76 -->
+            <!-- Indigo: 48% → 114.6 dash -->
+            <circle cx="55" cy="55" r="38" fill="none"
+              stroke="var(--c-indigo)" stroke-width="14"
+              stroke-dasharray="114.6 238.76"
+              stroke-dashoffset="0"
+              transform="rotate(-90 55 55)"/>
+            <!-- Teal: 28% → 66.9 dash, offset=−114.6 -->
+            <circle cx="55" cy="55" r="38" fill="none"
+              stroke="var(--c-teal)" stroke-width="14"
+              stroke-dasharray="66.9 238.76"
+              stroke-dashoffset="-114.6"
+              transform="rotate(-90 55 55)"/>
+            <!-- Amber: 16% → 38.2 dash, offset=−181.5 -->
+            <circle cx="55" cy="55" r="38" fill="none"
+              stroke="var(--c-amber)" stroke-width="14"
+              stroke-dasharray="38.2 238.76"
+              stroke-dashoffset="-181.5"
+              transform="rotate(-90 55 55)"/>
+            <!-- Rose: 8% → 19.1 dash, offset=−219.7 -->
+            <circle cx="55" cy="55" r="38" fill="none"
+              stroke="var(--c-rose)" stroke-width="14"
+              stroke-dasharray="19.1 238.76"
+              stroke-dashoffset="-219.7"
+              transform="rotate(-90 55 55)"/>
+            <circle cx="55" cy="55" r="27" fill="#ffffff"/>
+          </svg>
+          <div class="donut-label-center">
+            <span class="donut-center-val">$4.7M</span>
+            <span class="donut-center-sub">Total</span>
+          </div>
+        </div>
+        <div class="donut-legend">
+          <span class="donut-legend-item">
+            <span class="donut-legend-swatch" style="background:var(--c-indigo)"></span>
+            Web
+            <span class="donut-legend-val">48%</span>
+          </span>
+          <span class="donut-legend-item">
+            <span class="donut-legend-swatch" style="background:var(--c-teal)"></span>
+            Mobile
+            <span class="donut-legend-val">28%</span>
+          </span>
+          <span class="donut-legend-item">
+            <span class="donut-legend-swatch" style="background:var(--c-amber)"></span>
+            Partner API
+            <span class="donut-legend-val">16%</span>
+          </span>
+          <span class="donut-legend-item">
+            <span class="donut-legend-swatch" style="background:var(--c-rose)"></span>
+            In-store
+            <span class="donut-legend-val">8%</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Mini-table tile: Top Regions -->
+  <article class="tile tile-table" aria-label="Top regions table">
+    <div class="tile-inner">
+      <div class="table-header">
+        <span class="table-title">Top Regions by Revenue</span>
+        <a href="#" class="view-all">View all →</a>
+      </div>
+      <table class="mini-table">
+        <thead>
+          <tr>
+            <th>Region</th>
+            <th>Channel</th>
+            <th>Revenue (7D)</th>
+            <th>Growth</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="entity">North America</td>
+            <td>Web + Mobile</td>
+            <td>$1 842 300</td>
+            <td>+18.2%</td>
+            <td><span class="pill pill-ok">On track</span></td>
+          </tr>
+          <tr>
+            <td class="entity">Western Europe</td>
+            <td>Web + Partner API</td>
+            <td>$1 134 700</td>
+            <td>+9.4%</td>
+            <td><span class="pill pill-ok">On track</span></td>
+          </tr>
+          <tr>
+            <td class="entity">South-East Asia</td>
+            <td>Mobile + In-store</td>
+            <td>$794 200</td>
+            <td>+31.6%</td>
+            <td><span class="pill pill-blue">Scaling</span></td>
+          </tr>
+          <tr>
+            <td class="entity">Latin America</td>
+            <td>Mobile</td>
+            <td>$512 400</td>
+            <td>+5.1%</td>
+            <td><span class="pill pill-warn">Watch</span></td>
+          </tr>
+          <tr>
+            <td class="entity">Middle East</td>
+            <td>Partner API</td>
+            <td>$427 600</td>
+            <td>−2.3%</td>
+            <td><span class="pill pill-error">At risk</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <!-- Status tile: System Health -->
+  <article class="tile tile-status tile-rose-border" aria-label="System health status">
+    <div class="tile-inner">
+      <p class="status-title">System Health</p>
+      <div class="status-list">
+        <div class="status-item">
+          <span class="status-dot status-dot-ok"></span>
+          <span class="status-name">API Gateway</span>
+          <span class="status-uptime">99.98%</span>
+        </div>
+        <div class="status-item">
+          <span class="status-dot status-dot-ok"></span>
+          <span class="status-name">Order Processor</span>
+          <span class="status-uptime">99.91%</span>
+        </div>
+        <div class="status-item">
+          <span class="status-dot status-dot-warn"></span>
+          <span class="status-name">Catalog Sync</span>
+          <span class="status-uptime">97.40%</span>
+        </div>
+        <div class="status-item">
+          <span class="status-dot status-dot-error"></span>
+          <span class="status-name">EMEA Processor</span>
+          <span class="status-uptime">84.12%</span>
+        </div>
+      </div>
+    </div>
+  </article>
+
+</main>
+
+</body>
+</html>

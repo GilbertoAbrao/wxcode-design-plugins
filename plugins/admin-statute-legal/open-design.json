@@ -1,0 +1,97 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "wxcode-admin-statute-legal",
+  "title": "Statute Legal Admin",
+  "version": "0.1.0",
+  "description": "Refined light-mode law firm dashboard for case and matter management — practice-area sidebar, KPI tiles for active cases / billable hours / deadlines / realization rate, matters table with status pills, upcoming deadlines panel, matters-by-practice chart, and recent documents list. Burgundy-gold accent palette on warm white surfaces.",
+  "license": "MIT",
+  "author": {
+    "name": "WXCode",
+    "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+  },
+  "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-statute-legal",
+  "tags": [
+    "wxcode-plugin",
+    "wxcode",
+    "first-party",
+    "prototype",
+    "operations",
+    "web",
+    "admin",
+    "legal",
+    "case-management",
+    "law-firm",
+    "matter-management",
+    "light-mode",
+    "refined-professional",
+    "burgundy",
+    "gold-accent"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "prototype",
+    "scenario": "operations",
+    "surface": "web",
+    "preview": {
+      "type": "html",
+      "entry": "./example.html"
+    },
+    "useCase": {
+      "query": {
+        "en": "Build me a refined law firm admin dashboard for case and matter management — practice-area sidebar, 4 KPI tiles (active cases, billable hours MTD, deadlines this week, realization rate), matters table with status pills, upcoming deadlines panel, matters-by-practice chart, recent documents list. Burgundy and gold accents on warm white.",
+        "zh-CN": "使用这个插件完成以下任务：Build me a refined law firm admin dashboard for case and matter management — practice-area sidebar, 4 KPI tiles (active cases, billable hours MTD, deadlines this week, realization rate), matters table with status pills, upcoming deadlines panel, matters-by-practice chart, recent documents list. Burgundy and gold accents on warm white."
+      },
+      "exampleOutputs": [
+        {
+          "path": "./example.html",
+          "title": "Statute Legal Admin"
+        }
+      ]
+    },
+    "context": {
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ],
+      "designSystem": {
+        "primary": true
+      },
+      "craft": [
+        "pixel-discipline",
+        "laws-of-ux"
+      ],
+      "assets": [
+        "./example.html"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ],
+    "provenance": {
+      "category": "admin-dashboards",
+      "note": "original archetype; no third-party template reproduced"
+    }
+  }
+}

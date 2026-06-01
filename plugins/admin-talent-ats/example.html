@@ -1,0 +1,1306 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Talent ATS Admin — HireFlow</title>
+<style>
+/* ── Palette tokens ──────────────────────────────────────────── */
+:root {
+  --c-primary:    #4f46e5;
+  --c-primary-lt: #6366f1;
+  --c-primary-bg: #eef2ff;
+  --c-accent:     #ec4899;
+  --c-accent-lt:  #f472b6;
+  --c-accent-bg:  #fdf2f8;
+  --c-success:    #22c55e;
+  --c-success-bg: #f0fdf4;
+  --c-warning:    #f59e0b;
+  --c-warning-bg: #fffbeb;
+  --c-surface:    #f8f8fc;
+  --c-border:     #e8e8f2;
+  --c-sidebar:    #ffffff;
+  --c-card:       #ffffff;
+  --c-violet:     #7c3aed;
+  --c-violet-bg:  #f5f3ff;
+}
+
+/* ── Reset & base ───────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:13px;line-height:1.5;
+  background:var(--c-surface);
+  color:#1e1b4b;
+  display:flex;height:100vh;overflow:hidden;
+}
+svg{display:block;flex-shrink:0}
+a{color:var(--c-primary);text-decoration:none}
+a:hover{text-decoration:underline}
+button{font-family:inherit;cursor:pointer}
+
+/* ── Sidebar ────────────────────────────────────────────────── */
+.sidebar{
+  width:232px;min-width:232px;
+  background:var(--c-sidebar);
+  border-right:1px solid var(--c-border);
+  display:flex;flex-direction:column;
+  overflow-y:auto;
+}
+.sb-brand{
+  display:flex;align-items:center;gap:10px;
+  padding:20px 16px 16px;
+  border-bottom:1px solid var(--c-border);
+}
+.sb-logo{
+  width:34px;height:34px;flex-shrink:0;
+}
+.sb-brandname{font-size:14px;font-weight:700;color:#1e1b4b;line-height:1.2}
+.sb-brandname span{display:block;font-size:11px;font-weight:400;color:#94a3b8}
+
+/* Req switcher */
+.sb-req{
+  margin:12px 12px 4px;
+  background:var(--c-primary-bg);
+  border:1px solid var(--c-border);
+  border-radius:8px;
+  padding:8px 10px;
+  display:flex;align-items:center;gap:8px;
+  cursor:pointer;
+}
+.sb-req-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--c-primary);flex-shrink:0;
+}
+.sb-req-text{flex:1;font-size:11.5px;font-weight:600;color:#3730a3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-req-caret{color:var(--c-primary-lt)}
+
+/* Nav */
+.sb-nav{padding:8px 0 16px}
+.sb-section{
+  font-size:10px;font-weight:700;letter-spacing:.08em;
+  color:#94a3b8;padding:10px 16px 4px;text-transform:uppercase;
+}
+.sb-item{
+  display:flex;align-items:center;gap:9px;
+  padding:7px 16px;
+  border-radius:0;position:relative;
+  color:#475569;font-size:12.5px;font-weight:500;
+  cursor:pointer;user-select:none;
+  transition:background .12s;
+}
+.sb-item:hover{background:#f1f0fe}
+.sb-item.active{
+  color:var(--c-primary);font-weight:600;
+  background:var(--c-primary-bg);
+}
+.sb-item.active::before{
+  content:"";position:absolute;left:0;top:4px;bottom:4px;
+  width:3px;border-radius:0 2px 2px 0;
+  background:var(--c-primary);
+}
+.sb-badge{
+  margin-left:auto;background:var(--c-primary);color:#fff;
+  font-size:10px;font-weight:700;
+  padding:1px 6px;border-radius:20px;
+}
+.sb-item-icon{color:currentColor;opacity:.7}
+.sb-item.active .sb-item-icon{opacity:1}
+
+/* sidebar footer */
+.sb-footer{
+  margin-top:auto;padding:12px 14px;
+  border-top:1px solid var(--c-border);
+  display:flex;align-items:center;gap:8px;
+}
+.avatars-cluster{display:flex}
+.avatars-cluster .av{
+  width:26px;height:26px;border-radius:50%;
+  border:2px solid #fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;color:#fff;
+  margin-left:-7px;
+}
+.avatars-cluster .av:first-child{margin-left:0}
+.sb-footer-label{font-size:11px;color:#64748b;line-height:1.2}
+.sb-footer-label strong{display:block;font-size:12px;color:#334155}
+
+/* ── Main area ──────────────────────────────────────────────── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* Topbar */
+.topbar{
+  height:56px;background:#fff;
+  border-bottom:1px solid var(--c-border);
+  display:flex;align-items:center;gap:12px;
+  padding:0 20px;flex-shrink:0;
+}
+.topbar-title{font-size:14px;font-weight:700;color:#1e1b4b}
+.topbar-crumb{font-size:11.5px;color:#94a3b8;margin-left:4px}
+.topbar-crumb span{margin:0 4px}
+.search-wrap{
+  flex:1;max-width:320px;margin-left:16px;
+  position:relative;
+}
+.search-wrap svg{position:absolute;left:9px;top:50%;transform:translateY(-50%)}
+.search-wrap input{
+  width:100%;padding:6px 10px 6px 32px;
+  border:1px solid var(--c-border);border-radius:8px;
+  font-size:12.5px;font-family:inherit;
+  background:#f8f8fc;color:#334155;outline:none;
+}
+.search-wrap input:focus{border-color:var(--c-primary-lt);background:#fff}
+.period-select{
+  border:1px solid var(--c-border);border-radius:8px;
+  padding:5px 10px;font-size:12px;font-family:inherit;
+  background:#fff;color:#334155;cursor:pointer;outline:none;
+  margin-left:auto;
+}
+.topbar-bell{
+  position:relative;background:none;border:none;padding:6px;
+  color:#64748b;border-radius:8px;
+}
+.topbar-bell:hover{background:var(--c-surface)}
+.bell-dot{
+  position:absolute;top:6px;right:5px;
+  width:7px;height:7px;border-radius:50%;
+  background:var(--c-accent);border:1.5px solid #fff;
+}
+.topbar-av{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--c-primary);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:#fff;cursor:pointer;
+  flex-shrink:0;
+}
+.topbar-user{font-size:12px;font-weight:600;color:#334155;white-space:nowrap}
+
+/* Content scroll area */
+.content{flex:1;overflow-y:auto;padding:20px}
+
+/* Page header strip */
+.page-header{
+  display:flex;align-items:center;gap:10px;margin-bottom:18px;
+}
+.page-header h1{font-size:18px;font-weight:700;color:#1e1b4b;flex:1}
+.page-header .date-chip{
+  font-size:11.5px;color:#64748b;
+  background:#fff;border:1px solid var(--c-border);
+  padding:4px 10px;border-radius:20px;
+}
+.btn{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:6px 14px;border-radius:8px;font-size:12.5px;
+  font-family:inherit;font-weight:600;cursor:pointer;border:none;
+  transition:opacity .12s;
+}
+.btn:hover{opacity:.88}
+.btn-ghost{background:none;border:1px solid var(--c-border);color:#475569}
+.btn-primary{background:var(--c-primary);color:#fff}
+.btn-sm{padding:4px 10px;font-size:12px}
+
+/* ── KPI cards ──────────────────────────────────────────────── */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.kpi{
+  background:var(--c-card);border:1px solid var(--c-border);
+  border-radius:12px;padding:16px;
+  display:flex;flex-direction:column;gap:10px;
+  box-shadow:0 1px 4px rgba(79,70,229,.04);
+}
+.kpi-top{display:flex;align-items:flex-start;justify-content:space-between}
+.kpi-label{
+  font-size:10.5px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;color:#94a3b8;margin-bottom:4px;
+}
+.kpi-value{font-size:26px;font-weight:800;color:#1e1b4b;line-height:1}
+.kpi-icon{
+  width:36px;height:36px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+}
+.kpi-delta{
+  display:inline-flex;align-items:center;gap:3px;
+  font-size:11px;font-weight:600;
+  padding:2px 7px;border-radius:20px;
+}
+.delta-up{background:#dcfce7;color:#15803d}
+.delta-dn{background:#fee2e2;color:#b91c1c}
+.delta-neu{background:#f1f5f9;color:#64748b}
+.kpi-bottom{display:flex;align-items:center;gap:8px}
+.kpi-sub{font-size:11px;color:#94a3b8;flex:1}
+
+/* ── Pipeline board ─────────────────────────────────────────── */
+.section-title{
+  font-size:13px;font-weight:700;color:#1e1b4b;
+  margin-bottom:10px;display:flex;align-items:center;gap:8px;
+}
+.section-title .badge-count{
+  background:var(--c-primary);color:#fff;
+  font-size:10px;padding:1px 7px;border-radius:20px;
+}
+.pipeline-board{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:12px;margin-bottom:18px;
+}
+.pipeline-col{
+  background:#f4f4fa;border:1px solid var(--c-border);
+  border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;
+}
+.col-header{
+  display:flex;align-items:center;gap:7px;margin-bottom:4px;
+}
+.col-stage{font-size:12px;font-weight:700;color:#334155}
+.col-count{
+  font-size:11px;font-weight:700;
+  background:#e8e8f2;color:#475569;
+  padding:1px 8px;border-radius:20px;margin-left:auto;
+}
+.stage-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+.cand-card{
+  background:var(--c-card);border:1px solid var(--c-border);
+  border-radius:9px;padding:10px 11px;
+  display:flex;flex-direction:column;gap:5px;
+  position:relative;overflow:hidden;
+}
+.cand-card::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;
+  width:3px;
+}
+.cand-card.applied::before{background:#94a3b8}
+.cand-card.screening::before{background:var(--c-violet)}
+.cand-card.interview::before{background:var(--c-accent)}
+.cand-card.offer::before{background:var(--c-success)}
+
+.cand-top{display:flex;align-items:center;gap:7px}
+.cand-av{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:800;color:#fff;flex-shrink:0;
+}
+.cand-name{font-size:12px;font-weight:700;color:#1e1b4b}
+.cand-role{font-size:11px;color:#64748b;margin-top:1px}
+.cand-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:2px}
+.tag{
+  font-size:10px;font-weight:600;padding:1px 7px;border-radius:20px;
+  border:1px solid;
+}
+.tag-linkedin{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
+.tag-referral{background:var(--c-accent-bg);border-color:#fbcfe8;color:#be185d}
+.tag-agency{background:var(--c-warning-bg);border-color:#fde68a;color:#b45309}
+.tag-board{background:#f0fdf4;border-color:#bbf7d0;color:#15803d}
+.cand-days{font-size:10.5px;color:#94a3b8;margin-left:auto}
+
+/* ── Lower grid ─────────────────────────────────────────────── */
+.lower-grid{display:grid;grid-template-columns:1fr 280px;gap:14px;margin-bottom:18px}
+
+/* Funnel card */
+.funnel-card{
+  background:var(--c-card);border:1px solid var(--c-border);
+  border-radius:12px;padding:18px;
+  box-shadow:0 1px 4px rgba(79,70,229,.04);
+}
+.funnel-card .section-title{margin-bottom:14px}
+
+/* Interviews panel */
+.interviews-panel{
+  background:var(--c-card);border:1px solid var(--c-border);
+  border-radius:12px;padding:16px;
+  box-shadow:0 1px 4px rgba(79,70,229,.04);
+  display:flex;flex-direction:column;gap:0;
+}
+.interview-group{margin-bottom:10px}
+.interview-date{
+  font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:#94a3b8;margin-bottom:6px;
+}
+.interview-item{
+  display:flex;align-items:flex-start;gap:9px;
+  padding:8px 0;border-bottom:1px solid var(--c-border);
+}
+.interview-item:last-child{border-bottom:none}
+.iv-time{
+  font-size:11px;font-weight:700;color:var(--c-primary);
+  min-width:42px;padding-top:1px;
+}
+.iv-body{flex:1}
+.iv-name{font-size:12px;font-weight:700;color:#1e1b4b}
+.iv-role{font-size:11px;color:#64748b}
+.iv-meta{display:flex;align-items:center;gap:5px;margin-top:3px}
+.badge-mode{
+  font-size:10px;font-weight:600;padding:1px 7px;border-radius:20px;
+}
+.badge-video{background:var(--c-primary-bg);color:var(--c-primary)}
+.badge-onsite{background:#f0fdf4;color:#15803d}
+.badge-phone{background:var(--c-warning-bg);color:#b45309}
+
+/* ── Candidates table ───────────────────────────────────────── */
+.table-card{
+  background:var(--c-card);border:1px solid var(--c-border);
+  border-radius:12px;overflow:hidden;
+  box-shadow:0 1px 4px rgba(79,70,229,.04);
+  margin-bottom:8px;
+}
+.table-header{
+  display:flex;align-items:center;gap:10px;
+  padding:14px 18px;border-bottom:1px solid var(--c-border);
+}
+.table-header h2{font-size:13px;font-weight:700;color:#1e1b4b;flex:1}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{
+  padding:9px 14px;text-align:left;
+  font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:#94a3b8;border-bottom:1px solid var(--c-border);
+  background:#fafafa;
+}
+.tbl td{
+  padding:10px 14px;border-bottom:1px solid #f0f0f8;
+  font-size:12.5px;color:#334155;vertical-align:middle;
+}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tbody tr:hover td{background:#f8f7ff}
+.cand-cell{display:flex;align-items:center;gap:9px}
+.cand-cell-av{
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;color:#fff;flex-shrink:0;
+}
+.cand-cell-name{font-size:12.5px;font-weight:700;color:#1e1b4b}
+.cand-cell-email{font-size:11px;color:#94a3b8}
+.stage-pill{
+  display:inline-block;padding:2px 10px;border-radius:20px;
+  font-size:11px;font-weight:600;
+}
+.pill-applied{background:#f1f5f9;color:#475569}
+.pill-screening{background:var(--c-violet-bg);color:var(--c-violet)}
+.pill-interview{background:var(--c-accent-bg);color:#be185d}
+.pill-offer{background:#dcfce7;color:#15803d}
+.stars{color:var(--c-warning);letter-spacing:1px;font-size:13px}
+.stars .empty{color:#e2e8f0}
+.tbl-actions{display:flex;gap:6px}
+.act-btn{
+  padding:3px 9px;border-radius:6px;font-size:11px;font-weight:600;
+  border:1px solid var(--c-border);background:none;color:#475569;cursor:pointer;
+}
+.act-btn:hover{background:var(--c-primary-bg);color:var(--c-primary);border-color:var(--c-primary)}
+.tbl-footer{
+  padding:10px 18px;display:flex;align-items:center;gap:6px;
+  border-top:1px solid var(--c-border);
+}
+.tbl-footer span{font-size:11.5px;color:#94a3b8;flex:1}
+.page-btn{
+  width:26px;height:26px;border-radius:6px;border:1px solid var(--c-border);
+  background:none;font-size:12px;color:#475569;cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+.page-btn.active{background:var(--c-primary);color:#fff;border-color:var(--c-primary)}
+.page-btn:hover:not(.active){background:var(--c-primary-bg)}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════ SIDEBAR ═══════════════════════════ -->
+<aside class="sidebar">
+
+  <!-- Brand -->
+  <div class="sb-brand">
+    <svg class="sb-logo" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="34" height="34" rx="9" fill="var(--c-primary)"/>
+      <path d="M8 17c0-5 4.03-9 9-9s9 4 9 9-4.03 9-9 9" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+      <circle cx="17" cy="17" r="4" fill="var(--c-accent)"/>
+      <path d="M17 8v2M17 24v2M8 17h2M24 17h2" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <div class="sb-brandname">HireFlow<span>Talent Ops Platform</span></div>
+    </div>
+  </div>
+
+  <!-- Requisition switcher -->
+  <div class="sb-req">
+    <div class="sb-req-dot"></div>
+    <div class="sb-req-text">Sr. Frontend Engineer</div>
+    <svg class="sb-req-caret" width="12" height="12" viewBox="0 0 12 12" fill="none">
+      <path d="M3 4.5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <!-- Nav -->
+  <nav class="sb-nav">
+    <div class="sb-section">Pipeline</div>
+
+    <div class="sb-item active">
+      <svg class="sb-item-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
+        <rect x="1" y="1" width="5.5" height="5.5" rx="1.5" fill="currentColor"/>
+        <rect x="8.5" y="1" width="5.5" height="5.5" rx="1.5" fill="currentColor" opacity=".4"/>
+        <rect x="1" y="8.5" width="5.5" height="5.5" rx="1.5" fill="currentColor" opacity=".4"/>
+        <rect x="8.5" y="8.5" width="5.5" height="5.5" rx="1.5" fill="currentColor" opacity=".4"/>
+      </svg>
+      Dashboard
+      <span class="sb-badge">3</span>
+    </div>
+
+    <div class="sb-item">
+      <svg class="sb-item-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
+        <circle cx="5.5" cy="5" r="3" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M1 13c0-2.5 2-4 4.5-4s4.5 1.5 4.5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        <path d="M11 6l2 2-2 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Candidates
+    </div>
+
+    <div class="sb-item">
+      <svg class="sb-item-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
+        <rect x="1.5" y="1.5" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M4 8h7M4 5.5h4M4 10.5h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      Pipeline Board
+    </div>
+
+    <div class="sb-section">Sourcing</div>
+
+    <div class="sb-item">
+      <svg class="sb-item-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
+        <path d="M7.5 1.5l1.8 3.6 4 .6-2.9 2.8.7 3.9-3.6-1.9-3.6 1.9.7-3.9-2.9-2.8 4-.6z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+      </svg>
+      Job Postings
+    </div>
+
+    <div class="sb-item">
+      <svg class="sb-item-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
+        <path d="M1.5 10.5l3-3 2.5 2.5 3.5-5 3 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Campaigns
+    </div>
+
+    <div class="sb-item">
+      <svg class="sb-item-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
+        <path d="M7.5 2a5 5 0 11-3.5 8.5L1.5 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        <circle cx="7.5" cy="7" r="2" fill="currentColor" opacity=".5"/>
+      </svg>
+      Referrals
+      <span class="sb-badge" style="background:var(--c-accent)">7</span>
+    </div>
+
+    <div class="sb-section">Reports</div>
+
+    <div class="sb-item">
+      <svg class="sb-item-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
+        <rect x="1.5" y="8" width="2.5" height="5.5" rx="1" fill="currentColor"/>
+        <rect x="6" y="5" width="2.5" height="8.5" rx="1" fill="currentColor" opacity=".6"/>
+        <rect x="10.5" y="2" width="2.5" height="11.5" rx="1" fill="currentColor" opacity=".35"/>
+      </svg>
+      Analytics
+    </div>
+
+    <div class="sb-item">
+      <svg class="sb-item-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
+        <path d="M2 4h11M3.5 7.5h8M5 11h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      Funnel Report
+    </div>
+
+    <div class="sb-item">
+      <svg class="sb-item-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
+        <path d="M4 1.5v4l3 2 3-2v-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M1.5 13.5l1.5-4h8l1.5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Export
+    </div>
+  </nav>
+
+  <!-- Footer -->
+  <div class="sb-footer">
+    <div class="avatars-cluster">
+      <div class="av" style="background:var(--c-primary)">RA</div>
+      <div class="av" style="background:var(--c-accent)">MT</div>
+      <div class="av" style="background:var(--c-violet)">KS</div>
+    </div>
+    <div class="sb-footer-label">
+      <strong>HR Ops Team</strong>
+      3 recruiters
+    </div>
+  </div>
+</aside>
+
+<!-- ════════════════════════════════════ MAIN ══════════════════════════════ -->
+<div class="main">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div>
+      <div class="topbar-title">Hiring Overview</div>
+      <div class="topbar-crumb">
+        Home<span>›</span>Recruiting<span>›</span><strong style="color:var(--c-primary)">Dashboard</strong>
+      </div>
+    </div>
+
+    <div class="search-wrap">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <circle cx="6" cy="6" r="4.5" stroke="#94a3b8" stroke-width="1.4"/>
+        <path d="M9.5 9.5l2.5 2.5" stroke="#94a3b8" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <input type="text" placeholder="Search candidates, roles…">
+    </div>
+
+    <select class="period-select">
+      <option>This Month</option>
+      <option>Q2 2025</option>
+      <option>YTD 2025</option>
+    </select>
+
+    <button class="topbar-bell">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M9 2a5.5 5.5 0 00-5.5 5.5c0 2.5-.5 4-1.5 5h14c-1-1-1.5-2.5-1.5-5A5.5 5.5 0 009 2z" stroke="#64748b" stroke-width="1.4"/>
+        <path d="M7.5 14.5a1.5 1.5 0 003 0" stroke="#64748b" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <span class="bell-dot"></span>
+    </button>
+
+    <div class="topbar-av">RB</div>
+    <div class="topbar-user">Rachel B.</div>
+  </header>
+
+  <!-- Scrollable content -->
+  <div class="content">
+
+    <!-- Page header -->
+    <div class="page-header">
+      <h1>Hiring Overview</h1>
+      <div class="date-chip">June 2025</div>
+      <button class="btn btn-ghost btn-sm">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M1 6h10M6 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Export
+      </button>
+      <button class="btn btn-primary btn-sm">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        Add Candidate
+      </button>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="kpi-row">
+
+      <!-- Open Roles -->
+      <div class="kpi">
+        <div class="kpi-top">
+          <div>
+            <div class="kpi-label">Open Roles</div>
+            <div class="kpi-value">24</div>
+          </div>
+          <div class="kpi-icon" style="background:var(--c-primary-bg)">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M3 17V15a4 4 0 014-4h6a4 4 0 014 4v2" stroke="var(--c-primary)" stroke-width="1.6" stroke-linecap="round"/>
+              <circle cx="10" cy="7" r="3" stroke="var(--c-primary)" stroke-width="1.6"/>
+            </svg>
+          </div>
+        </div>
+        <!-- Sparkline SVG -->
+        <svg width="100%" height="28" viewBox="0 0 120 28" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="var(--c-primary)" stop-opacity=".18"/>
+              <stop offset="100%" stop-color="var(--c-primary)" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d="M0 22 L15 18 L30 20 L45 14 L60 16 L75 10 L90 12 L105 7 L120 5" fill="none" stroke="var(--c-primary)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M0 22 L15 18 L30 20 L45 14 L60 16 L75 10 L90 12 L105 7 L120 5 L120 28 L0 28Z" fill="url(#g1)"/>
+        </svg>
+        <div class="kpi-bottom">
+          <span class="kpi-delta delta-up">▲ 4 this qtr</span>
+          <span class="kpi-sub">vs 20 last month</span>
+        </div>
+      </div>
+
+      <!-- Active Candidates -->
+      <div class="kpi">
+        <div class="kpi-top">
+          <div>
+            <div class="kpi-label">Active Candidates</div>
+            <div class="kpi-value">318</div>
+          </div>
+          <div class="kpi-icon" style="background:var(--c-violet-bg)">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <circle cx="7" cy="7" r="3" stroke="var(--c-violet)" stroke-width="1.6"/>
+              <circle cx="14" cy="8" r="2.5" stroke="var(--c-violet)" stroke-width="1.4"/>
+              <path d="M1 17a6 6 0 0112 0" stroke="var(--c-violet)" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M14 11a4 4 0 015 4" stroke="var(--c-violet)" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+        <svg width="100%" height="28" viewBox="0 0 120 28" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="var(--c-violet)" stop-opacity=".16"/>
+              <stop offset="100%" stop-color="var(--c-violet)" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d="M0 20 L15 22 L30 16 L45 18 L60 10 L75 14 L90 8 L105 10 L120 4" fill="none" stroke="var(--c-violet)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M0 20 L15 22 L30 16 L45 18 L60 10 L75 14 L90 8 L105 10 L120 4 L120 28 L0 28Z" fill="url(#g2)"/>
+        </svg>
+        <div class="kpi-bottom">
+          <span class="kpi-delta delta-up">▲ 12%</span>
+          <span class="kpi-sub">vs 284 last month</span>
+        </div>
+      </div>
+
+      <!-- Interviews this week -->
+      <div class="kpi">
+        <div class="kpi-top">
+          <div>
+            <div class="kpi-label">Interviews This Week</div>
+            <div class="kpi-value">41</div>
+          </div>
+          <div class="kpi-icon" style="background:var(--c-accent-bg)">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <rect x="2.5" y="4" width="15" height="13" rx="2.5" stroke="var(--c-accent)" stroke-width="1.6"/>
+              <path d="M2.5 8h15M7 2v4M13 2v4" stroke="var(--c-accent)" stroke-width="1.5" stroke-linecap="round"/>
+              <circle cx="10" cy="13" r="1.5" fill="var(--c-accent)"/>
+            </svg>
+          </div>
+        </div>
+        <svg width="100%" height="28" viewBox="0 0 120 28" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="g3" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="var(--c-accent)" stop-opacity=".16"/>
+              <stop offset="100%" stop-color="var(--c-accent)" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d="M0 18 L20 14 L40 20 L60 8 L80 12 L100 6 L120 10" fill="none" stroke="var(--c-accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M0 18 L20 14 L40 20 L60 8 L80 12 L100 6 L120 10 L120 28 L0 28Z" fill="url(#g3)"/>
+        </svg>
+        <div class="kpi-bottom">
+          <span class="kpi-delta delta-up">▲ 8 vs last wk</span>
+          <span class="kpi-sub">33 completed</span>
+        </div>
+      </div>
+
+      <!-- Time to hire -->
+      <div class="kpi">
+        <div class="kpi-top">
+          <div>
+            <div class="kpi-label">Avg. Time-to-Hire</div>
+            <div class="kpi-value">18<span style="font-size:14px;font-weight:500;color:#94a3b8">d</span></div>
+          </div>
+          <div class="kpi-icon" style="background:var(--c-success-bg)">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <circle cx="10" cy="10" r="7.5" stroke="var(--c-success)" stroke-width="1.6"/>
+              <path d="M10 6v4.5l3 1.8" stroke="var(--c-success)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <svg width="100%" height="28" viewBox="0 0 120 28" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="g4" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="var(--c-success)" stop-opacity=".16"/>
+              <stop offset="100%" stop-color="var(--c-success)" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d="M0 24 L20 22 L40 20 L60 17 L80 15 L100 12 L120 9" fill="none" stroke="var(--c-success)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M0 24 L20 22 L40 20 L60 17 L80 15 L100 12 L120 9 L120 28 L0 28Z" fill="url(#g4)"/>
+        </svg>
+        <div class="kpi-bottom">
+          <span class="kpi-delta delta-up" style="background:#dcfce7;color:#15803d">▼ 3d faster</span>
+          <span class="kpi-sub">vs 21d industry avg</span>
+        </div>
+      </div>
+
+    </div><!-- /kpi-row -->
+
+    <!-- Pipeline Board -->
+    <div class="section-title">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+        <rect x="1" y="1" width="3.5" height="13" rx="1.5" fill="var(--c-primary)" opacity=".8"/>
+        <rect x="5.75" y="1" width="3.5" height="10" rx="1.5" fill="var(--c-primary)" opacity=".5"/>
+        <rect x="10.5" y="1" width="3.5" height="7" rx="1.5" fill="var(--c-primary)" opacity=".3"/>
+      </svg>
+      Hiring Pipeline
+      <span class="badge-count">76 active</span>
+      <a href="#" style="margin-left:auto;font-size:12px;font-weight:500">View board →</a>
+    </div>
+
+    <div class="pipeline-board">
+
+      <!-- Applied -->
+      <div class="pipeline-col">
+        <div class="col-header">
+          <div class="stage-dot" style="background:#94a3b8"></div>
+          <div class="col-stage">Applied</div>
+          <div class="col-count">28</div>
+        </div>
+
+        <div class="cand-card applied">
+          <div class="cand-top">
+            <div class="cand-av" style="background:#64748b">JM</div>
+            <div>
+              <div class="cand-name">Jamie Morales</div>
+              <div class="cand-role">Sr. Frontend Engineer</div>
+            </div>
+          </div>
+          <div class="cand-meta">
+            <span class="tag tag-linkedin">LinkedIn</span>
+            <span class="cand-days">2d ago</span>
+          </div>
+        </div>
+
+        <div class="cand-card applied">
+          <div class="cand-top">
+            <div class="cand-av" style="background:#6366f1">SO</div>
+            <div>
+              <div class="cand-name">Sasha Okonkwo</div>
+              <div class="cand-role">Product Designer</div>
+            </div>
+          </div>
+          <div class="cand-meta">
+            <span class="tag tag-referral">Referral</span>
+            <span class="cand-days">1d ago</span>
+          </div>
+        </div>
+
+        <div class="cand-card applied">
+          <div class="cand-top">
+            <div class="cand-av" style="background:#0ea5e9">TK</div>
+            <div>
+              <div class="cand-name">Tomás Krejčí</div>
+              <div class="cand-role">Data Engineer</div>
+            </div>
+          </div>
+          <div class="cand-meta">
+            <span class="tag tag-board">Job Board</span>
+            <span class="cand-days">3d ago</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screening -->
+      <div class="pipeline-col">
+        <div class="col-header">
+          <div class="stage-dot" style="background:var(--c-violet)"></div>
+          <div class="col-stage">Screening</div>
+          <div class="col-count">19</div>
+        </div>
+
+        <div class="cand-card screening">
+          <div class="cand-top">
+            <div class="cand-av" style="background:#7c3aed">NP</div>
+            <div>
+              <div class="cand-name">Nina Petrov</div>
+              <div class="cand-role">Backend Engineer</div>
+            </div>
+          </div>
+          <div class="cand-meta">
+            <span class="tag tag-linkedin">LinkedIn</span>
+            <span class="cand-days">5d</span>
+          </div>
+        </div>
+
+        <div class="cand-card screening">
+          <div class="cand-top">
+            <div class="cand-av" style="background:#a78bfa">DC</div>
+            <div>
+              <div class="cand-name">David Chukwu</div>
+              <div class="cand-role">DevOps Lead</div>
+            </div>
+          </div>
+          <div class="cand-meta">
+            <span class="tag tag-agency">Agency</span>
+            <span class="cand-days">4d</span>
+          </div>
+        </div>
+
+        <div class="cand-card screening">
+          <div class="cand-top">
+            <div class="cand-av" style="background:#8b5cf6">RL</div>
+            <div>
+              <div class="cand-name">Rosa López</div>
+              <div class="cand-role">UX Researcher</div>
+            </div>
+          </div>
+          <div class="cand-meta">
+            <span class="tag tag-referral">Referral</span>
+            <span class="cand-days">6d</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interview -->
+      <div class="pipeline-col">
+        <div class="col-header">
+          <div class="stage-dot" style="background:var(--c-accent)"></div>
+          <div class="col-stage">Interview</div>
+          <div class="col-count">21</div>
+        </div>
+
+        <div class="cand-card interview">
+          <div class="cand-top">
+            <div class="cand-av" style="background:#ec4899">AW</div>
+            <div>
+              <div class="cand-name">Amara Williams</div>
+              <div class="cand-role">Head of Growth</div>
+            </div>
+          </div>
+          <div class="cand-meta">
+            <span class="tag tag-linkedin">LinkedIn</span>
+            <span class="cand-days">R3 today</span>
+          </div>
+        </div>
+
+        <div class="cand-card interview">
+          <div class="cand-top">
+            <div class="cand-av" style="background:#f472b6">BF</div>
+            <div>
+              <div class="cand-name">Ben Fujiwara</div>
+              <div class="cand-role">Sr. Frontend Engineer</div>
+            </div>
+          </div>
+          <div class="cand-meta">
+            <span class="tag tag-referral">Referral</span>
+            <span class="cand-days">R2 done</span>
+          </div>
+        </div>
+
+        <div class="cand-card interview">
+          <div class="cand-top">
+            <div class="cand-av" style="background:#db2777">LM</div>
+            <div>
+              <div class="cand-name">Lila Marchetti</div>
+              <div class="cand-role">Product Designer</div>
+            </div>
+          </div>
+          <div class="cand-meta">
+            <span class="tag tag-agency">Agency</span>
+            <span class="cand-days">R1 done</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Offer -->
+      <div class="pipeline-col">
+        <div class="col-header">
+          <div class="stage-dot" style="background:var(--c-success)"></div>
+          <div class="col-stage">Offer</div>
+          <div class="col-count">8</div>
+        </div>
+
+        <div class="cand-card offer">
+          <div class="cand-top">
+            <div class="cand-av" style="background:#22c55e">KA</div>
+            <div>
+              <div class="cand-name">Kofi Asante</div>
+              <div class="cand-role">Engineering Manager</div>
+            </div>
+          </div>
+          <div class="cand-meta">
+            <span class="tag tag-linkedin">LinkedIn</span>
+            <span class="cand-days" style="color:var(--c-success);font-weight:700">Accepted</span>
+          </div>
+        </div>
+
+        <div class="cand-card offer">
+          <div class="cand-top">
+            <div class="cand-av" style="background:#16a34a">YS</div>
+            <div>
+              <div class="cand-name">Yuki Sato</div>
+              <div class="cand-role">Senior Data Scientist</div>
+            </div>
+          </div>
+          <div class="cand-meta">
+            <span class="tag tag-referral">Referral</span>
+            <span class="cand-days" style="color:var(--c-warning);font-weight:700">Pending</span>
+          </div>
+        </div>
+
+        <div class="cand-card offer">
+          <div class="cand-top">
+            <div class="cand-av" style="background:#15803d">PR</div>
+            <div>
+              <div class="cand-name">Priya Reddy</div>
+              <div class="cand-role">DevOps Lead</div>
+            </div>
+          </div>
+          <div class="cand-meta">
+            <span class="tag tag-board">Job Board</span>
+            <span class="cand-days" style="color:var(--c-success);font-weight:700">Signed</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /pipeline-board -->
+
+    <!-- Lower grid: Funnel + Interviews -->
+    <div class="lower-grid">
+
+      <!-- Recruiting Funnel -->
+      <div class="funnel-card">
+        <div class="section-title">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <path d="M1 2h13L9 8v5l-3-1.5V8L1 2z" stroke="var(--c-primary)" stroke-width="1.4" stroke-linejoin="round"/>
+          </svg>
+          Recruiting Funnel
+          <span style="font-size:11px;color:#94a3b8;font-weight:400;margin-left:4px">— June 2025</span>
+        </div>
+
+        <!-- Inline SVG funnel -->
+        <svg width="100%" height="220" viewBox="0 0 500 220" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="gf1" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="var(--c-primary)"/>
+              <stop offset="100%" stop-color="var(--c-primary-lt)"/>
+            </linearGradient>
+            <linearGradient id="gf2" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="var(--c-primary)"/>
+              <stop offset="100%" stop-color="var(--c-violet)"/>
+            </linearGradient>
+            <linearGradient id="gf3" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="var(--c-violet)"/>
+              <stop offset="100%" stop-color="var(--c-accent)"/>
+            </linearGradient>
+            <linearGradient id="gf4" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="var(--c-accent)"/>
+              <stop offset="100%" stop-color="var(--c-accent-lt)"/>
+            </linearGradient>
+            <linearGradient id="gf5" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="var(--c-success)"/>
+              <stop offset="100%" stop-color="#4ade80"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Stage rows -->
+          <!-- Applied: 1420 = full width 460 -->
+          <rect x="0" y="10" width="460" height="30" rx="6" fill="url(#gf1)"/>
+          <text x="470" y="30" font-size="11" fill="#334155" font-family="Inter,system-ui,sans-serif" font-weight="600">1,420 applied</text>
+          <text x="210" y="30" font-size="11" fill="#fff" font-family="Inter,system-ui,sans-serif" font-weight="700" text-anchor="middle" dominant-baseline="middle">Applied</text>
+
+          <!-- Screened: 680 = 48% → 221px -->
+          <rect x="0" y="58" width="320" height="30" rx="6" fill="url(#gf2)"/>
+          <text x="330" y="78" font-size="11" fill="#334155" font-family="Inter,system-ui,sans-serif" font-weight="600">680 screened</text>
+          <text x="160" y="78" font-size="11" fill="#fff" font-family="Inter,system-ui,sans-serif" font-weight="700" text-anchor="middle" dominant-baseline="middle">Screened — 48%</text>
+
+          <!-- Interviewed: 214 = 15% → 140px -->
+          <rect x="0" y="106" width="210" height="30" rx="6" fill="url(#gf3)"/>
+          <text x="220" y="126" font-size="11" fill="#334155" font-family="Inter,system-ui,sans-serif" font-weight="600">214 interviewed</text>
+          <text x="105" y="126" font-size="11" fill="#fff" font-family="Inter,system-ui,sans-serif" font-weight="700" text-anchor="middle" dominant-baseline="middle">Interviewed — 15%</text>
+
+          <!-- Offered: 52 = 3.7% → 90px -->
+          <rect x="0" y="154" width="120" height="30" rx="6" fill="url(#gf4)"/>
+          <text x="130" y="174" font-size="11" fill="#334155" font-family="Inter,system-ui,sans-serif" font-weight="600">52 offered</text>
+          <text x="60" y="174" font-size="11" fill="#fff" font-family="Inter,system-ui,sans-serif" font-weight="700" text-anchor="middle" dominant-baseline="middle">Offered — 3.7%</text>
+
+          <!-- Hired: 38 = 2.7% → 60px -->
+          <rect x="0" y="202" width="76" height="14" rx="4" fill="url(#gf5)"/>
+          <text x="86" y="213" font-size="11" fill="#334155" font-family="Inter,system-ui,sans-serif" font-weight="600">38 hired — 2.7%</text>
+        </svg>
+      </div>
+
+      <!-- Upcoming Interviews -->
+      <div class="interviews-panel">
+        <div class="section-title" style="margin-bottom:12px">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <rect x="1" y="2.5" width="12" height="10" rx="2" stroke="var(--c-accent)" stroke-width="1.4"/>
+            <path d="M1 6h12M5 1v3M9 1v3" stroke="var(--c-accent)" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          Upcoming Interviews
+        </div>
+
+        <div class="interview-group">
+          <div class="interview-date">Today — Mon 2 Jun</div>
+
+          <div class="interview-item">
+            <div class="iv-time">09:00</div>
+            <div class="iv-body">
+              <div class="iv-name">Amara Williams</div>
+              <div class="iv-role">Head of Growth · R3 Final</div>
+              <div class="iv-meta">
+                <span class="badge-mode badge-video">Video</span>
+                <span style="font-size:10.5px;color:#94a3b8">with Rachel B.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="interview-item">
+            <div class="iv-time">11:30</div>
+            <div class="iv-body">
+              <div class="iv-name">Ben Fujiwara</div>
+              <div class="iv-role">Sr. Frontend Engineer · R2</div>
+              <div class="iv-meta">
+                <span class="badge-mode badge-onsite">Onsite</span>
+                <span style="font-size:10.5px;color:#94a3b8">with Kai S.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="interview-item">
+            <div class="iv-time">14:00</div>
+            <div class="iv-body">
+              <div class="iv-name">Nina Petrov</div>
+              <div class="iv-role">Backend Engineer · R1</div>
+              <div class="iv-meta">
+                <span class="badge-mode badge-phone">Phone</span>
+                <span style="font-size:10.5px;color:#94a3b8">with Marco T.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="interview-group">
+          <div class="interview-date">Tomorrow — Tue 3 Jun</div>
+
+          <div class="interview-item">
+            <div class="iv-time">10:00</div>
+            <div class="iv-body">
+              <div class="iv-name">Lila Marchetti</div>
+              <div class="iv-role">Product Designer · R2</div>
+              <div class="iv-meta">
+                <span class="badge-mode badge-video">Video</span>
+                <span style="font-size:10.5px;color:#94a3b8">with Rachel B.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="interview-item">
+            <div class="iv-time">13:00</div>
+            <div class="iv-body">
+              <div class="iv-name">David Chukwu</div>
+              <div class="iv-role">DevOps Lead · R1</div>
+              <div class="iv-meta">
+                <span class="badge-mode badge-phone">Phone</span>
+                <span style="font-size:10.5px;color:#94a3b8">with Kai S.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="interview-item">
+            <div class="iv-time">15:30</div>
+            <div class="iv-body">
+              <div class="iv-name">Rosa López</div>
+              <div class="iv-role">UX Researcher · R1</div>
+              <div class="iv-meta">
+                <span class="badge-mode badge-onsite">Onsite</span>
+                <span style="font-size:10.5px;color:#94a3b8">with Marco T.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /lower-grid -->
+
+    <!-- Candidates Table -->
+    <div class="table-card">
+      <div class="table-header">
+        <h2>Active Candidates</h2>
+        <a href="#" style="font-size:12px;font-weight:500">View All →</a>
+        <button class="btn btn-ghost btn-sm" style="margin-left:8px">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M1 3h10M3 6h6M5 9h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+          Export CSV
+        </button>
+        <button class="btn btn-primary btn-sm" style="margin-left:6px">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          Add Candidate
+        </button>
+      </div>
+
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Candidate</th>
+            <th>Applied Role</th>
+            <th>Stage</th>
+            <th>Source</th>
+            <th>Rating</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="cand-cell">
+                <div class="cand-cell-av" style="background:#ec4899">AW</div>
+                <div>
+                  <div class="cand-cell-name">Amara Williams</div>
+                  <div class="cand-cell-email">amara.w@mail.co</div>
+                </div>
+              </div>
+            </td>
+            <td>Head of Growth</td>
+            <td><span class="stage-pill pill-interview">Interview</span></td>
+            <td><span class="tag tag-linkedin">LinkedIn</span></td>
+            <td><span class="stars">★★★★<span class="empty">★</span></span></td>
+            <td>
+              <div class="tbl-actions">
+                <button class="act-btn">View</button>
+                <button class="act-btn">Schedule</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="cand-cell">
+                <div class="cand-cell-av" style="background:#22c55e">KA</div>
+                <div>
+                  <div class="cand-cell-name">Kofi Asante</div>
+                  <div class="cand-cell-email">kofi.a@webdev.io</div>
+                </div>
+              </div>
+            </td>
+            <td>Engineering Manager</td>
+            <td><span class="stage-pill pill-offer">Offer</span></td>
+            <td><span class="tag tag-linkedin">LinkedIn</span></td>
+            <td><span class="stars">★★★★★</span></td>
+            <td>
+              <div class="tbl-actions">
+                <button class="act-btn">View</button>
+                <button class="act-btn">Schedule</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="cand-cell">
+                <div class="cand-cell-av" style="background:#7c3aed">NP</div>
+                <div>
+                  <div class="cand-cell-name">Nina Petrov</div>
+                  <div class="cand-cell-email">nina.p@devstack.eu</div>
+                </div>
+              </div>
+            </td>
+            <td>Backend Engineer</td>
+            <td><span class="stage-pill pill-screening">Screening</span></td>
+            <td><span class="tag tag-linkedin">LinkedIn</span></td>
+            <td><span class="stars">★★★★<span class="empty">★</span></span></td>
+            <td>
+              <div class="tbl-actions">
+                <button class="act-btn">View</button>
+                <button class="act-btn">Schedule</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="cand-cell">
+                <div class="cand-cell-av" style="background:#f59e0b">BF</div>
+                <div>
+                  <div class="cand-cell-name">Ben Fujiwara</div>
+                  <div class="cand-cell-email">ben.f@frontcraft.jp</div>
+                </div>
+              </div>
+            </td>
+            <td>Sr. Frontend Engineer</td>
+            <td><span class="stage-pill pill-interview">Interview</span></td>
+            <td><span class="tag tag-referral">Referral</span></td>
+            <td><span class="stars">★★★★★</span></td>
+            <td>
+              <div class="tbl-actions">
+                <button class="act-btn">View</button>
+                <button class="act-btn">Schedule</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="cand-cell">
+                <div class="cand-cell-av" style="background:#db2777">LM</div>
+                <div>
+                  <div class="cand-cell-name">Lila Marchetti</div>
+                  <div class="cand-cell-email">lila.m@uxlab.it</div>
+                </div>
+              </div>
+            </td>
+            <td>Product Designer</td>
+            <td><span class="stage-pill pill-interview">Interview</span></td>
+            <td><span class="tag tag-agency">Agency</span></td>
+            <td><span class="stars">★★★<span class="empty">★★</span></span></td>
+            <td>
+              <div class="tbl-actions">
+                <button class="act-btn">View</button>
+                <button class="act-btn">Schedule</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="cand-cell">
+                <div class="cand-cell-av" style="background:#0ea5e9">DC</div>
+                <div>
+                  <div class="cand-cell-name">David Chukwu</div>
+                  <div class="cand-cell-email">d.chukwu@cloudops.ng</div>
+                </div>
+              </div>
+            </td>
+            <td>DevOps Lead</td>
+            <td><span class="stage-pill pill-screening">Screening</span></td>
+            <td><span class="tag tag-agency">Agency</span></td>
+            <td><span class="stars">★★★★<span class="empty">★</span></span></td>
+            <td>
+              <div class="tbl-actions">
+                <button class="act-btn">View</button>
+                <button class="act-btn">Schedule</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="cand-cell">
+                <div class="cand-cell-av" style="background:#16a34a">YS</div>
+                <div>
+                  <div class="cand-cell-name">Yuki Sato</div>
+                  <div class="cand-cell-email">yuki.s@datahub.jp</div>
+                </div>
+              </div>
+            </td>
+            <td>Senior Data Scientist</td>
+            <td><span class="stage-pill pill-offer">Offer</span></td>
+            <td><span class="tag tag-referral">Referral</span></td>
+            <td><span class="stars">★★★★★</span></td>
+            <td>
+              <div class="tbl-actions">
+                <button class="act-btn">View</button>
+                <button class="act-btn">Schedule</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="cand-cell">
+                <div class="cand-cell-av" style="background:#6366f1">RL</div>
+                <div>
+                  <div class="cand-cell-name">Rosa López</div>
+                  <div class="cand-cell-email">r.lopez@researchlab.es</div>
+                </div>
+              </div>
+            </td>
+            <td>UX Researcher</td>
+            <td><span class="stage-pill pill-screening">Screening</span></td>
+            <td><span class="tag tag-referral">Referral</span></td>
+            <td><span class="stars">★★★★<span class="empty">★</span></span></td>
+            <td>
+              <div class="tbl-actions">
+                <button class="act-btn">View</button>
+                <button class="act-btn">Schedule</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="tbl-footer">
+        <span>Showing 8 of 318 candidates</span>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">…</button>
+        <button class="page-btn">40</button>
+        <button class="page-btn" style="width:auto;padding:0 10px">Next →</button>
+      </div>
+    </div><!-- /table-card -->
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+</body>
+</html>

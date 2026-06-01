@@ -1,0 +1,1255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pixel LiveOps Admin — Nova Pixel Studio</title>
+<style>
+:root {
+  --accent: #a855f7;
+  --accent-soft: #c084fc;
+  --cyan: #22d3ee;
+  --green: #4ade80;
+  --red: #f87171;
+  --amber: #fbbf24;
+  --text: #ece8f5;
+  --text-muted: #968fb0;
+  --bg: #0c0a14;
+  --surface: #15101f;
+  --card: #1e1730;
+  --border: #2c2440;
+  --sidebar-w: 220px;
+  --topbar-h: 56px;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:13px;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  display:flex;
+}
+
+/* ── SIDEBAR ──────────────────────────────────────────────────── */
+.sidebar{
+  width:var(--sidebar-w);
+  min-height:100vh;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  flex-shrink:0;
+  padding:0 0 16px;
+}
+
+.sidebar-logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:18px 16px 14px;
+  border-bottom:1px solid var(--border);
+}
+.sidebar-logo svg{color:var(--accent)}
+.sidebar-logo-text{
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--text);
+  line-height:1.3;
+}
+
+.game-switcher{
+  margin:12px 12px 4px;
+  background:#110e1c;
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:8px 10px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  cursor:pointer;
+}
+.game-switcher-name{
+  font-size:12px;
+  font-weight:600;
+  color:var(--text);
+}
+.game-switcher-sub{
+  font-size:10px;
+  color:var(--text-muted);
+  margin-top:1px;
+}
+.game-switcher svg{color:var(--text-muted)}
+
+.nav-section{
+  margin-top:14px;
+  padding:0 12px;
+}
+.nav-label{
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--text-muted);
+  padding:0 4px;
+  margin-bottom:4px;
+}
+.nav-item{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:7px 8px;
+  border-radius:6px;
+  cursor:pointer;
+  color:var(--text-muted);
+  font-size:12.5px;
+  font-weight:500;
+  position:relative;
+  margin-bottom:1px;
+  transition:background .15s,color .15s;
+}
+.nav-item:hover{background:#261e3a;color:var(--text)}
+.nav-item.active{
+  background:rgba(168,85,247,.12);
+  color:var(--accent-soft);
+  font-weight:600;
+}
+.nav-item.active::before{
+  content:"";
+  position:absolute;
+  left:0;top:6px;bottom:6px;
+  width:3px;
+  background:var(--accent);
+  border-radius:0 3px 3px 0;
+}
+.nav-item svg{flex-shrink:0;color:currentColor;opacity:.85}
+.nav-badge{
+  margin-left:auto;
+  background:var(--accent);
+  color:#fff;
+  font-size:9px;
+  font-weight:700;
+  border-radius:8px;
+  padding:1px 5px;
+}
+
+.sidebar-footer{
+  margin-top:auto;
+  padding:12px 12px 0;
+  border-top:1px solid var(--border);
+}
+.sidebar-user{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 6px;
+}
+.avatar-sm{
+  width:28px;height:28px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--accent) 0%,#7c3aed 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;color:#fff;flex-shrink:0;
+}
+.user-name{font-size:12px;font-weight:600;color:var(--text)}
+.user-role{font-size:10px;color:var(--text-muted)}
+
+/* ── MAIN ─────────────────────────────────────────────────────── */
+.main{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  overflow:hidden;
+}
+
+/* ── TOPBAR ───────────────────────────────────────────────────── */
+.topbar{
+  height:var(--topbar-h);
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:0 20px;
+  flex-shrink:0;
+}
+.topbar-title{
+  font-size:14px;
+  font-weight:600;
+  color:var(--text);
+  white-space:nowrap;
+}
+.topbar-title span{color:var(--text-muted);font-weight:400}
+
+.search-wrap{
+  flex:1;
+  max-width:320px;
+  margin:0 auto;
+  position:relative;
+}
+.search-wrap svg{
+  position:absolute;left:10px;top:50%;transform:translateY(-50%);
+  color:var(--text-muted);pointer-events:none;
+}
+.search-input{
+  width:100%;
+  background:#110e1c;
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:7px 10px 7px 32px;
+  font-size:12px;
+  color:var(--text);
+  outline:none;
+  font-family:inherit;
+  transition:border-color .15s;
+}
+.search-input::placeholder{color:var(--text-muted)}
+.search-input:focus{border-color:var(--accent)}
+
+.period-pills{
+  display:flex;
+  gap:2px;
+  background:#110e1c;
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:3px;
+}
+.period-pill{
+  padding:4px 10px;
+  border-radius:6px;
+  font-size:11px;
+  font-weight:600;
+  color:var(--text-muted);
+  cursor:pointer;
+  transition:background .15s,color .15s;
+  font-variant-numeric:tabular-nums;
+}
+.period-pill.active{
+  background:var(--accent);
+  color:#fff;
+}
+
+.notif-btn{
+  position:relative;
+  width:34px;height:34px;
+  background:#110e1c;
+  border:1px solid var(--border);
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  color:var(--text-muted);
+}
+.notif-badge{
+  position:absolute;top:5px;right:5px;
+  width:7px;height:7px;
+  background:#f87171;
+  border-radius:50%;
+  border:1.5px solid var(--surface);
+}
+.topbar-avatar{
+  width:32px;height:32px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--accent) 0%,#7c3aed 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#fff;
+  cursor:pointer;
+  flex-shrink:0;
+}
+.topbar-user{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap}
+
+/* ── CONTENT ──────────────────────────────────────────────────── */
+.content{
+  flex:1;
+  overflow-y:auto;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+
+/* ── KPI TILES ────────────────────────────────────────────────── */
+.kpi-strip{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+}
+.kpi-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  transition:border-color .2s,box-shadow .2s;
+}
+.kpi-card:hover{
+  border-color:var(--accent);
+  box-shadow:0 0 18px rgba(168,85,247,.18);
+}
+.kpi-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.kpi-label{
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--text-muted);
+}
+.kpi-icon{
+  width:28px;height:28px;
+  background:rgba(168,85,247,.15);
+  border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--accent-soft);
+}
+.kpi-icon.cyan{background:rgba(34,211,238,.12);color:var(--cyan)}
+.kpi-value{
+  font-size:22px;
+  font-weight:700;
+  color:var(--text);
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-.02em;
+  line-height:1;
+}
+.kpi-footer{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.kpi-delta{
+  font-size:11px;
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  gap:3px;
+}
+.kpi-delta.up{color:var(--green)}
+.kpi-delta.down{color:var(--red)}
+.kpi-delta.warn{color:var(--amber)}
+
+/* sparkline */
+.sparkline{overflow:visible}
+
+/* ── GRID ─────────────────────────────────────────────────────── */
+.main-grid{
+  display:grid;
+  grid-template-columns:1fr 300px;
+  gap:14px;
+}
+
+/* ── CARD BASE ────────────────────────────────────────────────── */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  overflow:hidden;
+}
+.card-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 16px;
+  border-bottom:1px solid var(--border);
+}
+.card-title{font-size:13px;font-weight:700;color:var(--text)}
+.card-sub{font-size:11px;color:var(--text-muted);margin-top:2px}
+.card-link{
+  font-size:11px;
+  font-weight:600;
+  color:var(--accent-soft);
+  text-decoration:none;
+  cursor:pointer;
+}
+.card-link:hover{color:var(--accent)}
+
+/* ── CHART ────────────────────────────────────────────────────── */
+.chart-wrap{
+  padding:16px;
+  position:relative;
+}
+.chart-legend{
+  display:flex;
+  gap:14px;
+  margin-bottom:12px;
+}
+.legend-dot{
+  width:8px;height:8px;
+  border-radius:50%;
+  flex-shrink:0;
+  margin-top:3px;
+}
+.legend-item{
+  display:flex;align-items:flex-start;gap:5px;
+  font-size:11px;color:var(--text-muted);
+}
+.legend-item strong{color:var(--text);font-variant-numeric:tabular-nums}
+
+/* ── SEGMENTS PANEL ───────────────────────────────────────────── */
+.segments-list{
+  padding:14px 16px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.seg-row{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.seg-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+}
+.seg-name{font-size:12px;font-weight:600;color:var(--text)}
+.seg-count{font-size:11px;color:var(--text-muted);font-variant-numeric:tabular-nums}
+.seg-bar-track{
+  height:5px;
+  background:#110e1c;
+  border-radius:4px;
+  overflow:hidden;
+}
+.seg-bar-fill{
+  height:100%;
+  border-radius:4px;
+  background:linear-gradient(90deg,var(--accent) 0%,var(--accent-soft) 100%);
+}
+.seg-bar-fill.cyan{background:linear-gradient(90deg,var(--cyan) 0%,#67e8f9 100%)}
+.seg-footer{
+  padding:10px 16px 14px;
+  border-top:1px solid var(--border);
+  text-align:center;
+}
+
+/* ── EVENTS TABLE ─────────────────────────────────────────────── */
+.events-head-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 16px;
+  border-bottom:1px solid var(--border);
+}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--accent);
+  color:#fff;
+  font-size:11px;font-weight:700;
+  border-radius:7px;
+  padding:6px 12px;
+  cursor:pointer;
+  border:none;
+  font-family:inherit;
+  transition:background .15s;
+}
+.btn-primary:hover{background:var(--accent-soft);color:#fff}
+
+.table-wrap{overflow-x:auto}
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+th{
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--text-muted);
+  padding:10px 16px;
+  text-align:left;
+  border-bottom:1px solid var(--border);
+  white-space:nowrap;
+}
+td{
+  padding:11px 16px;
+  border-bottom:1px solid var(--border);
+  color:var(--text);
+  font-size:12.5px;
+  vertical-align:middle;
+}
+tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:rgba(255,255,255,.025)}
+
+.event-name{font-weight:600;color:var(--text)}
+.event-type-chip{
+  display:inline-block;
+  font-size:10px;
+  font-weight:600;
+  padding:2px 7px;
+  border-radius:10px;
+  background:rgba(168,85,247,.12);
+  color:var(--accent-soft);
+  white-space:nowrap;
+}
+
+.pill{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  font-size:10px;
+  font-weight:700;
+  padding:3px 8px;
+  border-radius:10px;
+  white-space:nowrap;
+}
+.pill::before{
+  content:"";
+  width:5px;height:5px;
+  border-radius:50%;
+  background:currentColor;
+  flex-shrink:0;
+}
+.pill.live{
+  background:rgba(34,211,238,.12);
+  color:var(--cyan);
+}
+.pill.scheduled{
+  background:rgba(168,85,247,.12);
+  color:var(--accent-soft);
+}
+.pill.ended{
+  background:var(--border);
+  color:var(--text-muted);
+}
+
+.action-btns{display:flex;gap:6px;align-items:center}
+.icon-btn{
+  width:26px;height:26px;
+  background:transparent;
+  border:1px solid var(--border);
+  border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  color:var(--text-muted);
+  transition:border-color .15s,color .15s;
+}
+.icon-btn:hover{border-color:var(--accent-soft);color:var(--accent-soft)}
+
+/* ── ITEMS LIST ───────────────────────────────────────────────── */
+.items-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+.items-list{
+  display:flex;
+  flex-direction:column;
+}
+.item-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 16px;
+  border-bottom:1px solid var(--border);
+  transition:background .12s;
+}
+.item-row:last-child{border-bottom:none}
+.item-row:hover{background:rgba(255,255,255,.02)}
+.item-rank{
+  width:18px;
+  font-size:11px;
+  font-weight:700;
+  color:var(--text-muted);
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+  flex-shrink:0;
+}
+.item-info{flex:1;min-width:0}
+.item-name{
+  font-size:12.5px;
+  font-weight:600;
+  color:var(--text);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.rarity{
+  display:inline-block;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  padding:1px 5px;
+  border-radius:4px;
+  margin-top:2px;
+}
+.rarity.legendary{background:rgba(251,191,36,.15);color:#fbbf24}
+.rarity.epic{background:rgba(168,85,247,.15);color:var(--accent-soft)}
+.rarity.rare{background:rgba(34,211,238,.12);color:var(--cyan)}
+.rarity.common{background:rgba(150,143,176,.1);color:var(--text-muted)}
+
+.item-bar-wrap{width:80px;flex-shrink:0}
+.item-bar-track{
+  height:4px;
+  background:#110e1c;
+  border-radius:3px;
+  margin-top:2px;
+  overflow:hidden;
+}
+.item-bar-fill{
+  height:100%;
+  border-radius:3px;
+  background:linear-gradient(90deg,var(--accent) 0%,var(--accent-soft) 100%);
+}
+.item-rev{
+  width:56px;
+  font-size:12px;
+  font-weight:600;
+  color:var(--text);
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+  flex-shrink:0;
+}
+.item-sales{
+  font-size:10px;
+  color:var(--text-muted);
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+
+/* ── SCROLLBAR ────────────────────────────────────────────────── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#3a2e5a}
+</style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ─────────────────────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <!-- pixel controller icon -->
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+      <rect x="3" y="9" width="22" height="14" rx="4" fill="currentColor" opacity=".18"/>
+      <rect x="3" y="9" width="22" height="14" rx="4" stroke="currentColor" stroke-width="1.5"/>
+      <!-- d-pad -->
+      <rect x="7" y="13" width="2" height="6" rx="1" fill="currentColor"/>
+      <rect x="5" y="15" width="6" height="2" rx="1" fill="currentColor"/>
+      <!-- buttons -->
+      <circle cx="20" cy="14" r="1.2" fill="currentColor"/>
+      <circle cx="22.5" cy="16" r="1.2" fill="currentColor"/>
+      <circle cx="17.5" cy="16" r="1.2" fill="currentColor"/>
+      <circle cx="20" cy="18" r="1.2" fill="currentColor"/>
+      <!-- grips -->
+      <rect x="5" y="21" width="4" height="3" rx="1.5" fill="currentColor" opacity=".6"/>
+      <rect x="19" y="21" width="4" height="3" rx="1.5" fill="currentColor" opacity=".6"/>
+    </svg>
+    <div class="sidebar-logo-text">Nova Pixel<br>Studio</div>
+  </div>
+
+  <!-- game switcher -->
+  <div class="game-switcher">
+    <div>
+      <div class="game-switcher-name">Void Hunters</div>
+      <div class="game-switcher-sub">Mobile · Live Service</div>
+    </div>
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+      <path d="M3 4.5 6 7.5 9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <!-- LIVE OPS -->
+  <nav class="nav-section">
+    <div class="nav-label">Live Ops</div>
+    <div class="nav-item active">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="5" height="5" rx="1.5" fill="currentColor"/>
+        <rect x="8" y="1" width="5" height="5" rx="1.5" fill="currentColor" opacity=".5"/>
+        <rect x="1" y="8" width="5" height="5" rx="1.5" fill="currentColor" opacity=".5"/>
+        <rect x="8" y="8" width="5" height="5" rx="1.5" fill="currentColor"/>
+      </svg>
+      Dashboard
+    </div>
+    <div class="nav-item">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <path d="M2 7a5 5 0 1 0 10 0A5 5 0 0 0 2 7Z" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M7 4v3l2 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Live Events
+      <span class="nav-badge">12</span>
+    </div>
+    <div class="nav-item">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <rect x="1.5" y="3" width="11" height="8.5" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M5 3V1.5M9 3V1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        <path d="M1.5 5.5h11" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+      Rewards
+    </div>
+  </nav>
+
+  <!-- ECONOMY -->
+  <nav class="nav-section">
+    <div class="nav-label">Economy</div>
+    <div class="nav-item">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <path d="M7 1.5 9.5 6H12l-4 3 1.5 3.5L7 10l-2.5 2.5L6 9 2 6h2.5L7 1.5Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+      </svg>
+      In-Game Items
+    </div>
+    <div class="nav-item">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M7 4v1.5M7 9v-1.5M5 7h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      Currencies
+    </div>
+    <div class="nav-item">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <path d="M2 11 5 4l3 4 2-2.5 2 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Offers
+    </div>
+  </nav>
+
+  <!-- PLAYERS -->
+  <nav class="nav-section">
+    <div class="nav-label">Players</div>
+    <div class="nav-item">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <circle cx="5.5" cy="4.5" r="2" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M1 11c0-2 2-3.5 4.5-3.5S10 9 10 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        <circle cx="10.5" cy="5" r="1.5" stroke="currentColor" stroke-width="1.2" opacity=".6"/>
+        <path d="M10.5 8c1.5.3 2.5 1.3 2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".6"/>
+      </svg>
+      Segments
+    </div>
+    <div class="nav-item">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <path d="M7 1.5A5.5 5.5 0 1 0 7 12.5A5.5 5.5 0 0 0 7 1.5Z" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M5 5l4 4M9 5 5 9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      Bans
+    </div>
+    <div class="nav-item">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <path d="M2 2.5h10v7a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V2.5Z" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M5 6h4M5 8h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      Support
+    </div>
+  </nav>
+
+  <!-- SETTINGS -->
+  <nav class="nav-section">
+    <div class="nav-label">Settings</div>
+    <div class="nav-item">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <circle cx="7" cy="7" r="1.8" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M7 1.5v1M7 11.5v1M1.5 7h1M11.5 7h1M3.1 3.1l.7.7M10.2 10.2l.7.7M3.1 10.9l.7-.7M10.2 3.8l.7-.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      Config
+    </div>
+    <div class="nav-item">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <path d="M2.5 11 4 3h6l1.5 8H2.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+        <path d="M5.5 3V2a1.5 1.5 0 0 1 3 0v1" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+      Releases
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="avatar-sm">KL</div>
+      <div>
+        <div class="user-name">Kaede L.</div>
+        <div class="user-role">LiveOps Lead</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ── MAIN ─────────────────────────────────────────────────────── -->
+<div class="main">
+
+  <!-- topbar -->
+  <header class="topbar">
+    <div class="topbar-title">Live Operations <span>· Dashboard</span></div>
+
+    <div class="search-wrap">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M9.5 9.5 12 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <input class="search-input" type="search" placeholder="Search players, events, items…" aria-label="Search">
+    </div>
+
+    <div class="period-pills" role="group" aria-label="Period">
+      <div class="period-pill">7D</div>
+      <div class="period-pill">14D</div>
+      <div class="period-pill active">30D</div>
+      <div class="period-pill">90D</div>
+    </div>
+
+    <div class="notif-btn" aria-label="Notifications">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M8 1.5A4.5 4.5 0 0 0 3.5 6v2.5L2 10h12l-1.5-1.5V6A4.5 4.5 0 0 0 8 1.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+        <path d="M6.5 10.5a1.5 1.5 0 0 0 3 0" stroke="currentColor" stroke-width="1.3"/>
+      </svg>
+      <div class="notif-badge"></div>
+    </div>
+
+    <div class="topbar-avatar" aria-label="User menu">KL</div>
+    <div class="topbar-user">Kaede L.</div>
+  </header>
+
+  <!-- scrollable content -->
+  <div class="content">
+
+    <!-- ── KPI TILES ─────────────────────────────────────────────── -->
+    <div class="kpi-strip">
+
+      <!-- DAU -->
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <div class="kpi-label">Daily Active Users</div>
+          <div class="kpi-icon">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+              <circle cx="5.5" cy="4.5" r="2" stroke="currentColor" stroke-width="1.4"/>
+              <path d="M1 12c0-2.2 2-4 4.5-4S10 9.8 10 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              <circle cx="11" cy="5" r="1.5" stroke="currentColor" stroke-width="1.2" opacity=".6"/>
+              <path d="M11 8c1.7.4 3 1.5 3 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".6"/>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-value">1,284,671</div>
+        <div class="kpi-footer">
+          <div class="kpi-delta up">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M5 8V2M2 5l3-3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            +4.2% vs last week
+          </div>
+          <!-- sparkline -->
+          <svg class="sparkline" width="52" height="20" viewBox="0 0 52 20" aria-hidden="true">
+            <defs>
+              <linearGradient id="sp1" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--accent)" stop-opacity=".5"/>
+                <stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <polyline points="0,16 8,12 16,14 24,8 32,10 40,5 52,3" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- D1 Retention -->
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <div class="kpi-label">D1 Retention</div>
+          <div class="kpi-icon">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+              <path d="M7.5 2A5.5 5.5 0 1 1 2 7.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              <path d="M2 3v4.5H6.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-value">38.7%</div>
+        <div class="kpi-footer">
+          <div class="kpi-delta down">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M5 2v6M2 5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            −1.3pp vs prev 30D
+          </div>
+          <svg class="sparkline" width="52" height="20" viewBox="0 0 52 20" aria-hidden="true">
+            <polyline points="0,5 8,7 16,6 24,8 32,11 40,13 52,16" fill="none" stroke="var(--red)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- ARPDAU -->
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <div class="kpi-label">ARPDAU</div>
+          <div class="kpi-icon cyan">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+              <circle cx="7.5" cy="7.5" r="5.5" stroke="currentColor" stroke-width="1.4"/>
+              <path d="M7.5 4.5v.8M7.5 10.5v-.8M5.5 7.5h4M5.5 7.5A2 2 0 0 1 7.5 5.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-value">$0.94</div>
+        <div class="kpi-footer">
+          <div class="kpi-delta up">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M5 8V2M2 5l3-3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            +$0.07 vs last week
+          </div>
+          <svg class="sparkline" width="52" height="20" viewBox="0 0 52 20" aria-hidden="true">
+            <polyline points="0,14 8,12 16,13 24,10 32,9 40,7 52,5" fill="none" stroke="var(--cyan)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Live Events -->
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <div class="kpi-label">Live Events</div>
+          <div class="kpi-icon">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+              <path d="M7.5 2A5.5 5.5 0 1 0 7.5 13A5.5 5.5 0 0 0 7.5 2Z" stroke="currentColor" stroke-width="1.4"/>
+              <path d="M7.5 4.5v3.25L9.5 9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-value">12 active</div>
+        <div class="kpi-footer">
+          <div class="kpi-delta warn">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M5 1.5 9 8H1L5 1.5Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M5 4.5v2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            3 ending today
+          </div>
+          <svg class="sparkline" width="52" height="20" viewBox="0 0 52 20" aria-hidden="true">
+            <polyline points="0,12 8,10 16,8 24,12 32,6 40,9 52,7" fill="none" stroke="var(--amber)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MAIN GRID ──────────────────────────────────────────────── -->
+    <div class="main-grid">
+
+      <!-- DAU Chart -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Daily Active Users · 30 Days</div>
+            <div class="card-sub">Void Hunters · all platforms</div>
+          </div>
+          <a class="card-link" href="#" aria-label="View full chart">Full report →</a>
+        </div>
+        <div class="chart-wrap">
+          <div class="chart-legend">
+            <div class="legend-item">
+              <div class="legend-dot" style="background:var(--accent)"></div>
+              <div>DAU <strong>1,284,671</strong></div>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:var(--cyan)"></div>
+              <div>Peak <strong>1,401,055</strong> on May 18</div>
+            </div>
+          </div>
+          <!-- SVG area chart -->
+          <svg width="100%" height="160" viewBox="0 0 600 160" preserveAspectRatio="none" aria-label="DAU over 30 days chart">
+            <defs>
+              <linearGradient id="dauGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--accent)" stop-opacity=".35"/>
+                <stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <!-- grid lines -->
+            <line x1="0" y1="20" x2="600" y2="20" stroke="#2c2440" stroke-width="1" stroke-dasharray="4,4"/>
+            <line x1="0" y1="60" x2="600" y2="60" stroke="#2c2440" stroke-width="1" stroke-dasharray="4,4"/>
+            <line x1="0" y1="100" x2="600" y2="100" stroke="#2c2440" stroke-width="1" stroke-dasharray="4,4"/>
+            <line x1="0" y1="140" x2="600" y2="140" stroke="#2c2440" stroke-width="1" stroke-dasharray="4,4"/>
+            <!-- y labels -->
+            <text x="0" y="18" font-size="9" fill="#968fb0" font-family="Inter,system-ui,sans-serif">1.4M</text>
+            <text x="0" y="58" font-size="9" fill="#968fb0" font-family="Inter,system-ui,sans-serif">1.1M</text>
+            <text x="0" y="98" font-size="9" fill="#968fb0" font-family="Inter,system-ui,sans-serif">800K</text>
+            <text x="0" y="138" font-size="9" fill="#968fb0" font-family="Inter,system-ui,sans-serif">500K</text>
+            <!-- area fill -->
+            <polygon
+              points="20,118 60,105 100,110 140,90 180,95 220,78 260,82 300,68 340,30 380,55 420,70 460,65 500,60 540,75 580,72 580,140 20,140"
+              fill="url(#dauGrad)"
+            />
+            <!-- line -->
+            <polyline
+              points="20,118 60,105 100,110 140,90 180,95 220,78 260,82 300,68 340,30 380,55 420,70 460,65 500,60 540,75 580,72"
+              fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            />
+            <!-- peak dot + callout -->
+            <circle cx="340" cy="30" r="5" fill="var(--cyan)" stroke="#1e1730" stroke-width="2"/>
+            <rect x="322" y="8" width="54" height="16" rx="4" fill="rgba(34,211,238,.15)"/>
+            <text x="349" y="20" font-size="8.5" fill="var(--cyan)" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-weight="700">Peak May 18</text>
+            <!-- x labels -->
+            <text x="20" y="156" font-size="9" fill="#968fb0" text-anchor="middle" font-family="Inter,system-ui,sans-serif">May 2</text>
+            <text x="120" y="156" font-size="9" fill="#968fb0" text-anchor="middle" font-family="Inter,system-ui,sans-serif">May 9</text>
+            <text x="220" y="156" font-size="9" fill="#968fb0" text-anchor="middle" font-family="Inter,system-ui,sans-serif">May 16</text>
+            <text x="320" y="156" font-size="9" fill="#968fb0" text-anchor="middle" font-family="Inter,system-ui,sans-serif">May 20</text>
+            <text x="420" y="156" font-size="9" fill="#968fb0" text-anchor="middle" font-family="Inter,system-ui,sans-serif">May 25</text>
+            <text x="570" y="156" font-size="9" fill="#968fb0" text-anchor="middle" font-family="Inter,system-ui,sans-serif">Jun 1</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Segments Panel -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Player Segments</div>
+            <div class="card-sub">Void Hunters · live snapshot</div>
+          </div>
+          <a class="card-link" href="#" aria-label="View all segments">All →</a>
+        </div>
+        <div class="segments-list">
+          <div class="seg-row">
+            <div class="seg-top">
+              <span class="seg-name">🐳 Whales</span>
+              <span class="seg-count">38,540 · 3.0%</span>
+            </div>
+            <div class="seg-bar-track"><div class="seg-bar-fill" style="width:30%"></div></div>
+          </div>
+          <div class="seg-row">
+            <div class="seg-top">
+              <span class="seg-name">🎮 Engaged F2P</span>
+              <span class="seg-count">514,668 · 40.1%</span>
+            </div>
+            <div class="seg-bar-track"><div class="seg-bar-fill" style="width:100%"></div></div>
+          </div>
+          <div class="seg-row">
+            <div class="seg-top">
+              <span class="seg-name">⚠️ At-Risk</span>
+              <span class="seg-count">192,701 · 15.0%</span>
+            </div>
+            <div class="seg-bar-track"><div class="seg-bar-fill" style="width:38%;background:linear-gradient(90deg,var(--amber) 0%,#fde68a 100%)"></div></div>
+          </div>
+          <div class="seg-row">
+            <div class="seg-top">
+              <span class="seg-name">✨ New Players</span>
+              <span class="seg-count">257,334 · 20.0%</span>
+            </div>
+            <div class="seg-bar-track"><div class="seg-bar-fill cyan" style="width:50%"></div></div>
+          </div>
+          <div class="seg-row">
+            <div class="seg-top">
+              <span class="seg-name">💤 Dormant</span>
+              <span class="seg-count">281,428 · 21.9%</span>
+            </div>
+            <div class="seg-bar-track"><div class="seg-bar-fill" style="width:55%;background:#2c2440"></div></div>
+          </div>
+        </div>
+        <div class="seg-footer">
+          <a class="card-link" href="#" aria-label="View all segments">View all segments →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── LIVE EVENTS TABLE ─────────────────────────────────────── -->
+    <div class="card">
+      <div class="events-head-row">
+        <div>
+          <div class="card-title">Live Events</div>
+          <div class="card-sub">All titles · 30D filter</div>
+        </div>
+        <button class="btn-primary" type="button">
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
+            <path d="M5.5 1v9M1 5.5h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          New Event
+        </button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Event</th>
+              <th>Type</th>
+              <th>Window</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="event-name">Void Surge Weekend</div></td>
+              <td><span class="event-type-chip">Limited Drop</span></td>
+              <td style="color:var(--text-muted);font-variant-numeric:tabular-nums">Sat 00:00 → Sun 23:59</td>
+              <td><span class="pill live">Live</span></td>
+              <td>
+                <div class="action-btns">
+                  <div class="icon-btn" title="Edit" aria-label="Edit">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M8 2 10 4 4 10H2V8L8 2Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+                  </div>
+                  <div class="icon-btn" title="Pause" aria-label="Pause">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><rect x="3" y="2.5" width="2" height="7" rx="1" fill="currentColor"/><rect x="7" y="2.5" width="2" height="7" rx="1" fill="currentColor"/></svg>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><div class="event-name">Crystal Cache Bundle</div></td>
+              <td><span class="event-type-chip">Bundle</span></td>
+              <td style="color:var(--text-muted);font-variant-numeric:tabular-nums">Mon 09:00 → Mon 23:59</td>
+              <td><span class="pill scheduled">Scheduled</span></td>
+              <td>
+                <div class="action-btns">
+                  <div class="icon-btn" title="Edit" aria-label="Edit"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M8 2 10 4 4 10H2V8L8 2Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></div>
+                  <div class="icon-btn" title="Play" aria-label="Activate"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3.5 2.5 9 6l-5.5 3.5V2.5Z" fill="currentColor"/></svg></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><div class="event-name">Chromarush Season 3</div></td>
+              <td><span class="event-type-chip">Season Pass</span></td>
+              <td style="color:var(--text-muted);font-variant-numeric:tabular-nums">May 1 → Jul 31</td>
+              <td><span class="pill live">Live</span></td>
+              <td>
+                <div class="action-btns">
+                  <div class="icon-btn" title="Edit" aria-label="Edit"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M8 2 10 4 4 10H2V8L8 2Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></div>
+                  <div class="icon-btn" title="Pause" aria-label="Pause"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><rect x="3" y="2.5" width="2" height="7" rx="1" fill="currentColor"/><rect x="7" y="2.5" width="2" height="7" rx="1" fill="currentColor"/></svg></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><div class="event-name">Shard Storm Challenges</div></td>
+              <td><span class="event-type-chip">Challenge</span></td>
+              <td style="color:var(--amber);font-variant-numeric:tabular-nums">Ends in 2h 14m</td>
+              <td><span class="pill live">Live</span></td>
+              <td>
+                <div class="action-btns">
+                  <div class="icon-btn" title="Edit" aria-label="Edit"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M8 2 10 4 4 10H2V8L8 2Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></div>
+                  <div class="icon-btn" title="Pause" aria-label="Pause"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><rect x="3" y="2.5" width="2" height="7" rx="1" fill="currentColor"/><rect x="7" y="2.5" width="2" height="7" rx="1" fill="currentColor"/></svg></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><div class="event-name">Starfall Siege Collab</div></td>
+              <td><span class="event-type-chip">Crossover</span></td>
+              <td style="color:var(--text-muted);font-variant-numeric:tabular-nums">Thu 00:00 → Sun 23:59</td>
+              <td><span class="pill scheduled">Scheduled</span></td>
+              <td>
+                <div class="action-btns">
+                  <div class="icon-btn" title="Edit" aria-label="Edit"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M8 2 10 4 4 10H2V8L8 2Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></div>
+                  <div class="icon-btn" title="Play" aria-label="Activate"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3.5 2.5 9 6l-5.5 3.5V2.5Z" fill="currentColor"/></svg></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><div class="event-name">Galaxy Grind Boost</div></td>
+              <td><span class="event-type-chip">XP Boost</span></td>
+              <td style="color:var(--text-muted);font-variant-numeric:tabular-nums">May 10 → May 12</td>
+              <td><span class="pill ended">Ended</span></td>
+              <td>
+                <div class="action-btns">
+                  <div class="icon-btn" title="Edit" aria-label="Edit"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M8 2 10 4 4 10H2V8L8 2Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></div>
+                  <div class="icon-btn" title="Archive" aria-label="Archive"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 4h8l-1 5.5H3L2 4Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M1 2.5h10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M4.5 6.5h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── TOP IN-GAME ITEMS ─────────────────────────────────────── -->
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Top Items by Revenue · 30D</div>
+          <div class="card-sub">All titles combined</div>
+        </div>
+        <a class="card-link" href="#" aria-label="View economy">Economy →</a>
+      </div>
+      <div class="items-list">
+        <div class="item-row">
+          <div class="item-rank">1</div>
+          <div class="item-info">
+            <div class="item-name">Stellar Shard Pack</div>
+            <span class="rarity legendary">Legendary</span>
+          </div>
+          <div class="item-bar-wrap">
+            <div style="font-size:10px;color:var(--text-muted);text-align:right;font-variant-numeric:tabular-nums">84,210 sales</div>
+            <div class="item-bar-track"><div class="item-bar-fill" style="width:100%"></div></div>
+          </div>
+          <div>
+            <div class="item-rev">$421,050</div>
+            <div class="item-sales"></div>
+          </div>
+        </div>
+        <div class="item-row">
+          <div class="item-rank">2</div>
+          <div class="item-info">
+            <div class="item-name">Void Blade Skin</div>
+            <span class="rarity epic">Epic</span>
+          </div>
+          <div class="item-bar-wrap">
+            <div style="font-size:10px;color:var(--text-muted);text-align:right;font-variant-numeric:tabular-nums">61,430 sales</div>
+            <div class="item-bar-track"><div class="item-bar-fill" style="width:73%"></div></div>
+          </div>
+          <div><div class="item-rev">$307,150</div></div>
+        </div>
+        <div class="item-row">
+          <div class="item-rank">3</div>
+          <div class="item-info">
+            <div class="item-name">Crystal Keystone</div>
+            <span class="rarity rare">Rare</span>
+          </div>
+          <div class="item-bar-wrap">
+            <div style="font-size:10px;color:var(--text-muted);text-align:right;font-variant-numeric:tabular-nums">145,880 sales</div>
+            <div class="item-bar-track"><div class="item-bar-fill" style="width:60%"></div></div>
+          </div>
+          <div><div class="item-rev">$254,292</div></div>
+        </div>
+        <div class="item-row">
+          <div class="item-rank">4</div>
+          <div class="item-info">
+            <div class="item-name">Nova Pilot Frame</div>
+            <span class="rarity epic">Epic</span>
+          </div>
+          <div class="item-bar-wrap">
+            <div style="font-size:10px;color:var(--text-muted);text-align:right;font-variant-numeric:tabular-nums">38,770 sales</div>
+            <div class="item-bar-track"><div class="item-bar-fill" style="width:45%"></div></div>
+          </div>
+          <div><div class="item-rev">$193,850</div></div>
+        </div>
+        <div class="item-row">
+          <div class="item-rank">5</div>
+          <div class="item-info">
+            <div class="item-name">XP Catalyst ×5</div>
+            <span class="rarity common">Common</span>
+          </div>
+          <div class="item-bar-wrap">
+            <div style="font-size:10px;color:var(--text-muted);text-align:right;font-variant-numeric:tabular-nums">612,100 sales</div>
+            <div class="item-bar-track"><div class="item-bar-fill" style="width:38%;background:linear-gradient(90deg,#6d28d9 0%,var(--accent) 100%)"></div></div>
+          </div>
+          <div><div class="item-rev">$153,025</div></div>
+        </div>
+        <div class="item-row">
+          <div class="item-rank">6</div>
+          <div class="item-info">
+            <div class="item-name">Phase Drift Emote</div>
+            <span class="rarity rare">Rare</span>
+          </div>
+          <div class="item-bar-wrap">
+            <div style="font-size:10px;color:var(--text-muted);text-align:right;font-variant-numeric:tabular-nums">52,090 sales</div>
+            <div class="item-bar-track"><div class="item-bar-fill" style="width:28%"></div></div>
+          </div>
+          <div><div class="item-rev">$104,180</div></div>
+        </div>
+        <div class="item-row">
+          <div class="item-rank">7</div>
+          <div class="item-info">
+            <div class="item-name">Chromaflux Bundle</div>
+            <span class="rarity legendary">Legendary</span>
+          </div>
+          <div class="item-bar-wrap">
+            <div style="font-size:10px;color:var(--text-muted);text-align:right;font-variant-numeric:tabular-nums">14,320 sales</div>
+            <div class="item-bar-track"><div class="item-bar-fill" style="width:20%"></div></div>
+          </div>
+          <div><div class="item-rev">$71,600</div></div>
+        </div>
+        <div class="item-row">
+          <div class="item-rank">8</div>
+          <div class="item-info">
+            <div class="item-name">Energy Core ×10</div>
+            <span class="rarity common">Common</span>
+          </div>
+          <div class="item-bar-wrap">
+            <div style="font-size:10px;color:var(--text-muted);text-align:right;font-variant-numeric:tabular-nums">890,450 sales</div>
+            <div class="item-bar-track"><div class="item-bar-fill" style="width:13%;background:linear-gradient(90deg,#4b5563 0%,#6b7280 100%)"></div></div>
+          </div>
+          <div><div class="item-rev">$44,523</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+</body>
+</html>

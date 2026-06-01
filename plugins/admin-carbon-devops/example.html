@@ -1,0 +1,990 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Carbon DevOps Admin</title>
+<style>
+:root {
+  --accent: #22c55e;
+  --accent-hi: #4ade80;
+  --blue: #3b82f6;
+  --blue-hi: #60a5fa;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+}
+
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #0b0d10;
+  color: #e6edf3;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.75); }
+}
+
+code, .mono {
+  font-family: ui-monospace, "SF Mono", Menlo, "Cascadia Code", monospace;
+}
+
+/* ── TOP NAVBAR ── */
+.navbar {
+  height: 48px;
+  background: #14171c;
+  border-bottom: 1px solid #262c34;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  color: #8b949e;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, background 0.15s;
+}
+.nav-btn:hover { color: #e6edf3; background: #1c2128; }
+
+.repo-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  background: #1c2128;
+  border: 1px solid #262c34;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #e6edf3;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.repo-selector .repo-name { font-weight: 600; }
+.branch-badge {
+  font-size: 10px;
+  padding: 1px 6px;
+  background: #262c34;
+  border-radius: 10px;
+  color: #8b949e;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+.env-switcher {
+  display: flex;
+  gap: 4px;
+}
+.env-pill {
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.env-pill.active { background: color-mix(in srgb, var(--accent) 15%, transparent); border-color: var(--accent); color: var(--accent); }
+.env-pill:not(.active) { color: #8b949e; border-color: #262c34; background: transparent; }
+
+.nav-search {
+  flex: 1;
+  max-width: 320px;
+  position: relative;
+  margin: 0 auto;
+}
+.nav-search input {
+  width: 100%;
+  background: #0b0d10;
+  border: 1px solid #262c34;
+  border-radius: 6px;
+  color: #e6edf3;
+  font-size: 12px;
+  padding: 5px 10px 5px 30px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+.nav-search input::placeholder { color: #8b949e; }
+.nav-search input:focus { border-color: var(--blue); }
+.nav-search .search-icon {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #8b949e;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.bell-wrap { position: relative; }
+.bell-badge {
+  position: absolute;
+  top: 2px; right: 2px;
+  width: 8px; height: 8px;
+  background: var(--danger);
+  border-radius: 50%;
+  border: 1px solid #14171c;
+}
+
+.avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--blue));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #0b0d10;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ── BODY LAYOUT ── */
+.layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── LEFT ICON RAIL ── */
+.rail {
+  width: 48px;
+  background: #14171c;
+  border-right: 1px solid #262c34;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 0;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.rail-item {
+  position: relative;
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #8b949e;
+  transition: color 0.15s, background 0.15s;
+}
+.rail-item:hover { color: #e6edf3; background: #1c2128; }
+.rail-item.active { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.rail-item.active::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 18px;
+  background: var(--accent);
+  border-radius: 0 2px 2px 0;
+}
+
+.rail-spacer { flex: 1; }
+
+/* ── MAIN CONTENT ── */
+.main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── KPI TILES ── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.kpi-tile {
+  background: #14171c;
+  border: 1px solid #262c34;
+  border-radius: 8px;
+  padding: 16px 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8b949e;
+  margin-bottom: 6px;
+}
+
+.kpi-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #e6edf3;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.kpi-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+.kpi-delta.up { color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.kpi-delta.down { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, transparent); }
+
+.kpi-sparkline {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  opacity: 0.6;
+}
+
+/* ── CARD ── */
+.card {
+  background: #14171c;
+  border: 1px solid #262c34;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid #262c34;
+}
+
+.card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #e6edf3;
+}
+
+.card-link {
+  font-size: 12px;
+  color: var(--blue);
+  text-decoration: none;
+  cursor: pointer;
+}
+.card-link:hover { color: var(--blue-hi); }
+
+/* ── PIPELINE BOARD ── */
+.pipeline-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.pipeline-table th {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8b949e;
+  padding: 10px 18px;
+  text-align: left;
+  border-bottom: 1px solid #262c34;
+}
+
+.pipeline-table td {
+  padding: 11px 18px;
+  border-bottom: 1px solid #1c2128;
+  vertical-align: middle;
+}
+
+.pipeline-table tr:last-child td { border-bottom: none; }
+.pipeline-table tr:hover td { background: #1c2128; }
+
+.pipeline-name {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: #e6edf3;
+}
+
+.sha-chip {
+  display: inline-block;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 10px;
+  padding: 2px 6px;
+  background: #1c2128;
+  border: 1px solid #262c34;
+  border-radius: 4px;
+  color: #8b949e;
+}
+
+.stage-chips { display: flex; gap: 4px; }
+
+.stage-chip {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.stage-chip.pass { color: var(--accent); border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.stage-chip.fail { color: var(--danger); border-color: var(--danger); background: color-mix(in srgb, var(--danger) 10%, transparent); }
+.stage-chip.running { color: var(--warn); border-color: var(--warn); background: color-mix(in srgb, var(--warn) 10%, transparent); }
+
+.running-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--warn);
+  animation: pulse 1.2s ease-in-out infinite;
+  display: inline-block;
+}
+
+.duration-badge {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  color: #8b949e;
+}
+
+.author-cell { color: #8b949e; font-size: 12px; }
+.ts-cell { color: #8b949e; font-size: 11px; white-space: nowrap; }
+
+/* ── BOTTOM GRID ── */
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+}
+
+/* ── INCIDENTS PANEL ── */
+.incident-list { padding: 4px 0; }
+
+.incident-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 18px;
+  border-bottom: 1px solid #1c2128;
+}
+.incident-row:last-child { border-bottom: none; }
+.incident-row:hover { background: #1c2128; }
+
+.sev-pill {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  letter-spacing: 0.04em;
+  margin-top: 1px;
+}
+.sev-pill.p1 { background: color-mix(in srgb, var(--danger) 20%, transparent); color: var(--danger); border: 1px solid var(--danger); }
+.sev-pill.p2 { background: color-mix(in srgb, var(--warn) 20%, transparent); color: var(--warn); border: 1px solid var(--warn); }
+.sev-pill.p3 { background: color-mix(in srgb, var(--blue) 20%, transparent); color: var(--blue); border: 1px solid var(--blue); }
+
+.incident-body { flex: 1; }
+.incident-service { font-size: 12px; font-weight: 600; color: #e6edf3; margin-bottom: 2px; }
+.incident-desc { font-size: 11px; color: #8b949e; }
+.incident-ts { font-size: 10px; color: #8b949e; margin-top: 2px; }
+
+/* ── BUILDS TABLE ── */
+.filter-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid #262c34;
+}
+.filter-tab {
+  padding: 9px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #8b949e;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s, border-color 0.15s;
+}
+.filter-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.filter-tab:hover:not(.active) { color: #e6edf3; }
+
+.builds-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.builds-table th {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8b949e;
+  padding: 10px 18px;
+  text-align: left;
+  border-bottom: 1px solid #262c34;
+}
+.builds-table td {
+  padding: 10px 18px;
+  border-bottom: 1px solid #1c2128;
+  vertical-align: middle;
+}
+.builds-table tr:last-child td { border-bottom: none; }
+.builds-table tr:hover td { background: #1c2128; }
+
+.build-id {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 12px;
+  color: var(--blue);
+  font-weight: 600;
+}
+
+.branch-name {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  color: #8b949e;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 10px;
+  letter-spacing: 0.03em;
+}
+.status-pill.passed { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); }
+.status-pill.failed { background: color-mix(in srgb, var(--danger) 18%, transparent); color: var(--danger); }
+.status-pill.running { background: color-mix(in srgb, var(--warn) 18%, transparent); color: var(--warn); }
+.status-pill.cancelled { background: #1c2128; color: #8b949e; border: 1px solid #262c34; }
+
+.act-link {
+  font-size: 11px;
+  color: var(--blue);
+  cursor: pointer;
+  text-decoration: none;
+}
+.act-link:hover { color: var(--blue-hi); }
+
+/* ── DEPLOY FREQUENCY CHART ── */
+.chart-wrap { padding: 16px 18px; }
+.chart-sub { font-size: 11px; color: #8b949e; margin-top: 2px; }
+.chart-legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+  margin-bottom: 8px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: #8b949e;
+}
+.legend-dot {
+  width: 8px; height: 8px;
+  border-radius: 2px;
+}
+.legend-dot.success { background: var(--accent); }
+.legend-dot.rollback { background: var(--danger); }
+
+.freq-chart { display: block; width: 100%; }
+</style>
+</head>
+<body>
+
+<!-- ── TOP NAVBAR ── -->
+<nav class="navbar">
+  <button class="nav-btn" aria-label="Menu">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <rect x="2" y="3.5" width="12" height="1.5" rx="0.75" fill="currentColor"/>
+      <rect x="2" y="7.25" width="12" height="1.5" rx="0.75" fill="currentColor"/>
+      <rect x="2" y="11" width="12" height="1.5" rx="0.75" fill="currentColor"/>
+    </svg>
+  </button>
+
+  <div class="repo-selector">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <rect x="2" y="1" width="6" height="8" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/>
+      <path d="M8 3h2a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-1" stroke="currentColor" stroke-width="1.2"/>
+    </svg>
+    <span class="repo-name">carbon-platform</span>
+    <span class="branch-badge">main</span>
+    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+      <path d="M2.5 3.5l2.5 3 2.5-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <div class="env-switcher">
+    <span class="env-pill active">Prod</span>
+    <span class="env-pill">Staging</span>
+    <span class="env-pill">Canary</span>
+  </div>
+
+  <div class="nav-search">
+    <svg class="search-icon" width="13" height="13" viewBox="0 0 13 13" fill="none">
+      <circle cx="5.5" cy="5.5" r="4" stroke="currentColor" stroke-width="1.3"/>
+      <path d="M8.5 8.5l2.5 2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+    </svg>
+    <input type="text" placeholder="Jump to pipeline, commit, branch…" aria-label="Search">
+  </div>
+
+  <div class="nav-right">
+    <div class="bell-wrap">
+      <button class="nav-btn" aria-label="Notifications">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M8 2a4.5 4.5 0 0 0-4.5 4.5V10l-1 1.5h11L12.5 10V6.5A4.5 4.5 0 0 0 8 2z" stroke="currentColor" stroke-width="1.3" fill="none"/>
+          <path d="M6.5 12.5a1.5 1.5 0 0 0 3 0" stroke="currentColor" stroke-width="1.3" fill="none"/>
+        </svg>
+      </button>
+      <span class="bell-badge" aria-label="2 incidents"></span>
+    </div>
+    <div class="avatar" aria-label="Rafael Nguyen">RN</div>
+  </div>
+</nav>
+
+<!-- ── BODY LAYOUT ── -->
+<div class="layout">
+
+  <!-- ── LEFT ICON RAIL ── -->
+  <aside class="rail" aria-label="Navigation">
+    <div class="rail-item active" title="Dashboard">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <rect x="2" y="2" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.9"/>
+        <rect x="10" y="2" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.5"/>
+        <rect x="2" y="10" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.5"/>
+        <rect x="10" y="10" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.5"/>
+      </svg>
+    </div>
+    <div class="rail-item" title="Pipelines">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <circle cx="4" cy="5" r="2" stroke="currentColor" stroke-width="1.3" fill="none"/>
+        <circle cx="4" cy="13" r="2" stroke="currentColor" stroke-width="1.3" fill="none"/>
+        <circle cx="14" cy="9" r="2" stroke="currentColor" stroke-width="1.3" fill="none"/>
+        <path d="M6 5h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H6" stroke="currentColor" stroke-width="1.3" fill="none"/>
+        <line x1="4" y1="7" x2="4" y2="11" stroke="currentColor" stroke-width="1.3"/>
+      </svg>
+    </div>
+    <div class="rail-item" title="Deployments">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M9 2l6 3.5v7L9 16 3 12.5v-7L9 2z" stroke="currentColor" stroke-width="1.3" fill="none"/>
+        <circle cx="9" cy="9" r="2.5" stroke="currentColor" stroke-width="1.3" fill="none"/>
+      </svg>
+    </div>
+    <div class="rail-item" title="Incidents">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M9 2.5L16.5 15H1.5L9 2.5z" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="round"/>
+        <line x1="9" y1="7.5" x2="9" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="9" cy="13" r="0.8" fill="currentColor"/>
+      </svg>
+    </div>
+    <div class="rail-spacer"></div>
+    <div class="rail-item" title="Settings">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="9" r="2.5" stroke="currentColor" stroke-width="1.3" fill="none"/>
+        <path d="M9 1v2M9 15v2M1 9h2M15 9h2M3.05 3.05l1.41 1.41M13.54 13.54l1.41 1.41M3.05 14.95l1.41-1.41M13.54 4.46l1.41-1.41" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </aside>
+
+  <!-- ── MAIN CONTENT ── -->
+  <main class="main" aria-label="Dashboard content">
+
+    <!-- KPI TILES -->
+    <section class="kpi-grid" aria-label="Key performance indicators">
+
+      <div class="kpi-tile">
+        <div class="kpi-label">Deploys Today</div>
+        <div class="kpi-value">47</div>
+        <span class="kpi-delta up">
+          <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+            <path d="M4.5 1.5v6M1.5 4.5l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          +12% vs yesterday
+        </span>
+        <svg class="kpi-sparkline" width="48" height="24" viewBox="0 0 48 24" fill="none" aria-hidden="true">
+          <polyline points="0,20 8,16 16,18 24,10 32,12 40,6 48,4" stroke="var(--accent)" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+
+      <div class="kpi-tile">
+        <div class="kpi-label">Build Success Rate</div>
+        <div class="kpi-value">96.3%</div>
+        <span class="kpi-delta up">
+          <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+            <path d="M4.5 1.5v6M1.5 4.5l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          +1.8pp vs last week
+        </span>
+        <svg class="kpi-sparkline" width="48" height="24" viewBox="0 0 48 24" fill="none" aria-hidden="true">
+          <polyline points="0,14 8,12 16,16 24,8 32,10 40,6 48,4" stroke="var(--accent)" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+
+      <div class="kpi-tile">
+        <div class="kpi-label">Open Incidents</div>
+        <div class="kpi-value">2</div>
+        <span class="kpi-delta down">
+          <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+            <path d="M4.5 7.5v-6M1.5 4.5l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          +2 since 08:00
+        </span>
+        <svg class="kpi-sparkline" width="48" height="24" viewBox="0 0 48 24" fill="none" aria-hidden="true">
+          <polyline points="0,4 8,6 16,4 24,4 32,6 40,16 48,20" stroke="var(--danger)" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+
+      <div class="kpi-tile">
+        <div class="kpi-label">MTTR</div>
+        <div class="kpi-value">18m</div>
+        <span class="kpi-delta up">
+          <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+            <path d="M4.5 1.5v6M1.5 4.5l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          −6m vs 30d avg
+        </span>
+        <svg class="kpi-sparkline" width="48" height="24" viewBox="0 0 48 24" fill="none" aria-hidden="true">
+          <polyline points="0,20 8,18 16,14 24,16 32,10 40,8 48,6" stroke="var(--accent)" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+
+    </section>
+
+    <!-- PIPELINE BOARD -->
+    <div class="card" aria-label="Pipeline runs">
+      <div class="card-header">
+        <span class="card-title">Pipeline Runs</span>
+        <a class="card-link">View all →</a>
+      </div>
+      <table class="pipeline-table" aria-label="Recent pipeline runs">
+        <thead>
+          <tr>
+            <th>Pipeline</th>
+            <th>Commit</th>
+            <th>Author</th>
+            <th>Branch</th>
+            <th>Stages</th>
+            <th>Duration</th>
+            <th>Started</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="pipeline-name">api-gateway</span></td>
+            <td><span class="sha-chip">a3f9c12</span></td>
+            <td class="author-cell">R. Nguyen</td>
+            <td><span class="branch-name">feat/rate-limit-v2</span></td>
+            <td>
+              <div class="stage-chips">
+                <span class="stage-chip running"><span class="running-dot"></span>Build</span>
+                <span class="stage-chip" style="color:#8b949e;border-color:#262c34;">Test</span>
+                <span class="stage-chip" style="color:#8b949e;border-color:#262c34;">Deploy</span>
+              </div>
+            </td>
+            <td class="duration-badge">1m 42s</td>
+            <td class="ts-cell">Just now</td>
+          </tr>
+          <tr>
+            <td><span class="pipeline-name">inference-worker</span></td>
+            <td><span class="sha-chip">7e2b45d</span></td>
+            <td class="author-cell">S. Okafor</td>
+            <td><span class="branch-name">main</span></td>
+            <td>
+              <div class="stage-chips">
+                <span class="stage-chip pass">Build</span>
+                <span class="stage-chip pass">Test</span>
+                <span class="stage-chip pass">Deploy</span>
+              </div>
+            </td>
+            <td class="duration-badge">4m 08s</td>
+            <td class="ts-cell">3 min ago</td>
+          </tr>
+          <tr>
+            <td><span class="pipeline-name">carbon-ui-lib</span></td>
+            <td><span class="sha-chip">c01fa3e</span></td>
+            <td class="author-cell">M. Patel</td>
+            <td><span class="branch-name">fix/button-a11y</span></td>
+            <td>
+              <div class="stage-chips">
+                <span class="stage-chip pass">Build</span>
+                <span class="stage-chip fail">Test</span>
+                <span class="stage-chip" style="color:#8b949e;border-color:#262c34;">Deploy</span>
+              </div>
+            </td>
+            <td class="duration-badge">2m 31s</td>
+            <td class="ts-cell">11 min ago</td>
+          </tr>
+          <tr>
+            <td><span class="pipeline-name">event-bus</span></td>
+            <td><span class="sha-chip">d88b901</span></td>
+            <td class="author-cell">L. Torres</td>
+            <td><span class="branch-name">refactor/kafka-upgrade</span></td>
+            <td>
+              <div class="stage-chips">
+                <span class="stage-chip pass">Build</span>
+                <span class="stage-chip pass">Test</span>
+                <span class="stage-chip pass">Deploy</span>
+              </div>
+            </td>
+            <td class="duration-badge">6m 55s</td>
+            <td class="ts-cell">28 min ago</td>
+          </tr>
+          <tr>
+            <td><span class="pipeline-name">metrics-collector</span></td>
+            <td><span class="sha-chip">f140e6a</span></td>
+            <td class="author-cell">A. Chen</td>
+            <td><span class="branch-name">chore/otel-upgrade</span></td>
+            <td>
+              <div class="stage-chips">
+                <span class="stage-chip pass">Build</span>
+                <span class="stage-chip pass">Test</span>
+                <span class="stage-chip fail">Deploy</span>
+              </div>
+            </td>
+            <td class="duration-badge">3m 19s</td>
+            <td class="ts-cell">52 min ago</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- BOTTOM GRID: chart + incidents -->
+    <div class="bottom-grid">
+
+      <!-- DEPLOY FREQUENCY CHART -->
+      <div class="card" aria-label="Deploy frequency">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Deploy Frequency</div>
+            <div class="chart-sub">Successful deploys vs rollbacks · last 7 days</div>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <div class="chart-legend">
+            <span class="legend-item"><span class="legend-dot success"></span>Successful</span>
+            <span class="legend-item"><span class="legend-dot rollback"></span>Rollback</span>
+          </div>
+          <!-- Inline SVG bar chart -->
+          <svg class="freq-chart" height="120" viewBox="0 0 560 120" aria-label="Deploy frequency bar chart">
+            <!-- Y axis gridlines -->
+            <line x1="0" y1="0" x2="560" y2="0" stroke="#262c34" stroke-width="1"/>
+            <line x1="0" y1="30" x2="560" y2="30" stroke="#262c34" stroke-width="1"/>
+            <line x1="0" y1="60" x2="560" y2="60" stroke="#262c34" stroke-width="1"/>
+            <line x1="0" y1="90" x2="560" y2="90" stroke="#262c34" stroke-width="1"/>
+            <!-- Y labels -->
+            <text x="0" y="0" fill="#8b949e" font-size="9" dy="10">16</text>
+            <text x="0" y="30" fill="#8b949e" font-size="9" dy="10">12</text>
+            <text x="0" y="60" fill="#8b949e" font-size="9" dy="10">8</text>
+            <text x="0" y="90" fill="#8b949e" font-size="9" dy="10">4</text>
+
+            <!-- Mon: 8 deploys -->
+            <rect x="24" y="60" width="30" height="60" rx="3" fill="var(--accent)" opacity="0.85"/>
+            <!-- rollback 0 -->
+            <text x="39" y="118" fill="#8b949e" font-size="9" text-anchor="middle">Mon</text>
+
+            <!-- Tue: 12 deploys -->
+            <rect x="102" y="30" width="30" height="90" rx="3" fill="var(--accent)" opacity="0.85"/>
+            <!-- 1 rollback -->
+            <rect x="134" y="105" width="10" height="15" rx="2" fill="var(--danger)" opacity="0.8"/>
+            <text x="117" y="118" fill="#8b949e" font-size="9" text-anchor="middle">Tue</text>
+
+            <!-- Wed: 10 deploys -->
+            <rect x="180" y="45" width="30" height="75" rx="3" fill="var(--accent)" opacity="0.85"/>
+            <text x="195" y="118" fill="#8b949e" font-size="9" text-anchor="middle">Wed</text>
+
+            <!-- Thu: 14 deploys -->
+            <rect x="258" y="15" width="30" height="105" rx="3" fill="var(--accent)" opacity="0.85"/>
+            <text x="273" y="118" fill="#8b949e" font-size="9" text-anchor="middle">Thu</text>
+
+            <!-- Fri: 11 deploys -->
+            <rect x="336" y="37.5" width="30" height="82.5" rx="3" fill="var(--accent)" opacity="0.85"/>
+            <!-- 2 rollbacks -->
+            <rect x="368" y="97.5" width="10" height="22.5" rx="2" fill="var(--danger)" opacity="0.8"/>
+            <text x="351" y="118" fill="#8b949e" font-size="9" text-anchor="middle">Fri</text>
+
+            <!-- Sat: 5 deploys -->
+            <rect x="414" y="82.5" width="30" height="37.5" rx="3" fill="var(--accent)" opacity="0.85"/>
+            <text x="429" y="118" fill="#8b949e" font-size="9" text-anchor="middle">Sat</text>
+
+            <!-- Sun: 7 deploys -->
+            <rect x="492" y="67.5" width="30" height="52.5" rx="3" fill="var(--accent)" opacity="0.85"/>
+            <text x="507" y="118" fill="#8b949e" font-size="9" text-anchor="middle">Sun</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- ACTIVE INCIDENTS -->
+      <div class="card" aria-label="Active incidents">
+        <div class="card-header">
+          <span class="card-title">Active Incidents</span>
+          <a class="card-link">Open board →</a>
+        </div>
+        <div class="incident-list">
+          <div class="incident-row">
+            <span class="sev-pill p1">P1</span>
+            <div class="incident-body">
+              <div class="incident-service">api-gateway · prod</div>
+              <div class="incident-desc">Elevated 5xx on /v2/completions — p99 latency 8.4 s</div>
+              <div class="incident-ts">Opened 14 min ago · R. Nguyen on-call</div>
+            </div>
+          </div>
+          <div class="incident-row">
+            <span class="sev-pill p2">P2</span>
+            <div class="incident-body">
+              <div class="incident-service">metrics-collector · prod</div>
+              <div class="incident-desc">OTEL deploy rollback — metrics gap ~40 min</div>
+              <div class="incident-ts">Opened 55 min ago · A. Chen on-call</div>
+            </div>
+          </div>
+          <div class="incident-row">
+            <span class="sev-pill p3">P3</span>
+            <div class="incident-body">
+              <div class="incident-service">carbon-ui-lib · staging</div>
+              <div class="incident-desc">Failed accessibility test suite blocking merge</div>
+              <div class="incident-ts">Opened 2h ago · M. Patel assigned</div>
+            </div>
+          </div>
+          <div class="incident-row">
+            <span class="sev-pill p3">P3</span>
+            <div class="incident-body">
+              <div class="incident-service">event-bus · canary</div>
+              <div class="incident-desc">Consumer lag spike on topic order.created</div>
+              <div class="incident-ts">Opened 3h ago · L. Torres assigned</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BUILDS TABLE -->
+    <div class="card" aria-label="Recent builds">
+      <div class="card-header">
+        <span class="card-title">Recent Builds</span>
+      </div>
+      <div class="filter-tabs">
+        <span class="filter-tab active">All</span>
+        <span class="filter-tab">Passing</span>
+        <span class="filter-tab">Failing</span>
+        <span class="filter-tab">Cancelled</span>
+      </div>
+      <table class="builds-table" aria-label="Build history">
+        <thead>
+          <tr>
+            <th>Build</th>
+            <th>Branch</th>
+            <th>Commit</th>
+            <th>Triggered By</th>
+            <th>Status</th>
+            <th>Duration</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="build-id">#2891</span></td>
+            <td><span class="branch-name">feat/rate-limit-v2</span></td>
+            <td><span class="sha-chip">a3f9c12</span></td>
+            <td class="author-cell">R. Nguyen</td>
+            <td><span class="status-pill running"><span class="running-dot"></span>Running</span></td>
+            <td class="duration-badge">1m 42s</td>
+            <td><a class="act-link">Logs</a></td>
+          </tr>
+          <tr>
+            <td><span class="build-id">#2890</span></td>
+            <td><span class="branch-name">main</span></td>
+            <td><span class="sha-chip">7e2b45d</span></td>
+            <td class="author-cell">S. Okafor</td>
+            <td><span class="status-pill passed">Passed</span></td>
+            <td class="duration-badge">4m 08s</td>
+            <td><a class="act-link">Logs</a></td>
+          </tr>
+          <tr>
+            <td><span class="build-id">#2889</span></td>
+            <td><span class="branch-name">fix/button-a11y</span></td>
+            <td><span class="sha-chip">c01fa3e</span></td>
+            <td class="author-cell">M. Patel</td>
+            <td><span class="status-pill failed">Failed</span></td>
+            <td class="duration-badge">2m 31s</td>
+            <td><a class="act-link">Logs</a></td>
+          </tr>
+          <tr>
+            <td><span class="build-id">#2888</span></td>
+            <td><span class="branch-name">refactor/kafka-upgrade</span></td>
+            <td><span class="sha-chip">d88b901</span></td>
+            <td class="author-cell">L. Torres</td>
+            <td><span class="status-pill passed">Passed</span></td>
+            <td class="duration-badge">6m 55s</td>
+            <td><a class="act-link">Logs</a></td>
+          </tr>
+          <tr>
+            <td><span class="build-id">#2887</span></td>
+            <td><span class="branch-name">chore/otel-upgrade</span></td>
+            <td><span class="sha-chip">f140e6a</span></td>
+            <td class="author-cell">A. Chen</td>
+            <td><span class="status-pill failed">Failed</span></td>
+            <td class="duration-badge">3m 19s</td>
+            <td><a class="act-link">Logs</a></td>
+          </tr>
+          <tr>
+            <td><span class="build-id">#2886</span></td>
+            <td><span class="branch-name">main</span></td>
+            <td><span class="sha-chip">b72d308</span></td>
+            <td class="author-cell">S. Okafor</td>
+            <td><span class="status-pill passed">Passed</span></td>
+            <td class="duration-badge">4m 51s</td>
+            <td><a class="act-link">Logs</a></td>
+          </tr>
+          <tr>
+            <td><span class="build-id">#2885</span></td>
+            <td><span class="branch-name">deps/node-24-lts</span></td>
+            <td><span class="sha-chip">e91c477</span></td>
+            <td class="author-cell">M. Patel</td>
+            <td><span class="status-pill cancelled">Cancelled</span></td>
+            <td class="duration-badge">0m 38s</td>
+            <td><a class="act-link">Logs</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>

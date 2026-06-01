@@ -1,0 +1,1330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Forge MES Admin — Ironclad Manufacturing</title>
+<style>
+  :root {
+    --accent:        #f97316;
+    --accent-light:  #fb923c;
+    --accent-dim:    rgba(249,115,22,.14);
+    --state-running: #22c55e;
+    --state-running-dim: rgba(34,197,94,.13);
+    --state-idle:    #f59e0b;
+    --state-idle-dim: rgba(245,158,11,.13);
+    --state-down:    #ef4444;
+    --state-down-dim: rgba(239,68,68,.13);
+    --state-queued:  #64748b;
+    --state-queued-dim: rgba(100,116,139,.15);
+    --state-completed: #22c55e;
+    --state-completed-dim: rgba(34,197,94,.13);
+    --state-hold:    #ef4444;
+    --state-hold-dim: rgba(239,68,68,.13);
+    --delta-up:      #4ade80;
+    --delta-down:    #f87171;
+    --sev-critical:  #ef4444;
+    --sev-warn:      #f59e0b;
+    --sev-info:      #38bdf8;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+    background: #0c0f14;
+    color: #e6ebf2;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── TOP NAVBAR ─────────────────────────────────────────────── */
+  .navbar {
+    height: 52px;
+    background: #141922;
+    border-bottom: 1px solid #2a3340;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-shrink: 0;
+  }
+
+  .navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .navbar-brand svg { flex-shrink: 0; }
+
+  .brand-text {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -.3px;
+    color: #e6ebf2;
+    line-height: 1;
+  }
+
+  .brand-text span { color: var(--accent); }
+
+  .plant-switcher {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 8px;
+    padding: 5px 10px;
+    background: #1d2530;
+    border: 1px solid #2a3340;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #e6ebf2;
+    white-space: nowrap;
+  }
+
+  .plant-switcher svg { color: #8b96a5; }
+
+  .navbar-search {
+    flex: 1;
+    max-width: 320px;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #1d2530;
+    border: 1px solid #2a3340;
+    border-radius: 20px;
+    padding: 6px 14px;
+  }
+
+  .navbar-search input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #e6ebf2;
+    font-size: 13px;
+    width: 100%;
+    font-family: inherit;
+  }
+
+  .navbar-search input::placeholder { color: #8b96a5; }
+
+  .shift-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: var(--accent-dim);
+    border: 1px solid rgba(249,115,22,.3);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent-light);
+    white-space: nowrap;
+  }
+
+  .shift-badge-dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%,100% { opacity: 1; }
+    50% { opacity: .4; }
+  }
+
+  .navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+
+  .icon-btn {
+    position: relative;
+    width: 34px; height: 34px;
+    background: #1d2530;
+    border: 1px solid #2a3340;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #8b96a5;
+  }
+
+  .icon-btn:hover { color: #e6ebf2; border-color: #3a4455; }
+
+  .notif-dot {
+    position: absolute;
+    top: 6px; right: 6px;
+    width: 7px; height: 7px;
+    background: var(--accent);
+    border-radius: 50%;
+    border: 1.5px solid #141922;
+  }
+
+  .avatar {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--accent) 0%, #c2410c 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* ── SHELL BELOW NAVBAR ─────────────────────────────────────── */
+  .shell {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── LEFT ICON RAIL ─────────────────────────────────────────── */
+  .rail {
+    width: 56px;
+    background: #0c0f14;
+    border-right: 1px solid #2a3340;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 0;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .rail-item {
+    position: relative;
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #64748b;
+    transition: background .15s, color .15s;
+  }
+
+  .rail-item:hover { background: #141922; color: #8b96a5; }
+
+  .rail-item.active {
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  .rail-item.active svg path,
+  .rail-item.active svg rect,
+  .rail-item.active svg circle { fill: var(--accent); }
+
+  .rail-spacer { flex: 1; }
+
+  /* ── MAIN CONTENT ───────────────────────────────────────────── */
+  .main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .page-title { font-size: 18px; font-weight: 700; color: #e6ebf2; }
+  .page-subtitle { font-size: 13px; color: #8b96a5; margin-top: 2px; }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-ghost {
+    padding: 7px 14px;
+    background: transparent;
+    border: 1px solid #2a3340;
+    border-radius: 7px;
+    color: #8b96a5;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: border-color .15s, color .15s;
+  }
+
+  .btn-ghost:hover { border-color: #3a4455; color: #e6ebf2; }
+
+  .btn-primary {
+    padding: 7px 14px;
+    background: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 7px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background .15s;
+  }
+
+  .btn-primary:hover { background: var(--accent-light); }
+
+  /* ── KPI TILES ──────────────────────────────────────────────── */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+
+  .kpi-tile {
+    background: #141922;
+    border: 1px solid #2a3340;
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .kpi-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .kpi-icon {
+    width: 36px; height: 36px;
+    background: var(--accent-dim);
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .kpi-icon.amber { background: rgba(245,158,11,.14); }
+  .kpi-icon.red   { background: rgba(239,68,68,.14); }
+  .kpi-icon.steel { background: rgba(100,116,139,.14); }
+
+  .kpi-delta {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  .kpi-delta.up   { color: var(--delta-up);   background: rgba(74,222,128,.1); }
+  .kpi-delta.down { color: var(--delta-down);  background: rgba(248,113,113,.1); }
+  .kpi-delta.warn { color: var(--state-idle);  background: rgba(245,158,11,.1); }
+
+  .kpi-value {
+    font-size: 28px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -.5px;
+    line-height: 1;
+    color: #e6ebf2;
+  }
+
+  .kpi-value.orange { color: var(--accent); }
+  .kpi-value.amber  { color: var(--state-idle); }
+  .kpi-value.red    { color: var(--state-down); }
+
+  .kpi-label {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: .6px;
+    text-transform: uppercase;
+    color: #8b96a5;
+  }
+
+  .kpi-sub {
+    font-size: 11.5px;
+    color: #64748b;
+    margin-top: 2px;
+  }
+
+  /* ── MAIN GRID ──────────────────────────────────────────────── */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 7fr 5fr;
+    gap: 14px;
+    align-items: start;
+  }
+
+  .card {
+    background: #141922;
+    border: 1px solid #2a3340;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid #2a3340;
+  }
+
+  .card-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #e6ebf2;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .card-title svg { color: var(--accent); }
+  .card-count { font-size: 11px; color: #8b96a5; font-weight: 400; }
+
+  .view-all {
+    font-size: 12px;
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .view-all:hover { color: var(--accent-light); }
+
+  /* ── PRODUCTION LINES BOARD ─────────────────────────────────── */
+  .lines-board { padding: 0; }
+
+  .line-row {
+    display: grid;
+    grid-template-columns: 110px 90px 1fr 80px 28px;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 16px;
+    border-bottom: 1px solid #1d2530;
+    transition: background .12s;
+  }
+
+  .line-row:last-child { border-bottom: none; }
+  .line-row:hover { background: #1d2530; }
+
+  .line-name { font-size: 13px; font-weight: 600; color: #e6ebf2; }
+  .line-name-sub { font-size: 11px; color: #8b96a5; }
+
+  .state-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .2px;
+    white-space: nowrap;
+  }
+
+  .state-pill-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+  .state-pill.running {
+    background: var(--state-running-dim);
+    color: var(--state-running);
+    border: 1px solid rgba(34,197,94,.22);
+  }
+
+  .state-pill.running .state-pill-dot { background: var(--state-running); }
+
+  .state-pill.idle {
+    background: var(--state-idle-dim);
+    color: var(--state-idle);
+    border: 1px solid rgba(245,158,11,.22);
+  }
+
+  .state-pill.idle .state-pill-dot { background: var(--state-idle); }
+
+  .state-pill.down {
+    background: var(--state-down-dim);
+    color: var(--state-down);
+    border: 1px solid rgba(239,68,68,.22);
+  }
+
+  .state-pill.down .state-pill-dot { background: var(--state-down); }
+
+  .line-progress-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .line-progress-nums {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .line-progress-nums .cur { color: #e6ebf2; font-weight: 600; }
+  .line-progress-nums .tgt { color: #8b96a5; }
+
+  .progress-bar {
+    height: 4px;
+    background: #2a3340;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--accent);
+    transition: width .4s ease;
+  }
+
+  .progress-bar-fill.low { background: var(--state-down); }
+
+  .ops-icon {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    color: #64748b;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── OUTPUT TREND CHART ─────────────────────────────────────── */
+  .chart-wrap {
+    padding: 14px 16px;
+    background: #141922;
+  }
+
+  .chart-labels-x {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0 0;
+    font-size: 10px;
+    color: #64748b;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── ALERTS PANEL ───────────────────────────────────────────── */
+  .alerts-list { padding: 0; }
+
+  .alert-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 11px 16px;
+    border-bottom: 1px solid #1d2530;
+    transition: background .12s;
+  }
+
+  .alert-row:last-child { border-bottom: none; }
+  .alert-row:hover { background: #1d2530; }
+
+  .sev-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-top: 4px;
+    flex-shrink: 0;
+  }
+
+  .sev-dot.critical { background: var(--sev-critical); box-shadow: 0 0 5px var(--sev-critical); }
+  .sev-dot.warn     { background: var(--sev-warn); }
+  .sev-dot.info     { background: var(--sev-info); }
+
+  .alert-body { flex: 1; min-width: 0; }
+
+  .alert-line-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 6px;
+    background: #1d2530;
+    border: 1px solid #2a3340;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #8b96a5;
+    margin-bottom: 3px;
+  }
+
+  .alert-desc { font-size: 12.5px; color: #c5cdd7; line-height: 1.4; }
+  .alert-time { font-size: 11px; color: #64748b; margin-top: 2px; font-variant-numeric: tabular-nums; }
+
+  .downtime-mini { padding: 12px 16px 14px; border-top: 1px solid #2a3340; }
+
+  .downtime-mini-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    color: #8b96a5;
+    margin-bottom: 10px;
+  }
+
+  .dt-table { width: 100%; border-collapse: collapse; }
+
+  .dt-table th {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .4px;
+    text-transform: uppercase;
+    color: #64748b;
+    text-align: left;
+    padding: 0 0 6px;
+  }
+
+  .dt-table td {
+    font-size: 12px;
+    color: #8b96a5;
+    padding: 5px 0;
+    border-top: 1px solid #1d2530;
+    font-variant-numeric: tabular-nums;
+    vertical-align: middle;
+  }
+
+  .dt-table td:first-child { color: #c5cdd7; font-weight: 500; }
+
+  .acknowledge-btn {
+    display: block;
+    width: 100%;
+    margin-top: 14px;
+    padding: 8px;
+    background: transparent;
+    border: 1px solid rgba(249,115,22,.35);
+    border-radius: 7px;
+    color: var(--accent);
+    font-size: 12.5px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    text-align: center;
+    transition: background .15s;
+  }
+
+  .acknowledge-btn:hover { background: var(--accent-dim); }
+
+  /* ── WORK ORDERS TABLE ──────────────────────────────────────── */
+  .wo-card { margin-top: 0; }
+
+  .wo-table-wrap { overflow-x: auto; }
+
+  .wo-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .wo-table th {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    color: #64748b;
+    text-align: left;
+    padding: 10px 16px;
+    background: #141922;
+    border-bottom: 1px solid #2a3340;
+    white-space: nowrap;
+  }
+
+  .wo-table td {
+    padding: 11px 16px;
+    font-size: 13px;
+    color: #c5cdd7;
+    border-bottom: 1px solid #1d2530;
+    vertical-align: middle;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .wo-table tr:last-child td { border-bottom: none; }
+  .wo-table tbody tr:hover td { background: #1d2530; }
+
+  .wo-num { font-weight: 700; color: #e6ebf2; font-family: "Courier New", monospace; font-size: 12px; }
+
+  .prod-code {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .prod-code-id { font-weight: 600; color: #e6ebf2; font-family: "Courier New", monospace; font-size: 12px; }
+  .prod-code-name { font-size: 11px; color: #8b96a5; }
+
+  .wo-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1px;
+    white-space: nowrap;
+  }
+
+  .wo-status.inprogress {
+    background: var(--accent-dim);
+    color: var(--accent-light);
+    border: 1px solid rgba(249,115,22,.25);
+  }
+
+  .wo-status.queued {
+    background: var(--state-queued-dim);
+    color: #94a3b8;
+    border: 1px solid rgba(100,116,139,.25);
+  }
+
+  .wo-status.completed {
+    background: var(--state-completed-dim);
+    color: var(--state-completed);
+    border: 1px solid rgba(34,197,94,.22);
+  }
+
+  .wo-status.onhold {
+    background: var(--state-hold-dim);
+    color: var(--state-hold);
+    border: 1px solid rgba(239,68,68,.22);
+  }
+
+  .wo-status-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
+  .due-date { font-size: 12px; color: #8b96a5; }
+  .due-date.overdue { color: var(--state-down); font-weight: 600; }
+
+  .qty-cell { font-weight: 600; color: #e6ebf2; }
+
+  .wo-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-top: 1px solid #2a3340;
+    font-size: 12px;
+    color: #64748b;
+  }
+
+  .wo-pagination {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .page-btn {
+    width: 28px; height: 28px;
+    background: #1d2530;
+    border: 1px solid #2a3340;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #8b96a5;
+    font-size: 12px;
+    font-family: inherit;
+  }
+
+  .page-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
+  .page-btn:hover:not(.active) { border-color: #3a4455; color: #e6ebf2; }
+</style>
+</head>
+<body>
+
+<!-- ── TOP NAVBAR ──────────────────────────────────────────────── -->
+<nav class="navbar">
+
+  <!-- Brand wordmark -->
+  <a href="#" class="navbar-brand">
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="26" height="26" rx="7" fill="#f97316"/>
+      <path d="M7 19L10 10H13L11 15H14L9.5 24L13 17H10.5L12.5 10H16L13 19H7Z" fill="white"/>
+      <rect x="15" y="7" width="4" height="12" rx="1.5" fill="rgba(255,255,255,.55)"/>
+    </svg>
+    <span class="brand-text">Forge<span>MES</span></span>
+  </a>
+
+  <!-- Plant switcher -->
+  <button class="plant-switcher">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+    Ironclad — Plant 1 · Sector A
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
+
+  <!-- Search -->
+  <div class="navbar-search">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b96a5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" placeholder="Search WO, product, line…">
+  </div>
+
+  <!-- Shift badge -->
+  <div class="shift-badge">
+    <span class="shift-badge-dot"></span>
+    Shift B · 06:00–14:00
+  </div>
+
+  <div class="navbar-right">
+    <!-- Notifications -->
+    <div class="icon-btn">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="notif-dot"></span>
+    </div>
+    <!-- Avatar -->
+    <div class="avatar">MK</div>
+  </div>
+</nav>
+
+<!-- ── SHELL ───────────────────────────────────────────────────── -->
+<div class="shell">
+
+  <!-- ── LEFT ICON RAIL ────────────────────────────────────────── -->
+  <aside class="rail">
+    <!-- Dashboard (active) -->
+    <div class="rail-item active" title="Dashboard">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3" y="3" width="8" height="8" rx="2" fill="var(--accent)"/>
+        <rect x="13" y="3" width="8" height="8" rx="2" fill="var(--accent)" opacity=".5"/>
+        <rect x="3" y="13" width="8" height="8" rx="2" fill="var(--accent)" opacity=".5"/>
+        <rect x="13" y="13" width="8" height="8" rx="2" fill="var(--accent)" opacity=".35"/>
+      </svg>
+    </div>
+    <!-- Production -->
+    <div class="rail-item" title="Production Lines">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="4" rx="1"/><rect x="2" y="10" width="20" height="4" rx="1"/><rect x="2" y="17" width="20" height="4" rx="1"/></svg>
+    </div>
+    <!-- Work Orders -->
+    <div class="rail-item" title="Work Orders">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="12" y2="15"/></svg>
+    </div>
+    <!-- Reports -->
+    <div class="rail-item" title="Reports">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    </div>
+    <div class="rail-spacer"></div>
+    <!-- Settings -->
+    <div class="rail-item" title="Settings">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </div>
+  </aside>
+
+  <!-- ── MAIN CONTENT ───────────────────────────────────────────── -->
+  <main class="main">
+
+    <!-- Page header -->
+    <div class="page-header">
+      <div>
+        <div class="page-title">Operations Dashboard</div>
+        <div class="page-subtitle">Plant 1 · Sector A · Mon 2 Jun 2025 · Live data</div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-ghost">Export Report</button>
+        <button class="btn-primary">+ New Work Order</button>
+      </div>
+    </div>
+
+    <!-- ── KPI TILES ────────────────────────────────────────────── -->
+    <div class="kpi-row">
+
+      <!-- OEE -->
+      <div class="kpi-tile">
+        <div class="kpi-top">
+          <div class="kpi-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <span class="kpi-delta up">▲ 3.1%</span>
+        </div>
+        <div class="kpi-value orange">84.7<span style="font-size:16px;font-weight:600">%</span></div>
+        <div>
+          <div class="kpi-label">Overall Equipment Effectiveness</div>
+          <div class="kpi-sub">Target: 85.0% · Availability 91%</div>
+        </div>
+      </div>
+
+      <!-- Output Today -->
+      <div class="kpi-tile">
+        <div class="kpi-top">
+          <div class="kpi-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+          </div>
+          <span class="kpi-delta up">▲ 218</span>
+        </div>
+        <div class="kpi-value">14,382</div>
+        <div>
+          <div class="kpi-label">Units Output Today</div>
+          <div class="kpi-sub">Target: 16,000 · 89.9% attained</div>
+        </div>
+      </div>
+
+      <!-- Downtime -->
+      <div class="kpi-tile">
+        <div class="kpi-top">
+          <div class="kpi-icon amber">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--state-idle)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <span class="kpi-delta warn">▲ 14 min</span>
+        </div>
+        <div class="kpi-value amber">47</div>
+        <div>
+          <div class="kpi-label">Downtime Minutes</div>
+          <div class="kpi-sub">This shift · 3 incidents logged</div>
+        </div>
+      </div>
+
+      <!-- Scrap Rate -->
+      <div class="kpi-tile">
+        <div class="kpi-top">
+          <div class="kpi-icon red">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--state-down)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <span class="kpi-delta down">▼ 0.4%</span>
+        </div>
+        <div class="kpi-value red">2.1<span style="font-size:16px;font-weight:600">%</span></div>
+        <div>
+          <div class="kpi-label">Scrap Rate</div>
+          <div class="kpi-sub">Threshold: 1.8% · 297 pcs scrapped</div>
+        </div>
+      </div>
+
+    </div><!-- /kpi-row -->
+
+    <!-- ── MAIN GRID ─────────────────────────────────────────────── -->
+    <div class="main-grid">
+
+      <!-- LEFT: Lines Board + Trend Chart -->
+      <div style="display:flex;flex-direction:column;gap:14px;">
+
+        <!-- Production Lines Status Board -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="4" rx="1"/><rect x="2" y="10" width="20" height="4" rx="1"/><rect x="2" y="17" width="20" height="4" rx="1"/></svg>
+              Production Lines
+              <span class="card-count">5 lines</span>
+            </div>
+            <a href="#" class="view-all">View all →</a>
+          </div>
+
+          <div class="lines-board">
+            <!-- Line A-01 -->
+            <div class="line-row">
+              <div>
+                <div class="line-name">Line A-01</div>
+                <div class="line-name-sub">Stamping · Bay 1</div>
+              </div>
+              <span class="state-pill running"><span class="state-pill-dot"></span>Running</span>
+              <div class="line-progress-wrap">
+                <div class="line-progress-nums">
+                  <span class="cur">348 u/hr</span>
+                  <span class="tgt">/ 360</span>
+                </div>
+                <div class="progress-bar"><div class="progress-bar-fill" style="width:96.7%"></div></div>
+              </div>
+              <div></div>
+              <div class="ops-icon">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 20a7.5 7.5 0 0 1 13 0"/></svg>
+                3
+              </div>
+            </div>
+
+            <!-- Line A-02 -->
+            <div class="line-row">
+              <div>
+                <div class="line-name">Line A-02</div>
+                <div class="line-name-sub">Welding · Bay 2</div>
+              </div>
+              <span class="state-pill running"><span class="state-pill-dot"></span>Running</span>
+              <div class="line-progress-wrap">
+                <div class="line-progress-nums">
+                  <span class="cur">210 u/hr</span>
+                  <span class="tgt">/ 240</span>
+                </div>
+                <div class="progress-bar"><div class="progress-bar-fill" style="width:87.5%"></div></div>
+              </div>
+              <div></div>
+              <div class="ops-icon">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 20a7.5 7.5 0 0 1 13 0"/></svg>
+                4
+              </div>
+            </div>
+
+            <!-- Line B-01 -->
+            <div class="line-row">
+              <div>
+                <div class="line-name">Line B-01</div>
+                <div class="line-name-sub">Assembly · Bay 3</div>
+              </div>
+              <span class="state-pill idle"><span class="state-pill-dot"></span>Idle</span>
+              <div class="line-progress-wrap">
+                <div class="line-progress-nums">
+                  <span class="cur">0 u/hr</span>
+                  <span class="tgt">/ 180</span>
+                </div>
+                <div class="progress-bar"><div class="progress-bar-fill low" style="width:0%"></div></div>
+              </div>
+              <div></div>
+              <div class="ops-icon">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 20a7.5 7.5 0 0 1 13 0"/></svg>
+                2
+              </div>
+            </div>
+
+            <!-- Line B-02 -->
+            <div class="line-row">
+              <div>
+                <div class="line-name">Line B-02</div>
+                <div class="line-name-sub">Painting · Bay 4</div>
+              </div>
+              <span class="state-pill running"><span class="state-pill-dot"></span>Running</span>
+              <div class="line-progress-wrap">
+                <div class="line-progress-nums">
+                  <span class="cur">162 u/hr</span>
+                  <span class="tgt">/ 200</span>
+                </div>
+                <div class="progress-bar"><div class="progress-bar-fill" style="width:81%"></div></div>
+              </div>
+              <div></div>
+              <div class="ops-icon">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 20a7.5 7.5 0 0 1 13 0"/></svg>
+                3
+              </div>
+            </div>
+
+            <!-- Line C-01 -->
+            <div class="line-row">
+              <div>
+                <div class="line-name">Line C-01</div>
+                <div class="line-name-sub">Quality · Bay 5</div>
+              </div>
+              <span class="state-pill down"><span class="state-pill-dot"></span>Down</span>
+              <div class="line-progress-wrap">
+                <div class="line-progress-nums">
+                  <span class="cur">0 u/hr</span>
+                  <span class="tgt">/ 120</span>
+                </div>
+                <div class="progress-bar"><div class="progress-bar-fill low" style="width:0%"></div></div>
+              </div>
+              <div></div>
+              <div class="ops-icon">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 20a7.5 7.5 0 0 1 13 0"/></svg>
+                2
+              </div>
+            </div>
+          </div><!-- /lines-board -->
+        </div><!-- /Production Lines card -->
+
+        <!-- Output Trend Chart -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              Output Trend
+              <span class="card-count">Last 8 hours · units/hr</span>
+            </div>
+            <span style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:4px;">
+              <span style="display:inline-block;width:20px;height:2px;background:var(--accent);border-radius:1px;vertical-align:middle;"></span>
+              All lines combined
+            </span>
+          </div>
+
+          <div class="chart-wrap">
+            <!-- Inline SVG chart -->
+            <svg viewBox="0 0 600 120" width="100%" height="120" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+              <!-- Grid lines -->
+              <line x1="0" y1="30"  x2="600" y2="30"  stroke="#2a3340" stroke-width="1" stroke-dasharray="4 3"/>
+              <line x1="0" y1="60"  x2="600" y2="60"  stroke="#2a3340" stroke-width="1" stroke-dasharray="4 3"/>
+              <line x1="0" y1="90"  x2="600" y2="90"  stroke="#2a3340" stroke-width="1" stroke-dasharray="4 3"/>
+              <!-- Y axis labels -->
+              <text x="0" y="28"  font-size="9" fill="#64748b" font-family="system-ui,sans-serif">900</text>
+              <text x="0" y="58"  font-size="9" fill="#64748b" font-family="system-ui,sans-serif">600</text>
+              <text x="0" y="88"  font-size="9" fill="#64748b" font-family="system-ui,sans-serif">300</text>
+              <text x="0" y="116" font-size="9" fill="#64748b" font-family="system-ui,sans-serif">0</text>
+              <!-- Area fill -->
+              <defs>
+                <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%"   stop-color="#f97316" stop-opacity=".22"/>
+                  <stop offset="100%" stop-color="#f97316" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <!-- Data: hours 06-13, values: 320,580,710,850,790,720,680,720 (mapped to y in 0-120 scale, max=960) -->
+              <polygon
+                points="30,120 30,80 105,55 180,31 255,14 330,24 405,34 480,39 555,34 555,120"
+                fill="url(#areaGrad)"/>
+              <!-- Line -->
+              <polyline
+                points="30,80 105,55 180,31 255,14 330,24 405,34 480,39 555,34"
+                fill="none"
+                stroke="var(--accent)"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"/>
+              <!-- Dots -->
+              <circle cx="30"  cy="80" r="3.5" fill="#141922" stroke="var(--accent)" stroke-width="2"/>
+              <circle cx="105" cy="55" r="3.5" fill="#141922" stroke="var(--accent)" stroke-width="2"/>
+              <circle cx="180" cy="31" r="3.5" fill="#141922" stroke="var(--accent)" stroke-width="2"/>
+              <circle cx="255" cy="14" r="3.5" fill="var(--accent)" stroke="var(--accent)" stroke-width="2"/>
+              <circle cx="330" cy="24" r="3.5" fill="#141922" stroke="var(--accent)" stroke-width="2"/>
+              <circle cx="405" cy="34" r="3.5" fill="#141922" stroke="var(--accent)" stroke-width="2"/>
+              <circle cx="480" cy="39" r="3.5" fill="#141922" stroke="var(--accent)" stroke-width="2"/>
+              <circle cx="555" cy="34" r="3.5" fill="#141922" stroke="var(--accent)" stroke-width="2"/>
+              <!-- Tooltip marker at peak -->
+              <rect x="225" y="2" width="66" height="18" rx="4" fill="#f97316"/>
+              <text x="258" y="14.5" font-size="10" fill="white" font-family="system-ui,sans-serif" font-weight="700" text-anchor="middle">Peak 854</text>
+            </svg>
+            <div class="chart-labels-x">
+              <span>06:00</span><span>07:00</span><span>08:00</span>
+              <span>09:00</span><span>10:00</span><span>11:00</span>
+              <span>12:00</span><span>13:00</span>
+            </div>
+          </div>
+        </div><!-- /trend chart card -->
+
+      </div><!-- /LEFT col -->
+
+      <!-- RIGHT: Alerts Panel -->
+      <div class="card" style="display:flex;flex-direction:column;">
+        <div class="card-header">
+          <div class="card-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Alerts · This Shift
+            <span class="card-count">6 open</span>
+          </div>
+          <a href="#" class="view-all">History →</a>
+        </div>
+
+        <div class="alerts-list">
+          <div class="alert-row">
+            <div class="sev-dot critical"></div>
+            <div class="alert-body">
+              <span class="alert-line-tag">C-01</span>
+              <div class="alert-desc">Hydraulic press fault — E-Stop triggered on press #3. Maintenance dispatched.</div>
+              <div class="alert-time">23 min ago</div>
+            </div>
+          </div>
+          <div class="alert-row">
+            <div class="sev-dot warn"></div>
+            <div class="alert-body">
+              <span class="alert-line-tag">B-01</span>
+              <div class="alert-desc">Planned changeover — SKU transition FRG-4412 → FRG-5503, tooling swap in progress.</div>
+              <div class="alert-time">41 min ago</div>
+            </div>
+          </div>
+          <div class="alert-row">
+            <div class="sev-dot warn"></div>
+            <div class="alert-body">
+              <span class="alert-line-tag">A-02</span>
+              <div class="alert-desc">Weld torch #7 tip wear exceeding 80% threshold — scheduled replacement at next break.</div>
+              <div class="alert-time">1 hr 02 min ago</div>
+            </div>
+          </div>
+          <div class="alert-row">
+            <div class="sev-dot info"></div>
+            <div class="alert-body">
+              <span class="alert-line-tag">A-01</span>
+              <div class="alert-desc">Feeder magazine refill completed — 2,400 blanks loaded, production resumed.</div>
+              <div class="alert-time">1 hr 38 min ago</div>
+            </div>
+          </div>
+          <div class="alert-row">
+            <div class="sev-dot warn"></div>
+            <div class="alert-body">
+              <span class="alert-line-tag">B-02</span>
+              <div class="alert-desc">Paint booth temperature 4°C above spec (74°C vs 70°C) — HVAC adjustment pending.</div>
+              <div class="alert-time">2 hr 11 min ago</div>
+            </div>
+          </div>
+          <div class="alert-row">
+            <div class="sev-dot info"></div>
+            <div class="alert-body">
+              <span class="alert-line-tag">C-01</span>
+              <div class="alert-desc">Calibration reminder — vision inspection camera 2 due for daily calibration.</div>
+              <div class="alert-time">2 hr 55 min ago</div>
+            </div>
+          </div>
+        </div><!-- /alerts-list -->
+
+        <div class="downtime-mini">
+          <div class="downtime-mini-title">Recent Downtime</div>
+          <table class="dt-table">
+            <thead>
+              <tr>
+                <th>Line</th>
+                <th>Reason</th>
+                <th>Start</th>
+                <th>Min</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>C-01</td>
+                <td>Mechanical fault</td>
+                <td>09:37</td>
+                <td>23</td>
+              </tr>
+              <tr>
+                <td>B-01</td>
+                <td>Changeover</td>
+                <td>08:19</td>
+                <td>18</td>
+              </tr>
+              <tr>
+                <td>A-02</td>
+                <td>Material starved</td>
+                <td>07:44</td>
+                <td>6</td>
+              </tr>
+            </tbody>
+          </table>
+          <button class="acknowledge-btn">Acknowledge All Alerts</button>
+        </div>
+      </div><!-- /alerts card -->
+
+    </div><!-- /main-grid -->
+
+    <!-- ── WORK ORDERS TABLE ─────────────────────────────────────── -->
+    <div class="card wo-card">
+      <div class="card-header">
+        <div class="card-title">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="12" y2="15"/></svg>
+          Work Orders — Active
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="btn-ghost" style="font-size:12px;padding:5px 11px;">Export CSV</button>
+          <button class="btn-primary" style="font-size:12px;padding:5px 11px;">+ New WO</button>
+        </div>
+      </div>
+
+      <div class="wo-table-wrap">
+        <table class="wo-table">
+          <thead>
+            <tr>
+              <th>WO #</th>
+              <th>Product Code</th>
+              <th>Description</th>
+              <th style="text-align:right">Qty (pcs)</th>
+              <th>Line</th>
+              <th>Due Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="wo-num">WO-240601</span></td>
+              <td><div class="prod-code"><span class="prod-code-id">FRG-4412</span><span class="prod-code-name">Bracket Assy — Rear Frame</span></div></td>
+              <td style="color:#8b96a5;font-size:12px;">Weld + stamp, Tier-1 auto</td>
+              <td style="text-align:right" class="qty-cell">2,400</td>
+              <td style="color:#e6ebf2;font-weight:600;">A-01</td>
+              <td><span class="due-date">02 Jun 2025</span></td>
+              <td><span class="wo-status inprogress"><span class="wo-status-dot"></span>In Progress</span></td>
+            </tr>
+            <tr>
+              <td><span class="wo-num">WO-240602</span></td>
+              <td><div class="prod-code"><span class="prod-code-id">FRG-5503</span><span class="prod-code-name">Crossmember Sub-assy</span></div></td>
+              <td style="color:#8b96a5;font-size:12px;">Assembly + weld, struct.</td>
+              <td style="text-align:right" class="qty-cell">1,800</td>
+              <td style="color:#e6ebf2;font-weight:600;">B-01</td>
+              <td><span class="due-date">03 Jun 2025</span></td>
+              <td><span class="wo-status queued"><span class="wo-status-dot"></span>Queued</span></td>
+            </tr>
+            <tr>
+              <td><span class="wo-num">WO-240598</span></td>
+              <td><div class="prod-code"><span class="prod-code-id">FRG-2871</span><span class="prod-code-name">Door Hinge Reinforcement</span></div></td>
+              <td style="color:#8b96a5;font-size:12px;">Paint + QA inspection</td>
+              <td style="text-align:right" class="qty-cell">3,600</td>
+              <td style="color:#e6ebf2;font-weight:600;">B-02</td>
+              <td><span class="due-date">02 Jun 2025</span></td>
+              <td><span class="wo-status inprogress"><span class="wo-status-dot"></span>In Progress</span></td>
+            </tr>
+            <tr>
+              <td><span class="wo-num">WO-240595</span></td>
+              <td><div class="prod-code"><span class="prod-code-id">FRG-1104</span><span class="prod-code-name">Engine Mount Plate</span></div></td>
+              <td style="color:#8b96a5;font-size:12px;">Precision stamp, toleranced</td>
+              <td style="text-align:right" class="qty-cell">960</td>
+              <td style="color:#e6ebf2;font-weight:600;">A-01</td>
+              <td><span class="due-date">01 Jun 2025</span></td>
+              <td><span class="wo-status completed"><span class="wo-status-dot"></span>Completed</span></td>
+            </tr>
+            <tr>
+              <td><span class="wo-num">WO-240588</span></td>
+              <td><div class="prod-code"><span class="prod-code-id">FRG-3390</span><span class="prod-code-name">Fuel Tank Brace — Lower</span></div></td>
+              <td style="color:#8b96a5;font-size:12px;">Weld + e-coat, corrosion</td>
+              <td style="text-align:right" class="qty-cell">720</td>
+              <td style="color:#e6ebf2;font-weight:600;">A-02</td>
+              <td><span class="due-date overdue">30 May 2025</span></td>
+              <td><span class="wo-status onhold"><span class="wo-status-dot"></span>On Hold</span></td>
+            </tr>
+            <tr>
+              <td><span class="wo-num">WO-240610</span></td>
+              <td><div class="prod-code"><span class="prod-code-id">FRG-6620</span><span class="prod-code-name">Roof Bow Stamping</span></div></td>
+              <td style="color:#8b96a5;font-size:12px;">Progressive die, GA steel</td>
+              <td style="text-align:right" class="qty-cell">4,200</td>
+              <td style="color:#e6ebf2;font-weight:600;">A-01</td>
+              <td><span class="due-date">05 Jun 2025</span></td>
+              <td><span class="wo-status queued"><span class="wo-status-dot"></span>Queued</span></td>
+            </tr>
+            <tr>
+              <td><span class="wo-num">WO-240603</span></td>
+              <td><div class="prod-code"><span class="prod-code-id">FRG-4419</span><span class="prod-code-name">Seat Pan Support Rail</span></div></td>
+              <td style="color:#8b96a5;font-size:12px;">Weld + assembly, HRPO</td>
+              <td style="text-align:right" class="qty-cell">1,080</td>
+              <td style="color:#e6ebf2;font-weight:600;">A-02</td>
+              <td><span class="due-date">04 Jun 2025</span></td>
+              <td><span class="wo-status inprogress"><span class="wo-status-dot"></span>In Progress</span></td>
+            </tr>
+            <tr>
+              <td><span class="wo-num">WO-240597</span></td>
+              <td><div class="prod-code"><span class="prod-code-id">FRG-0882</span><span class="prod-code-name">Quarter Panel Inner</span></div></td>
+              <td style="color:#8b96a5;font-size:12px;">Stamp + hem flange, Class A</td>
+              <td style="text-align:right" class="qty-cell">600</td>
+              <td style="color:#e6ebf2;font-weight:600;">C-01</td>
+              <td><span class="due-date">03 Jun 2025</span></td>
+              <td><span class="wo-status queued"><span class="wo-status-dot"></span>Queued</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="wo-footer">
+        <span>Showing 8 of 34 work orders</span>
+        <div class="wo-pagination">
+          <button class="page-btn">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">4</button>
+          <button class="page-btn">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </div><!-- /work-orders card -->
+
+  </main><!-- /main -->
+</div><!-- /shell -->
+
+</body>
+</html>

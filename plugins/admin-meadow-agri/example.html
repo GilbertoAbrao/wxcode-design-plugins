@@ -1,0 +1,1145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meadow Agri Admin</title>
+<style>
+:root {
+  --accent: #16a34a;
+  --accent-hover: #22c55e;
+  --accent-muted: rgba(22,163,74,0.10);
+  --accent-border: rgba(22,163,74,0.30);
+  --earth: #a16207;
+  --earth-light: #fef3c7;
+  --earth-border: #fde68a;
+  --status-healthy: #16a34a;
+  --status-healthy-bg: #dcfce7;
+  --status-moderate: #d97706;
+  --status-moderate-bg: #fef3c7;
+  --status-attention: #dc2626;
+  --status-attention-bg: #fee2e2;
+  --status-online: #16a34a;
+  --status-online-bg: #dcfce7;
+  --status-warning: #d97706;
+  --status-warning-bg: #fef3c7;
+  --status-offline: #64748b;
+  --status-offline-bg: #f1f5f9;
+  --chart-forecast: #16a34a;
+  --chart-forecast-fill: rgba(22,163,74,0.15);
+  --chart-target: #a16207;
+  --sidebar-active-bar: #16a34a;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1e293b;
+  background: #f7faf5;
+  min-height: 100vh;
+  display: flex;
+}
+
+/* ── SIDEBAR ─────────────────────────────────────────────── */
+.sidebar {
+  width: 240px;
+  min-height: 100vh;
+  background: #fff;
+  border-right: 1px solid #e6ece1;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid #e6ece1;
+}
+
+.brand-icon {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.brand-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e293b;
+  letter-spacing: -0.02em;
+}
+.brand-sub {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 400;
+}
+
+.farm-switcher {
+  margin: 12px 14px;
+  padding: 8px 12px;
+  background: #f7faf5;
+  border: 1px solid #e6ece1;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.farm-switcher-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+}
+.farm-switcher-region {
+  font-size: 11px;
+  color: #64748b;
+}
+.farm-switcher svg { color: #94a3b8; }
+
+.nav-section { padding: 14px 14px 4px; }
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  padding: 0 4px;
+  margin-bottom: 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  color: #475569;
+  font-size: 13.5px;
+  font-weight: 500;
+  margin-bottom: 1px;
+  position: relative;
+  transition: background 0.14s;
+}
+.nav-item:hover { background: #f1f5f9; color: #1e293b; }
+.nav-item.active {
+  background: var(--accent-muted);
+  color: var(--accent);
+  font-weight: 600;
+}
+.nav-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 4px; bottom: 4px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--sidebar-active-bar);
+}
+.nav-item svg { flex-shrink: 0; }
+
+.nav-badge {
+  margin-left: auto;
+  background: var(--status-attention);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 99px;
+  padding: 1px 6px;
+  line-height: 1.4;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 14px 14px;
+  border-top: 1px solid #e6ece1;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.avatar-sm {
+  width: 32px; height: 32px;
+  border-radius: 99px;
+  background: var(--accent-muted);
+  border: 1px solid var(--accent-border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.sidebar-user-name { font-size: 13px; font-weight: 600; color: #1e293b; }
+.sidebar-user-role { font-size: 11px; color: #64748b; }
+
+/* ── MAIN ────────────────────────────────────────────────── */
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── TOPBAR ──────────────────────────────────────────────── */
+.topbar {
+  height: 56px;
+  background: #fff;
+  border-bottom: 1px solid #e6ece1;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.topbar-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e293b;
+  white-space: nowrap;
+}
+
+.topbar-search {
+  flex: 1;
+  max-width: 340px;
+  margin-left: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f7faf5;
+  border: 1px solid #e6ece1;
+  border-radius: 7px;
+  padding: 6px 12px;
+  color: #94a3b8;
+}
+.topbar-search input {
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  color: #1e293b;
+  outline: none;
+  width: 100%;
+}
+.topbar-search input::placeholder { color: #94a3b8; }
+
+.topbar-spacer { flex: 1; }
+
+.season-badge {
+  background: var(--earth-light);
+  border: 1px solid var(--earth-border);
+  color: var(--earth);
+  font-size: 11.5px;
+  font-weight: 700;
+  border-radius: 6px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.topbar-bell {
+  position: relative;
+  width: 34px; height: 34px;
+  border-radius: 7px;
+  border: 1px solid #e6ece1;
+  background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: #64748b;
+}
+.bell-dot {
+  position: absolute;
+  top: 6px; right: 7px;
+  width: 7px; height: 7px;
+  border-radius: 99px;
+  background: var(--status-attention);
+  border: 1.5px solid #fff;
+}
+
+.topbar-avatar {
+  width: 34px; height: 34px;
+  border-radius: 99px;
+  background: var(--accent-muted);
+  border: 1.5px solid var(--accent-border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+/* ── CONTENT AREA ────────────────────────────────────────── */
+.content {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+}
+
+/* ── GREETING ────────────────────────────────────────────── */
+.greeting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.greeting-text { font-size: 20px; font-weight: 700; color: #1e293b; }
+.greeting-sub { font-size: 13px; color: #64748b; margin-top: 2px; }
+.greeting-actions { display: flex; gap: 8px; align-items: center; }
+.btn-ghost {
+  border: 1px solid #e6ece1;
+  background: #fff;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 7px;
+  padding: 7px 14px;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+}
+.btn-primary {
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 7px;
+  padding: 7px 14px;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+}
+
+/* ── KPI CARDS ───────────────────────────────────────────── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.kpi-card {
+  background: #fff;
+  border: 1px solid #e6ece1;
+  border-radius: 12px;
+  padding: 18px 18px 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  position: relative;
+}
+.kpi-icon-wrap {
+  position: absolute;
+  top: 16px; right: 16px;
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--accent-muted);
+  color: var(--accent);
+}
+.kpi-icon-earth {
+  background: var(--earth-light);
+  color: var(--earth);
+}
+.kpi-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-bottom: 6px;
+}
+.kpi-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: #1e293b;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+.kpi-sub {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 5px;
+}
+.delta-up {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--status-healthy);
+  background: var(--status-healthy-bg);
+  border-radius: 5px;
+  padding: 2px 6px;
+  margin-top: 8px;
+}
+.delta-down {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--status-attention);
+  background: var(--status-attention-bg);
+  border-radius: 5px;
+  padding: 2px 6px;
+  margin-top: 8px;
+}
+.delta-neutral {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--status-offline);
+  background: var(--status-offline-bg);
+  border-radius: 5px;
+  padding: 2px 6px;
+  margin-top: 8px;
+}
+
+/* ── MAIN GRID ───────────────────────────────────────────── */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 16px;
+}
+
+/* ── CARD BASE ───────────────────────────────────────────── */
+.card {
+  background: #fff;
+  border: 1px solid #e6ece1;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px 14px;
+  border-bottom: 1px solid #e6ece1;
+}
+.card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+}
+.card-link {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+/* ── FIELDS TABLE ────────────────────────────────────────── */
+.fields-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.fields-table th {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  padding: 10px 18px;
+  text-align: left;
+  border-bottom: 1px solid #e6ece1;
+  background: #f7faf5;
+}
+.fields-table td {
+  padding: 11px 18px;
+  border-bottom: 1px solid #f0f4ee;
+  color: #334155;
+  vertical-align: middle;
+}
+.fields-table tr:last-child td { border-bottom: none; }
+.fields-table tr:hover td { background: #f7faf5; }
+
+.field-name { font-weight: 600; color: #1e293b; }
+.crop-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #475569;
+}
+.crop-dot {
+  width: 7px; height: 7px;
+  border-radius: 99px;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+.stage-text { font-size: 12px; color: #64748b; }
+.area-text { font-size: 12px; color: #64748b; font-variant-numeric: tabular-nums; }
+
+.pill {
+  display: inline-block;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 9px;
+  white-space: nowrap;
+}
+.pill-healthy { background: var(--status-healthy-bg); color: var(--status-healthy); }
+.pill-moderate { background: var(--status-moderate-bg); color: var(--status-moderate); }
+.pill-attention { background: var(--status-attention-bg); color: var(--status-attention); }
+.pill-online { background: var(--status-online-bg); color: var(--status-online); }
+.pill-warning { background: var(--status-warning-bg); color: var(--status-warning); }
+.pill-offline { background: var(--status-offline-bg); color: var(--status-offline); }
+
+/* ── CHART CARD ──────────────────────────────────────────── */
+.chart-wrap {
+  padding: 16px 18px 18px;
+  overflow: hidden;
+}
+.chart-legend {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+.legend-dot {
+  width: 10px; height: 3px;
+  border-radius: 2px;
+}
+.legend-dot-forecast { background: var(--chart-forecast); }
+.legend-dot-target { background: var(--chart-target); }
+
+.chart-svg { width: 100%; height: 140px; display: block; overflow: visible; }
+
+/* ── SENSORS TABLE ───────────────────────────────────────── */
+.sensors-wrap { padding: 0; }
+.sensors-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.sensors-table th {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  padding: 10px 18px;
+  text-align: left;
+  border-bottom: 1px solid #e6ece1;
+  background: #f7faf5;
+}
+.sensors-table td {
+  padding: 10px 18px;
+  border-bottom: 1px solid #f0f4ee;
+  color: #334155;
+  vertical-align: middle;
+}
+.sensors-table tr:last-child td { border-bottom: none; }
+.sensors-table tr:hover td { background: #f7faf5; }
+
+.sensor-id {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1e293b;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.03em;
+}
+.reading-val {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── RIGHT PANEL ─────────────────────────────────────────── */
+.right-panel { display: flex; flex-direction: column; gap: 14px; }
+
+/* ── WEATHER CARD ────────────────────────────────────────── */
+.weather-hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 18px 14px;
+  border-bottom: 1px solid #e6ece1;
+}
+.weather-icon-main { color: var(--earth); }
+.weather-temp { font-size: 32px; font-weight: 800; color: #1e293b; letter-spacing: -0.04em; }
+.weather-condition { font-size: 13px; color: #64748b; margin-top: 2px; }
+.weather-location { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+
+.forecast-strip {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 18px;
+}
+.forecast-day { text-align: center; }
+.forecast-day-name { font-size: 10.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; }
+.forecast-day-icon { color: var(--earth); margin-bottom: 4px; }
+.forecast-hi { font-size: 12px; font-weight: 700; color: #1e293b; }
+.forecast-lo { font-size: 11px; color: #94a3b8; }
+
+/* ── TASKS CARD ──────────────────────────────────────────── */
+.tasks-list { padding: 8px 0; }
+.task-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 18px;
+  cursor: pointer;
+}
+.task-item:hover { background: #f7faf5; }
+.task-check { color: #cbd5e1; flex-shrink: 0; margin-top: 1px; }
+.task-check.done { color: var(--accent); }
+.task-priority-dot {
+  width: 7px; height: 7px;
+  border-radius: 99px;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+.pri-high { background: var(--status-attention); }
+.pri-medium { background: var(--status-moderate); }
+.pri-low { background: var(--accent); }
+.task-label { font-size: 13px; color: #334155; line-height: 1.4; flex: 1; }
+.task-label.done-text { text-decoration: line-through; color: #94a3b8; }
+.task-assignee {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-muted);
+  border-radius: 5px;
+  padding: 2px 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tasks-add-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+  border-top: 1px solid #e6ece1;
+  margin-top: 2px;
+}
+.tasks-add-btn:hover { background: #f7faf5; }
+
+/* ── LEFT COLUMN STACK ───────────────────────────────────── */
+.left-col { display: flex; flex-direction: column; gap: 16px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <span class="brand-icon">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <rect width="28" height="28" rx="8" fill="currentColor" opacity="0.12"/>
+        <path d="M14 5C14 5 8 9 8 15.5C8 19.09 10.69 22 14 22C17.31 22 20 19.09 20 15.5C20 9 14 5 14 5Z" fill="currentColor"/>
+        <path d="M14 12V22" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M11 15C12.1 14.3 13.1 13.5 14 12" stroke="white" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <div>
+      <div class="brand-name">Meadow Agri</div>
+      <div class="brand-sub">Farm Operations</div>
+    </div>
+  </div>
+
+  <div class="farm-switcher">
+    <div>
+      <div class="farm-switcher-name">Greenfield Station</div>
+      <div class="farm-switcher-region">Northern Valley Region</div>
+    </div>
+    <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+
+  <nav>
+    <div class="nav-section">
+      <div class="nav-section-label">Overview</div>
+      <div class="nav-item active">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="5" rx="1.5" fill="currentColor" opacity="0.85"/><rect x="9" y="2" width="5" height="5" rx="1.5" fill="currentColor" opacity="0.85"/><rect x="2" y="9" width="5" height="5" rx="1.5" fill="currentColor" opacity="0.85"/><rect x="9" y="9" width="5" height="5" rx="1.5" fill="currentColor" opacity="0.85"/></svg>
+        Dashboard
+      </div>
+      <div class="nav-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Map View
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Crops</div>
+      <div class="nav-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M8 2C8 2 4 5 4 9.5C4 11.99 5.79 14 8 14s4-2.01 4-4.5C12 5 8 2 8 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 7v7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Fields
+      </div>
+      <div class="nav-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M3 13l3-4 3 2 4-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Harvest Plan
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Sensors</div>
+      <div class="nav-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 5a4.2 4.2 0 0 0 0 6M11 11a4.2 4.2 0 0 0 0-6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Live Readings
+      </div>
+      <div class="nav-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M8 3v1M8 12v1M3 8H2M14 8h-1M4.93 4.93l-.7-.7M11.77 11.77l-.7-.7M4.93 11.07l-.7.7M11.77 4.23l-.7.7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.4"/></svg>
+        Alerts
+        <span class="nav-badge">3</span>
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Operations</div>
+      <div class="nav-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><rect x="3" y="2" width="10" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M6 6h4M6 9h2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Tasks
+        <span class="nav-badge">7</span>
+      </div>
+      <div class="nav-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 13h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Reports
+      </div>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="avatar-sm">RL</div>
+    <div>
+      <div class="sidebar-user-name">Rosa Larkins</div>
+      <div class="sidebar-user-role">Head of Operations</div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-title">Operations Dashboard</div>
+    <div class="topbar-search">
+      <svg width="15" height="15" fill="none" viewBox="0 0 15 15"><circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.4"/><path d="M10 10l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <input type="text" placeholder="Search fields, sensors, tasks…">
+    </div>
+    <div class="topbar-spacer"></div>
+    <div class="season-badge">Growing Season 2026</div>
+    <div class="topbar-bell">
+      <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M8 2a4 4 0 0 1 4 4v2.5l1 2H3l1-2V6a4 4 0 0 1 4-4Z" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 13a1.5 1.5 0 0 0 3 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <span class="bell-dot"></span>
+    </div>
+    <div class="topbar-avatar">RL</div>
+  </header>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- GREETING -->
+    <div class="greeting-row">
+      <div>
+        <div class="greeting-text">Good morning, Rosa</div>
+        <div class="greeting-sub">Monday, 2 June 2026 — Greenfield Station</div>
+      </div>
+      <div class="greeting-actions">
+        <button class="btn-ghost">
+          <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M2 10l4-5 3 3 3-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Export Report
+        </button>
+        <button class="btn-primary">
+          <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Log Activity
+        </button>
+      </div>
+    </div>
+
+    <!-- KPI CARDS -->
+    <div class="kpi-grid">
+      <!-- Active Fields -->
+      <div class="kpi-card">
+        <div class="kpi-icon-wrap">
+          <svg width="18" height="18" fill="none" viewBox="0 0 18 18"><rect x="2" y="2" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.9"/><rect x="10" y="2" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.9"/><rect x="2" y="10" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.9"/><rect x="10" y="10" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.9"/></svg>
+        </div>
+        <div class="kpi-label">Active Fields</div>
+        <div class="kpi-value">42</div>
+        <div class="delta-up">
+          <svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M5 8V2M2 5l3-3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          +3 this season
+        </div>
+      </div>
+      <!-- Yield Forecast -->
+      <div class="kpi-card">
+        <div class="kpi-icon-wrap">
+          <svg width="18" height="18" fill="none" viewBox="0 0 18 18"><path d="M2 14l4-5 4 3 4-6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="6" r="1.5" fill="currentColor"/></svg>
+        </div>
+        <div class="kpi-label">Yield Forecast</div>
+        <div class="kpi-value">1,840<span style="font-size:14px;font-weight:500;color:#64748b;"> t</span></div>
+        <div class="delta-up">
+          <svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M5 8V2M2 5l3-3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          +8.4% vs last yr
+        </div>
+      </div>
+      <!-- Avg Soil Moisture -->
+      <div class="kpi-card">
+        <div class="kpi-icon-wrap">
+          <svg width="18" height="18" fill="none" viewBox="0 0 18 18"><path d="M9 3C9 3 4.5 7.5 4.5 11a4.5 4.5 0 0 0 9 0C13.5 7.5 9 3 9 3Z" stroke="currentColor" stroke-width="1.5" fill="currentColor" fill-opacity="0.2"/></svg>
+        </div>
+        <div class="kpi-label">Avg Soil Moisture</div>
+        <div class="kpi-value">61<span style="font-size:16px;font-weight:600;color:#64748b;">%</span></div>
+        <div class="delta-neutral">
+          <svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M2 5h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Stable range
+        </div>
+      </div>
+      <!-- Tasks Due -->
+      <div class="kpi-card">
+        <div class="kpi-icon-wrap kpi-icon-earth">
+          <svg width="18" height="18" fill="none" viewBox="0 0 18 18"><rect x="3" y="2" width="12" height="14" rx="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 7h5M6.5 10h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="kpi-label">Tasks Due</div>
+        <div class="kpi-value" style="color:#a16207;">7</div>
+        <div class="delta-down">
+          <svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M5 2v6M2 5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          2 overdue
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN GRID -->
+    <div class="main-grid">
+      <!-- LEFT COL -->
+      <div class="left-col">
+
+        <!-- FIELDS STATUS BOARD -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Fields Status</div>
+            <a class="card-link" href="#">View all fields →</a>
+          </div>
+          <table class="fields-table">
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Crop</th>
+                <th>Stage</th>
+                <th>Health</th>
+                <th>Area</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="field-name">North Paddock</span></td>
+                <td><span class="crop-badge"><span class="crop-dot"></span>Winter Wheat</span></td>
+                <td><span class="stage-text">Grain Fill</span></td>
+                <td><span class="pill pill-healthy">Healthy</span></td>
+                <td><span class="area-text">48.2 ha</span></td>
+              </tr>
+              <tr>
+                <td><span class="field-name">River Bend</span></td>
+                <td><span class="crop-badge"><span class="crop-dot" style="background:#d97706;"></span>Canola</span></td>
+                <td><span class="stage-text">Flowering</span></td>
+                <td><span class="pill pill-healthy">Healthy</span></td>
+                <td><span class="area-text">31.6 ha</span></td>
+              </tr>
+              <tr>
+                <td><span class="field-name">Sunridge A</span></td>
+                <td><span class="crop-badge"><span class="crop-dot" style="background:#eab308;"></span>Barley</span></td>
+                <td><span class="stage-text">Vegetative</span></td>
+                <td><span class="pill pill-moderate">Moderate</span></td>
+                <td><span class="area-text">22.0 ha</span></td>
+              </tr>
+              <tr>
+                <td><span class="field-name">Eastgate Plot</span></td>
+                <td><span class="crop-badge"><span class="crop-dot"></span>Winter Wheat</span></td>
+                <td><span class="stage-text">Germination</span></td>
+                <td><span class="pill pill-healthy">Healthy</span></td>
+                <td><span class="area-text">18.5 ha</span></td>
+              </tr>
+              <tr>
+                <td><span class="field-name">Hollow Creek</span></td>
+                <td><span class="crop-badge"><span class="crop-dot" style="background:#7c3aed;"></span>Lentils</span></td>
+                <td><span class="stage-text">Flowering</span></td>
+                <td><span class="pill pill-attention">Attention</span></td>
+                <td><span class="area-text">14.3 ha</span></td>
+              </tr>
+              <tr>
+                <td><span class="field-name">Birchwood South</span></td>
+                <td><span class="crop-badge"><span class="crop-dot" style="background:#d97706;"></span>Canola</span></td>
+                <td><span class="stage-text">Harvest</span></td>
+                <td><span class="pill pill-healthy">Healthy</span></td>
+                <td><span class="area-text">39.8 ha</span></td>
+              </tr>
+              <tr>
+                <td><span class="field-name">Limestone Rise</span></td>
+                <td><span class="crop-badge"><span class="crop-dot" style="background:#eab308;"></span>Barley</span></td>
+                <td><span class="stage-text">Grain Fill</span></td>
+                <td><span class="pill pill-moderate">Moderate</span></td>
+                <td><span class="area-text">26.1 ha</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- YIELD FORECAST CHART -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Yield Forecast — 8-Week Outlook (tonnes)</div>
+            <div style="display:flex;gap:8px;">
+              <span style="font-size:12px;color:#94a3b8;">Greenfield Station</span>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <div class="chart-legend">
+              <div class="legend-item"><div class="legend-dot legend-dot-forecast"></div>Forecast</div>
+              <div class="legend-item"><div class="legend-dot legend-dot-target" style="height:2px;background:repeating-linear-gradient(90deg,var(--chart-target) 0 5px,transparent 5px 9px);"></div>Target</div>
+            </div>
+            <!-- Inline SVG chart: x=W1–W8, y=0–300 tonnes -->
+            <svg class="chart-svg" viewBox="0 0 560 140" preserveAspectRatio="none">
+              <!-- grid lines -->
+              <line x1="40" y1="10" x2="40" y2="115" stroke="#e6ece1" stroke-width="1"/>
+              <line x1="40" y1="115" x2="548" y2="115" stroke="#e6ece1" stroke-width="1"/>
+              <line x1="40" y1="77" x2="548" y2="77" stroke="#f0f4ee" stroke-width="1" stroke-dasharray="3 4"/>
+              <line x1="40" y1="46" x2="548" y2="46" stroke="#f0f4ee" stroke-width="1" stroke-dasharray="3 4"/>
+
+              <!-- y-axis labels -->
+              <text x="35" y="118" fill="#94a3b8" font-size="9" text-anchor="end" font-family="system-ui,sans-serif">0</text>
+              <text x="35" y="80" fill="#94a3b8" font-size="9" text-anchor="end" font-family="system-ui,sans-serif">150</text>
+              <text x="35" y="49" fill="#94a3b8" font-size="9" text-anchor="end" font-family="system-ui,sans-serif">250</text>
+              <text x="35" y="18" fill="#94a3b8" font-size="9" text-anchor="end" font-family="system-ui,sans-serif">300</text>
+
+              <!-- x-axis points: x from 40 to 548, step 72.57 -->
+              <!-- W1:x=40 W2:x=113 W3:x=186 W4:x=258 W5:x=330 W6:x=402 W7:x=474 W8:x=548 -->
+              <!-- Forecast values (t): 80,110,145,190,230,260,240,210 → y=115-(v/300)*105 -->
+              <!-- y = 115 - (v*105/300) -->
+              <!-- 80→87, 110→77, 145→64, 190→49, 230→34, 260→24, 240→31, 210→41 -->
+
+              <!-- Forecast area fill -->
+              <path d="M40,87 L113,77 L186,64 L258,49 L330,34 L402,24 L474,31 L548,41 L548,115 L40,115 Z"
+                    fill="var(--chart-forecast-fill)" stroke="none"/>
+
+              <!-- Forecast line -->
+              <polyline points="40,87 113,77 186,64 258,49 330,34 402,24 474,31 548,41"
+                        fill="none" stroke="var(--chart-forecast)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+
+              <!-- Target line (dashed amber): target 200t constant → y=45 -->
+              <!-- Target values: 100,130,160,180,210,240,220,200 → y=80,69,59,52,42,31,38,45 -->
+              <polyline points="40,80 113,69 186,59 258,52 330,42 402,31 474,38 548,45"
+                        fill="none" stroke="var(--chart-target)" stroke-width="1.8" stroke-dasharray="5 4"
+                        stroke-linecap="round" stroke-linejoin="round"/>
+
+              <!-- Forecast data dots -->
+              <circle cx="40" cy="87" r="3" fill="var(--chart-forecast)"/>
+              <circle cx="113" cy="77" r="3" fill="var(--chart-forecast)"/>
+              <circle cx="186" cy="64" r="3" fill="var(--chart-forecast)"/>
+              <circle cx="258" cy="49" r="3" fill="var(--chart-forecast)"/>
+              <circle cx="330" cy="34" r="3" fill="var(--chart-forecast)"/>
+              <circle cx="402" cy="24" r="3.5" fill="var(--chart-forecast)"/>
+              <circle cx="474" cy="31" r="3" fill="var(--chart-forecast)"/>
+              <circle cx="548" cy="41" r="3" fill="var(--chart-forecast)"/>
+
+              <!-- x-axis labels -->
+              <text x="40"  y="128" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="system-ui,sans-serif">W1</text>
+              <text x="113" y="128" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="system-ui,sans-serif">W2</text>
+              <text x="186" y="128" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="system-ui,sans-serif">W3</text>
+              <text x="258" y="128" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="system-ui,sans-serif">W4</text>
+              <text x="330" y="128" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="system-ui,sans-serif">W5</text>
+              <text x="402" y="128" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="system-ui,sans-serif">W6</text>
+              <text x="474" y="128" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="system-ui,sans-serif">W7</text>
+              <text x="548" y="128" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="system-ui,sans-serif">W8</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- SENSORS TABLE -->
+        <div class="card sensors-wrap">
+          <div class="card-header">
+            <div class="card-title">Sensor Readings</div>
+            <a class="card-link" href="#">Live dashboard →</a>
+          </div>
+          <table class="sensors-table">
+            <thead>
+              <tr>
+                <th>Sensor ID</th>
+                <th>Field</th>
+                <th>Metric</th>
+                <th>Reading</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="sensor-id">SNS-0041</span></td>
+                <td>North Paddock</td>
+                <td>Soil Moisture</td>
+                <td><span class="reading-val">63%</span></td>
+                <td><span class="pill pill-online">Online</span></td>
+              </tr>
+              <tr>
+                <td><span class="sensor-id">SNS-0019</span></td>
+                <td>River Bend</td>
+                <td>Soil Temp</td>
+                <td><span class="reading-val">14.2 °C</span></td>
+                <td><span class="pill pill-online">Online</span></td>
+              </tr>
+              <tr>
+                <td><span class="sensor-id">SNS-0033</span></td>
+                <td>Sunridge A</td>
+                <td>Soil pH</td>
+                <td><span class="reading-val">6.1</span></td>
+                <td><span class="pill pill-warning">Warning</span></td>
+              </tr>
+              <tr>
+                <td><span class="sensor-id">SNS-0057</span></td>
+                <td>Hollow Creek</td>
+                <td>N-Level</td>
+                <td><span class="reading-val">38 mg/kg</span></td>
+                <td><span class="pill pill-warning">Warning</span></td>
+              </tr>
+              <tr>
+                <td><span class="sensor-id">SNS-0008</span></td>
+                <td>Birchwood South</td>
+                <td>Humidity</td>
+                <td><span class="reading-val">71%</span></td>
+                <td><span class="pill pill-online">Online</span></td>
+              </tr>
+              <tr>
+                <td><span class="sensor-id">SNS-0072</span></td>
+                <td>Limestone Rise</td>
+                <td>Lux (PAR)</td>
+                <td><span class="reading-val">— — —</span></td>
+                <td><span class="pill pill-offline">Offline</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div><!-- /left-col -->
+
+      <!-- RIGHT PANEL -->
+      <div class="right-panel">
+
+        <!-- WEATHER CARD -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Weather</div>
+            <span style="font-size:11px;color:#94a3b8;">Northern Valley</span>
+          </div>
+          <div class="weather-hero">
+            <!-- Partly cloudy sun SVG -->
+            <svg class="weather-icon-main" width="48" height="48" fill="none" viewBox="0 0 48 48">
+              <circle cx="24" cy="20" r="9" fill="currentColor" opacity="0.9"/>
+              <path d="M24 8V5M24 35v3M12 20H9M39 20h3M15.5 11.5l-2-2M34.5 28.5l2 2M15.5 28.5l-2 2M34.5 11.5l2-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+              <ellipse cx="22" cy="33" rx="10" ry="6" fill="#cbd5e1" opacity="0.7"/>
+            </svg>
+            <div>
+              <div class="weather-temp">19°C</div>
+              <div class="weather-condition">Partly Cloudy</div>
+              <div class="weather-location">Greenfield Station · 6:42 AM</div>
+            </div>
+          </div>
+          <div class="forecast-strip">
+            <!-- Mon -->
+            <div class="forecast-day">
+              <div class="forecast-day-name">Mon</div>
+              <div class="forecast-day-icon">
+                <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><circle cx="10" cy="10" r="5" fill="currentColor"/></svg>
+              </div>
+              <div class="forecast-hi">22°</div>
+              <div class="forecast-lo">11°</div>
+            </div>
+            <!-- Tue -->
+            <div class="forecast-day">
+              <div class="forecast-day-name">Tue</div>
+              <div class="forecast-day-icon">
+                <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><circle cx="10" cy="9" r="4" fill="currentColor" opacity="0.8"/><ellipse cx="9" cy="14" rx="6" ry="3.5" fill="#94a3b8" opacity="0.7"/></svg>
+              </div>
+              <div class="forecast-hi">17°</div>
+              <div class="forecast-lo">9°</div>
+            </div>
+            <!-- Wed -->
+            <div class="forecast-day">
+              <div class="forecast-day-name">Wed</div>
+              <div class="forecast-day-icon">
+                <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><ellipse cx="10" cy="11" rx="7" ry="4" fill="#94a3b8" opacity="0.7"/><path d="M8 15v2M11 15v2M14 15v2" stroke="#64748b" stroke-width="1.3" stroke-linecap="round"/></svg>
+              </div>
+              <div class="forecast-hi">13°</div>
+              <div class="forecast-lo">8°</div>
+            </div>
+            <!-- Thu -->
+            <div class="forecast-day">
+              <div class="forecast-day-name">Thu</div>
+              <div class="forecast-day-icon">
+                <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><ellipse cx="10" cy="11" rx="7" ry="4" fill="#94a3b8" opacity="0.5"/><path d="M9 15v2M12 15v2" stroke="#64748b" stroke-width="1.3" stroke-linecap="round"/></svg>
+              </div>
+              <div class="forecast-hi">15°</div>
+              <div class="forecast-lo">9°</div>
+            </div>
+            <!-- Fri -->
+            <div class="forecast-day">
+              <div class="forecast-day-name">Fri</div>
+              <div class="forecast-day-icon">
+                <svg width="20" height="20" fill="none" viewBox="0 0 20 20"><circle cx="10" cy="10" r="5" fill="currentColor"/></svg>
+              </div>
+              <div class="forecast-hi">21°</div>
+              <div class="forecast-lo">12°</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TASKS CARD -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Tasks Due</div>
+            <a class="card-link" href="#">All tasks →</a>
+          </div>
+          <div class="tasks-list">
+            <div class="task-item">
+              <svg class="task-check done" width="16" height="16" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4" fill="currentColor" fill-opacity="0.1"/><path d="M5.5 8.2l2 2 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div class="task-priority-dot pri-low"></div>
+              <span class="task-label done-text">Submit weekly yield report</span>
+              <span class="task-assignee">RL</span>
+            </div>
+            <div class="task-item">
+              <svg class="task-check" width="16" height="16" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/></svg>
+              <div class="task-priority-dot pri-high"></div>
+              <span class="task-label">Inspect Hollow Creek irrigation fault</span>
+              <span class="task-assignee">JM</span>
+            </div>
+            <div class="task-item">
+              <svg class="task-check" width="16" height="16" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/></svg>
+              <div class="task-priority-dot pri-high"></div>
+              <span class="task-label">Replace SNS-0072 battery unit</span>
+              <span class="task-assignee">PO</span>
+            </div>
+            <div class="task-item">
+              <svg class="task-check" width="16" height="16" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/></svg>
+              <div class="task-priority-dot pri-medium"></div>
+              <span class="task-label">Schedule N-fertiliser top-dress for Sunridge A</span>
+              <span class="task-assignee">RL</span>
+            </div>
+            <div class="task-item">
+              <svg class="task-check" width="16" height="16" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/></svg>
+              <div class="task-priority-dot pri-low"></div>
+              <span class="task-label">Update harvest plan for Birchwood South</span>
+              <span class="task-assignee">KT</span>
+            </div>
+          </div>
+          <div class="tasks-add-btn">
+            <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Add task
+          </div>
+        </div>
+
+      </div><!-- /right-panel -->
+    </div><!-- /main-grid -->
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+</body>
+</html>

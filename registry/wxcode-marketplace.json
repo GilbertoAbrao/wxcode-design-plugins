@@ -2,16 +2,53 @@
   "$schema": "https://open-design.ai/schemas/marketplace.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-design-plugins",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "owner": "GilbertoAbrao",
   "trust": "community",
   "metadata": {
     "title": "WXCode Design Plugins",
     "description": "First-party admin / dashboard / cockpit plugins curated by WXCode for Open Design daemons. Tenant VMs register this catalog as a marketplace source to consume plugins without rebuild.",
     "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins",
-    "updatedAt": "2026-06-01T20:22:26Z"
+    "updatedAt": "2026-06-01T23:49:38Z"
   },
   "plugins": [
+    {
+      "name": "wxcode-admin-aegis-insurance",
+      "title": "Aegis Insurance Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-aegis-insurance",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-aegis-insurance",
+      "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Institutional light-mode operations dashboard for an insurance carrier \u2014 policy & claims lifecycle management. Left sidebar with line-of-business switcher, topbar with period filter, 4 KPI cards, claims pipeline board, policies table, renewals panel, and inline SVG claims trend chart.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "insurance",
+        "claims",
+        "policies",
+        "light-mode",
+        "institutional",
+        "navy-teal",
+        "carrier-ops",
+        "renewals",
+        "loss-ratio"
+      ],
+      "mode": "prototype"
+    },
     {
       "name": "wxcode-admin-ai-copilot",
       "title": "AI Copilot Admin",
@@ -78,6 +115,115 @@
       "mode": "prototype"
     },
     {
+      "name": "wxcode-admin-bento-overview",
+      "title": "Bento Ops Overview",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-bento-overview",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-bento-overview",
+      "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Operations overview dashboard built on a bento-grid layout \u2014 asymmetric tiles of varied sizes spanning a neutral canvas. One hero metric, an inline SVG area chart, KPI pills, donut chart, activity feed, mini-table, and status tile. Multi-accent palette: indigo, teal, amber, rose.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "bento-grid",
+        "overview",
+        "light-mode",
+        "multi-accent",
+        "kpi",
+        "dashboard",
+        "ops",
+        "asymmetric-layout"
+      ],
+      "mode": "prototype"
+    },
+    {
+      "name": "wxcode-admin-bloom-nonprofit",
+      "title": "Bloom Nonprofit Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-bloom-nonprofit",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-bloom-nonprofit",
+      "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Warm-optimistic light-mode admin dashboard for nonprofit fundraising and donor management \u2014 org/program switcher sidebar, KPI cards, campaigns progress, donations trend chart, donor-segments donut, and recent donations table. Original archetype with emerald + coral accent palette.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "nonprofit",
+        "donations",
+        "light-mode",
+        "emerald",
+        "coral",
+        "warm-optimistic",
+        "fundraising",
+        "donor-management"
+      ],
+      "mode": "prototype"
+    },
+    {
+      "name": "wxcode-admin-carbon-devops",
+      "title": "Carbon DevOps Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-carbon-devops",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-carbon-devops",
+      "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Dark-mode CI/CD operations dashboard \u2014 terminal-inspired admin for pipeline runs, deploy frequency, build health, and incident tracking. Original archetype built for DevOps and platform engineering teams.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "devops",
+        "ci-cd",
+        "dark-mode",
+        "terminal-vibe",
+        "pipelines",
+        "deployments",
+        "platform-engineering",
+        "monospace",
+        "green-accent"
+      ],
+      "mode": "prototype"
+    },
+    {
       "name": "wxcode-admin-cargo-fleet",
       "title": "Cargo Fleet Admin",
       "version": "0.1.0",
@@ -110,6 +256,41 @@
         "orange-accent",
         "kanban",
         "status-board"
+      ],
+      "mode": "prototype"
+    },
+    {
+      "name": "wxcode-admin-circle-social",
+      "title": "Circle Community Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-circle-social",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-circle-social",
+      "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Friendly light-mode admin dashboard for online community and social platform operators \u2014 left sidebar with community switcher, topbar with search and date-range, 4 KPI cards, moderation queue with approve/remove actions, engagement chart, members table, and trending/flagged side panel. Original archetype for the community-ops use case.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "social",
+        "community",
+        "light-mode",
+        "moderation",
+        "friendly",
+        "blue-violet",
+        "dashboard"
       ],
       "mode": "prototype"
     },
@@ -151,6 +332,79 @@
       "mode": "prototype"
     },
     {
+      "name": "wxcode-admin-coral-billing",
+      "title": "Coral Billing Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-coral-billing",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-coral-billing",
+      "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Clean-fintech billing operations dashboard \u2014 left sidebar, topbar with period picker, 4 KPI cards (MRR / active subscriptions / churn / ARPU), inline SVG trend chart, plan breakdown bars, invoices table, and a dunning side panel. Coral accent on white surfaces.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "saas",
+        "billing",
+        "light-mode",
+        "clean-fintech",
+        "coral",
+        "subscriptions",
+        "invoices",
+        "dunning"
+      ],
+      "mode": "prototype"
+    },
+    {
+      "name": "wxcode-admin-dense-grid",
+      "title": "Dense Grid Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-dense-grid",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-dense-grid",
+      "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "High-density dark-mode operations dashboard in the trading-desk style \u2014 compact rows, monospace tabular figures, color-coded deltas, watchlist, positions table, order book, sparkline strip, and stats row. Maximum information per pixel with a 4-px spacing grid.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "data-ops",
+        "dense",
+        "dark-mode",
+        "trading-desk",
+        "monospace",
+        "compact",
+        "watchlist",
+        "order-book",
+        "high-density"
+      ],
+      "mode": "prototype"
+    },
+    {
       "name": "wxcode-admin-ember-campaigns",
       "title": "Ember Campaigns Admin",
       "version": "0.1.0",
@@ -186,6 +440,40 @@
       "mode": "prototype"
     },
     {
+      "name": "wxcode-admin-estate-realty",
+      "title": "Estate Realty Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-estate-realty",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-estate-realty",
+      "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Real-estate brokerage back-office admin \u2014 light mode, teal accent, left sidebar with brokerage switcher, 4 KPI cards (active listings, deals in progress, avg days on market, commission MTD), listings table, deals pipeline, and agent leaderboard.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "real-estate",
+        "brokerage",
+        "light-mode",
+        "teal-accent",
+        "refined",
+        "property-management"
+      ],
+      "mode": "prototype"
+    },
+    {
       "name": "wxcode-admin-finance-terminal",
       "title": "Finance Terminal Admin",
       "version": "0.1.0",
@@ -215,6 +503,80 @@
         "dark-mode",
         "monospace",
         "trading-terminal"
+      ],
+      "mode": "prototype"
+    },
+    {
+      "name": "wxcode-admin-forge-mes",
+      "title": "Forge MES Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-forge-mes",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-forge-mes",
+      "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Industrial dark-mode Manufacturing Execution System dashboard \u2014 shop-floor plant switcher, OEE / output / downtime / scrap KPI tiles, production lines status board, inline SVG output trend chart, work-orders table, and real-time downtime alerts panel. Original archetype for discrete manufacturing operations teams.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "manufacturing",
+        "mes",
+        "dark-mode",
+        "industrial",
+        "shop-floor",
+        "oee",
+        "production",
+        "enterprise",
+        "orange-accent",
+        "status-board"
+      ],
+      "mode": "prototype"
+    },
+    {
+      "name": "wxcode-admin-frost-glass",
+      "title": "Frost Glass Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-frost-glass",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-frost-glass",
+      "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Glassmorphism operations dashboard \u2014 frosted translucent cards layered over a deep indigo-violet-teal gradient canvas. Signature style: backdrop-filter blur, 1px translucent borders, soft ambient shadows, cyan and violet accents on near-black. Use when the brief calls for a dark, premium, or futuristic analytics look.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "analytics",
+        "glassmorphism",
+        "dark-mode",
+        "frosted-glass",
+        "gradient-canvas",
+        "futuristic",
+        "cyan-violet",
+        "dashboard"
       ],
       "mode": "prototype"
     },
@@ -285,6 +647,115 @@
         "payment-card",
         "trustworthy",
         "clean-cards"
+      ],
+      "mode": "prototype"
+    },
+    {
+      "name": "wxcode-admin-jetstream-airline",
+      "title": "Jetstream Airline Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-jetstream-airline",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-jetstream-airline",
+      "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Airline operations control center \u2014 dark-mode admin dashboard with slim navbar, icon rail, KPI tiles (on-time performance, flights today, load factor, delayed), live flights board, departures-by-hour SVG chart, flights table, and crew/aircraft side panel. Original archetype for aviation and transport operations.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "airline",
+        "aviation",
+        "dark-mode",
+        "control-center",
+        "transport",
+        "operations-center",
+        "flights",
+        "indigo-sky"
+      ],
+      "mode": "prototype"
+    },
+    {
+      "name": "wxcode-admin-kinetic-fitness",
+      "title": "Kinetic Fitness Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-kinetic-fitness",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-kinetic-fitness",
+      "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Dark-mode gym and fitness studio operations dashboard \u2014 active member KPIs, live class schedule with capacity bars, weekly attendance area chart, members table with plan/status, and coach panel. Original energetic dark-green palette with lime accent.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "fitness",
+        "gym",
+        "dark-mode",
+        "energetic",
+        "lime-accent",
+        "schedule",
+        "members",
+        "studio-management"
+      ],
+      "mode": "prototype"
+    },
+    {
+      "name": "wxcode-admin-meadow-agri",
+      "title": "Meadow Agri Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-meadow-agri",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-meadow-agri",
+      "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Original agriculture farm-management admin dashboard \u2014 light mode, natural green and earth-amber palette, left sidebar with farm/region switcher, 4 KPI cards, fields status board, yield forecast chart, sensors table, and weather plus tasks side panel.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "agriculture",
+        "farm",
+        "light-mode",
+        "natural",
+        "green",
+        "earth",
+        "field-management",
+        "sensors",
+        "yield-forecast"
       ],
       "mode": "prototype"
     },
@@ -420,6 +891,42 @@
         "portfolio",
         "defi",
         "sleek"
+      ],
+      "mode": "prototype"
+    },
+    {
+      "name": "wxcode-admin-pixel-liveops",
+      "title": "Pixel LiveOps Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-pixel-liveops",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-pixel-liveops",
+      "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Dark-mode game studio live-operations dashboard \u2014 neon purple/cyan accent on deep-space backgrounds. Sidebar game switcher, topbar period filter, 4 KPI tiles (DAU / D1 retention / ARPDAU / live events), DAU chart, live events board, top in-game items table, player segments panel. Original archetype for game ops teams.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "gaming",
+        "liveops",
+        "dark-mode",
+        "neon",
+        "game-studio",
+        "analytics",
+        "real-time",
+        "playful-techy"
       ],
       "mode": "prototype"
     },
@@ -563,6 +1070,42 @@
       "mode": "prototype"
     },
     {
+      "name": "wxcode-admin-savory-pos",
+      "title": "Savory POS Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-savory-pos",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-savory-pos",
+      "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Restaurant point-of-sale back-office admin: warm light mode, amber + tomato accent, left sidebar with venue switcher, live orders kanban (New / Cooking / Served), KPI tiles, top-selling items, sales sparkline, and recent orders table.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "restaurant",
+        "pos",
+        "light-mode",
+        "warm-palette",
+        "amber-accent",
+        "kanban",
+        "food-service",
+        "back-office"
+      ],
+      "mode": "prototype"
+    },
+    {
       "name": "wxcode-admin-slate-commerce",
       "title": "Slate Commerce Admin",
       "version": "0.1.0",
@@ -627,6 +1170,117 @@
         "cyan-accent",
         "device-fleet",
         "monitoring"
+      ],
+      "mode": "prototype"
+    },
+    {
+      "name": "wxcode-admin-statute-legal",
+      "title": "Statute Legal Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-statute-legal",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-statute-legal",
+      "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Refined light-mode law firm dashboard for case and matter management \u2014 practice-area sidebar, KPI tiles for active cases / billable hours / deadlines / realization rate, matters table with status pills, upcoming deadlines panel, matters-by-practice chart, and recent documents list. Burgundy-gold accent palette on warm white surfaces.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "legal",
+        "case-management",
+        "law-firm",
+        "matter-management",
+        "light-mode",
+        "refined-professional",
+        "burgundy",
+        "gold-accent"
+      ],
+      "mode": "prototype"
+    },
+    {
+      "name": "wxcode-admin-sterling-bankops",
+      "title": "Sterling Bank Ops Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-sterling-bankops",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-sterling-bankops",
+      "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Retail banking back-office operations dashboard \u2014 sober slate-blue and emerald palette, left sidebar with branch switcher, topbar with period picker, 4 KPI cards, an approvals queue, a transactions table, a risk/exceptions panel, and an inline SVG throughput chart. Designed for trust and clarity.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "banking",
+        "back-office",
+        "retail-banking",
+        "approvals",
+        "transactions",
+        "light-mode",
+        "slate-blue",
+        "emerald",
+        "trust",
+        "finance"
+      ],
+      "mode": "prototype"
+    },
+    {
+      "name": "wxcode-admin-talent-ats",
+      "title": "Talent ATS Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-talent-ats",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-talent-ats",
+      "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Recruiting & applicant-tracking dashboard archetype \u2014 left sidebar with requisition switcher, topbar with period picker and avatar, 4 KPI cards (open roles / candidates / interviews / time-to-hire), kanban-style hiring pipeline, recruiting funnel SVG, candidates table, and upcoming-interviews side panel. Indigo + pink accent, light HR aesthetic.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "recruiting",
+        "ats",
+        "light-mode",
+        "hr",
+        "hiring",
+        "pipeline",
+        "kanban",
+        "indigo",
+        "pink-accent"
       ],
       "mode": "prototype"
     },
@@ -699,6 +1353,79 @@
         "triage",
         "schedule",
         "patient-management"
+      ],
+      "mode": "prototype"
+    },
+    {
+      "name": "wxcode-admin-volt-energy",
+      "title": "Volt Energy Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-volt-energy",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-volt-energy",
+      "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Dark-mode utility grid operations control-room dashboard \u2014 KPI tiles, regions/sites status board, dual-series load/generation chart, alerts table, and sites side panel. Amber + cyan accent on deep navy. Original archetype for energy and infrastructure operations.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "energy",
+        "utilities",
+        "dark-mode",
+        "control-room",
+        "grid-operations",
+        "amber-accent",
+        "cyan-accent",
+        "infrastructure"
+      ],
+      "mode": "prototype"
+    },
+    {
+      "name": "wxcode-admin-voyage-travel",
+      "title": "Voyage Travel Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-voyage-travel",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-voyage-travel",
+      "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Airy light-mode operations dashboard for travel agencies \u2014 region/agency switcher sidebar, topbar with date-range picker, 4 KPI cards, itinerary board, destinations breakdown, recent bookings table, and occupancy side panel. Sky-and-coral accent palette; original copy and invented data.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "travel",
+        "booking",
+        "light-mode",
+        "airy",
+        "sky-accent",
+        "coral-accent",
+        "travel-agency",
+        "itinerary",
+        "occupancy"
       ],
       "mode": "prototype"
     }

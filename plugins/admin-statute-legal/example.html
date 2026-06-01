@@ -1,0 +1,685 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Statute Legal Admin — Hargrove &amp; Calloway LLP</title>
+<style>
+:root {
+  --clr-accent:        #9f1239;
+  --clr-accent-hi:     #be123c;
+  --clr-accent-subtle: #fdf2f4;
+  --clr-accent-muted:  #fce7eb;
+  --clr-gold:          #b45309;
+  --clr-gold-hi:       #d97706;
+  --clr-gold-subtle:   #fffbeb;
+  --clr-surface:       #faf8f6;
+  --clr-surface-raised:#ffffff;
+  --clr-border:        #e8e2dc;
+  --clr-sidebar-bg:    #1e1714;
+  --clr-sidebar-hover: #2d2420;
+  --clr-sidebar-active:#3a2820;
+  --clr-sidebar-text:  #d6cfc8;
+  --clr-sidebar-muted: #8b7f78;
+  --status-active-bg:  #dcfce7;
+  --status-active-fg:  #15803d;
+  --status-pending-bg: #fef3c7;
+  --status-pending-fg: #b45309;
+  --status-closed-bg:  #f1f5f9;
+  --status-closed-fg:  #64748b;
+  --status-urgent-bg:  #ffe4e6;
+  --status-urgent-fg:  #be123c;
+  --clr-sidebar-light: #f5f0ec;
+  --clr-delta-up-bg:   #dcfce7;
+  --clr-delta-up-fg:   #15803d;
+  --clr-delta-dn-bg:   #ffe4e6;
+  --clr-delta-dn-fg:   #be123c;
+  --clr-delta-wn-bg:   #fef3c7;
+  --clr-delta-wn-fg:   #b45309;
+  --clr-dot-ok:        #16a34a;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:14px;color:#334155;background:var(--clr-surface);display:flex;min-height:100vh;line-height:1.5}
+
+/* ─── SIDEBAR ─────────────────────────────────────────────── */
+.sidebar{width:240px;min-width:240px;background:var(--clr-sidebar-bg);display:flex;flex-direction:column;height:100vh;position:sticky;top:0;overflow-y:auto}
+.sidebar-brand{display:flex;align-items:center;gap:10px;padding:20px 18px 16px;border-bottom:1px solid #2d2420}
+.sidebar-monogram{width:36px;height:36px;background:var(--clr-accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;letter-spacing:-0.03em;flex-shrink:0}
+.sidebar-name{font-size:13px;font-weight:600;color:var(--clr-sidebar-light);line-height:1.25}
+.sidebar-name span{display:block;font-size:11px;font-weight:400;color:var(--clr-sidebar-muted);letter-spacing:0.03em}
+
+/* practice switcher */
+.practice-switcher{padding:14px 12px 10px}
+.practice-switcher label{font-size:10px;font-weight:500;color:var(--clr-sidebar-muted);letter-spacing:0.08em;text-transform:uppercase;display:block;margin-bottom:6px;padding-left:6px}
+.practice-select{width:100%;background:#2d2420;border:1px solid #3a2820;border-radius:6px;color:var(--clr-sidebar-text);font-size:13px;padding:7px 10px;appearance:none;cursor:pointer;outline:none}
+
+.nav-section{padding:10px 12px 4px}
+.nav-section-label{font-size:10px;font-weight:500;color:var(--clr-sidebar-muted);letter-spacing:0.1em;text-transform:uppercase;padding:0 6px;margin-bottom:4px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:6px;color:var(--clr-sidebar-text);font-size:13px;font-weight:400;cursor:pointer;text-decoration:none;transition:background 0.15s;position:relative;margin-bottom:1px}
+.nav-item:hover{background:var(--clr-sidebar-hover);color:#f5f0ec}
+.nav-item.active{background:var(--clr-sidebar-active);color:#fff}
+.nav-item.active::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;background:var(--clr-accent-hi);border-radius:0 3px 3px 0}
+.nav-item svg{flex-shrink:0;opacity:0.75}
+.nav-item.active svg{opacity:1}
+.nav-badge{margin-left:auto;background:var(--clr-accent);color:#fff;font-size:10px;font-weight:600;padding:1px 6px;border-radius:10px;min-width:18px;text-align:center}
+.sidebar-footer{margin-top:auto;padding:14px 12px;border-top:1px solid #2d2420}
+.attorney-chip{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#2d2420;border-radius:8px}
+.attorney-avatar{width:28px;height:28px;background:var(--clr-accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.attorney-info{font-size:12px;font-weight:500;color:#e8e2dc;line-height:1.2}
+.attorney-info span{display:block;font-size:11px;font-weight:400;color:var(--clr-sidebar-muted)}
+
+/* ─── MAIN ────────────────────────────────────────────────── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* topbar */
+.topbar{height:60px;background:var(--clr-surface-raised);border-bottom:1px solid var(--clr-border);display:flex;align-items:center;gap:14px;padding:0 24px;position:sticky;top:0;z-index:10}
+.topbar-title{font-size:16px;font-weight:600;color:#1e293b;white-space:nowrap}
+.topbar-search{flex:1;max-width:340px;position:relative}
+.topbar-search input{width:100%;border:1px solid var(--clr-border);border-radius:8px;background:var(--clr-surface);padding:8px 12px 8px 36px;font-size:13px;color:#334155;outline:none;transition:border-color 0.15s}
+.topbar-search input:focus{border-color:var(--clr-accent);box-shadow:0 0 0 3px var(--clr-accent-muted)}
+.topbar-search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#94a3b8}
+.topbar-period{display:flex;background:var(--clr-surface);border:1px solid var(--clr-border);border-radius:8px;overflow:hidden}
+.period-btn{padding:7px 13px;font-size:12px;font-weight:500;color:#64748b;cursor:pointer;background:transparent;border:none;transition:background 0.12s,color 0.12s}
+.period-btn.active{background:var(--clr-accent);color:#fff}
+.topbar-actions{display:flex;align-items:center;gap:10px;margin-left:auto}
+.icon-btn{width:36px;height:36px;border-radius:8px;border:1px solid var(--clr-border);background:var(--clr-surface-raised);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;color:#64748b}
+.icon-btn:hover{border-color:var(--clr-accent);color:var(--clr-accent)}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--clr-accent-hi);border-radius:50%;border:1.5px solid #fff}
+.user-avatar{width:36px;height:36px;background:var(--clr-accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;cursor:pointer}
+
+/* page body */
+.page-body{padding:24px;overflow-y:auto;flex:1}
+
+/* greeting strip */
+.greeting-strip{display:flex;align-items:center;gap:12px;margin-bottom:22px;flex-wrap:wrap}
+.greeting-date{font-size:13px;color:#64748b}
+.realization-chip{display:inline-flex;align-items:center;gap:5px;background:var(--clr-delta-up-bg);color:var(--clr-delta-up-fg);font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px}
+.greeting-actions{display:flex;gap:8px;margin-left:auto}
+.btn-ghost{padding:7px 14px;font-size:13px;font-weight:500;border:1px solid var(--clr-border);border-radius:8px;background:transparent;color:#334155;cursor:pointer}
+.btn-ghost:hover{border-color:var(--clr-accent);color:var(--clr-accent)}
+.btn-primary{padding:7px 16px;font-size:13px;font-weight:600;border:none;border-radius:8px;background:var(--clr-accent);color:#fff;cursor:pointer}
+.btn-primary:hover{background:var(--clr-accent-hi)}
+
+/* ─── KPI TILES ───────────────────────────────────────────── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.kpi-card{background:var(--clr-surface-raised);border:1px solid var(--clr-border);border-radius:10px;padding:18px 18px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.05);position:relative;overflow:hidden}
+.kpi-card::before{content:"";position:absolute;top:0;left:0;width:100%;height:3px;background:var(--clr-accent);border-radius:10px 10px 0 0}
+.kpi-card.gold::before{background:var(--clr-gold)}
+.kpi-icon{position:absolute;top:16px;right:16px;opacity:0.15}
+.kpi-label{font-size:11px;font-weight:500;color:#64748b;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px}
+.kpi-value{font-size:30px;font-weight:700;color:#1e293b;line-height:1;margin-bottom:10px}
+.kpi-sub{font-size:12px;color:#64748b;display:flex;align-items:center;gap:6px}
+.kpi-delta{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:2px 7px;border-radius:10px}
+.kpi-delta.up{background:var(--clr-delta-up-bg);color:var(--clr-delta-up-fg)}
+.kpi-delta.down{background:var(--clr-delta-dn-bg);color:var(--clr-delta-dn-fg)}
+.kpi-delta.warn{background:var(--clr-delta-wn-bg);color:var(--clr-delta-wn-fg)}
+.kpi-bar-track{height:5px;background:#e8e2dc;border-radius:3px;margin-top:8px;overflow:hidden}
+.kpi-bar-fill{height:100%;border-radius:3px;background:var(--clr-gold)}
+
+/* ─── MAIN GRID ───────────────────────────────────────────── */
+.content-grid{display:grid;grid-template-columns:1fr 320px;gap:16px;margin-bottom:16px}
+
+/* matters table card */
+.card{background:var(--clr-surface-raised);border:1px solid var(--clr-border);border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.04);overflow:hidden}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--clr-border)}
+.card-title{font-size:14px;font-weight:600;color:#1e293b}
+.card-link{font-size:12px;color:var(--clr-accent);text-decoration:none;font-weight:500}
+.card-link:hover{text-decoration:underline}
+table{width:100%;border-collapse:collapse}
+thead th{font-size:11px;font-weight:500;color:#64748b;letter-spacing:0.05em;text-transform:uppercase;padding:10px 16px;text-align:left;background:#faf8f6;border-bottom:1px solid var(--clr-border)}
+tbody tr{border-bottom:1px solid #f4f0ec;transition:background 0.12s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#fdf7f5}
+tbody td{padding:11px 16px;font-size:13px;color:#334155;vertical-align:middle}
+.matter-num{font-family:ui-monospace,"Cascadia Code","Fira Code",monospace;font-size:12px;color:var(--clr-accent);font-weight:600}
+.client-name{font-weight:500;color:#1e293b}
+.lead-att{display:flex;align-items:center;gap:7px}
+.att-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.pill-active{background:var(--status-active-bg);color:var(--status-active-fg)}
+.pill-pending{background:var(--status-pending-bg);color:var(--status-pending-fg)}
+.pill-closed{background:var(--status-closed-bg);color:var(--status-closed-fg)}
+.pill-urgent{background:var(--status-urgent-bg);color:var(--status-urgent-fg)}
+.pill-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+.action-link{font-size:12px;color:var(--clr-accent);text-decoration:none;font-weight:500}
+
+/* ─── RIGHT PANEL ─────────────────────────────────────────── */
+.right-panel{display:flex;flex-direction:column;gap:16px}
+.deadline-list{padding:4px 0}
+.deadline-item{display:flex;align-items:flex-start;gap:10px;padding:10px 16px;border-bottom:1px solid #f4f0ec}
+.deadline-item:last-child{border-bottom:none}
+.dl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.dl-dot.urgent{background:var(--clr-accent-hi)}
+.dl-dot.warn{background:var(--clr-gold-hi)}
+.dl-dot.ok{background:var(--clr-dot-ok)}
+.dl-matter{font-size:11px;font-weight:600;color:var(--clr-accent);font-family:ui-monospace,"Cascadia Code","Fira Code",monospace}
+.dl-desc{font-size:12px;color:#334155;font-weight:500;margin-top:1px}
+.dl-date{font-size:11px;color:#64748b;margin-top:1px}
+
+/* chart card */
+.chart-body{padding:16px 20px}
+.chart-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.chart-label{width:80px;font-size:11px;color:#64748b;text-align:right;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chart-bar-track{flex:1;height:18px;background:#f4f0ec;border-radius:4px;overflow:hidden}
+.chart-bar-fill{height:100%;border-radius:4px;background:var(--clr-accent);display:flex;align-items:center;justify-content:flex-end;padding-right:7px}
+.chart-bar-fill.gold{background:var(--clr-gold)}
+.chart-count{font-size:11px;font-weight:700;color:#fff}
+.chart-count-ext{font-size:11px;font-weight:600;color:#64748b;margin-left:6px;min-width:20px}
+
+/* ─── RECENT DOCUMENTS ────────────────────────────────────── */
+.doc-list{padding:4px 0}
+.doc-row{display:flex;align-items:center;gap:12px;padding:11px 20px;border-bottom:1px solid #f4f0ec;transition:background 0.12s}
+.doc-row:last-child{border-bottom:none}
+.doc-row:hover{background:#fdf7f5}
+.doc-icon{width:32px;height:32px;background:var(--clr-accent-subtle);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--clr-accent)}
+.doc-name{font-size:13px;font-weight:500;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px}
+.doc-meta{font-size:11px;color:#64748b;margin-top:1px}
+.doc-meta a{color:var(--clr-accent);text-decoration:none;font-weight:500}
+.doc-meta a:hover{text-decoration:underline}
+.doc-right{margin-left:auto;display:flex;align-items:center;gap:16px;flex-shrink:0}
+.doc-date{font-size:12px;color:#64748b;white-space:nowrap}
+.doc-view{font-size:12px;font-weight:500;color:var(--clr-accent);text-decoration:none;padding:4px 10px;border:1px solid var(--clr-accent-muted);border-radius:6px}
+.doc-view:hover{background:var(--clr-accent-subtle)}
+
+/* sparkline inline */
+.sparkline{display:inline-block;vertical-align:middle}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-monogram">H&amp;C</div>
+    <div class="sidebar-name">Hargrove &amp; Calloway
+      <span>Legal Practice Suite</span>
+    </div>
+  </div>
+
+  <div class="practice-switcher">
+    <label>Practice Area</label>
+    <select class="practice-select">
+      <option>All Practices</option>
+      <option>Corporate &amp; M&amp;A</option>
+      <option>Litigation</option>
+      <option>Real Estate</option>
+      <option>Employment Law</option>
+      <option>Intellectual Property</option>
+    </select>
+  </div>
+
+  <nav>
+    <div class="nav-section">
+      <div class="nav-section-label">Overview</div>
+      <a class="nav-item active" href="#">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Matters
+        <span class="nav-badge">42</span>
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        Clients
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Calendar
+        <span class="nav-badge">7</span>
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-label">Billing</div>
+      <a class="nav-item" href="#">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        Timesheets
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+        Invoices
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 110 20A10 10 0 0112 2z"/><path d="M12 6v6l4 2"/></svg>
+        Receipts
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-label">Settings</div>
+      <a class="nav-item" href="#">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        Team
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Roles &amp; Access
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Integrations
+      </a>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="attorney-chip">
+      <div class="attorney-avatar">MH</div>
+      <div class="attorney-info">Margaret Hargrove
+        <span>Managing Partner</span>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════════════════════════ MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-title">Matter Overview</div>
+    <div class="topbar-search">
+      <svg class="topbar-search svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#94a3b8"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="search" placeholder="Search matters, clients, documents…">
+    </div>
+    <div class="topbar-period">
+      <button class="period-btn">24H</button>
+      <button class="period-btn active">This Month</button>
+      <button class="period-btn">Q2</button>
+      <button class="period-btn">YTD</button>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" title="Notifications">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="notif-dot"></span>
+      </button>
+      <div class="user-avatar" title="Margaret Hargrove">MH</div>
+    </div>
+  </header>
+
+  <!-- PAGE BODY -->
+  <div class="page-body">
+
+    <!-- GREETING STRIP -->
+    <div class="greeting-strip">
+      <div class="greeting-date">Monday, 2 June 2026 &nbsp;·&nbsp; Billing Period: May 2026</div>
+      <span class="realization-chip">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Realization Rate 87%
+      </span>
+      <div class="greeting-actions">
+        <button class="btn-ghost">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          Export CSV
+        </button>
+        <button class="btn-primary">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Matter
+        </button>
+      </div>
+    </div>
+
+    <!-- KPI TILES -->
+    <div class="kpi-grid">
+
+      <!-- Tile 1: Active Cases -->
+      <div class="kpi-card">
+        <div class="kpi-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="color:var(--clr-accent)"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        </div>
+        <div class="kpi-label">Active Cases</div>
+        <div class="kpi-value">42</div>
+        <div class="kpi-sub">
+          <span class="kpi-delta up">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
+            +5
+          </span>
+          vs last month
+        </div>
+        <svg class="sparkline" width="80" height="24" viewBox="0 0 80 24" fill="none" style="margin-top:8px">
+          <polyline points="0,20 12,16 24,18 36,10 48,14 60,8 72,6 80,4" stroke="var(--clr-accent)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+        </svg>
+      </div>
+
+      <!-- Tile 2: Billable Hours MTD -->
+      <div class="kpi-card gold">
+        <div class="kpi-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="color:var(--clr-gold)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="kpi-label">Billable Hours MTD</div>
+        <div class="kpi-value">1,284</div>
+        <div class="kpi-sub">Target: 1,500 hrs</div>
+        <div class="kpi-bar-track" style="margin-top:10px">
+          <div class="kpi-bar-fill" style="width:85.6%"></div>
+        </div>
+      </div>
+
+      <!-- Tile 3: Deadlines This Week -->
+      <div class="kpi-card">
+        <div class="kpi-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="color:var(--clr-accent)"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="kpi-label">Deadlines This Week</div>
+        <div class="kpi-value">7</div>
+        <div class="kpi-sub">
+          <span class="kpi-delta warn">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            2 urgent
+          </span>
+          &nbsp;require immediate action
+        </div>
+      </div>
+
+      <!-- Tile 4: Realization Rate -->
+      <div class="kpi-card gold">
+        <div class="kpi-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="color:var(--clr-gold)"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        </div>
+        <div class="kpi-label">Realization Rate</div>
+        <div class="kpi-value">87%</div>
+        <div class="kpi-sub">
+          <span class="kpi-delta up">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
+            +3pp
+          </span>
+          vs Q1 avg
+        </div>
+        <svg class="sparkline" width="80" height="24" viewBox="0 0 80 24" fill="none" style="margin-top:8px">
+          <polyline points="0,18 12,16 24,15 36,14 48,12 60,10 72,9 80,7" stroke="var(--clr-gold)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+        </svg>
+      </div>
+
+    </div><!-- /kpi-grid -->
+
+    <!-- MAIN CONTENT GRID -->
+    <div class="content-grid">
+
+      <!-- MATTERS TABLE -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Active Matters</div>
+          <a class="card-link" href="#">View all matters →</a>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Matter #</th>
+              <th>Client</th>
+              <th>Practice</th>
+              <th>Lead Attorney</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="matter-num">M-2026-0441</span></td>
+              <td><span class="client-name">Vantara Holdings LLC</span></td>
+              <td>Corporate &amp; M&amp;A</td>
+              <td><div class="lead-att"><div class="att-dot" style="background:#9f1239">MH</div>M. Hargrove</div></td>
+              <td><span class="pill pill-active"><span class="pill-dot"></span>Active</span></td>
+              <td><a class="action-link" href="#">Open</a></td>
+            </tr>
+            <tr>
+              <td><span class="matter-num">M-2026-0437</span></td>
+              <td><span class="client-name">Desai Pharma Group</span></td>
+              <td>Litigation</td>
+              <td><div class="lead-att"><div class="att-dot" style="background:#b45309">RC</div>R. Calloway</div></td>
+              <td><span class="pill pill-urgent"><span class="pill-dot"></span>Urgent</span></td>
+              <td><a class="action-link" href="#">Open</a></td>
+            </tr>
+            <tr>
+              <td><span class="matter-num">M-2026-0429</span></td>
+              <td><span class="client-name">Norden Real Estates</span></td>
+              <td>Real Estate</td>
+              <td><div class="lead-att"><div class="att-dot" style="background:#0369a1">SK</div>S. Kovalenko</div></td>
+              <td><span class="pill pill-active"><span class="pill-dot"></span>Active</span></td>
+              <td><a class="action-link" href="#">Open</a></td>
+            </tr>
+            <tr>
+              <td><span class="matter-num">M-2026-0418</span></td>
+              <td><span class="client-name">Brightline Tech Inc.</span></td>
+              <td>Intellectual Property</td>
+              <td><div class="lead-att"><div class="att-dot" style="background:#7c3aed">AW</div>A. Winters</div></td>
+              <td><span class="pill pill-pending"><span class="pill-dot"></span>Pending</span></td>
+              <td><a class="action-link" href="#">Open</a></td>
+            </tr>
+            <tr>
+              <td><span class="matter-num">M-2026-0412</span></td>
+              <td><span class="client-name">Olmstead &amp; Pryce Co.</span></td>
+              <td>Employment Law</td>
+              <td><div class="lead-att"><div class="att-dot" style="background:#0d9488">JN</div>J. Nakamura</div></td>
+              <td><span class="pill pill-active"><span class="pill-dot"></span>Active</span></td>
+              <td><a class="action-link" href="#">Open</a></td>
+            </tr>
+            <tr>
+              <td><span class="matter-num">M-2026-0398</span></td>
+              <td><span class="client-name">Castellan Infrastructure</span></td>
+              <td>Litigation</td>
+              <td><div class="lead-att"><div class="att-dot" style="background:#b45309">RC</div>R. Calloway</div></td>
+              <td><span class="pill pill-urgent"><span class="pill-dot"></span>Urgent</span></td>
+              <td><a class="action-link" href="#">Open</a></td>
+            </tr>
+            <tr>
+              <td><span class="matter-num">M-2025-0381</span></td>
+              <td><span class="client-name">Mercer Logistics SA</span></td>
+              <td>Corporate &amp; M&amp;A</td>
+              <td><div class="lead-att"><div class="att-dot" style="background:#9f1239">MH</div>M. Hargrove</div></td>
+              <td><span class="pill pill-closed"><span class="pill-dot"></span>Closed</span></td>
+              <td><a class="action-link" href="#">Open</a></td>
+            </tr>
+            <tr>
+              <td><span class="matter-num">M-2026-0455</span></td>
+              <td><span class="client-name">Talcott Renewables Ltd.</span></td>
+              <td>Real Estate</td>
+              <td><div class="lead-att"><div class="att-dot" style="background:#0369a1">SK</div>S. Kovalenko</div></td>
+              <td><span class="pill pill-pending"><span class="pill-dot"></span>Pending</span></td>
+              <td><a class="action-link" href="#">Open</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- RIGHT PANEL -->
+      <div class="right-panel">
+
+        <!-- Upcoming Deadlines -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Upcoming Deadlines</div>
+            <a class="card-link" href="#">Calendar →</a>
+          </div>
+          <div class="deadline-list">
+            <div class="deadline-item">
+              <div class="dl-dot urgent"></div>
+              <div>
+                <div class="dl-matter">M-2026-0437</div>
+                <div class="dl-desc">Response to Motion to Dismiss</div>
+                <div class="dl-date">Tomorrow, 3 Jun 2026</div>
+              </div>
+            </div>
+            <div class="deadline-item">
+              <div class="dl-dot urgent"></div>
+              <div>
+                <div class="dl-matter">M-2026-0398</div>
+                <div class="dl-desc">Expert Witness Disclosure</div>
+                <div class="dl-date">Wed 4 Jun 2026</div>
+              </div>
+            </div>
+            <div class="deadline-item">
+              <div class="dl-dot warn"></div>
+              <div>
+                <div class="dl-matter">M-2026-0441</div>
+                <div class="dl-desc">Share Purchase Agreement — final draft</div>
+                <div class="dl-date">Thu 5 Jun 2026</div>
+              </div>
+            </div>
+            <div class="deadline-item">
+              <div class="dl-dot warn"></div>
+              <div>
+                <div class="dl-matter">M-2026-0418</div>
+                <div class="dl-desc">Patent Opposition Response</div>
+                <div class="dl-date">Fri 6 Jun 2026</div>
+              </div>
+            </div>
+            <div class="deadline-item">
+              <div class="dl-dot ok"></div>
+              <div>
+                <div class="dl-matter">M-2026-0412</div>
+                <div class="dl-desc">Settlement Conference Prep</div>
+                <div class="dl-date">Mon 9 Jun 2026</div>
+              </div>
+            </div>
+            <div class="deadline-item">
+              <div class="dl-dot ok"></div>
+              <div>
+                <div class="dl-matter">M-2026-0455</div>
+                <div class="dl-desc">Environmental Review Filing</div>
+                <div class="dl-date">Tue 10 Jun 2026</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Matters by Practice Chart -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Matters by Practice</div>
+          </div>
+          <div class="chart-body">
+            <!-- Litigation: 14 -->
+            <div class="chart-row">
+              <div class="chart-label">Litigation</div>
+              <div class="chart-bar-track">
+                <div class="chart-bar-fill" style="width:100%"><span class="chart-count">14</span></div>
+              </div>
+            </div>
+            <!-- Corporate: 11 -->
+            <div class="chart-row">
+              <div class="chart-label">Corporate</div>
+              <div class="chart-bar-track">
+                <div class="chart-bar-fill" style="width:78.5%"><span class="chart-count">11</span></div>
+              </div>
+            </div>
+            <!-- Real Estate: 8 -->
+            <div class="chart-row">
+              <div class="chart-label">Real Estate</div>
+              <div class="chart-bar-track">
+                <div class="chart-bar-fill gold" style="width:57%"><span class="chart-count">8</span></div>
+              </div>
+            </div>
+            <!-- Employment: 5 -->
+            <div class="chart-row">
+              <div class="chart-label">Employment</div>
+              <div class="chart-bar-track">
+                <div class="chart-bar-fill gold" style="width:35.7%"><span class="chart-count">5</span></div>
+              </div>
+            </div>
+            <!-- IP: 4 -->
+            <div class="chart-row">
+              <div class="chart-label">IP</div>
+              <div class="chart-bar-track">
+                <div class="chart-bar-fill" style="width:28.5%;opacity:0.65"><span class="chart-count">4</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /right-panel -->
+    </div><!-- /content-grid -->
+
+    <!-- RECENT DOCUMENTS -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Recent Documents</div>
+        <a class="card-link" href="#">Document vault →</a>
+      </div>
+      <div class="doc-list">
+        <div class="doc-row">
+          <div class="doc-icon">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div>
+            <div class="doc-name">Share Purchase Agreement — Vantara Holdings v3.docx</div>
+            <div class="doc-meta">Matter <a href="#">M-2026-0441</a> &nbsp;·&nbsp; Uploaded by M. Hargrove</div>
+          </div>
+          <div class="doc-right">
+            <div class="doc-date">Today, 09:41</div>
+            <a class="doc-view" href="#">View</a>
+          </div>
+        </div>
+        <div class="doc-row">
+          <div class="doc-icon">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div>
+            <div class="doc-name">Expert Witness Statement — Desai Pharma Group.pdf</div>
+            <div class="doc-meta">Matter <a href="#">M-2026-0437</a> &nbsp;·&nbsp; Uploaded by R. Calloway</div>
+          </div>
+          <div class="doc-right">
+            <div class="doc-date">Today, 08:15</div>
+            <a class="doc-view" href="#">View</a>
+          </div>
+        </div>
+        <div class="doc-row">
+          <div class="doc-icon">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div>
+            <div class="doc-name">Patent Opposition Brief — Brightline Tech.pdf</div>
+            <div class="doc-meta">Matter <a href="#">M-2026-0418</a> &nbsp;·&nbsp; Uploaded by A. Winters</div>
+          </div>
+          <div class="doc-right">
+            <div class="doc-date">Yesterday, 16:52</div>
+            <a class="doc-view" href="#">View</a>
+          </div>
+        </div>
+        <div class="doc-row">
+          <div class="doc-icon">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div>
+            <div class="doc-name">Land Title Report — Norden Real Estates Lot 7B.pdf</div>
+            <div class="doc-meta">Matter <a href="#">M-2026-0429</a> &nbsp;·&nbsp; Uploaded by S. Kovalenko</div>
+          </div>
+          <div class="doc-right">
+            <div class="doc-date">Yesterday, 14:08</div>
+            <a class="doc-view" href="#">View</a>
+          </div>
+        </div>
+        <div class="doc-row">
+          <div class="doc-icon">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div>
+            <div class="doc-name">Settlement Conference Memorandum — Olmstead &amp; Pryce.docx</div>
+            <div class="doc-meta">Matter <a href="#">M-2026-0412</a> &nbsp;·&nbsp; Uploaded by J. Nakamura</div>
+          </div>
+          <div class="doc-right">
+            <div class="doc-date">29 May 2026</div>
+            <a class="doc-view" href="#">View</a>
+          </div>
+        </div>
+        <div class="doc-row">
+          <div class="doc-icon">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div>
+            <div class="doc-name">Environmental Impact Assessment — Talcott Renewables.pdf</div>
+            <div class="doc-meta">Matter <a href="#">M-2026-0455</a> &nbsp;·&nbsp; Uploaded by S. Kovalenko</div>
+          </div>
+          <div class="doc-right">
+            <div class="doc-date">28 May 2026</div>
+            <a class="doc-view" href="#">View</a>
+          </div>
+        </div>
+      </div>
+    </div><!-- /recent docs -->
+
+  </div><!-- /page-body -->
+</div><!-- /main -->
+
+</body>
+</html>

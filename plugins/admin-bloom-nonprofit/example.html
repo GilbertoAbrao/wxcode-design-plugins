@@ -1,0 +1,1359 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bloom Nonprofit Admin</title>
+<style>
+:root {
+  --accent:         #10b981;
+  --accent-light:   #d1fae5;
+  --accent-dark:    #059669;
+  --coral:          #fb7185;
+  --coral-light:    #ffe4e8;
+  --coral-dark:     #e11d48;
+  --amber:          #f59e0b;
+  --amber-dark:     #92400e;
+  --amber-light:    #fef3c7;
+  --accent-mid:     #34d399;
+  --surface:        #f7fbf9;
+  --card:           #ffffff;
+  --border:         #e4ede9;
+  --text-primary:   #1e293b;
+  --text-secondary: #64748b;
+  --text-muted:     #94a3b8;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--surface);
+  display: flex;
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* ── SIDEBAR ───────────────────────────────────────────────── */
+.sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: var(--card);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+}
+
+.org-switcher {
+  padding: 20px 16px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.org-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 8px;
+  transition: background .15s;
+}
+.org-row:hover { background: var(--surface); }
+
+.org-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.org-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.org-caret {
+  color: var(--text-muted);
+}
+
+.program-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 0 8px;
+}
+
+.program-chip {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 20px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all .15s;
+}
+.program-chip.active {
+  background: var(--accent-light);
+  color: var(--accent-dark);
+  border-color: var(--accent-light);
+}
+
+.nav {
+  flex: 1;
+  padding: 12px 10px;
+  overflow-y: auto;
+}
+
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 10px 8px 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  position: relative;
+  transition: all .15s;
+  text-decoration: none;
+}
+.nav-item:hover {
+  background: var(--surface);
+  color: var(--text-primary);
+}
+.nav-item.active {
+  background: var(--accent-light);
+  color: var(--accent-dark);
+  font-weight: 600;
+}
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--accent);
+}
+.nav-item svg { flex-shrink: 0; }
+.nav-item.active svg { color: var(--accent); }
+
+.nav-badge {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--coral-light);
+  color: var(--coral-dark);
+  border-radius: 10px;
+  padding: 1px 6px;
+}
+
+.sidebar-footer {
+  padding: 14px 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-avatar-sm {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent-light);
+  color: var(--accent-dark);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.user-info { flex: 1; }
+.user-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.user-role { font-size: 11px; color: var(--text-muted); }
+
+.signout-btn {
+  font-size: 11px;
+  color: var(--text-muted);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: color .15s;
+}
+.signout-btn:hover { color: var(--coral-dark); }
+
+/* ── MAIN ──────────────────────────────────────────────────── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* ── TOPBAR ────────────────────────────────────────────────── */
+.topbar {
+  height: 60px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.topbar-left { flex: 0 0 auto; }
+.page-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+.page-date  { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
+.topbar-search {
+  flex: 1;
+  max-width: 360px;
+  position: relative;
+}
+.topbar-search svg {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+}
+.topbar-search input {
+  width: 100%;
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 0 12px 0 34px;
+  font-size: 13px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color .15s;
+}
+.topbar-search input:focus { border-color: var(--accent); }
+.topbar-search input::placeholder { color: var(--text-muted); }
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.period-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface);
+}
+.period-tab {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 11px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  border-right: 1px solid var(--border);
+  transition: all .15s;
+  white-space: nowrap;
+}
+.period-tab:last-child { border-right: none; }
+.period-tab.active {
+  background: var(--card);
+  color: var(--accent-dark);
+  border-bottom: 2px solid var(--accent);
+}
+.period-tab:hover:not(.active) { background: var(--card); color: var(--text-primary); }
+
+.notif-btn {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: background .15s;
+}
+.notif-btn:hover { background: var(--surface); }
+.notif-dot {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--amber);
+  border: 1.5px solid var(--card);
+}
+
+.topbar-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* ── CONTENT ───────────────────────────────────────────────── */
+.content {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── KPI CARDS ─────────────────────────────────────────────── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.kpi-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kpi-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.kpi-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.kpi-number {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+
+.kpi-sparkline { flex-shrink: 0; }
+
+.kpi-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.kpi-delta {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+}
+.kpi-delta.up   { background: var(--accent-light); color: var(--accent-dark); }
+.kpi-delta.down { background: var(--coral-light);  color: var(--coral-dark); }
+
+.kpi-ctx { font-size: 11px; color: var(--text-muted); }
+
+/* ── MIDDLE ROW ────────────────────────────────────────────── */
+.mid-row {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 16px;
+  align-items: start;
+}
+
+/* ── CAMPAIGNS CARD ────────────────────────────────────────── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.view-all {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-dark);
+  cursor: pointer;
+  text-decoration: none;
+  border: none;
+  background: none;
+}
+.view-all:hover { text-decoration: underline; }
+
+/* campaign table */
+.camp-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.camp-table th {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 8px 20px;
+  text-align: left;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.camp-table td {
+  padding: 11px 20px;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.camp-table tr:last-child td { border-bottom: none; }
+.camp-table tr:hover td { background: #f9fdfb; }
+
+.camp-name-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.camp-name { font-weight: 600; color: var(--text-primary); }
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 20px;
+  padding: 2px 7px;
+}
+.status-badge.active   { background: var(--accent-light); color: var(--accent-dark); }
+.status-badge.ending   { background: var(--amber-light);  color: var(--amber-dark); }
+.status-badge.paused   { background: #f1f5f9;              color: #64748b; }
+
+.progress-wrap { display: flex; flex-direction: column; gap: 4px; min-width: 120px; }
+.progress-bar-bg {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border);
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--accent);
+  transition: width .4s;
+}
+.progress-bar-fill.near { background: var(--amber); }
+.progress-pct { font-size: 10px; color: var(--text-muted); }
+
+.days-left { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
+.days-left.ending { color: var(--amber); font-weight: 700; }
+.days-left.paused { color: var(--text-muted); }
+
+/* ── DONOR SEGMENTS PANEL ──────────────────────────────────── */
+.segments-panel { display: flex; flex-direction: column; }
+
+.donut-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 20px 20px 10px;
+}
+
+.donut-svg { overflow: visible; }
+
+.segments-legend {
+  padding: 0 20px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.seg-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.seg-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.seg-name { font-size: 12px; color: var(--text-secondary); flex: 1; }
+.seg-count { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+.seg-pct   { font-size: 11px; color: var(--text-muted); min-width: 34px; text-align: right; }
+
+/* ── TREND CHART CARD ──────────────────────────────────────── */
+.trend-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.trend-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.trend-legend {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.legend-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+.legend-swatch.accent { background: var(--accent); }
+.legend-swatch.coral  { background: var(--coral);  }
+
+.trend-chart-wrap {
+  padding: 16px 20px 8px;
+}
+
+.trend-svg { display: block; width: 100%; }
+
+.chart-month-labels {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 20px 14px;
+}
+.chart-month-labels span { font-size: 10px; color: var(--text-muted); }
+
+/* ── BOTTOM ROW ────────────────────────────────────────────── */
+.bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 16px;
+  align-items: start;
+}
+
+/* ── DONATIONS TABLE ───────────────────────────────────────── */
+.donations-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.donations-table th {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 9px 20px;
+  text-align: left;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+.donations-table th:hover { color: var(--text-secondary); }
+.sort-hint { color: var(--text-muted); font-size: 9px; margin-left: 3px; }
+
+.donations-table td {
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  vertical-align: middle;
+}
+.donations-table tr:last-child td { border-bottom: none; }
+.donations-table tr:hover td { background: #f9fdfb; }
+
+.donor-cell {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.donor-initials {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+  color: #ffffff;
+}
+
+.donor-name { font-weight: 600; color: var(--text-primary); }
+
+.amount-cell { font-weight: 700; color: var(--text-primary); }
+
+.type-pill {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.type-pill.onetime   { background: var(--accent-light); color: var(--accent-dark); }
+.type-pill.recurring { background: var(--coral-light);  color: var(--coral-dark); }
+
+.date-cell { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+
+/* ── QUICK STATS SIDEBAR ───────────────────────────────────── */
+.quick-stats {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.qs-item {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.qs-item:last-child { border-bottom: none; }
+
+.qs-left { display: flex; flex-direction: column; gap: 2px; }
+.qs-label { font-size: 11px; color: var(--text-muted); }
+.qs-value { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+
+.qs-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.qs-icon.emerald { background: var(--accent-light); color: var(--accent); }
+.qs-icon.coral   { background: var(--coral-light);  color: var(--coral); }
+.qs-icon.amber   { background: var(--amber-light);  color: var(--amber); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ SIDEBAR ═════════════════════════ -->
+<aside class="sidebar">
+
+  <!-- Org switcher -->
+  <div class="org-switcher">
+    <div class="org-row">
+      <div class="org-avatar">B</div>
+      <span class="org-name">Bloom Foundation</span>
+      <span class="org-caret">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </span>
+    </div>
+    <div class="program-chips">
+      <span class="program-chip active">All Programs</span>
+      <span class="program-chip">Food &amp; Hunger</span>
+      <span class="program-chip">Education</span>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+
+    <div class="nav-section-label">Overview</div>
+
+    <a class="nav-item active">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+
+    <a class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      Campaigns
+      <span class="nav-badge">12</span>
+    </a>
+
+    <div class="nav-section-label">Donors</div>
+
+    <a class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Donor List
+    </a>
+
+    <a class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      Segments
+    </a>
+
+    <a class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+      Import
+    </a>
+
+    <div class="nav-section-label">Finance</div>
+
+    <a class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Revenue
+    </a>
+
+    <a class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Grants
+    </a>
+
+    <a class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Reports
+    </a>
+
+    <div class="nav-section-label">Settings</div>
+
+    <a class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Team
+    </a>
+
+    <a class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      Integrations
+    </a>
+
+  </nav>
+
+  <!-- Footer -->
+  <div class="sidebar-footer">
+    <div class="user-avatar-sm">SA</div>
+    <div class="user-info">
+      <div class="user-name">Sara Adeyemi</div>
+      <div class="user-role">Operations Lead</div>
+    </div>
+    <button class="signout-btn" title="Sign out">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </button>
+  </div>
+
+</aside>
+
+<!-- ═══════════════════════════════ MAIN ════════════════════════════ -->
+<main class="main">
+
+  <!-- ── TOPBAR ── -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="page-title">Dashboard</div>
+      <div class="page-date">Sunday, June 1 2026</div>
+    </div>
+
+    <div class="topbar-search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search donors, campaigns…" aria-label="Search">
+    </div>
+
+    <div class="topbar-right">
+      <div class="period-tabs" role="tablist">
+        <button class="period-tab" role="tab">This Month</button>
+        <button class="period-tab active" role="tab">This Quarter</button>
+        <button class="period-tab" role="tab">This Year</button>
+      </div>
+
+      <button class="notif-btn" aria-label="Notifications">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-dot"></span>
+      </button>
+
+      <div class="topbar-avatar" title="Sara Adeyemi">SA</div>
+    </div>
+  </header>
+
+  <!-- ── CONTENT ── -->
+  <div class="content">
+
+    <!-- KPI CARDS -->
+    <div class="kpi-grid">
+
+      <!-- Total Raised -->
+      <div class="kpi-card">
+        <div class="kpi-label">Total Raised</div>
+        <div class="kpi-row">
+          <div class="kpi-number">$1.24M</div>
+          <svg class="kpi-sparkline" width="44" height="26" viewBox="0 0 44 26" fill="none">
+            <polyline points="2,22 9,18 16,20 23,12 30,14 37,7 44,4" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+            <polyline points="2,22 9,18 16,20 23,12 30,14 37,7 44,4 44,26 2,26" fill="var(--accent)" fill-opacity="0.12"/>
+          </svg>
+        </div>
+        <div class="kpi-footer">
+          <span class="kpi-delta up">↑ 14%</span>
+          <span class="kpi-ctx">vs last quarter</span>
+        </div>
+      </div>
+
+      <!-- Active Donors -->
+      <div class="kpi-card">
+        <div class="kpi-label">Active Donors</div>
+        <div class="kpi-row">
+          <div class="kpi-number">4,821</div>
+          <svg class="kpi-sparkline" width="44" height="26" viewBox="0 0 44 26" fill="none">
+            <polyline points="2,20 9,19 16,16 23,17 30,11 37,9 44,6" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+            <polyline points="2,20 9,19 16,16 23,17 30,11 37,9 44,6 44,26 2,26" fill="var(--accent)" fill-opacity="0.12"/>
+          </svg>
+        </div>
+        <div class="kpi-footer">
+          <span class="kpi-delta up">↑ 9%</span>
+          <span class="kpi-ctx">vs last quarter</span>
+        </div>
+      </div>
+
+      <!-- Active Campaigns -->
+      <div class="kpi-card">
+        <div class="kpi-label">Active Campaigns</div>
+        <div class="kpi-row">
+          <div class="kpi-number">12</div>
+          <svg class="kpi-sparkline" width="44" height="26" viewBox="0 0 44 26" fill="none">
+            <polyline points="2,16 9,16 16,14 23,14 30,13 37,13 44,13" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+            <polyline points="2,16 9,16 16,14 23,14 30,13 37,13 44,13 44,26 2,26" fill="var(--accent)" fill-opacity="0.12"/>
+          </svg>
+        </div>
+        <div class="kpi-footer">
+          <span class="kpi-delta up">↑ 2</span>
+          <span class="kpi-ctx">new this quarter</span>
+        </div>
+      </div>
+
+      <!-- Recurring Gifts -->
+      <div class="kpi-card">
+        <div class="kpi-label">Recurring Gifts</div>
+        <div class="kpi-row">
+          <div class="kpi-number">$38.9k</div>
+          <svg class="kpi-sparkline" width="44" height="26" viewBox="0 0 44 26" fill="none">
+            <polyline points="2,21 9,20 16,18 23,15 30,13 37,10 44,8" stroke="var(--coral)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+            <polyline points="2,21 9,20 16,18 23,15 30,13 37,10 44,8 44,26 2,26" fill="var(--coral)" fill-opacity="0.10"/>
+          </svg>
+        </div>
+        <div class="kpi-footer">
+          <span class="kpi-delta up">↑ 7%</span>
+          <span class="kpi-ctx">monthly average</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MID ROW: campaigns + segments -->
+    <div class="mid-row">
+
+      <!-- Campaigns List -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Active Campaigns</span>
+          <button class="view-all">View all →</button>
+        </div>
+        <table class="camp-table">
+          <thead>
+            <tr>
+              <th>Campaign</th>
+              <th>Progress</th>
+              <th>Raised</th>
+              <th>Goal</th>
+              <th>Days Left</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="camp-name-cell">
+                  <span class="camp-name">Harvest Hope Food Drive</span>
+                  <span class="status-badge active">
+                    <svg width="7" height="7" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg>
+                    Active
+                  </span>
+                </div>
+              </td>
+              <td>
+                <div class="progress-wrap">
+                  <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:70%"></div></div>
+                  <span class="progress-pct">70%</span>
+                </div>
+              </td>
+              <td>$84,200</td>
+              <td>$120,000</td>
+              <td><span class="days-left">18 days</span></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="camp-name-cell">
+                  <span class="camp-name">Spring Literacy Fund</span>
+                  <span class="status-badge active">
+                    <svg width="7" height="7" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg>
+                    Active
+                  </span>
+                </div>
+              </td>
+              <td>
+                <div class="progress-wrap">
+                  <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:71%"></div></div>
+                  <span class="progress-pct">71%</span>
+                </div>
+              </td>
+              <td>$56,780</td>
+              <td>$80,000</td>
+              <td><span class="days-left">31 days</span></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="camp-name-cell">
+                  <span class="camp-name">Clean Water Initiative</span>
+                  <span class="status-badge ending">
+                    <svg width="7" height="7" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg>
+                    Ending Soon
+                  </span>
+                </div>
+              </td>
+              <td>
+                <div class="progress-wrap">
+                  <div class="progress-bar-bg"><div class="progress-bar-fill near" style="width:99%"></div></div>
+                  <span class="progress-pct">99%</span>
+                </div>
+              </td>
+              <td>$198,500</td>
+              <td>$200,000</td>
+              <td><span class="days-left ending">4 days</span></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="camp-name-cell">
+                  <span class="camp-name">Youth Arts Scholarship</span>
+                  <span class="status-badge active">
+                    <svg width="7" height="7" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg>
+                    Active
+                  </span>
+                </div>
+              </td>
+              <td>
+                <div class="progress-wrap">
+                  <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:54%"></div></div>
+                  <span class="progress-pct">54%</span>
+                </div>
+              </td>
+              <td>$32,100</td>
+              <td>$60,000</td>
+              <td><span class="days-left">47 days</span></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="camp-name-cell">
+                  <span class="camp-name">Emergency Relief 2026</span>
+                  <span class="status-badge paused">
+                    <svg width="7" height="7" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg>
+                    Paused
+                  </span>
+                </div>
+              </td>
+              <td>
+                <div class="progress-wrap">
+                  <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:82%"></div></div>
+                  <span class="progress-pct">82%</span>
+                </div>
+              </td>
+              <td>$410,000</td>
+              <td>$500,000</td>
+              <td><span class="days-left paused">—</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Donor Segments -->
+      <div class="card segments-panel">
+        <div class="card-header">
+          <span class="card-title">Donor Segments</span>
+          <button class="view-all">Details →</button>
+        </div>
+
+        <!-- Donut chart — 4 arcs, hand-computed with cx=80, cy=80, r=58 -->
+        <!-- circumference = 2π×58 ≈ 364.4 -->
+        <div class="donut-wrap">
+          <svg class="donut-svg" width="160" height="160" viewBox="0 0 160 160">
+            <!-- Major Donors 3% → 10.9 of 364.4 -->
+            <circle cx="80" cy="80" r="58"
+              fill="none" stroke="var(--accent)" stroke-width="22"
+              stroke-dasharray="10.9 353.5"
+              stroke-dashoffset="0"
+              stroke-linecap="butt"
+              transform="rotate(-90 80 80)"/>
+            <!-- Mid-Level 17% → 61.9 -->
+            <circle cx="80" cy="80" r="58"
+              fill="none" stroke="var(--accent-mid)" stroke-width="22"
+              stroke-dasharray="61.9 302.5"
+              stroke-dashoffset="-14.9"
+              stroke-linecap="butt"
+              transform="rotate(-90 80 80)"/>
+            <!-- General 66% → 240.5 -->
+            <circle cx="80" cy="80" r="58"
+              fill="none" stroke="var(--coral)" stroke-width="22"
+              stroke-dasharray="240.5 123.9"
+              stroke-dashoffset="-80.8"
+              stroke-linecap="butt"
+              transform="rotate(-90 80 80)"/>
+            <!-- Lapsed 14% → 51.0 -->
+            <circle cx="80" cy="80" r="58"
+              fill="none" stroke="var(--amber)" stroke-width="22"
+              stroke-dasharray="51.0 313.4"
+              stroke-dashoffset="-325.3"
+              stroke-linecap="butt"
+              transform="rotate(-90 80 80)"/>
+            <!-- Center label -->
+            <text x="80" y="74" text-anchor="middle" font-size="22" font-weight="700" fill="#1e293b">4,821</text>
+            <text x="80" y="90" text-anchor="middle" font-size="10" fill="#94a3b8">donors</text>
+          </svg>
+        </div>
+
+        <div class="segments-legend">
+          <div class="seg-row">
+            <span class="seg-dot" style="background:var(--accent)"></span>
+            <span class="seg-name">Major Donors (≥$5k)</span>
+            <span class="seg-count">148</span>
+            <span class="seg-pct">3%</span>
+          </div>
+          <div class="seg-row">
+            <span class="seg-dot" style="background:var(--accent-mid)"></span>
+            <span class="seg-name">Mid-Level ($500–$4.9k)</span>
+            <span class="seg-count">812</span>
+            <span class="seg-pct">17%</span>
+          </div>
+          <div class="seg-row">
+            <span class="seg-dot" style="background:var(--coral)"></span>
+            <span class="seg-name">General (&lt;$500)</span>
+            <span class="seg-count">3,204</span>
+            <span class="seg-pct">66%</span>
+          </div>
+          <div class="seg-row">
+            <span class="seg-dot" style="background:var(--amber)"></span>
+            <span class="seg-name">Lapsed (&gt;12 mo)</span>
+            <span class="seg-count">657</span>
+            <span class="seg-pct">14%</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TREND CHART -->
+    <div class="trend-card">
+      <div class="trend-header">
+        <span class="card-title">Donations Trend — Last 12 Months</span>
+        <div class="trend-legend">
+          <div class="legend-item"><span class="legend-swatch accent"></span>One-time</div>
+          <div class="legend-item"><span class="legend-swatch coral"></span>Recurring</div>
+        </div>
+      </div>
+      <div class="trend-chart-wrap">
+        <!-- SVG area chart, 12 data points Jun 25–May 26 -->
+        <!-- one-time (peaks): 42 38 55 61 48 72 80 65 90 84 70 96 (k) scaled to 120px height, max=100 -->
+        <!-- recurring (steady grow): 28 29 31 30 33 34 35 36 38 37 39 40 -->
+        <svg class="trend-svg" viewBox="0 0 760 120" height="140" preserveAspectRatio="none">
+          <!-- grid lines -->
+          <line x1="0" y1="0"   x2="760" y2="0"   stroke="#e4ede9" stroke-width="1"/>
+          <line x1="0" y1="40"  x2="760" y2="40"  stroke="#e4ede9" stroke-width="1"/>
+          <line x1="0" y1="80"  x2="760" y2="80"  stroke="#e4ede9" stroke-width="1"/>
+          <line x1="0" y1="120" x2="760" y2="120" stroke="#e4ede9" stroke-width="1"/>
+
+          <!-- one-time area: y = 120 - (val/100)*120 -->
+          <!-- 42→69.6 38→74.4 55→54 61→46.8 48→62.4 72→33.6 80→24 65→42 90→12 84→19.2 70→36 96→4.8 -->
+          <polygon
+            points="0,120 0,69.6 63.3,74.4 126.7,54 190,46.8 253.3,62.4 316.7,33.6 380,24 443.3,42 506.7,12 570,19.2 633.3,36 696.7,4.8 760,4.8 760,120"
+            fill="var(--accent)" fill-opacity="0.18"/>
+          <polyline
+            points="0,69.6 63.3,74.4 126.7,54 190,46.8 253.3,62.4 316.7,33.6 380,24 443.3,42 506.7,12 570,19.2 633.3,36 696.7,4.8 760,4.8"
+            fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+
+          <!-- recurring area: y = 120-(val/100)*120 -->
+          <!-- 28→86.4 29→85.2 31→82.8 30→84 33→80.4 34→79.2 35→78 36→76.8 38→74.4 37→75.6 39→73.2 40→72 -->
+          <polygon
+            points="0,120 0,86.4 63.3,85.2 126.7,82.8 190,84 253.3,80.4 316.7,79.2 380,78 443.3,76.8 506.7,74.4 570,75.6 633.3,73.2 696.7,72 760,72 760,120"
+            fill="var(--coral)" fill-opacity="0.16"/>
+          <polyline
+            points="0,86.4 63.3,85.2 126.7,82.8 190,84 253.3,80.4 316.7,79.2 380,78 443.3,76.8 506.7,74.4 570,75.6 633.3,73.2 696.7,72 760,72"
+            fill="none" stroke="var(--coral)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="chart-month-labels">
+        <span>Jun '25</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span>
+        <span>Dec</span><span>Jan '26</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span>
+      </div>
+    </div>
+
+    <!-- BOTTOM ROW: donations table + quick stats -->
+    <div class="bottom-row">
+
+      <!-- Recent Donations Table -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Recent Donations</span>
+          <button class="view-all">Export →</button>
+        </div>
+        <table class="donations-table">
+          <thead>
+            <tr>
+              <th>Donor<span class="sort-hint">↕</span></th>
+              <th>Campaign<span class="sort-hint">↕</span></th>
+              <th>Amount<span class="sort-hint">↕</span></th>
+              <th>Type</th>
+              <th>Date<span class="sort-hint">↕</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="donor-cell">
+                  <div class="donor-initials" style="background:var(--accent)">MO</div>
+                  <span class="donor-name">Margaret Okonkwo</span>
+                </div>
+              </td>
+              <td>Clean Water Initiative</td>
+              <td class="amount-cell">$5,000</td>
+              <td><span class="type-pill onetime">One-time</span></td>
+              <td class="date-cell">May 31, 2026</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="donor-cell">
+                  <div class="donor-initials" style="background:var(--accent-mid)">LT</div>
+                  <span class="donor-name">Luís Tavares</span>
+                </div>
+              </td>
+              <td>Spring Literacy Fund</td>
+              <td class="amount-cell">$150</td>
+              <td><span class="type-pill recurring">Recurring</span></td>
+              <td class="date-cell">May 31, 2026</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="donor-cell">
+                  <div class="donor-initials" style="background:var(--coral)">AK</div>
+                  <span class="donor-name">Amara Kim</span>
+                </div>
+              </td>
+              <td>Youth Arts Scholarship</td>
+              <td class="amount-cell">$250</td>
+              <td><span class="type-pill onetime">One-time</span></td>
+              <td class="date-cell">May 30, 2026</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="donor-cell">
+                  <div class="donor-initials" style="background:var(--amber)">JR</div>
+                  <span class="donor-name">James Rørvik</span>
+                </div>
+              </td>
+              <td>Harvest Hope Food Drive</td>
+              <td class="amount-cell">$1,200</td>
+              <td><span class="type-pill recurring">Recurring</span></td>
+              <td class="date-cell">May 30, 2026</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="donor-cell">
+                  <div class="donor-initials" style="background:var(--accent-dark)">PC</div>
+                  <span class="donor-name">Priya Chatterjee</span>
+                </div>
+              </td>
+              <td>Emergency Relief 2026</td>
+              <td class="amount-cell">$500</td>
+              <td><span class="type-pill onetime">One-time</span></td>
+              <td class="date-cell">May 29, 2026</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="donor-cell">
+                  <div class="donor-initials" style="background:#64748b">TM</div>
+                  <span class="donor-name">Tobias Metzger</span>
+                </div>
+              </td>
+              <td>Clean Water Initiative</td>
+              <td class="amount-cell">$75</td>
+              <td><span class="type-pill recurring">Recurring</span></td>
+              <td class="date-cell">May 29, 2026</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="donor-cell">
+                  <div class="donor-initials" style="background:var(--accent)">NW</div>
+                  <span class="donor-name">Nadia Walsh</span>
+                </div>
+              </td>
+              <td>Spring Literacy Fund</td>
+              <td class="amount-cell">$3,000</td>
+              <td><span class="type-pill onetime">One-time</span></td>
+              <td class="date-cell">May 28, 2026</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="donor-cell">
+                  <div class="donor-initials" style="background:var(--coral-dark)">OF</div>
+                  <span class="donor-name">Oluwaseun Fadare</span>
+                </div>
+              </td>
+              <td>Youth Arts Scholarship</td>
+              <td class="amount-cell">$200</td>
+              <td><span class="type-pill recurring">Recurring</span></td>
+              <td class="date-cell">May 28, 2026</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Quick Stats sidebar -->
+      <div class="quick-stats card">
+        <div class="card-header">
+          <span class="card-title">Quick Stats</span>
+        </div>
+
+        <div class="qs-item">
+          <div class="qs-left">
+            <span class="qs-label">Avg. Gift Size</span>
+            <span class="qs-value">$258</span>
+          </div>
+          <div class="qs-icon emerald">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+        </div>
+
+        <div class="qs-item">
+          <div class="qs-left">
+            <span class="qs-label">Donor Retention</span>
+            <span class="qs-value">72%</span>
+          </div>
+          <div class="qs-icon emerald">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          </div>
+        </div>
+
+        <div class="qs-item">
+          <div class="qs-left">
+            <span class="qs-label">New Donors (QTD)</span>
+            <span class="qs-value">394</span>
+          </div>
+          <div class="qs-icon coral">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+          </div>
+        </div>
+
+        <div class="qs-item">
+          <div class="qs-left">
+            <span class="qs-label">Lapsed (re-engage)</span>
+            <span class="qs-value">657</span>
+          </div>
+          <div class="qs-icon amber">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+        </div>
+
+        <div class="qs-item">
+          <div class="qs-left">
+            <span class="qs-label">Grants Active</span>
+            <span class="qs-value">7</span>
+          </div>
+          <div class="qs-icon emerald">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+        </div>
+
+        <div class="qs-item">
+          <div class="qs-left">
+            <span class="qs-label">Pending Pledges</span>
+            <span class="qs-value">$84k</span>
+          </div>
+          <div class="qs-icon amber">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+</body>
+</html>

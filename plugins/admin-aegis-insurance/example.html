@@ -1,0 +1,1060 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aegis Insurance Admin</title>
+<style>
+  /* ─── PALETTE TOKENS ─────────────────────────────────────────── */
+  :root {
+    --clr-navy-900: #1e3a8a;
+    --clr-navy-700: #1d4ed8;
+    --clr-navy-600: #2563eb;
+    --clr-navy-100: #dbeafe;
+    --clr-navy-050: #eff6ff;
+    --clr-teal-500: #14b8a6;
+    --clr-teal-300: #5eead4;
+    --clr-teal-100: #ccfbf1;
+    --clr-green-500: #22c55e;
+    --clr-green-100: #dcfce7;
+    --clr-amber-500: #f59e0b;
+    --clr-amber-100: #fef3c7;
+    --clr-red-500:   #ef4444;
+    --clr-red-100:   #fee2e2;
+    --clr-surface:   #f6f8fb;
+    --clr-border:    #e3e8f0;
+    --clr-sidebar-bg: #0f2057;
+    --clr-sidebar-active: rgba(37,99,235,0.18);
+    --clr-sidebar-hover:  rgba(255,255,255,0.06);
+    /* status text (dark variants for contrast on light tinted backgrounds) */
+    --clr-amber-700: #b45309;
+    --clr-teal-700:  #0f766e;
+    --clr-green-700: #15803d;
+  }
+
+  /* ─── RESET & BASE ───────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #1e293b;
+    background: var(--clr-surface);
+    display: flex;
+    min-height: 100vh;
+  }
+  button { cursor: pointer; font-family: inherit; }
+  a { color: var(--clr-navy-600); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ─── SIDEBAR ────────────────────────────────────────────────── */
+  .sidebar {
+    width: 240px;
+    min-height: 100vh;
+    background: var(--clr-sidebar-bg);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 22px 20px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .brand-icon {
+    width: 34px;
+    height: 34px;
+    color: var(--clr-teal-300);
+    flex-shrink: 0;
+  }
+  .brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+  .brand-name { font-size: 16px; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
+  .brand-sub  { font-size: 10px; font-weight: 500; color: rgba(255,255,255,0.45); letter-spacing: 0.8px; text-transform: uppercase; }
+
+  /* LOB switcher */
+  .lob-switcher {
+    margin: 16px 14px 8px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: rgba(255,255,255,0.9);
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .lob-switcher svg { color: rgba(255,255,255,0.5); }
+
+  /* Nav */
+  .nav-section { padding: 18px 0 6px; }
+  .nav-section-label {
+    padding: 0 20px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 20px;
+    color: rgba(255,255,255,0.65);
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.15s, color 0.15s;
+    border-left: 3px solid transparent;
+  }
+  .nav-item:hover { background: var(--clr-sidebar-hover); color: rgba(255,255,255,0.9); }
+  .nav-item.active {
+    background: var(--clr-sidebar-active);
+    color: #fff;
+    border-left-color: var(--clr-navy-600);
+  }
+  .nav-item svg { flex-shrink: 0; width: 16px; height: 16px; }
+  .nav-badge {
+    margin-left: auto;
+    background: var(--clr-red-500);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+  }
+  .nav-badge.amber { background: var(--clr-amber-500); }
+  .nav-badge.teal  { background: var(--clr-teal-500); }
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 16px 14px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sidebar-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--clr-navy-600);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;
+  }
+  .sidebar-user-name { font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,0.9); }
+  .sidebar-user-role { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+  /* ─── MAIN AREA ──────────────────────────────────────────────── */
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+  /* TOPBAR */
+  .topbar {
+    height: 60px;
+    background: #fff;
+    border-bottom: 1px solid var(--clr-border);
+    display: flex;
+    align-items: center;
+    padding: 0 28px;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .topbar-breadcrumb { display: flex; flex-direction: column; }
+  .topbar-title { font-size: 15px; font-weight: 700; color: #1e293b; }
+  .topbar-crumb { font-size: 11px; color: #64748b; }
+  .topbar-crumb span { color: var(--clr-navy-600); }
+  .topbar-search {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: 8px;
+    padding: 0 12px;
+    gap: 8px;
+    height: 36px;
+    min-width: 260px;
+    color: #64748b;
+  }
+  .topbar-search input {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 13px;
+    color: #1e293b;
+    width: 100%;
+  }
+  .topbar-search input::placeholder { color: #94a3b8; }
+  .period-tabs {
+    display: flex;
+    gap: 2px;
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    border-radius: 8px;
+    padding: 3px;
+  }
+  .period-tab {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    border: none;
+    background: transparent;
+    letter-spacing: 0.2px;
+  }
+  .period-tab.active {
+    background: var(--clr-navy-600);
+    color: #fff;
+  }
+  .topbar-bell {
+    position: relative;
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px;
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
+    color: #64748b;
+    cursor: pointer;
+  }
+  .topbar-bell .dot {
+    position: absolute;
+    top: 7px; right: 8px;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--clr-amber-500);
+    border: 1.5px solid #fff;
+  }
+  .topbar-avatar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--clr-border);
+    background: var(--clr-surface);
+    cursor: pointer;
+  }
+  .topbar-avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--clr-navy-600);
+    font-size: 11px; font-weight: 700; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .topbar-uname { font-size: 13px; font-weight: 600; color: #1e293b; }
+
+  /* CONTENT */
+  .content { padding: 24px 28px; display: flex; flex-direction: column; gap: 24px; }
+
+  /* ─── KPI CARDS ──────────────────────────────────────────────── */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+  .kpi-card {
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid var(--clr-border);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 18px 18px 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--clr-teal-500);
+  }
+  .kpi-label {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 8px;
+  }
+  .kpi-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; }
+  .kpi-value { font-size: 28px; font-weight: 800; color: #1e293b; letter-spacing: -1px; line-height: 1; }
+  .kpi-sparkline { flex-shrink: 0; }
+  .kpi-delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-top: 8px;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 20px;
+  }
+  .kpi-delta.green { color: var(--clr-green-500); background: var(--clr-green-100); }
+  .kpi-delta.amber { color: var(--clr-amber-500); background: var(--clr-amber-100); }
+  .kpi-delta.red   { color: var(--clr-red-500);   background: var(--clr-red-100); }
+
+  /* ─── SECTION HEADER ─────────────────────────────────────────── */
+  .section-hdr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .section-title { font-size: 15px; font-weight: 700; color: #1e293b; }
+  .section-link { font-size: 12.5px; color: var(--clr-navy-600); font-weight: 500; }
+
+  /* ─── CLAIMS PIPELINE ────────────────────────────────────────── */
+  .pipeline-wrap {
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid var(--clr-border);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 20px;
+  }
+  .pipeline-board { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+  .pipeline-col {}
+  .pipeline-stage-hdr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    border-radius: 7px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+  .pipeline-stage-hdr.filed    { background: var(--clr-red-100);   color: var(--clr-red-500); }
+  .pipeline-stage-hdr.review   { background: var(--clr-amber-100); color: var(--clr-amber-700); }
+  .pipeline-stage-hdr.approved { background: var(--clr-teal-100);  color: var(--clr-teal-700); }
+  .pipeline-stage-hdr.paid     { background: var(--clr-green-100); color: var(--clr-green-700); }
+  .stage-count {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 10px;
+    background: rgba(0,0,0,0.08);
+    color: inherit;
+  }
+  .claim-card {
+    background: var(--clr-surface);
+    border-radius: 7px;
+    border: 1px solid var(--clr-border);
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    border-left: 3px solid transparent;
+  }
+  .claim-card.filed    { border-left-color: var(--clr-red-500); }
+  .claim-card.review   { border-left-color: var(--clr-amber-500); }
+  .claim-card.approved { border-left-color: var(--clr-teal-500); }
+  .claim-card.paid     { border-left-color: var(--clr-green-500); }
+  .claim-id    { font-size: 10.5px; font-weight: 700; color: #64748b; margin-bottom: 3px; }
+  .claim-holder { font-size: 12.5px; font-weight: 600; color: #1e293b; margin-bottom: 2px; }
+  .claim-meta  { display: flex; justify-content: space-between; }
+  .claim-type  { font-size: 11px; color: #64748b; }
+  .claim-amount { font-size: 11.5px; font-weight: 700; color: #1e293b; }
+  .claim-days  { font-size: 10px; color: #94a3b8; margin-top: 4px; }
+
+  /* ─── LOWER ROW (TABLE + RENEWALS) ──────────────────────────── */
+  .lower-row { display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start; }
+
+  /* POLICIES TABLE */
+  .table-card {
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid var(--clr-border);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    overflow: hidden;
+  }
+  .table-card-hdr { padding: 16px 20px; border-bottom: 1px solid var(--clr-border); }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: #64748b;
+    background: var(--clr-surface);
+    border-bottom: 1px solid var(--clr-border);
+  }
+  tbody tr { transition: background 0.12s; }
+  tbody tr:hover { background: #f8faff; }
+  tbody td {
+    padding: 11px 14px;
+    font-size: 13px;
+    color: #1e293b;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  .policy-num { font-family: "Menlo", "Consolas", monospace; font-size: 12px; color: var(--clr-navy-600); font-weight: 600; }
+  .holder-name { font-weight: 600; }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+  }
+  .pill.active    { background: var(--clr-green-100);  color: var(--clr-green-700); }
+  .pill.pending   { background: var(--clr-amber-100);  color: var(--clr-amber-700); }
+  .pill.lapsed    { background: var(--clr-red-100);    color: var(--clr-red-500); }
+  .pill.cancelled { background: #f1f5f9;               color: #64748b; }
+
+  /* RENEWALS PANEL */
+  .renewals-panel {
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid var(--clr-border);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    overflow: hidden;
+  }
+  .renewals-hdr {
+    padding: 15px 18px;
+    border-bottom: 1px solid var(--clr-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .renewals-title { font-size: 13.5px; font-weight: 700; color: #1e293b; }
+  .renewals-badge {
+    background: var(--clr-amber-100);
+    color: var(--clr-amber-700);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 10px;
+  }
+  .renewal-item {
+    padding: 13px 18px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .renewal-item:last-child { border-bottom: none; }
+  .renewal-num { font-size: 10.5px; font-weight: 700; color: var(--clr-navy-600); font-family: monospace; }
+  .renewal-holder { font-size: 13px; font-weight: 600; color: #1e293b; margin-bottom: 2px; }
+  .renewal-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .renewal-type { font-size: 11px; color: #64748b; }
+  .renewal-date { font-size: 11px; font-weight: 600; color: var(--clr-amber-500); }
+  .renewal-premium { font-size: 12px; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
+  .btn-ghost-sm {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--clr-border);
+    background: transparent;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--clr-navy-600);
+    transition: background 0.12s, border-color 0.12s;
+  }
+  .btn-ghost-sm:hover { background: var(--clr-navy-050); border-color: var(--clr-navy-600); }
+
+  /* ─── TREND CHART ─────────────────────────────────────────────── */
+  .chart-card {
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid var(--clr-border);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 20px;
+  }
+  .chart-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .chart-legend { display: flex; align-items: center; gap: 16px; }
+  .legend-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #64748b;
+  }
+  .legend-dot::before {
+    content: "";
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .legend-dot.filed::before  { background: var(--clr-navy-600); }
+  .legend-dot.paid::before   { background: var(--clr-teal-500); }
+  .chart-period-tabs { display: flex; gap: 2px; }
+  .chart-period-tab {
+    padding: 4px 11px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+  }
+  .chart-period-tab.active {
+    background: var(--clr-navy-050);
+    color: var(--clr-navy-600);
+  }
+  .chart-svg-wrap { width: 100%; overflow: hidden; }
+</style>
+</head>
+<body>
+
+<!-- ═══ SIDEBAR ═════════════════════════════════════════════════ -->
+<aside class="sidebar">
+  <!-- Brand -->
+  <div class="sidebar-brand">
+    <svg class="brand-icon" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M17 3L5 8.5V17C5 23.627 10.373 29.5 17 31C23.627 29.5 29 23.627 29 17V8.5L17 3Z" fill="currentColor" opacity="0.25"/>
+      <path d="M17 3L5 8.5V17C5 23.627 10.373 29.5 17 31C23.627 29.5 29 23.627 29 17V8.5L17 3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M12 17.5l3.5 3.5 6.5-7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div class="brand-text">
+      <span class="brand-name">Aegis</span>
+      <span class="brand-sub">Insurance Group</span>
+    </div>
+  </div>
+
+  <!-- LOB Switcher -->
+  <div class="lob-switcher">
+    <span>All Lines of Business</span>
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3.5 5.25l3.5 3.5 3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+
+  <!-- Nav: Overview -->
+  <div class="nav-section">
+    <div class="nav-section-label">Overview</div>
+    <div class="nav-item active">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="1.5" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="1.5" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="1.5" y="9" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="9" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.4"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><polyline points="1.5,11.5 5.5,6.5 8.5,9 11.5,4.5 14.5,7.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      Analytics
+    </div>
+  </div>
+
+  <!-- Nav: Operations -->
+  <div class="nav-section">
+    <div class="nav-section-label">Operations</div>
+    <div class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13.5 4H2.5A1 1 0 001.5 5v7a1 1 0 001 1h11a1 1 0 001-1V5a1 1 0 00-1-1z" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 4V3a1 1 0 00-1-1h-3a1 1 0 00-1 1v1" stroke="currentColor" stroke-width="1.4"/><line x1="5.5" y1="8" x2="10.5" y2="8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      Policies
+      <span class="nav-badge teal">48k</span>
+    </div>
+    <div class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><line x1="8" y1="5" x2="8" y2="8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="10.5" r="0.75" fill="currentColor"/></svg>
+      Claims
+      <span class="nav-badge">1,847</span>
+    </div>
+    <div class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2.5" width="12" height="11" rx="1" stroke="currentColor" stroke-width="1.4"/><line x1="5" y1="1" x2="5" y2="4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="11" y1="1" x2="11" y2="4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="2" y1="6.5" x2="14" y2="6.5" stroke="currentColor" stroke-width="1.3"/></svg>
+      Renewals
+      <span class="nav-badge amber">3,204</span>
+    </div>
+    <div class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8a6 6 0 016-6M14 8a6 6 0 01-6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M8 4L5 7l3-3zM8 12l3-3-3 3z" fill="currentColor"/></svg>
+      Reinsurance
+    </div>
+  </div>
+
+  <!-- Nav: Admin -->
+  <div class="nav-section">
+    <div class="nav-section-label">Admin</div>
+    <div class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="5.5" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M1.5 13.5c0-2.485 2.239-4.5 5-4.5s5 2.015 5 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M11 7.5c1.657 0 3 1.119 3 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M13 5.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" stroke="currentColor" stroke-width="1.3"/></svg>
+      Agents
+    </div>
+    <div class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 12.5V4a1 1 0 011-1h10a1 1 0 011 1v8.5" stroke="currentColor" stroke-width="1.4"/><line x1="4.5" y1="7" x2="11.5" y2="7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="4.5" y1="9.5" x2="9" y2="9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M0.5 12.5h15" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      Reports
+    </div>
+    <div class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Settings
+    </div>
+  </div>
+
+  <!-- Footer user -->
+  <div class="sidebar-footer">
+    <div class="sidebar-avatar">SK</div>
+    <div>
+      <div class="sidebar-user-name">Sarah Keller</div>
+      <div class="sidebar-user-role">Operations Lead</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ═════════════════════════════════════════════════════ -->
+<main class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-breadcrumb">
+      <div class="topbar-title">Operations Overview</div>
+      <div class="topbar-crumb">Aegis / <span>Dashboard</span></div>
+    </div>
+    <div class="topbar-search">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="#94a3b8" stroke-width="1.4"/><line x1="9.5" y1="9.5" x2="13" y2="13" stroke="#94a3b8" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <input type="text" placeholder="Search policy, claim, holder…">
+    </div>
+    <div class="period-tabs">
+      <button class="period-tab">MTD</button>
+      <button class="period-tab active">QTD</button>
+      <button class="period-tab">YTD</button>
+    </div>
+    <div class="topbar-bell">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5a4.5 4.5 0 00-4.5 4.5v2.5L2 10.5h12l-1.5-2V6A4.5 4.5 0 008 1.5z" stroke="#64748b" stroke-width="1.4"/><path d="M6.5 10.5c0 .828.672 1.5 1.5 1.5s1.5-.672 1.5-1.5" stroke="#64748b" stroke-width="1.3"/></svg>
+      <span class="dot"></span>
+    </div>
+    <div class="topbar-avatar-wrap">
+      <div class="topbar-avatar">SK</div>
+      <span class="topbar-uname">Sarah K.</span>
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5l3.5 3.5 3.5-3.5" stroke="#64748b" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- KPI CARDS -->
+    <div class="kpi-grid">
+
+      <!-- Active Policies -->
+      <div class="kpi-card">
+        <div class="kpi-label">Active Policies</div>
+        <div class="kpi-row">
+          <div class="kpi-value">48,312</div>
+          <svg class="kpi-sparkline" width="64" height="32" viewBox="0 0 64 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polyline points="0,26 10,22 20,24 30,18 40,15 50,11 64,8" stroke="var(--clr-navy-600)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <polyline points="0,26 10,22 20,24 30,18 40,15 50,11 64,8 64,32 0,32" fill="var(--clr-navy-600)" opacity="0.1"/>
+          </svg>
+        </div>
+        <div class="kpi-delta green">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 2l4 6H1l4-6z" fill="currentColor"/></svg>
+          +3.2% vs last quarter
+        </div>
+      </div>
+
+      <!-- Open Claims -->
+      <div class="kpi-card">
+        <div class="kpi-label">Open Claims</div>
+        <div class="kpi-row">
+          <div class="kpi-value">1,847</div>
+          <svg class="kpi-sparkline" width="64" height="32" viewBox="0 0 64 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0"  y="20" width="8"  height="12" rx="2" fill="var(--clr-red-500)" opacity="0.35"/>
+            <rect x="10" y="16" width="8"  height="16" rx="2" fill="var(--clr-red-500)" opacity="0.5"/>
+            <rect x="20" y="18" width="8"  height="14" rx="2" fill="var(--clr-red-500)" opacity="0.4"/>
+            <rect x="30" y="12" width="8"  height="20" rx="2" fill="var(--clr-red-500)" opacity="0.6"/>
+            <rect x="40" y="10" width="8"  height="22" rx="2" fill="var(--clr-red-500)" opacity="0.7"/>
+            <rect x="50" y="8"  width="8"  height="24" rx="2" fill="var(--clr-red-500)" opacity="0.85"/>
+          </svg>
+        </div>
+        <div class="kpi-delta amber">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 2l4 6H1l4-6z" fill="currentColor"/></svg>
+          +12 filed this week
+        </div>
+      </div>
+
+      <!-- Renewals Due -->
+      <div class="kpi-card">
+        <div class="kpi-label">Renewals Due (30d)</div>
+        <div class="kpi-row">
+          <div class="kpi-value">3,204</div>
+          <svg class="kpi-sparkline" width="64" height="32" viewBox="0 0 64 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polyline points="0,8 10,12 20,10 30,14 40,18 50,20 64,24" stroke="var(--clr-amber-500)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <polyline points="0,8 10,12 20,10 30,14 40,18 50,20 64,24 64,32 0,32" fill="var(--clr-amber-500)" opacity="0.1"/>
+          </svg>
+        </div>
+        <div class="kpi-delta amber">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 8L1 2h8L5 8z" fill="currentColor"/></svg>
+          −8% vs last period
+        </div>
+      </div>
+
+      <!-- Loss Ratio -->
+      <div class="kpi-card">
+        <div class="kpi-label">Loss Ratio</div>
+        <div class="kpi-row">
+          <div class="kpi-value">61.4%</div>
+          <svg class="kpi-sparkline" width="64" height="32" viewBox="0 0 64 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polyline points="0,24 10,20 20,22 30,16 40,14 50,10 64,12" stroke="var(--clr-teal-500)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <polyline points="0,24 10,20 20,22 30,16 40,14 50,10 64,12 64,32 0,32" fill="var(--clr-teal-500)" opacity="0.1"/>
+          </svg>
+        </div>
+        <div class="kpi-delta green">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 8L1 2h8L5 8z" fill="currentColor"/></svg>
+          −2.1pp improvement
+        </div>
+      </div>
+
+    </div><!-- /kpi-grid -->
+
+    <!-- CLAIMS PIPELINE -->
+    <div class="pipeline-wrap">
+      <div class="section-hdr">
+        <span class="section-title">Claims Pipeline</span>
+        <a href="#" class="section-link">Manage all claims →</a>
+      </div>
+      <div class="pipeline-board">
+
+        <!-- Filed -->
+        <div class="pipeline-col">
+          <div class="pipeline-stage-hdr filed">Filed <span class="stage-count">312</span></div>
+          <div class="claim-card filed">
+            <div class="claim-id">CLM-2024-08841</div>
+            <div class="claim-holder">Marcus Delray</div>
+            <div class="claim-meta">
+              <span class="claim-type">Auto Collision</span>
+              <span class="claim-amount">$14,800</span>
+            </div>
+            <div class="claim-days">Opened 2 days ago</div>
+          </div>
+          <div class="claim-card filed">
+            <div class="claim-id">CLM-2024-08839</div>
+            <div class="claim-holder">Hartwell Properties LLC</div>
+            <div class="claim-meta">
+              <span class="claim-type">Property – Fire</span>
+              <span class="claim-amount">$287,500</span>
+            </div>
+            <div class="claim-days">Opened 3 days ago</div>
+          </div>
+          <div class="claim-card filed">
+            <div class="claim-id">CLM-2024-08836</div>
+            <div class="claim-holder">Elena Vasquez</div>
+            <div class="claim-meta">
+              <span class="claim-type">Liability – Slip</span>
+              <span class="claim-amount">$32,000</span>
+            </div>
+            <div class="claim-days">Opened 4 days ago</div>
+          </div>
+        </div>
+
+        <!-- In Review -->
+        <div class="pipeline-col">
+          <div class="pipeline-stage-hdr review">In Review <span class="stage-count">198</span></div>
+          <div class="claim-card review">
+            <div class="claim-id">CLM-2024-08701</div>
+            <div class="claim-holder">Thomas Okafor</div>
+            <div class="claim-meta">
+              <span class="claim-type">Auto – Theft</span>
+              <span class="claim-amount">$41,200</span>
+            </div>
+            <div class="claim-days">Day 9 in review</div>
+          </div>
+          <div class="claim-card review">
+            <div class="claim-id">CLM-2024-08694</div>
+            <div class="claim-holder">Clearview Medical Ctr</div>
+            <div class="claim-meta">
+              <span class="claim-type">GL Malpractice</span>
+              <span class="claim-amount">$520,000</span>
+            </div>
+            <div class="claim-days">Day 14 in review</div>
+          </div>
+          <div class="claim-card review">
+            <div class="claim-id">CLM-2024-08680</div>
+            <div class="claim-holder">Rita Fontaine</div>
+            <div class="claim-meta">
+              <span class="claim-type">Property – Storm</span>
+              <span class="claim-amount">$63,400</span>
+            </div>
+            <div class="claim-days">Day 18 in review</div>
+          </div>
+        </div>
+
+        <!-- Approved -->
+        <div class="pipeline-col">
+          <div class="pipeline-stage-hdr approved">Approved <span class="stage-count">574</span></div>
+          <div class="claim-card approved">
+            <div class="claim-id">CLM-2024-08512</div>
+            <div class="claim-holder">Sunrise Auto Group</div>
+            <div class="claim-meta">
+              <span class="claim-type">Commercial Fleet</span>
+              <span class="claim-amount">$88,900</span>
+            </div>
+            <div class="claim-days">Approved 1 day ago</div>
+          </div>
+          <div class="claim-card approved">
+            <div class="claim-id">CLM-2024-08499</div>
+            <div class="claim-holder">Nadia Bernstein</div>
+            <div class="claim-meta">
+              <span class="claim-type">Homeowners</span>
+              <span class="claim-amount">$18,750</span>
+            </div>
+            <div class="claim-days">Approved 2 days ago</div>
+          </div>
+          <div class="claim-card approved">
+            <div class="claim-id">CLM-2024-08483</div>
+            <div class="claim-holder">GreenPath Logistics</div>
+            <div class="claim-meta">
+              <span class="claim-type">Cargo – Damage</span>
+              <span class="claim-amount">$47,300</span>
+            </div>
+            <div class="claim-days">Approved 3 days ago</div>
+          </div>
+        </div>
+
+        <!-- Paid -->
+        <div class="pipeline-col">
+          <div class="pipeline-stage-hdr paid">Paid <span class="stage-count">763</span></div>
+          <div class="claim-card paid">
+            <div class="claim-id">CLM-2024-08201</div>
+            <div class="claim-holder">Samuel Whitmore</div>
+            <div class="claim-meta">
+              <span class="claim-type">Auto Collision</span>
+              <span class="claim-amount">$9,600</span>
+            </div>
+            <div class="claim-days">Paid Jun 1, 2026</div>
+          </div>
+          <div class="claim-card paid">
+            <div class="claim-id">CLM-2024-08177</div>
+            <div class="claim-holder">Blue Ridge Builders</div>
+            <div class="claim-meta">
+              <span class="claim-type">Property – Flood</span>
+              <span class="claim-amount">$142,800</span>
+            </div>
+            <div class="claim-days">Paid May 29, 2026</div>
+          </div>
+          <div class="claim-card paid">
+            <div class="claim-id">CLM-2024-08163</div>
+            <div class="claim-holder">Pamela Soto-Cruz</div>
+            <div class="claim-meta">
+              <span class="claim-type">Liability – Injury</span>
+              <span class="claim-amount">$77,000</span>
+            </div>
+            <div class="claim-days">Paid May 27, 2026</div>
+          </div>
+        </div>
+
+      </div><!-- /pipeline-board -->
+    </div><!-- /pipeline-wrap -->
+
+    <!-- LOWER ROW: TABLE + RENEWALS -->
+    <div class="lower-row">
+
+      <!-- POLICIES TABLE -->
+      <div class="table-card">
+        <div class="table-card-hdr section-hdr">
+          <span class="section-title">Active Policies</span>
+          <a href="#" class="section-link">View all policies →</a>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Policy #</th>
+              <th>Holder</th>
+              <th>Line</th>
+              <th>Annual Premium</th>
+              <th>Effective</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="policy-num">POL-AU-2024-10042</span></td>
+              <td><span class="holder-name">Marcus Delray</span></td>
+              <td>Auto</td>
+              <td>$2,340</td>
+              <td>Jan 15, 2026</td>
+              <td><span class="pill active">Active</span></td>
+            </tr>
+            <tr>
+              <td><span class="policy-num">POL-PR-2023-88317</span></td>
+              <td><span class="holder-name">Hartwell Properties LLC</span></td>
+              <td>Property</td>
+              <td>$18,600</td>
+              <td>Mar 01, 2026</td>
+              <td><span class="pill active">Active</span></td>
+            </tr>
+            <tr>
+              <td><span class="policy-num">POL-LI-2024-55290</span></td>
+              <td><span class="holder-name">Clearview Medical Ctr</span></td>
+              <td>Liability</td>
+              <td>$64,800</td>
+              <td>Feb 10, 2026</td>
+              <td><span class="pill pending">Pending</span></td>
+            </tr>
+            <tr>
+              <td><span class="policy-num">POL-AU-2023-73004</span></td>
+              <td><span class="holder-name">Rita Fontaine</span></td>
+              <td>Auto</td>
+              <td>$1,920</td>
+              <td>Apr 22, 2025</td>
+              <td><span class="pill lapsed">Lapsed</span></td>
+            </tr>
+            <tr>
+              <td><span class="policy-num">POL-PR-2024-99118</span></td>
+              <td><span class="holder-name">Blue Ridge Builders</span></td>
+              <td>Property</td>
+              <td>$31,200</td>
+              <td>May 05, 2026</td>
+              <td><span class="pill active">Active</span></td>
+            </tr>
+            <tr>
+              <td><span class="policy-num">POL-LI-2024-64501</span></td>
+              <td><span class="holder-name">GreenPath Logistics</span></td>
+              <td>Liability</td>
+              <td>$27,500</td>
+              <td>Jun 01, 2026</td>
+              <td><span class="pill active">Active</span></td>
+            </tr>
+            <tr>
+              <td><span class="policy-num">POL-AU-2022-41780</span></td>
+              <td><span class="holder-name">Elena Vasquez</span></td>
+              <td>Auto</td>
+              <td>$1,680</td>
+              <td>Sep 14, 2024</td>
+              <td><span class="pill cancelled">Cancelled</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div><!-- /table-card -->
+
+      <!-- RENEWALS PANEL -->
+      <div class="renewals-panel">
+        <div class="renewals-hdr">
+          <span class="renewals-title">Renewals Due — 30 Days</span>
+          <span class="renewals-badge">3,204</span>
+        </div>
+
+        <div class="renewal-item">
+          <div class="renewal-num">POL-AU-2023-61240</div>
+          <div class="renewal-holder">Thomas Okafor</div>
+          <div class="renewal-meta">
+            <span class="renewal-type">Auto</span>
+            <span class="renewal-date">Jun 14, 2026</span>
+          </div>
+          <div class="renewal-premium">$2,640 / year</div>
+          <button class="btn-ghost-sm">Send Notice</button>
+        </div>
+
+        <div class="renewal-item">
+          <div class="renewal-num">POL-PR-2023-77052</div>
+          <div class="renewal-holder">Sunrise Auto Group</div>
+          <div class="renewal-meta">
+            <span class="renewal-type">Commercial Property</span>
+            <span class="renewal-date">Jun 19, 2026</span>
+          </div>
+          <div class="renewal-premium">$44,100 / year</div>
+          <button class="btn-ghost-sm">Send Notice</button>
+        </div>
+
+        <div class="renewal-item">
+          <div class="renewal-num">POL-LI-2024-30899</div>
+          <div class="renewal-holder">Pamela Soto-Cruz</div>
+          <div class="renewal-meta">
+            <span class="renewal-type">Liability</span>
+            <span class="renewal-date">Jun 22, 2026</span>
+          </div>
+          <div class="renewal-premium">$7,800 / year</div>
+          <button class="btn-ghost-sm">Send Notice</button>
+        </div>
+
+        <div class="renewal-item">
+          <div class="renewal-num">POL-AU-2023-54471</div>
+          <div class="renewal-holder">Nadia Bernstein</div>
+          <div class="renewal-meta">
+            <span class="renewal-type">Auto</span>
+            <span class="renewal-date">Jun 26, 2026</span>
+          </div>
+          <div class="renewal-premium">$1,980 / year</div>
+          <button class="btn-ghost-sm">Send Notice</button>
+        </div>
+
+        <div class="renewal-item">
+          <div class="renewal-num">POL-PR-2024-80334</div>
+          <div class="renewal-holder">Samuel Whitmore</div>
+          <div class="renewal-meta">
+            <span class="renewal-type">Homeowners</span>
+            <span class="renewal-date">Jun 30, 2026</span>
+          </div>
+          <div class="renewal-premium">$3,120 / year</div>
+          <button class="btn-ghost-sm">Send Notice</button>
+        </div>
+
+      </div><!-- /renewals-panel -->
+
+    </div><!-- /lower-row -->
+
+    <!-- CLAIMS TREND CHART -->
+    <div class="chart-card">
+      <div class="chart-controls">
+        <div>
+          <div class="section-title" style="margin-bottom:4px">Claims Trend</div>
+          <div class="chart-legend">
+            <span class="legend-dot filed">Filed</span>
+            <span class="legend-dot paid">Paid</span>
+          </div>
+        </div>
+        <div class="chart-period-tabs">
+          <button class="chart-period-tab">6M</button>
+          <button class="chart-period-tab active">12M</button>
+          <button class="chart-period-tab">24M</button>
+        </div>
+      </div>
+      <div class="chart-svg-wrap">
+        <svg viewBox="0 0 780 160" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">
+          <!-- grid lines -->
+          <line x1="50" y1="20"  x2="770" y2="20"  stroke="#e3e8f0" stroke-width="1" stroke-dasharray="4 3"/>
+          <line x1="50" y1="60"  x2="770" y2="60"  stroke="#e3e8f0" stroke-width="1" stroke-dasharray="4 3"/>
+          <line x1="50" y1="100" x2="770" y2="100" stroke="#e3e8f0" stroke-width="1" stroke-dasharray="4 3"/>
+          <line x1="50" y1="140" x2="770" y2="140" stroke="#e3e8f0" stroke-width="1"/>
+          <!-- y-axis labels -->
+          <text x="42" y="24"  text-anchor="end" font-size="10" fill="#94a3b8">600</text>
+          <text x="42" y="64"  text-anchor="end" font-size="10" fill="#94a3b8">400</text>
+          <text x="42" y="104" text-anchor="end" font-size="10" fill="#94a3b8">200</text>
+          <text x="42" y="144" text-anchor="end" font-size="10" fill="#94a3b8">0</text>
+          <!-- x-axis labels (12 months) -->
+          <text x="62"  y="156" text-anchor="middle" font-size="10" fill="#94a3b8">Jun</text>
+          <text x="120" y="156" text-anchor="middle" font-size="10" fill="#94a3b8">Jul</text>
+          <text x="178" y="156" text-anchor="middle" font-size="10" fill="#94a3b8">Aug</text>
+          <text x="236" y="156" text-anchor="middle" font-size="10" fill="#94a3b8">Sep</text>
+          <text x="294" y="156" text-anchor="middle" font-size="10" fill="#94a3b8">Oct</text>
+          <text x="352" y="156" text-anchor="middle" font-size="10" fill="#94a3b8">Nov</text>
+          <text x="410" y="156" text-anchor="middle" font-size="10" fill="#94a3b8">Dec</text>
+          <text x="468" y="156" text-anchor="middle" font-size="10" fill="#94a3b8">Jan</text>
+          <text x="526" y="156" text-anchor="middle" font-size="10" fill="#94a3b8">Feb</text>
+          <text x="584" y="156" text-anchor="middle" font-size="10" fill="#94a3b8">Mar</text>
+          <text x="642" y="156" text-anchor="middle" font-size="10" fill="#94a3b8">Apr</text>
+          <text x="700" y="156" text-anchor="middle" font-size="10" fill="#94a3b8">May</text>
+          <!-- FILED area (navy) -->
+          <!-- data: 310,340,390,450,420,510,560,490,430,380,350,312 mapped 0-600 → y 140-20 -->
+          <polygon
+            points="62,123 120,117 178,101 236,79 294,88 352,55 410,42 468,67 526,85 584,100 642,110 700,122 700,140 62,140"
+            fill="var(--clr-navy-600)" opacity="0.12"/>
+          <polyline
+            points="62,123 120,117 178,101 236,79 294,88 352,55 410,42 468,67 526,85 584,100 642,110 700,122"
+            stroke="var(--clr-navy-600)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <!-- PAID area (teal) -->
+          <!-- data: 210,240,260,310,290,340,380,360,320,290,270,230 mapped same -->
+          <polygon
+            points="62,130 120,127 178,124 236,116 294,118 352,108 410,99 468,103 526,114 584,118 642,121 700,126 700,140 62,140"
+            fill="var(--clr-teal-500)" opacity="0.18"/>
+          <polyline
+            points="62,130 120,127 178,124 236,116 294,118 352,108 410,99 468,103 526,114 584,118 642,121 700,126"
+            stroke="var(--clr-teal-500)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <!-- current dot -->
+          <circle cx="700" cy="122" r="4" fill="var(--clr-navy-600)"/>
+          <circle cx="700" cy="126" r="4" fill="var(--clr-teal-500)"/>
+        </svg>
+      </div>
+    </div><!-- /chart-card -->
+
+  </div><!-- /content -->
+</main>
+
+</body>
+</html>

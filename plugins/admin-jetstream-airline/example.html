@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jetstream Airline Admin — Operations Center</title>
+<style>
+:root {
+  --color-accent-indigo: #6366f1;
+  --color-accent-sky: #38bdf8;
+  --color-status-on-time: #22c55e;
+  --color-status-delayed: #f59e0b;
+  --color-status-boarding: #38bdf8;
+  --color-status-departed: #8a98ad;
+  --color-text-primary: #e4ecf6;
+  --color-text-muted: #8a98ad;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#0a0f1a;color:#e4ecf6;font-size:14px;line-height:1.5}
+button{font-family:inherit;cursor:pointer}
+/* ── Layout shell ── */
+.shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+/* ── Navbar ── */
+.navbar{height:48px;background:#111a2b;border-bottom:1px solid #24314a;display:flex;align-items:center;padding:0 12px;gap:12px;flex-shrink:0;z-index:100}
+.hub-switcher{display:flex;align-items:center;gap:6px;padding:5px 10px;background:#18243a;border:1px solid #24314a;border-radius:7px;font-size:12px;font-weight:600;color:var(--color-text-primary);letter-spacing:.04em;min-width:96px}
+.hub-switcher svg{color:var(--color-accent-sky)}
+.hub-dot{width:7px;height:7px;border-radius:50%;background:var(--color-status-on-time);flex-shrink:0}
+.search-wrap{flex:1;max-width:340px;position:relative}
+.search-wrap svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--color-text-muted)}
+.search-wrap input{width:100%;background:#18243a;border:1px solid #24314a;border-radius:7px;color:#e4ecf6;font-family:inherit;font-size:13px;padding:6px 10px 6px 32px;outline:none}
+.search-wrap input::placeholder{color:#8a98ad}
+.search-wrap input:focus{border-color:var(--color-accent-indigo)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.bell-btn{position:relative;background:none;border:none;padding:6px;color:#8a98ad;display:flex;align-items:center}
+.bell-btn:hover{color:#e4ecf6}
+.bell-badge{position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:var(--color-status-delayed);border:2px solid #111a2b}
+.avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--color-accent-indigo),var(--color-accent-sky));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;letter-spacing:.03em;cursor:pointer}
+/* ── Body row ── */
+.body-row{display:flex;flex:1;overflow:hidden}
+/* ── Icon rail ── */
+.icon-rail{width:48px;background:#111a2b;border-right:1px solid #24314a;display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:4px;flex-shrink:0;overflow-y:auto}
+.rail-btn{width:36px;height:36px;background:none;border:none;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#8a98ad;transition:background .15s,color .15s}
+.rail-btn:hover{background:#18243a;color:#e4ecf6}
+.rail-btn.active{background:rgba(99,102,241,.18);color:var(--color-accent-sky)}
+.rail-divider{width:24px;height:1px;background:#24314a;margin:4px 0}
+/* ── Main content ── */
+.main{flex:1;overflow-y:auto;padding:20px 24px 32px}
+/* ── Page header ── */
+.page-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.page-title{font-size:18px;font-weight:700;color:#e4ecf6;letter-spacing:-.01em}
+.page-sub{font-size:12px;color:#8a98ad;margin-left:2px;margin-top:2px}
+.hdr-spacer{flex:1}
+.btn-ghost{background:none;border:1px solid #24314a;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:500;color:#8a98ad;transition:border-color .15s,color .15s}
+.btn-ghost:hover{border-color:var(--color-accent-sky);color:var(--color-accent-sky)}
+.btn-primary{background:var(--color-accent-indigo);border:none;border-radius:7px;padding:6px 14px;font-size:12px;font-weight:600;color:#fff;transition:opacity .15s}
+.btn-primary:hover{opacity:.85}
+/* ── KPI tiles ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+.kpi-card{background:#18243a;border:1px solid #24314a;border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.kpi-top{display:flex;align-items:center;justify-content:space-between}
+.kpi-label{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#8a98ad}
+.kpi-icon-wrap{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.kpi-icon-wrap.indigo{background:rgba(99,102,241,.15)}
+.kpi-icon-wrap.sky{background:rgba(56,189,248,.15)}
+.kpi-icon-wrap.green{background:rgba(34,197,94,.12)}
+.kpi-icon-wrap.amber{background:rgba(245,158,11,.12)}
+.kpi-num{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums;color:#e4ecf6;letter-spacing:-.02em;line-height:1.1}
+.kpi-footer{display:flex;align-items:center;gap:6px}
+.delta{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:2px 7px;border-radius:5px;font-variant-numeric:tabular-nums}
+.delta.up{background:rgba(34,197,94,.12);color:#22c55e}
+.delta.down{background:rgba(245,158,11,.12);color:#f59e0b}
+.delta.neutral{background:rgba(138,152,173,.12);color:#8a98ad}
+.kpi-since{font-size:11px;color:#8a98ad}
+/* ── Section card ── */
+.card{background:#18243a;border:1px solid #24314a;border-radius:10px;margin-bottom:18px}
+.card-hdr{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid #24314a}
+.card-title{font-size:13px;font-weight:700;color:#e4ecf6;letter-spacing:-.01em}
+.card-hdr-space{flex:1}
+.badge-live{display:inline-flex;align-items:center;gap:5px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:5px;padding:2px 8px;font-size:10px;font-weight:600;color:#22c55e;letter-spacing:.05em}
+.badge-live::before{content:"";width:6px;height:6px;border-radius:50%;background:#22c55e;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+/* ── Flights board table ── */
+.flights-table{width:100%;border-collapse:collapse}
+.flights-table th{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#8a98ad;padding:10px 18px;text-align:left;border-bottom:1px solid #24314a}
+.flights-table td{padding:11px 18px;font-size:13px;color:#e4ecf6;border-bottom:1px solid rgba(36,49,74,.6);vertical-align:middle;font-variant-numeric:tabular-nums}
+.flights-table tr:last-child td{border-bottom:none}
+.flights-table tbody tr:hover td{background:rgba(99,102,241,.04)}
+.flight-num{font-weight:700;color:var(--color-accent-sky);font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.route-cell{display:flex;align-items:center;gap:6px;font-weight:500}
+.route-arrow{color:#24314a}
+.gate-pill{display:inline-block;background:#0a0f1a;border:1px solid #24314a;border-radius:5px;padding:2px 8px;font-size:11px;font-weight:600;font-variant-numeric:tabular-nums}
+.status-pill{display:inline-flex;align-items:center;gap:5px;border-radius:6px;padding:3px 9px;font-size:11px;font-weight:600;white-space:nowrap}
+.status-pill.on-time{background:rgba(34,197,94,.1);color:var(--color-status-on-time);border:1px solid rgba(34,197,94,.2)}
+.status-pill.boarding{background:rgba(56,189,248,.1);color:var(--color-status-boarding);border:1px solid rgba(56,189,248,.2)}
+.status-pill.delayed{background:rgba(245,158,11,.1);color:var(--color-status-delayed);border:1px solid rgba(245,158,11,.2)}
+.status-pill.departed{background:rgba(138,152,173,.08);color:var(--color-status-departed);border:1px solid rgba(138,152,173,.18)}
+.status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.status-dot.on-time{background:var(--color-status-on-time)}
+.status-dot.boarding{background:var(--color-status-boarding)}
+.status-dot.delayed{background:var(--color-status-delayed)}
+.status-dot.departed{background:var(--color-status-departed)}
+/* ── Two-column middle grid ── */
+.mid-grid{display:grid;grid-template-columns:1fr 340px;gap:18px;margin-bottom:18px}
+@media(max-width:900px){.mid-grid{grid-template-columns:1fr}}
+/* ── Departures chart ── */
+.chart-wrap{padding:16px 18px}
+.chart-legend{display:flex;gap:14px;margin-bottom:12px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#8a98ad}
+.legend-swatch{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.legend-swatch.peak{background:var(--color-accent-indigo)}
+.legend-swatch.current{background:var(--color-accent-sky)}
+.legend-swatch.off{background:#18243a;border:1px solid #24314a}
+/* ── Side panel ── */
+.side-panel{display:flex;flex-direction:column;gap:0}
+.subcard{border-bottom:1px solid #24314a}
+.subcard:last-child{border-bottom:none}
+.subcard-hdr{padding:12px 16px 10px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8a98ad}
+.crew-row{display:flex;align-items:center;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(36,49,74,.5)}
+.crew-row:last-child{border-bottom:none}
+.crew-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#818cf8);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+.crew-avatar.alt{background:linear-gradient(135deg,#0284c7,#38bdf8)}
+.crew-avatar.alt2{background:linear-gradient(135deg,#7c3aed,#a78bfa)}
+.crew-info{flex:1;min-width:0}
+.crew-name{font-size:12px;font-weight:600;color:#e4ecf6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crew-role{font-size:10px;color:#8a98ad}
+.crew-status{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600}
+.crew-status.available{color:#22c55e}
+.crew-status.on-duty{color:var(--color-accent-sky)}
+.crew-status.rest{color:#8a98ad}
+.ac-row{display:flex;align-items:center;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(36,49,74,.5)}
+.ac-row:last-child{border-bottom:none}
+.ac-icon-wrap{width:28px;height:28px;border-radius:7px;background:rgba(99,102,241,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--color-accent-indigo)}
+.ac-info{flex:1;min-width:0}
+.ac-tail{font-size:12px;font-weight:700;color:#e4ecf6;font-variant-numeric:tabular-nums}
+.ac-type{font-size:10px;color:#8a98ad}
+.ac-dep{font-size:10px;color:#8a98ad;font-variant-numeric:tabular-nums}
+/* ── Flights detail table ── */
+.filter-row{display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid #24314a}
+.filter-search{position:relative;flex:1;max-width:220px}
+.filter-search svg{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:#8a98ad}
+.filter-search input{width:100%;background:#0a0f1a;border:1px solid #24314a;border-radius:6px;color:#e4ecf6;font-family:inherit;font-size:12px;padding:5px 8px 5px 28px;outline:none}
+.filter-search input:focus{border-color:var(--color-accent-indigo)}
+.chip-group{display:flex;gap:6px}
+.chip{background:none;border:1px solid #24314a;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:500;color:#8a98ad;cursor:pointer;transition:all .15s}
+.chip.active{background:rgba(99,102,241,.15);border-color:var(--color-accent-indigo);color:var(--color-accent-indigo)}
+.chip:hover:not(.active){border-color:#38bdf8;color:#38bdf8}
+.detail-table{width:100%;border-collapse:collapse}
+.detail-table th{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#8a98ad;padding:10px 18px;text-align:left;border-bottom:1px solid #24314a}
+.detail-table td{padding:10px 18px;font-size:12px;color:#e4ecf6;border-bottom:1px solid rgba(36,49,74,.5);font-variant-numeric:tabular-nums;vertical-align:middle}
+.detail-table tr:last-child td{border-bottom:none}
+.detail-table tbody tr:hover td{background:rgba(99,102,241,.04)}
+.od-arrow{color:#24314a;margin:0 4px}
+.pax-num{font-weight:600;color:#e4ecf6}
+.pax-cap{color:#8a98ad;font-weight:400}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ── Navbar ── -->
+  <nav class="navbar">
+    <div class="hub-switcher">
+      <span class="hub-dot"></span>
+      <span>KVX HUB</span>
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>
+    </div>
+    <div class="search-wrap">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>
+      <input type="text" placeholder="Search flights, gates, crew…">
+    </div>
+    <div class="nav-right">
+      <button class="bell-btn" aria-label="Alerts">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="bell-badge"></span>
+      </button>
+      <div class="avatar" title="Ops Dispatcher">OD</div>
+    </div>
+  </nav>
+
+  <!-- ── Body row ── -->
+  <div class="body-row">
+
+    <!-- ── Icon rail ── -->
+    <aside class="icon-rail" aria-label="Navigation">
+      <button class="rail-btn active" title="Dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      </button>
+      <button class="rail-btn" title="Flights">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 3.61 1.26h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.9a16 16 0 0 0 6.1 6.1l.97-.97a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.04z"/></svg>
+      </button>
+      <button class="rail-btn" title="Routes">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <button class="rail-btn" title="Gates">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 7v14M21 7v14M5 7a7 7 0 0 1 14 0M10 21v-4a2 2 0 0 1 4 0v4"/></svg>
+      </button>
+      <button class="rail-btn" title="Crew">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </button>
+      <div class="rail-divider"></div>
+      <button class="rail-btn" title="Aircraft">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/></svg>
+      </button>
+      <button class="rail-btn" title="Reports">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg>
+      </button>
+      <button class="rail-btn" title="Settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </aside>
+
+    <!-- ── Main content ── -->
+    <main class="main">
+
+      <!-- Page header -->
+      <div class="page-header">
+        <div>
+          <div class="page-title">Operations Center</div>
+          <div class="page-sub">KVX · Kelverton Int'l · Sun 01 Jun 2026 · 14:22 UTC</div>
+        </div>
+        <div class="hdr-spacer"></div>
+        <button class="btn-ghost">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-.15em;margin-right:4px"><path d="M8 1v9M4 7l4 4 4-4M2 14h12"/></svg>
+          Export
+        </button>
+        <button class="btn-primary">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-.15em;margin-right:4px"><path d="M8 2v12M2 8h12"/></svg>
+          New Flight
+        </button>
+      </div>
+
+      <!-- KPI tiles -->
+      <div class="kpi-grid">
+        <!-- On-Time Performance -->
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">On-Time Performance</span>
+            <span class="kpi-icon-wrap green">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-status-on-time)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="9,12 11,14 15,10"/></svg>
+            </span>
+          </div>
+          <div class="kpi-num">87.4%</div>
+          <div class="kpi-footer">
+            <span class="delta up">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="2,7 5,3 8,7"/></svg>
+              +2.1%
+            </span>
+            <span class="kpi-since">vs last week</span>
+          </div>
+        </div>
+        <!-- Flights Today -->
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Flights Today</span>
+            <span class="kpi-icon-wrap sky">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-sky)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
+            </span>
+          </div>
+          <div class="kpi-num">142</div>
+          <div class="kpi-footer">
+            <span class="delta up">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="2,7 5,3 8,7"/></svg>
+              +8
+            </span>
+            <span class="kpi-since">vs yesterday</span>
+          </div>
+        </div>
+        <!-- Load Factor -->
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Load Factor</span>
+            <span class="kpi-icon-wrap indigo">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-indigo)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="5" height="5" rx="1"/><rect x="10" y="3" width="5" height="5" rx="1"/><rect x="17" y="3" width="4" height="5" rx="1"/><rect x="3" y="10" width="5" height="5" rx="1"/><rect x="10" y="10" width="5" height="5" rx="1"/><rect x="17" y="10" width="4" height="5" rx="1"/></svg>
+            </span>
+          </div>
+          <div class="kpi-num">91.2%</div>
+          <div class="kpi-footer">
+            <span class="delta down">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="2,3 5,7 8,3"/></svg>
+              −0.6%
+            </span>
+            <span class="kpi-since">vs last week</span>
+          </div>
+        </div>
+        <!-- Delayed -->
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Delayed</span>
+            <span class="kpi-icon-wrap amber">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-status-delayed)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/><line x1="12" y1="2" x2="12" y2="4"/></svg>
+            </span>
+          </div>
+          <div class="kpi-num">11</div>
+          <div class="kpi-footer">
+            <span class="delta down">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="2,3 5,7 8,3"/></svg>
+              +3
+            </span>
+            <span class="kpi-since">vs rolling avg</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Flights Board -->
+      <div class="card">
+        <div class="card-hdr">
+          <div class="card-title">Live Flights Board</div>
+          <span class="badge-live">LIVE</span>
+          <div class="card-hdr-space"></div>
+          <button class="btn-ghost" style="font-size:11px;padding:4px 10px">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-.1em;margin-right:3px"><path d="M1.5 8a6.5 6.5 0 1 0 13 0A6.5 6.5 0 0 0 1.5 8z"/><path d="M1.5 4l-.5-3H4"/><path d="M14.5 4l.5-3H12"/></svg>
+            Refresh
+          </button>
+        </div>
+        <table class="flights-table">
+          <thead>
+            <tr>
+              <th>Flight</th>
+              <th>Route</th>
+              <th>Gate</th>
+              <th>Dep. Time</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="flight-num">JS401</span></td>
+              <td><span class="route-cell">KVX <span class="route-arrow">→</span> ORD</span></td>
+              <td><span class="gate-pill">A12</span></td>
+              <td>14:35</td>
+              <td><span class="status-pill boarding"><span class="status-dot boarding"></span>Boarding</span></td>
+            </tr>
+            <tr>
+              <td><span class="flight-num">JS218</span></td>
+              <td><span class="route-cell">KVX <span class="route-arrow">→</span> LHR</span></td>
+              <td><span class="gate-pill">B07</span></td>
+              <td>14:50</td>
+              <td><span class="status-pill on-time"><span class="status-dot on-time"></span>On Time</span></td>
+            </tr>
+            <tr>
+              <td><span class="flight-num">JS093</span></td>
+              <td><span class="route-cell">DXB <span class="route-arrow">→</span> KVX</span></td>
+              <td><span class="gate-pill">C04</span></td>
+              <td>15:10</td>
+              <td><span class="status-pill delayed"><span class="status-dot delayed"></span>Delayed</span></td>
+            </tr>
+            <tr>
+              <td><span class="flight-num">JS577</span></td>
+              <td><span class="route-cell">KVX <span class="route-arrow">→</span> CDG</span></td>
+              <td><span class="gate-pill">A03</span></td>
+              <td>13:55</td>
+              <td><span class="status-pill departed"><span class="status-dot departed"></span>Departed</span></td>
+            </tr>
+            <tr>
+              <td><span class="flight-num">JS340</span></td>
+              <td><span class="route-cell">SIN <span class="route-arrow">→</span> KVX</span></td>
+              <td><span class="gate-pill">D11</span></td>
+              <td>15:30</td>
+              <td><span class="status-pill on-time"><span class="status-dot on-time"></span>On Time</span></td>
+            </tr>
+            <tr>
+              <td><span class="flight-num">JS182</span></td>
+              <td><span class="route-cell">KVX <span class="route-arrow">→</span> JFK</span></td>
+              <td><span class="gate-pill">B15</span></td>
+              <td>15:45</td>
+              <td><span class="status-pill on-time"><span class="status-dot on-time"></span>On Time</span></td>
+            </tr>
+            <tr>
+              <td><span class="flight-num">JS629</span></td>
+              <td><span class="route-cell">KVX <span class="route-arrow">→</span> NRT</span></td>
+              <td><span class="gate-pill">C09</span></td>
+              <td>16:15</td>
+              <td><span class="status-pill delayed"><span class="status-dot delayed"></span>Delayed</span></td>
+            </tr>
+            <tr>
+              <td><span class="flight-num">JS055</span></td>
+              <td><span class="route-cell">FRA <span class="route-arrow">→</span> KVX</span></td>
+              <td><span class="gate-pill">A08</span></td>
+              <td>16:40</td>
+              <td><span class="status-pill on-time"><span class="status-dot on-time"></span>On Time</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Mid grid: chart + side panel -->
+      <div class="mid-grid">
+
+        <!-- Departures by Hour chart -->
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">Departures by Hour</div>
+            <div class="card-hdr-space"></div>
+            <span style="font-size:11px;color:#8a98ad">Today · KVX</span>
+          </div>
+          <div class="chart-wrap">
+            <div class="chart-legend">
+              <div class="legend-item"><span class="legend-swatch peak"></span>Peak hour</div>
+              <div class="legend-item"><span class="legend-swatch current"></span>Current</div>
+              <div class="legend-item"><span class="legend-swatch off"></span>Off-peak</div>
+            </div>
+            <!-- Inline SVG bar chart: 24 bars for 00–23h -->
+            <svg viewBox="0 0 480 140" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
+              <!-- Y-axis grid lines -->
+              <line x1="32" y1="10" x2="478" y2="10" stroke="#24314a" stroke-width="1"/>
+              <line x1="32" y1="40" x2="478" y2="40" stroke="#24314a" stroke-width="1"/>
+              <line x1="32" y1="70" x2="478" y2="70" stroke="#24314a" stroke-width="1"/>
+              <line x1="32" y1="100" x2="478" y2="100" stroke="#24314a" stroke-width="1"/>
+              <!-- Y labels -->
+              <text x="28" y="13" text-anchor="end" fill="#8a98ad" font-size="9" font-family="Inter,system-ui,sans-serif">12</text>
+              <text x="28" y="43" text-anchor="end" fill="#8a98ad" font-size="9" font-family="Inter,system-ui,sans-serif">9</text>
+              <text x="28" y="73" text-anchor="end" fill="#8a98ad" font-size="9" font-family="Inter,system-ui,sans-serif">6</text>
+              <text x="28" y="103" text-anchor="end" fill="#8a98ad" font-size="9" font-family="Inter,system-ui,sans-serif">3</text>
+              <!-- Bars: data = [1,1,0,0,1,2,4,7,9,10,11,8,7,9,12,10,8,6,5,4,3,2,1,1] peak>=8, current=hour14 -->
+              <!-- bar width=18, gap=1, start x=34 -->
+              <!-- 00 h=1 -->  <rect x="34"   y="97"  width="14" height="3"  rx="2" fill="#24314a"/>
+              <!-- 01 h=1 -->  <rect x="54"   y="97"  width="14" height="3"  rx="2" fill="#24314a"/>
+              <!-- 02 h=0 -->  <rect x="74"   y="100" width="14" height="0"  rx="2" fill="#24314a"/>
+              <!-- 03 h=0 -->  <rect x="94"   y="100" width="14" height="0"  rx="2" fill="#24314a"/>
+              <!-- 04 h=1 -->  <rect x="114"  y="97"  width="14" height="3"  rx="2" fill="#24314a"/>
+              <!-- 05 h=2 -->  <rect x="134"  y="92"  width="14" height="8"  rx="2" fill="#24314a"/>
+              <!-- 06 h=4 -->  <rect x="154"  y="83"  width="14" height="17" rx="2" fill="var(--color-accent-indigo)" opacity=".55"/>
+              <!-- 07 h=7 -->  <rect x="174"  y="70"  width="14" height="30" rx="2" fill="var(--color-accent-indigo)" opacity=".75"/>
+              <!-- 08 h=9 -->  <rect x="194"  y="62"  width="14" height="38" rx="2" fill="var(--color-accent-indigo)"/>
+              <!-- 09 h=10 --> <rect x="214"  y="57"  width="14" height="43" rx="2" fill="var(--color-accent-indigo)"/>
+              <!-- 10 h=11 --> <rect x="234"  y="52"  width="14" height="48" rx="2" fill="var(--color-accent-indigo)"/>
+              <!-- 11 h=8 -->  <rect x="254"  y="65"  width="14" height="35" rx="2" fill="var(--color-accent-indigo)" opacity=".85"/>
+              <!-- 12 h=7 -->  <rect x="274"  y="70"  width="14" height="30" rx="2" fill="var(--color-accent-indigo)" opacity=".75"/>
+              <!-- 13 h=9 -->  <rect x="294"  y="62"  width="14" height="38" rx="2" fill="var(--color-accent-indigo)"/>
+              <!-- 14 h=12 current --> <rect x="314" y="48" width="14" height="52" rx="2" fill="var(--color-accent-sky)"/>
+              <!-- 15 h=10 --> <rect x="334"  y="57"  width="14" height="43" rx="2" fill="var(--color-accent-indigo)"/>
+              <!-- 16 h=8 -->  <rect x="354"  y="65"  width="14" height="35" rx="2" fill="var(--color-accent-indigo)" opacity=".85"/>
+              <!-- 17 h=6 -->  <rect x="374"  y="75"  width="14" height="25" rx="2" fill="var(--color-accent-indigo)" opacity=".7"/>
+              <!-- 18 h=5 -->  <rect x="394"  y="79"  width="14" height="21" rx="2" fill="var(--color-accent-indigo)" opacity=".6"/>
+              <!-- 19 h=4 -->  <rect x="414"  y="83"  width="14" height="17" rx="2" fill="var(--color-accent-indigo)" opacity=".55"/>
+              <!-- 20 h=3 -->  <rect x="434"  y="87"  width="14" height="13" rx="2" fill="#24314a"/>
+              <!-- 21 h=2 -->  <rect x="454"  y="92"  width="14" height="8"  rx="2" fill="#24314a"/>
+              <!-- 22 h=1 -->  <rect x="474"  y="97"  width="14" height="3"  rx="2" fill="#24314a" style="display:none"/>
+              <!-- X labels every 3h -->
+              <text x="34"  y="118" fill="#8a98ad" font-size="8.5" font-family="Inter,system-ui,sans-serif" text-anchor="middle">00</text>
+              <text x="94"  y="118" fill="#8a98ad" font-size="8.5" font-family="Inter,system-ui,sans-serif" text-anchor="middle">03</text>
+              <text x="154" y="118" fill="#8a98ad" font-size="8.5" font-family="Inter,system-ui,sans-serif" text-anchor="middle">06</text>
+              <text x="214" y="118" fill="#8a98ad" font-size="8.5" font-family="Inter,system-ui,sans-serif" text-anchor="middle">09</text>
+              <text x="274" y="118" fill="#8a98ad" font-size="8.5" font-family="Inter,system-ui,sans-serif" text-anchor="middle">12</text>
+              <text x="321" y="118" fill="var(--color-accent-sky)" font-size="8.5" font-family="Inter,system-ui,sans-serif" text-anchor="middle" font-weight="700">14:00</text>
+              <text x="374" y="118" fill="#8a98ad" font-size="8.5" font-family="Inter,system-ui,sans-serif" text-anchor="middle">18</text>
+              <text x="434" y="118" fill="#8a98ad" font-size="8.5" font-family="Inter,system-ui,sans-serif" text-anchor="middle">21</text>
+              <!-- Current hour indicator line -->
+              <line x1="321" y1="48" x2="321" y2="104" stroke="var(--color-accent-sky)" stroke-width="1" stroke-dasharray="3,3" opacity=".5"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Crew & Aircraft side panel -->
+        <div class="card side-panel">
+          <div class="subcard">
+            <div class="subcard-hdr">Crew Availability</div>
+            <div class="crew-row">
+              <div class="crew-avatar">CM</div>
+              <div class="crew-info">
+                <div class="crew-name">Capt. M. Reyes</div>
+                <div class="crew-role">Captain · KVX Base</div>
+              </div>
+              <div class="crew-status available">
+                <span class="status-dot on-time"></span>Available
+              </div>
+            </div>
+            <div class="crew-row">
+              <div class="crew-avatar alt">FO</div>
+              <div class="crew-info">
+                <div class="crew-name">F.O. T. Nakamura</div>
+                <div class="crew-role">First Officer · KVX Base</div>
+              </div>
+              <div class="crew-status on-duty">
+                <span class="status-dot boarding"></span>On Duty
+              </div>
+            </div>
+            <div class="crew-row">
+              <div class="crew-avatar alt2">SV</div>
+              <div class="crew-info">
+                <div class="crew-name">S. Volkov</div>
+                <div class="crew-role">Purser · KVX Base</div>
+              </div>
+              <div class="crew-status rest">
+                <span class="status-dot departed"></span>Rest
+              </div>
+            </div>
+          </div>
+          <div class="subcard">
+            <div class="subcard-hdr">Aircraft Status</div>
+            <div class="ac-row">
+              <div class="ac-icon-wrap">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
+              </div>
+              <div class="ac-info">
+                <div class="ac-tail">JT-KVX-04</div>
+                <div class="ac-type">Airbus A320neo</div>
+              </div>
+              <div>
+                <div class="ac-dep" style="color:#e4ecf6;font-size:11px;font-weight:600">JS401</div>
+                <div class="ac-dep">14:35 UTC</div>
+              </div>
+            </div>
+            <div class="ac-row">
+              <div class="ac-icon-wrap">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
+              </div>
+              <div class="ac-info">
+                <div class="ac-tail">JT-KVX-11</div>
+                <div class="ac-type">Boeing 737-8</div>
+              </div>
+              <div>
+                <div class="ac-dep" style="color:#e4ecf6;font-size:11px;font-weight:600">JS218</div>
+                <div class="ac-dep">14:50 UTC</div>
+              </div>
+            </div>
+            <div class="ac-row">
+              <div class="ac-icon-wrap" style="color:var(--color-status-delayed);background:rgba(245,158,11,.1)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+              </div>
+              <div class="ac-info">
+                <div class="ac-tail">JT-KVX-07</div>
+                <div class="ac-type">Airbus A330-200</div>
+              </div>
+              <div>
+                <div class="ac-dep" style="color:var(--color-status-delayed);font-size:11px;font-weight:600">JS629</div>
+                <div class="ac-dep" style="color:var(--color-status-delayed)">Delayed</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flights Detail Table -->
+      <div class="card">
+        <div class="card-hdr">
+          <div class="card-title">All Flights</div>
+          <div class="card-hdr-space"></div>
+          <div class="filter-row" style="border:none;padding:0;background:transparent">
+            <div class="filter-search">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>
+              <input type="text" placeholder="Search…">
+            </div>
+            <div class="chip-group" style="margin-left:8px">
+              <button class="chip active">All</button>
+              <button class="chip">Domestic</button>
+              <button class="chip">International</button>
+            </div>
+          </div>
+        </div>
+        <table class="detail-table">
+          <thead>
+            <tr>
+              <th>Flight</th>
+              <th>Aircraft</th>
+              <th>Origin → Dest</th>
+              <th>Dep. Time</th>
+              <th>Status</th>
+              <th>Pax</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="flight-num">JS401</span></td>
+              <td>A320neo</td>
+              <td>KVX<span class="od-arrow">→</span>ORD</td>
+              <td>14:35</td>
+              <td><span class="status-pill boarding"><span class="status-dot boarding"></span>Boarding</span></td>
+              <td><span class="pax-num">152</span><span class="pax-cap">/180</span></td>
+            </tr>
+            <tr>
+              <td><span class="flight-num">JS218</span></td>
+              <td>B737-8</td>
+              <td>KVX<span class="od-arrow">→</span>LHR</td>
+              <td>14:50</td>
+              <td><span class="status-pill on-time"><span class="status-dot on-time"></span>On Time</span></td>
+              <td><span class="pax-num">164</span><span class="pax-cap">/174</span></td>
+            </tr>
+            <tr>
+              <td><span class="flight-num">JS093</span></td>
+              <td>A330-200</td>
+              <td>DXB<span class="od-arrow">→</span>KVX</td>
+              <td>15:10</td>
+              <td><span class="status-pill delayed"><span class="status-dot delayed"></span>Delayed</span></td>
+              <td><span class="pax-num">247</span><span class="pax-cap">/266</span></td>
+            </tr>
+            <tr>
+              <td><span class="flight-num">JS577</span></td>
+              <td>A320neo</td>
+              <td>KVX<span class="od-arrow">→</span>CDG</td>
+              <td>13:55</td>
+              <td><span class="status-pill departed"><span class="status-dot departed"></span>Departed</span></td>
+              <td><span class="pax-num">178</span><span class="pax-cap">/180</span></td>
+            </tr>
+            <tr>
+              <td><span class="flight-num">JS340</span></td>
+              <td>B737-8</td>
+              <td>SIN<span class="od-arrow">→</span>KVX</td>
+              <td>15:30</td>
+              <td><span class="status-pill on-time"><span class="status-dot on-time"></span>On Time</span></td>
+              <td><span class="pax-num">141</span><span class="pax-cap">/174</span></td>
+            </tr>
+            <tr>
+              <td><span class="flight-num">JS182</span></td>
+              <td>A350-900</td>
+              <td>KVX<span class="od-arrow">→</span>JFK</td>
+              <td>15:45</td>
+              <td><span class="status-pill on-time"><span class="status-dot on-time"></span>On Time</span></td>
+              <td><span class="pax-num">298</span><span class="pax-cap">/315</span></td>
+            </tr>
+            <tr>
+              <td><span class="flight-num">JS629</span></td>
+              <td>A330-200</td>
+              <td>KVX<span class="od-arrow">→</span>NRT</td>
+              <td>16:15</td>
+              <td><span class="status-pill delayed"><span class="status-dot delayed"></span>Delayed</span></td>
+              <td><span class="pax-num">231</span><span class="pax-cap">/266</span></td>
+            </tr>
+            <tr>
+              <td><span class="flight-num">JS055</span></td>
+              <td>B737-8</td>
+              <td>FRA<span class="od-arrow">→</span>KVX</td>
+              <td>16:40</td>
+              <td><span class="status-pill on-time"><span class="status-dot on-time"></span>On Time</span></td>
+              <td><span class="pax-num">158</span><span class="pax-cap">/174</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </main>
+  </div><!-- body-row -->
+</div><!-- shell -->
+</body>
+</html>

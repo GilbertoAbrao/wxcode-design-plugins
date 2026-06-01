@@ -1,0 +1,97 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "wxcode-admin-frost-glass",
+  "title": "Frost Glass Admin",
+  "version": "0.1.0",
+  "description": "Glassmorphism operations dashboard — frosted translucent cards layered over a deep indigo-violet-teal gradient canvas. Signature style: backdrop-filter blur, 1px translucent borders, soft ambient shadows, cyan and violet accents on near-black. Use when the brief calls for a dark, premium, or futuristic analytics look.",
+  "license": "MIT",
+  "author": {
+    "name": "WXCode",
+    "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+  },
+  "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-frost-glass",
+  "tags": [
+    "wxcode-plugin",
+    "wxcode",
+    "first-party",
+    "prototype",
+    "operations",
+    "web",
+    "admin",
+    "analytics",
+    "glassmorphism",
+    "dark-mode",
+    "frosted-glass",
+    "gradient-canvas",
+    "futuristic",
+    "cyan-violet",
+    "dashboard"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "prototype",
+    "scenario": "operations",
+    "surface": "web",
+    "preview": {
+      "type": "html",
+      "entry": "./example.html"
+    },
+    "useCase": {
+      "query": {
+        "en": "Build me a dark glassmorphism analytics dashboard — frosted glass cards over a deep gradient, KPI tiles, inline chart, data table, and side panel. Cyan and violet accents.",
+        "zh-CN": "使用这个插件完成以下任务：Build me a dark glassmorphism analytics dashboard — frosted glass cards over a deep gradient, KPI tiles, inline chart, data table, and side panel. Cyan and violet accents."
+      },
+      "exampleOutputs": [
+        {
+          "path": "./example.html",
+          "title": "Frost Glass Admin"
+        }
+      ]
+    },
+    "context": {
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ],
+      "designSystem": {
+        "primary": true
+      },
+      "craft": [
+        "pixel-discipline",
+        "laws-of-ux"
+      ],
+      "assets": [
+        "./example.html"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ],
+    "provenance": {
+      "category": "admin-dashboards",
+      "note": "original archetype; no third-party template reproduced"
+    }
+  }
+}

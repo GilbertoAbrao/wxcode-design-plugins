@@ -1,0 +1,98 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "wxcode-admin-meadow-agri",
+  "title": "Meadow Agri Admin",
+  "version": "0.1.0",
+  "description": "Original agriculture farm-management admin dashboard — light mode, natural green and earth-amber palette, left sidebar with farm/region switcher, 4 KPI cards, fields status board, yield forecast chart, sensors table, and weather plus tasks side panel.",
+  "license": "MIT",
+  "author": {
+    "name": "WXCode",
+    "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+  },
+  "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-meadow-agri",
+  "tags": [
+    "wxcode-plugin",
+    "wxcode",
+    "first-party",
+    "prototype",
+    "operations",
+    "web",
+    "admin",
+    "agriculture",
+    "farm",
+    "light-mode",
+    "natural",
+    "green",
+    "earth",
+    "field-management",
+    "sensors",
+    "yield-forecast"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "prototype",
+    "scenario": "operations",
+    "surface": "web",
+    "preview": {
+      "type": "html",
+      "entry": "./example.html"
+    },
+    "useCase": {
+      "query": {
+        "en": "Build me a farm management admin dashboard — left sidebar with farm switcher, 4 KPI cards (active fields, yield forecast, soil moisture, tasks due), fields status board, yield chart, sensors table, weather and tasks panel.",
+        "zh-CN": "使用这个插件完成以下任务：Build me a farm management admin dashboard — left sidebar with farm switcher, 4 KPI cards (active fields, yield forecast, soil moisture, tasks due), fields status board, yield chart, sensors table, weather and tasks panel."
+      },
+      "exampleOutputs": [
+        {
+          "path": "./example.html",
+          "title": "Meadow Agri Admin"
+        }
+      ]
+    },
+    "context": {
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ],
+      "designSystem": {
+        "primary": true
+      },
+      "craft": [
+        "pixel-discipline",
+        "laws-of-ux"
+      ],
+      "assets": [
+        "./example.html"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ],
+    "provenance": {
+      "category": "admin-dashboards",
+      "note": "original archetype; no third-party template reproduced"
+    }
+  }
+}

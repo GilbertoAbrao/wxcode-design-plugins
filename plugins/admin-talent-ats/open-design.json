@@ -1,0 +1,98 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "wxcode-admin-talent-ats",
+  "title": "Talent ATS Admin",
+  "version": "0.1.0",
+  "description": "Recruiting & applicant-tracking dashboard archetype — left sidebar with requisition switcher, topbar with period picker and avatar, 4 KPI cards (open roles / candidates / interviews / time-to-hire), kanban-style hiring pipeline, recruiting funnel SVG, candidates table, and upcoming-interviews side panel. Indigo + pink accent, light HR aesthetic.",
+  "license": "MIT",
+  "author": {
+    "name": "WXCode",
+    "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+  },
+  "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-talent-ats",
+  "tags": [
+    "wxcode-plugin",
+    "wxcode",
+    "first-party",
+    "prototype",
+    "operations",
+    "web",
+    "admin",
+    "recruiting",
+    "ats",
+    "light-mode",
+    "hr",
+    "hiring",
+    "pipeline",
+    "kanban",
+    "indigo",
+    "pink-accent"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "prototype",
+    "scenario": "operations",
+    "surface": "web",
+    "preview": {
+      "type": "html",
+      "entry": "./example.html"
+    },
+    "useCase": {
+      "query": {
+        "en": "Build me a recruiting ATS admin dashboard — left sidebar with requisition switcher, 4 KPI tiles (open roles, candidates, interviews, time-to-hire), hiring pipeline board, recruiting funnel chart, candidates table, and upcoming interviews panel.",
+        "zh-CN": "使用这个插件完成以下任务：Build me a recruiting ATS admin dashboard — left sidebar with requisition switcher, 4 KPI tiles (open roles, candidates, interviews, time-to-hire), hiring pipeline board, recruiting funnel chart, candidates table, and upcoming interviews panel."
+      },
+      "exampleOutputs": [
+        {
+          "path": "./example.html",
+          "title": "Talent ATS Admin"
+        }
+      ]
+    },
+    "context": {
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ],
+      "designSystem": {
+        "primary": true
+      },
+      "craft": [
+        "pixel-discipline",
+        "laws-of-ux"
+      ],
+      "assets": [
+        "./example.html"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ],
+    "provenance": {
+      "category": "admin-dashboards",
+      "note": "original archetype; no third-party template reproduced"
+    }
+  }
+}

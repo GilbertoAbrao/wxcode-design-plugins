@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Volt Energy Admin</title>
+<style>
+:root {
+  --bg-root:       #0a0e14;
+  --bg-panel:      #121822;
+  --bg-card:       #1a2230;
+  --border:        #28323f;
+  --accent-amber:  #fbbf24;
+  --accent-cyan:   #22d3ee;
+  --text-hi:       #e4ecf4;
+  --text-muted:    #8794a4;
+  --state-online:   #34d399;
+  --state-degraded: #fbbf24;
+  --state-offline:  #f87171;
+}
+*,::before,::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:13px;line-height:1.5;
+  background:var(--bg-root);color:var(--text-hi);
+  min-height:100vh;display:flex;flex-direction:column;
+  font-variant-numeric:tabular-nums;
+}
+
+/* ── NAVBAR ─────────────────────────────────────────────────────────── */
+.navbar{
+  height:48px;background:var(--bg-panel);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:16px;
+  padding:0 16px 0 0;
+  position:fixed;top:0;left:0;right:0;z-index:100;
+}
+.nav-logo{
+  width:52px;height:48px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  border-right:1px solid var(--border);
+}
+.nav-wordmark{
+  font-size:11px;font-weight:700;letter-spacing:.12em;
+  color:var(--accent-amber);text-transform:uppercase;
+  white-space:nowrap;padding-left:8px;
+}
+.nav-regions{
+  display:flex;gap:2px;background:var(--bg-root);
+  border:1px solid var(--border);border-radius:6px;padding:3px;
+  margin-left:8px;
+}
+.nav-regions button{
+  background:none;border:none;cursor:pointer;
+  padding:4px 12px;border-radius:4px;font-size:12px;font-weight:500;
+  color:var(--text-muted);transition:all .15s;
+}
+.nav-regions button.active{
+  background:var(--bg-card);color:var(--text-hi);
+}
+.nav-search{
+  margin-left:auto;display:flex;align-items:center;gap:8px;
+  background:var(--bg-root);border:1px solid var(--border);
+  border-radius:6px;padding:5px 10px;
+}
+.nav-search svg{opacity:.5}
+.nav-search input{
+  background:none;border:none;outline:none;
+  font-size:12px;color:var(--text-hi);width:160px;
+}
+.nav-search input::placeholder{color:var(--text-muted)}
+.nav-bell{position:relative;cursor:pointer;padding:6px}
+.nav-bell-badge{
+  position:absolute;top:4px;right:3px;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--accent-amber);
+  border:1.5px solid var(--bg-panel);
+}
+.nav-avatar{
+  width:30px;height:30px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent-cyan),#0e7490);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#0a0e14;cursor:pointer;
+}
+
+/* ── BODY LAYOUT ─────────────────────────────────────────────────────── */
+.body-wrap{display:flex;padding-top:48px;flex:1}
+
+/* ── ICON RAIL ───────────────────────────────────────────────────────── */
+.rail{
+  width:52px;flex-shrink:0;background:var(--bg-root);
+  border-right:1px solid var(--border);
+  position:fixed;top:48px;left:0;bottom:0;
+  display:flex;flex-direction:column;align-items:center;
+  padding:8px 0;gap:2px;z-index:50;
+}
+.rail-item{
+  position:relative;width:40px;height:40px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:8px;cursor:pointer;color:var(--text-muted);
+  transition:color .15s,background .15s;
+}
+.rail-item:hover{background:var(--bg-panel);color:var(--text-hi)}
+.rail-item.active{color:var(--accent-amber)}
+.rail-item.active::before{
+  content:'';position:absolute;left:-8px;top:10px;bottom:10px;
+  width:3px;border-radius:0 2px 2px 0;
+  background:var(--accent-amber);
+}
+.rail-sep{
+  width:28px;height:1px;background:var(--border);margin:4px 0;
+}
+
+/* ── MAIN CONTENT ────────────────────────────────────────────────────── */
+.main{
+  margin-left:52px;flex:1;padding:20px;
+  display:flex;flex-direction:column;gap:16px;
+  min-width:0;
+}
+
+/* ── PAGE HEADER ─────────────────────────────────────────────────────── */
+.page-header{
+  display:flex;align-items:flex-start;justify-content:space-between;
+}
+.page-header h1{font-size:17px;font-weight:700;color:var(--text-hi)}
+.page-header .sub{font-size:12px;color:var(--text-muted);margin-top:2px}
+.header-actions{display:flex;gap:8px;align-items:center}
+.btn-ghost{
+  background:none;border:1px solid var(--border);
+  border-radius:6px;padding:6px 14px;font-size:12px;
+  color:var(--text-muted);cursor:pointer;
+}
+.btn-ghost:hover{border-color:var(--accent-cyan);color:var(--accent-cyan)}
+.btn-primary{
+  background:var(--accent-amber);border:none;
+  border-radius:6px;padding:6px 14px;font-size:12px;
+  font-weight:600;color:#0a0e14;cursor:pointer;
+}
+.live-dot{
+  display:flex;align-items:center;gap:6px;
+  font-size:11px;color:var(--state-online);font-weight:600;
+  letter-spacing:.05em;text-transform:uppercase;
+}
+.live-dot::before{
+  content:'';width:7px;height:7px;border-radius:50%;
+  background:var(--state-online);
+  box-shadow:0 0 6px var(--state-online);
+  animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── KPI TILES ───────────────────────────────────────────────────────── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpi-tile{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:8px;
+}
+.kpi-label{
+  font-size:10px;font-weight:600;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--text-muted);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.kpi-value{font-size:28px;font-weight:700;letter-spacing:-.5px}
+.kpi-value.amber{color:var(--accent-amber)}
+.kpi-value.cyan{color:var(--accent-cyan)}
+.kpi-value.green{color:var(--state-online)}
+.kpi-bottom{display:flex;align-items:center;justify-content:space-between}
+.kpi-delta{
+  display:flex;align-items:center;gap:4px;
+  font-size:11px;font-weight:600;
+}
+.kpi-delta.up{color:var(--state-online)}
+.kpi-delta.down{color:var(--state-offline)}
+.kpi-sub{font-size:11px;color:var(--text-muted)}
+
+/* arc progress */
+.kpi-arc{position:relative;width:40px;height:40px}
+.kpi-arc text{font-family:inherit;font-variant-numeric:tabular-nums}
+
+/* sparkline */
+.sparkline{display:block}
+
+/* ── SECTION LABEL ───────────────────────────────────────────────────── */
+.section-label{
+  font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--text-muted);
+  display:flex;align-items:center;gap:8px;
+}
+.section-label::after{
+  content:'';flex:1;height:1px;background:var(--border);
+}
+
+/* ── STATUS BOARD ────────────────────────────────────────────────────── */
+.status-board{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:8px;overflow:hidden;
+}
+.board-header{
+  padding:12px 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.board-title{font-size:13px;font-weight:600;color:var(--text-hi)}
+.board-meta{font-size:11px;color:var(--text-muted)}
+.board-table{width:100%;border-collapse:collapse}
+.board-table th{
+  text-align:left;padding:8px 16px;
+  font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text-muted);border-bottom:1px solid var(--border);
+}
+.board-table td{padding:10px 16px;border-bottom:1px solid var(--border);vertical-align:middle}
+.board-table tr:last-child td{border-bottom:none}
+.board-table tr:hover td{background:rgba(255,255,255,.025)}
+.region-badge{
+  display:inline-block;font-size:10px;font-weight:600;
+  letter-spacing:.05em;text-transform:uppercase;
+  padding:2px 7px;border-radius:3px;margin-right:6px;
+  background:rgba(255,255,255,.06);color:var(--text-muted);
+}
+.site-name{font-weight:600;color:var(--text-hi);font-size:12px}
+.source-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;color:var(--text-muted);
+}
+.output-val{font-weight:700;font-size:13px;color:var(--text-hi)}
+.output-unit{font-size:11px;color:var(--text-muted);margin-left:2px}
+
+/* state pills */
+.pill{
+  display:inline-block;font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.06em;
+  padding:3px 9px;border-radius:4px;
+}
+.pill-online{background:rgba(52,211,153,.12);color:var(--state-online)}
+.pill-degraded{background:rgba(251,191,36,.14);color:var(--state-degraded)}
+.pill-offline{background:rgba(248,113,113,.13);color:var(--state-offline)}
+
+/* ── LOWER GRID ──────────────────────────────────────────────────────── */
+.lower-grid{display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start}
+
+/* ── CHART CARD ──────────────────────────────────────────────────────── */
+.chart-card{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:8px;overflow:hidden;
+}
+.chart-header{
+  padding:14px 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.chart-title{font-size:13px;font-weight:600;color:var(--text-hi)}
+.chart-legend{display:flex;gap:16px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted)}
+.legend-dot{width:8px;height:8px;border-radius:50%}
+.legend-dot.cyan{background:var(--accent-cyan)}
+.legend-dot.amber{background:var(--accent-amber)}
+.chart-ts{font-size:11px;color:var(--text-muted)}
+.chart-body{padding:16px}
+.chart-svg{display:block;width:100%}
+
+/* ── ALERTS TABLE ────────────────────────────────────────────────────── */
+.alerts-card{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:8px;overflow:hidden;
+}
+.alerts-header{
+  padding:12px 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.alerts-title{font-size:13px;font-weight:600;color:var(--text-hi)}
+.alert-count{
+  background:rgba(248,113,113,.16);color:var(--state-offline);
+  font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;
+}
+.alerts-table{width:100%;border-collapse:collapse}
+.alerts-table th{
+  text-align:left;padding:7px 12px;
+  font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text-muted);border-bottom:1px solid var(--border);
+}
+.alerts-table td{
+  padding:9px 12px;border-bottom:1px solid var(--border);
+  vertical-align:middle;font-size:12px;
+}
+.alerts-table tr:last-child td{border-bottom:none}
+.alerts-table tr:hover td{background:rgba(255,255,255,.025)}
+.alert-id{font-size:11px;color:var(--text-muted);font-family:monospace}
+.alert-site{font-weight:600;font-size:12px}
+.alert-msg{color:var(--text-muted);font-size:11px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.sev-critical{background:rgba(248,113,113,.16);color:var(--state-offline)}
+.sev-high{background:rgba(251,191,36,.14);color:var(--state-degraded)}
+.sev-info{background:rgba(135,148,164,.12);color:var(--text-muted)}
+
+.status-open{border:1px solid rgba(248,113,113,.5);color:var(--state-offline)}
+.status-ack{border:1px solid rgba(251,191,36,.5);color:var(--state-degraded)}
+.status-resolved{border:1px solid rgba(52,211,153,.5);color:var(--state-online)}
+
+/* ── SITES PANEL ─────────────────────────────────────────────────────── */
+.sites-panel{
+  background:var(--bg-panel);border:1px solid var(--border);
+  border-radius:8px;overflow:hidden;
+}
+.panel-header{
+  padding:12px 14px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.panel-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted)}
+.panel-body{padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.detail-group{}
+.detail-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:6px 0;border-bottom:1px solid var(--border);
+}
+.detail-row:last-child{border-bottom:none}
+.detail-key{font-size:11px;color:var(--text-muted)}
+.detail-val{font-size:11px;font-weight:600;color:var(--text-hi)}
+.panel-site-name{font-size:15px;font-weight:700;color:var(--text-hi);margin-bottom:2px}
+.panel-site-region{font-size:11px;color:var(--text-muted)}
+.uptime-bar{
+  height:6px;border-radius:3px;background:var(--border);overflow:hidden;margin-top:8px;
+}
+.uptime-fill{height:100%;border-radius:3px;background:var(--state-online)}
+.timeline-label{font-size:10px;color:var(--text-muted);margin-top:4px;text-align:right}
+.panel-divider{height:1px;background:var(--border)}
+
+/* ── FOOTER ──────────────────────────────────────────────────────────── */
+.footer{
+  margin-left:52px;padding:12px 20px;
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:11px;color:var(--text-muted);
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAVBAR ─────────────────────────────────────────────────────── -->
+<nav class="navbar">
+  <div class="nav-logo">
+    <!-- lightning bolt -->
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="13,1 5,12 10,12 9,21 17,10 12,10" fill="var(--accent-amber)" stroke="none"/>
+    </svg>
+  </div>
+  <span class="nav-wordmark">Volt Energy</span>
+
+  <div class="nav-regions">
+    <button class="active">North Grid</button>
+    <button>South Grid</button>
+    <button>West Corridor</button>
+  </div>
+
+  <div class="nav-search">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+      <circle cx="7" cy="7" r="5" stroke="var(--text-muted)" stroke-width="1.6"/>
+      <line x1="11" y1="11" x2="15" y2="15" stroke="var(--text-muted)" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+    <input type="text" placeholder="Search sites, alerts…">
+  </div>
+
+  <div class="nav-bell">
+    <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+      <path d="M10 2a6 6 0 0 0-6 6v3l-1.5 2.5h15L16 11V8a6 6 0 0 0-6-6z" stroke="var(--text-muted)" stroke-width="1.5" fill="none"/>
+      <path d="M8.5 16.5a1.5 1.5 0 0 0 3 0" stroke="var(--text-muted)" stroke-width="1.5" fill="none"/>
+    </svg>
+    <div class="nav-bell-badge"></div>
+  </div>
+
+  <div class="nav-avatar">OP</div>
+</nav>
+
+<div class="body-wrap">
+
+  <!-- ── ICON RAIL ─────────────────────────────────────────────────── -->
+  <aside class="rail">
+    <!-- Dashboard (active) -->
+    <div class="rail-item active" title="Dashboard">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+        <rect x="2" y="2" width="7" height="7" rx="1.5" fill="currentColor" opacity=".9"/>
+        <rect x="11" y="2" width="7" height="7" rx="1.5" fill="currentColor" opacity=".4"/>
+        <rect x="2" y="11" width="7" height="7" rx="1.5" fill="currentColor" opacity=".4"/>
+        <rect x="11" y="11" width="7" height="7" rx="1.5" fill="currentColor" opacity=".4"/>
+      </svg>
+    </div>
+    <!-- Regions -->
+    <div class="rail-item" title="Regions">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+        <path d="M10 2C6.686 2 4 4.686 4 8c0 4 6 10 6 10s6-6 6-10c0-3.314-2.686-6-6-6z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        <circle cx="10" cy="8" r="2" fill="currentColor" opacity=".7"/>
+      </svg>
+    </div>
+    <!-- Alerts -->
+    <div class="rail-item" title="Alerts">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+        <path d="M10 2l7.5 13H2.5L10 2z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+        <line x1="10" y1="8" x2="10" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="10" cy="14.5" r=".8" fill="currentColor"/>
+      </svg>
+    </div>
+    <div class="rail-sep"></div>
+    <!-- Schedule -->
+    <div class="rail-item" title="Schedule">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+        <rect x="3" y="4" width="14" height="13" rx="1.5" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        <line x1="7" y1="2" x2="7" y2="6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="13" y1="2" x2="13" y2="6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="3" y1="9" x2="17" y2="9" stroke="currentColor" stroke-width="1.3"/>
+      </svg>
+    </div>
+    <!-- Reports -->
+    <div class="rail-item" title="Reports">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+        <rect x="4" y="3" width="12" height="15" rx="1.5" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        <line x1="7" y1="8" x2="13" y2="8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="7" y1="11" x2="13" y2="11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="7" y1="14" x2="10" y2="14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="rail-sep"></div>
+    <!-- Settings -->
+    <div class="rail-item" title="Settings" style="margin-top:auto">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+        <circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.41 1.41M14.37 14.37l1.41 1.41M4.22 15.78l1.41-1.41M14.37 5.63l1.41-1.41" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ──────────────────────────────────────────────────────── -->
+  <main class="main">
+
+    <!-- Page header -->
+    <div class="page-header">
+      <div>
+        <h1>Grid Operations Center</h1>
+        <div class="sub">North Grid Region · Updated 14:32:07 UTC</div>
+      </div>
+      <div class="header-actions">
+        <span class="live-dot">Live</span>
+        <button class="btn-ghost">Export Report</button>
+        <button class="btn-primary">+ Dispatch Order</button>
+      </div>
+    </div>
+
+    <!-- ── KPI TILES ─────────────────────────────────────────────── -->
+    <div class="kpi-grid">
+
+      <!-- Current Load -->
+      <div class="kpi-tile">
+        <div class="kpi-label">
+          Current Load
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+            <path d="M2 13L6 7l3 4 3-6 2 2" stroke="var(--accent-cyan)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+        </div>
+        <div class="kpi-value cyan">4,821 <span style="font-size:16px;font-weight:500;color:var(--text-muted)">MW</span></div>
+        <div class="kpi-bottom">
+          <div class="kpi-delta up">
+            <svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 2L9 8H1z" fill="currentColor"/></svg>
+            +3.2% vs yesterday
+          </div>
+          <!-- mini sparkline -->
+          <svg class="sparkline" width="72" height="24" viewBox="0 0 72 24">
+            <polyline points="0,20 8,16 16,18 24,12 32,14 40,8 48,10 56,6 64,9 72,4"
+              fill="none" stroke="var(--accent-cyan)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity=".8"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Generation -->
+      <div class="kpi-tile">
+        <div class="kpi-label">
+          Generation
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+            <polygon points="9,1 4,8 7,8 7,15 12,8 9,8" fill="var(--accent-amber)"/>
+          </svg>
+        </div>
+        <div class="kpi-value amber">5,103 <span style="font-size:16px;font-weight:500;color:var(--text-muted)">MW</span></div>
+        <div class="kpi-bottom">
+          <div class="kpi-delta up">
+            <svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 2L9 8H1z" fill="currentColor"/></svg>
+            +1.7% capacity
+          </div>
+          <svg class="sparkline" width="72" height="24" viewBox="0 0 72 24">
+            <polyline points="0,18 8,14 16,16 24,10 32,12 40,6 48,8 56,5 64,7 72,3"
+              fill="none" stroke="var(--accent-amber)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity=".8"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Active Outages -->
+      <div class="kpi-tile">
+        <div class="kpi-label">
+          Active Outages
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+            <path d="M8 1L14 13H2z" stroke="var(--state-offline)" stroke-width="1.3" fill="none"/>
+            <line x1="8" y1="6" x2="8" y2="10" stroke="var(--state-offline)" stroke-width="1.3" stroke-linecap="round"/>
+            <circle cx="8" cy="12" r=".6" fill="var(--state-offline)"/>
+          </svg>
+        </div>
+        <div class="kpi-value" style="color:var(--state-offline)">7</div>
+        <div class="kpi-bottom">
+          <div class="kpi-delta down">
+            <svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 8L9 2H1z" fill="currentColor"/></svg>
+            2 critical, 5 minor
+          </div>
+          <span class="kpi-sub">Since 09:14 UTC</span>
+        </div>
+      </div>
+
+      <!-- Grid Efficiency -->
+      <div class="kpi-tile">
+        <div class="kpi-label">
+          Grid Efficiency
+          <span style="font-size:10px;color:var(--state-online)">Nominal</span>
+        </div>
+        <div class="kpi-value green">94.3 <span style="font-size:16px;font-weight:500;color:var(--text-muted)">%</span></div>
+        <div class="kpi-bottom">
+          <div class="kpi-delta up">
+            <svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 2L9 8H1z" fill="currentColor"/></svg>
+            +0.4% this week
+          </div>
+          <!-- arc progress -->
+          <svg class="kpi-arc" width="40" height="40" viewBox="0 0 40 40">
+            <circle cx="20" cy="20" r="15" fill="none" stroke="var(--border)" stroke-width="3.5"/>
+            <circle cx="20" cy="20" r="15" fill="none" stroke="var(--state-online)" stroke-width="3.5"
+              stroke-dasharray="88.9 94.2" stroke-dashoffset="23.6" stroke-linecap="round"
+              transform="rotate(-90 20 20)"/>
+          </svg>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── STATUS BOARD ───────────────────────────────────────────── -->
+    <div class="section-label">Regions &amp; Sites Status</div>
+    <div class="status-board">
+      <div class="board-header">
+        <div class="board-title">Site Monitoring — All Regions</div>
+        <div class="board-meta">9 sites · 2 degraded · 1 offline</div>
+      </div>
+      <table class="board-table">
+        <thead>
+          <tr>
+            <th>Site</th>
+            <th>Source</th>
+            <th>Output</th>
+            <th>State</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="region-badge">NORTH</span><span class="site-name">Arrowhead Station</span></td>
+            <td><span class="source-tag">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4" stroke="var(--accent-amber)" stroke-width="1.3"/><line x1="6" y1="1" x2="6" y2="3" stroke="var(--accent-amber)" stroke-width="1.3" stroke-linecap="round"/><line x1="6" y1="9" x2="6" y2="11" stroke="var(--accent-amber)" stroke-width="1.3" stroke-linecap="round"/></svg>
+              Gas Turbine
+            </span></td>
+            <td><span class="output-val">840</span><span class="output-unit">MW</span></td>
+            <td><span class="pill pill-online">Online</span></td>
+          </tr>
+          <tr>
+            <td><span class="region-badge">NORTH</span><span class="site-name">Kestrel Wind Farm</span></td>
+            <td><span class="source-tag">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="1.5" fill="var(--accent-cyan)"/><line x1="6" y1="1" x2="6" y2="4.5" stroke="var(--accent-cyan)" stroke-width="1.2" stroke-linecap="round"/><line x1="9.6" y1="8" x2="6.8" y2="6.5" stroke="var(--accent-cyan)" stroke-width="1.2" stroke-linecap="round"/><line x1="2.4" y1="8" x2="5.2" y2="6.5" stroke="var(--accent-cyan)" stroke-width="1.2" stroke-linecap="round"/></svg>
+              Wind
+            </span></td>
+            <td><span class="output-val">312</span><span class="output-unit">MW</span></td>
+            <td><span class="pill pill-online">Online</span></td>
+          </tr>
+          <tr>
+            <td><span class="region-badge">NORTH</span><span class="site-name">Ridgeline Solar Array</span></td>
+            <td><span class="source-tag">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="2.5" stroke="var(--accent-amber)" stroke-width="1.2" fill="none"/><line x1="6" y1="0.5" x2="6" y2="2" stroke="var(--accent-amber)" stroke-width="1.1" stroke-linecap="round"/><line x1="6" y1="10" x2="6" y2="11.5" stroke="var(--accent-amber)" stroke-width="1.1" stroke-linecap="round"/><line x1="0.5" y1="6" x2="2" y2="6" stroke="var(--accent-amber)" stroke-width="1.1" stroke-linecap="round"/><line x1="10" y1="6" x2="11.5" y2="6" stroke="var(--accent-amber)" stroke-width="1.1" stroke-linecap="round"/></svg>
+              Solar PV
+            </span></td>
+            <td><span class="output-val">178</span><span class="output-unit">MW</span></td>
+            <td><span class="pill pill-degraded">Degraded</span></td>
+          </tr>
+          <tr>
+            <td><span class="region-badge">SOUTH</span><span class="site-name">Bayside Combined Cycle</span></td>
+            <td><span class="source-tag">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4" stroke="var(--accent-amber)" stroke-width="1.3" fill="none"/><line x1="6" y1="1" x2="6" y2="3" stroke="var(--accent-amber)" stroke-width="1.3" stroke-linecap="round"/><line x1="6" y1="9" x2="6" y2="11" stroke="var(--accent-amber)" stroke-width="1.3" stroke-linecap="round"/></svg>
+              Gas + Steam
+            </span></td>
+            <td><span class="output-val">1,240</span><span class="output-unit">MW</span></td>
+            <td><span class="pill pill-online">Online</span></td>
+          </tr>
+          <tr>
+            <td><span class="region-badge">SOUTH</span><span class="site-name">Tidal Flats Hydro</span></td>
+            <td><span class="source-tag">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 7 Q4 4 6 7 Q8 10 10 7" stroke="var(--accent-cyan)" stroke-width="1.3" fill="none" stroke-linecap="round"/></svg>
+              Hydro
+            </span></td>
+            <td><span class="output-val">690</span><span class="output-unit">MW</span></td>
+            <td><span class="pill pill-online">Online</span></td>
+          </tr>
+          <tr>
+            <td><span class="region-badge">SOUTH</span><span class="site-name">Ironport Peaker Unit</span></td>
+            <td><span class="source-tag">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4" stroke="var(--accent-amber)" stroke-width="1.3" fill="none"/></svg>
+              Gas Peaker
+            </span></td>
+            <td><span class="output-val">0</span><span class="output-unit">MW</span></td>
+            <td><span class="pill pill-offline">Offline</span></td>
+          </tr>
+          <tr>
+            <td><span class="region-badge">WEST</span><span class="site-name">Quartzite Solar Farm</span></td>
+            <td><span class="source-tag">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="2.5" stroke="var(--accent-amber)" stroke-width="1.2" fill="none"/><line x1="6" y1="0.5" x2="6" y2="2" stroke="var(--accent-amber)" stroke-width="1.1" stroke-linecap="round"/><line x1="6" y1="10" x2="6" y2="11.5" stroke="var(--accent-amber)" stroke-width="1.1" stroke-linecap="round"/><line x1="0.5" y1="6" x2="2" y2="6" stroke="var(--accent-amber)" stroke-width="1.1" stroke-linecap="round"/><line x1="10" y1="6" x2="11.5" y2="6" stroke="var(--accent-amber)" stroke-width="1.1" stroke-linecap="round"/></svg>
+              Solar PV
+            </span></td>
+            <td><span class="output-val">425</span><span class="output-unit">MW</span></td>
+            <td><span class="pill pill-online">Online</span></td>
+          </tr>
+          <tr>
+            <td><span class="region-badge">WEST</span><span class="site-name">Mesa Verde Wind Cluster</span></td>
+            <td><span class="source-tag">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="1.5" fill="var(--accent-cyan)"/><line x1="6" y1="1" x2="6" y2="4.5" stroke="var(--accent-cyan)" stroke-width="1.2" stroke-linecap="round"/><line x1="9.6" y1="8" x2="6.8" y2="6.5" stroke="var(--accent-cyan)" stroke-width="1.2" stroke-linecap="round"/><line x1="2.4" y1="8" x2="5.2" y2="6.5" stroke="var(--accent-cyan)" stroke-width="1.2" stroke-linecap="round"/></svg>
+              Wind
+            </span></td>
+            <td><span class="output-val">287</span><span class="output-unit">MW</span></td>
+            <td><span class="pill pill-degraded">Degraded</span></td>
+          </tr>
+          <tr>
+            <td><span class="region-badge">WEST</span><span class="site-name">Copperhead Battery Storage</span></td>
+            <td><span class="source-tag">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><rect x="2" y="3" width="8" height="6" rx="1" stroke="var(--accent-cyan)" stroke-width="1.2" fill="none"/><line x1="5" y1="1.5" x2="7" y2="1.5" stroke="var(--accent-cyan)" stroke-width="1.2" stroke-linecap="round"/></svg>
+              BESS
+            </span></td>
+            <td><span class="output-val">132</span><span class="output-unit">MW</span></td>
+            <td><span class="pill pill-online">Online</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ── LOWER GRID ─────────────────────────────────────────────── -->
+    <div class="lower-grid">
+
+      <!-- Load / Generation Chart -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Load vs. Generation — Last 24 Hours</div>
+            <div class="chart-ts">North Grid Region · 00:00–23:59 UTC · Jun 1 2026</div>
+          </div>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="legend-dot cyan"></span>Load</span>
+            <span class="legend-item"><span class="legend-dot amber"></span>Generation</span>
+          </div>
+        </div>
+        <div class="chart-body">
+          <svg class="chart-svg" viewBox="0 0 620 180" xmlns="http://www.w3.org/2000/svg" style="height:180px">
+            <!-- grid lines -->
+            <line x1="0" y1="150" x2="620" y2="150" stroke="var(--border)" stroke-width=".8"/>
+            <line x1="0" y1="112" x2="620" y2="112" stroke="var(--border)" stroke-width=".8"/>
+            <line x1="0" y1="75"  x2="620" y2="75"  stroke="var(--border)" stroke-width=".8"/>
+            <line x1="0" y1="37"  x2="620" y2="37"  stroke="var(--border)" stroke-width=".8"/>
+            <!-- y-axis labels -->
+            <text x="0" y="153" font-size="9" fill="var(--text-muted)">3,500</text>
+            <text x="0" y="115" font-size="9" fill="var(--text-muted)">4,000</text>
+            <text x="0" y="78"  font-size="9" fill="var(--text-muted)">4,500</text>
+            <text x="0" y="40"  font-size="9" fill="var(--text-muted)">5,000</text>
+
+            <!-- Load (cyan) area fill -->
+            <defs>
+              <linearGradient id="cyan-fill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--accent-cyan)" stop-opacity=".18"/>
+                <stop offset="100%" stop-color="var(--accent-cyan)" stop-opacity="0"/>
+              </linearGradient>
+              <linearGradient id="amber-fill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--accent-amber)" stop-opacity=".15"/>
+                <stop offset="100%" stop-color="var(--accent-amber)" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+
+            <!-- load area -->
+            <polygon
+              points="38,138 63,132 88,128 113,120 138,108 163,96 188,88 213,82 238,86 263,92 288,100 313,106 338,108 363,112 388,118 413,122 438,126 463,122 488,114 513,104 538,96 563,90 588,86 610,84 610,155 38,155"
+              fill="url(#cyan-fill)"/>
+            <!-- load line -->
+            <polyline
+              points="38,138 63,132 88,128 113,120 138,108 163,96 188,88 213,82 238,86 263,92 288,100 313,106 338,108 363,112 388,118 413,122 438,126 463,122 488,114 513,104 538,96 563,90 588,86 610,84"
+              fill="none" stroke="var(--accent-cyan)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+
+            <!-- generation area -->
+            <polygon
+              points="38,130 63,124 88,118 113,110 138,96 163,82 188,72 213,66 238,70 263,76 288,84 313,90 338,92 363,98 388,104 413,108 438,114 463,110 488,100 513,88 538,78 563,70 588,66 610,62 610,155 38,155"
+              fill="url(#amber-fill)"/>
+            <!-- generation line -->
+            <polyline
+              points="38,130 63,124 88,118 113,110 138,96 163,82 188,72 213,66 238,70 263,76 288,84 313,90 338,92 363,98 388,104 413,108 438,114 463,110 488,100 513,88 538,78 563,70 588,66 610,62"
+              fill="none" stroke="var(--accent-amber)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+
+            <!-- x-axis labels — every 4 hours -->
+            <text x="35"  y="170" font-size="9" fill="var(--text-muted)" text-anchor="middle">00:00</text>
+            <text x="135" y="170" font-size="9" fill="var(--text-muted)" text-anchor="middle">04:00</text>
+            <text x="235" y="170" font-size="9" fill="var(--text-muted)" text-anchor="middle">08:00</text>
+            <text x="335" y="170" font-size="9" fill="var(--text-muted)" text-anchor="middle">12:00</text>
+            <text x="435" y="170" font-size="9" fill="var(--text-muted)" text-anchor="middle">16:00</text>
+            <text x="535" y="170" font-size="9" fill="var(--text-muted)" text-anchor="middle">20:00</text>
+            <text x="610" y="170" font-size="9" fill="var(--text-muted)" text-anchor="middle">24:00</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Alerts + Sites Panel (stacked) -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+
+        <!-- Active Alerts -->
+        <div class="alerts-card">
+          <div class="alerts-header">
+            <div class="alerts-title">Active Alerts</div>
+            <span class="alert-count">7 Open</span>
+          </div>
+          <table class="alerts-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Site</th>
+                <th>Sev</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="alert-id">ALT-0041</span></td>
+                <td><span class="alert-site">Ironport Peaker</span><br><span class="alert-msg">Unit tripped — breaker fault on Bus 3</span></td>
+                <td><span class="pill sev-critical">Critical</span></td>
+                <td><span class="pill status-open">Open</span></td>
+              </tr>
+              <tr>
+                <td><span class="alert-id">ALT-0038</span></td>
+                <td><span class="alert-site">Ridgeline Solar</span><br><span class="alert-msg">Inverter bank 4 offline — thermal fault</span></td>
+                <td><span class="pill sev-high">High</span></td>
+                <td><span class="pill status-ack">ACK</span></td>
+              </tr>
+              <tr>
+                <td><span class="alert-id">ALT-0036</span></td>
+                <td><span class="alert-site">Mesa Verde Wind</span><br><span class="alert-msg">Turbine #7 pitch control degraded</span></td>
+                <td><span class="pill sev-high">High</span></td>
+                <td><span class="pill status-open">Open</span></td>
+              </tr>
+              <tr>
+                <td><span class="alert-id">ALT-0033</span></td>
+                <td><span class="alert-site">Bayside CC</span><br><span class="alert-msg">HRSG steam pressure low — monitor</span></td>
+                <td><span class="pill sev-info">Info</span></td>
+                <td><span class="pill status-ack">ACK</span></td>
+              </tr>
+              <tr>
+                <td><span class="alert-id">ALT-0029</span></td>
+                <td><span class="alert-site">Kestrel Wind</span><br><span class="alert-msg">Maintenance window scheduled 18:00</span></td>
+                <td><span class="pill sev-info">Info</span></td>
+                <td><span class="pill status-resolved">Resolved</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Sites Side Panel -->
+        <div class="sites-panel">
+          <div class="panel-header">
+            <div class="panel-title">Site Detail</div>
+            <span class="pill pill-online" style="font-size:9px">Online</span>
+          </div>
+          <div class="panel-body">
+            <div>
+              <div class="panel-site-name">Bayside Combined Cycle</div>
+              <div class="panel-site-region">South Grid Region · Gas + Steam</div>
+            </div>
+            <div class="panel-divider"></div>
+            <div class="detail-group">
+              <div class="detail-row">
+                <span class="detail-key">Installed Capacity</span>
+                <span class="detail-val">1,400 MW</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-key">Current Output</span>
+                <span class="detail-val" style="color:var(--accent-cyan)">1,240 MW</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-key">Utilisation</span>
+                <span class="detail-val">88.6%</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-key">Uptime (30 d)</span>
+                <span class="detail-val" style="color:var(--state-online)">99.1%</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-key">Last Inspection</span>
+                <span class="detail-val">May 14 2026</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-key">Site Operator</span>
+                <span class="detail-val">D. Hargreaves</span>
+              </div>
+            </div>
+            <div>
+              <div class="uptime-bar">
+                <div class="uptime-fill" style="width:99.1%"></div>
+              </div>
+              <div class="timeline-label">99.1% uptime — last 30 days</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end stacked right col -->
+
+    </div><!-- end lower-grid -->
+
+  </main>
+</div><!-- end body-wrap -->
+
+<!-- ── FOOTER ─────────────────────────────────────────────────────── -->
+<footer class="footer">
+  <span>Volt Energy Operations Platform &copy; 2026</span>
+  <span>Grid Control System v4.2.1 · North Grid · All data UTC</span>
+</footer>
+
+</body>
+</html>

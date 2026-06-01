@@ -1,0 +1,99 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "wxcode-admin-forge-mes",
+  "title": "Forge MES Admin",
+  "version": "0.1.0",
+  "description": "Industrial dark-mode Manufacturing Execution System dashboard — shop-floor plant switcher, OEE / output / downtime / scrap KPI tiles, production lines status board, inline SVG output trend chart, work-orders table, and real-time downtime alerts panel. Original archetype for discrete manufacturing operations teams.",
+  "license": "MIT",
+  "author": {
+    "name": "WXCode",
+    "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+  },
+  "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-forge-mes",
+  "tags": [
+    "wxcode-plugin",
+    "wxcode",
+    "first-party",
+    "prototype",
+    "operations",
+    "web",
+    "admin",
+    "manufacturing",
+    "mes",
+    "dark-mode",
+    "industrial",
+    "shop-floor",
+    "oee",
+    "production",
+    "enterprise",
+    "orange-accent",
+    "status-board"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "prototype",
+    "scenario": "operations",
+    "surface": "web",
+    "preview": {
+      "type": "html",
+      "entry": "./example.html"
+    },
+    "useCase": {
+      "query": {
+        "en": "Build me an industrial dark-mode MES admin dashboard for a discrete manufacturing plant — plant switcher navbar, OEE / output / downtime / scrap KPI tiles, production lines status board, output trend chart, work-orders table, downtime alerts panel.",
+        "zh-CN": "使用这个插件完成以下任务：Build me an industrial dark-mode MES admin dashboard for a discrete manufacturing plant — plant switcher navbar, OEE / output / downtime / scrap KPI tiles, production lines status board, output trend chart, work-orders table, downtime alerts panel."
+      },
+      "exampleOutputs": [
+        {
+          "path": "./example.html",
+          "title": "Forge MES Admin"
+        }
+      ]
+    },
+    "context": {
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ],
+      "designSystem": {
+        "primary": true
+      },
+      "craft": [
+        "pixel-discipline",
+        "laws-of-ux"
+      ],
+      "assets": [
+        "./example.html"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ],
+    "provenance": {
+      "category": "admin-dashboards",
+      "note": "original archetype; no third-party template reproduced"
+    }
+  }
+}

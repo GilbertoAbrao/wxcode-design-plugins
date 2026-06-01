@@ -1,0 +1,97 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "wxcode-admin-pixel-liveops",
+  "title": "Pixel LiveOps Admin",
+  "version": "0.1.0",
+  "description": "Dark-mode game studio live-operations dashboard — neon purple/cyan accent on deep-space backgrounds. Sidebar game switcher, topbar period filter, 4 KPI tiles (DAU / D1 retention / ARPDAU / live events), DAU chart, live events board, top in-game items table, player segments panel. Original archetype for game ops teams.",
+  "license": "MIT",
+  "author": {
+    "name": "WXCode",
+    "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+  },
+  "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-pixel-liveops",
+  "tags": [
+    "wxcode-plugin",
+    "wxcode",
+    "first-party",
+    "prototype",
+    "operations",
+    "web",
+    "admin",
+    "gaming",
+    "liveops",
+    "dark-mode",
+    "neon",
+    "game-studio",
+    "analytics",
+    "real-time",
+    "playful-techy"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "prototype",
+    "scenario": "operations",
+    "surface": "web",
+    "preview": {
+      "type": "html",
+      "entry": "./example.html"
+    },
+    "useCase": {
+      "query": {
+        "en": "Build me a dark-mode live-ops admin dashboard for a game studio — sidebar with game switcher, KPI tiles for DAU/retention/ARPDAU/live events, a DAU trend chart, a live events board with status pills, a top in-game items list, and a player segments panel.",
+        "zh-CN": "使用这个插件完成以下任务：Build me a dark-mode live-ops admin dashboard for a game studio — sidebar with game switcher, KPI tiles for DAU/retention/ARPDAU/live events, a DAU trend chart, a live events board with status pills, a top in-game items list, and a player segments panel."
+      },
+      "exampleOutputs": [
+        {
+          "path": "./example.html",
+          "title": "Pixel LiveOps Admin"
+        }
+      ]
+    },
+    "context": {
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ],
+      "designSystem": {
+        "primary": true
+      },
+      "craft": [
+        "pixel-discipline",
+        "laws-of-ux"
+      ],
+      "assets": [
+        "./example.html"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ],
+    "provenance": {
+      "category": "admin-dashboards",
+      "note": "original archetype; no third-party template reproduced"
+    }
+  }
+}

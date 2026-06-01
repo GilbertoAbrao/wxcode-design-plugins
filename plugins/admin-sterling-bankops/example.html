@@ -1,0 +1,912 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sterling Bank Ops Admin</title>
+<style>
+:root {
+  --accent:       #475569;
+  --accent-deep:  #334155;
+  --accent-tint:  #f1f5f9;
+  --emerald:      #10b981;
+  --emerald-tint: #d1fae5;
+  --amber:        #f59e0b;
+  --amber-tint:   #fef3c7;
+  --red:          #ef4444;
+  --red-tint:     #fee2e2;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:14px;line-height:1.5;color:#1e293b;
+  background:#f7f8fa;display:flex;height:100vh;overflow:hidden;
+}
+
+/* ── SIDEBAR ─────────────────────────────────────────────── */
+.sidebar{
+  width:240px;min-width:240px;background:var(--accent-deep);
+  display:flex;flex-direction:column;height:100vh;overflow-y:auto;
+}
+.sb-brand{
+  display:flex;align-items:center;gap:10px;padding:20px 16px 16px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.sb-brand svg{color:#fff;}
+.sb-brand-name{
+  font-size:15px;font-weight:700;color:#fff;line-height:1.2;
+}
+.sb-branch{
+  margin:12px 12px 4px;
+  background:rgba(255,255,255,.08);border-radius:8px;
+  padding:8px 10px;display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;
+}
+.sb-branch-label{font-size:11px;color:#94a3b8;font-weight:500;letter-spacing:.04em;}
+.sb-branch-value{font-size:13px;color:#e2e8f0;font-weight:600;margin-top:1px;}
+.sb-branch svg{color:#94a3b8;}
+.sb-section{
+  padding:16px 12px 4px;
+  font-size:10px;letter-spacing:.08em;font-weight:600;color:#64748b;text-transform:uppercase;
+}
+.sb-nav{list-style:none;padding:0 8px;}
+.sb-nav li a{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 10px;border-radius:7px;
+  font-size:13px;font-weight:500;color:#cbd5e1;
+  text-decoration:none;position:relative;transition:background .15s;
+}
+.sb-nav li a:hover{background:rgba(255,255,255,.07);color:#f1f5f9;}
+.sb-nav li.active a{
+  background:rgba(255,255,255,.12);color:#fff;
+}
+.sb-nav li.active a::before{
+  content:'';position:absolute;left:0;top:20%;bottom:20%;
+  width:3px;background:var(--emerald);border-radius:0 3px 3px 0;
+}
+.sb-nav li a svg{flex-shrink:0;opacity:.75;}
+.sb-nav li.active a svg{opacity:1;}
+.sb-badge{
+  margin-left:auto;background:var(--red);color:#fff;
+  font-size:10px;font-weight:700;border-radius:10px;
+  padding:1px 6px;line-height:16px;
+}
+.sb-foot{
+  margin-top:auto;padding:16px;border-top:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;gap:10px;
+}
+.sb-avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--accent);display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:#fff;flex-shrink:0;
+}
+.sb-foot-info{flex:1;min-width:0;}
+.sb-foot-name{font-size:13px;font-weight:600;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sb-foot-role{font-size:11px;color:#64748b;}
+.sb-foot svg{color:#64748b;cursor:pointer;}
+
+/* ── MAIN AREA ───────────────────────────────────────────── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+/* ── TOPBAR ──────────────────────────────────────────────── */
+.topbar{
+  height:56px;background:#fff;border-bottom:1px solid #e4e7ec;
+  display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0;
+}
+.topbar-title{
+  display:flex;flex-direction:column;
+}
+.topbar-page{font-size:15px;font-weight:700;color:#1e293b;line-height:1;}
+.topbar-crumb{font-size:11px;color:#94a3b8;margin-top:2px;}
+.topbar-crumb span{color:#64748b;}
+.topbar-search{
+  flex:1;max-width:340px;margin-left:24px;position:relative;
+}
+.topbar-search input{
+  width:100%;padding:7px 12px 7px 34px;border:1px solid #e4e7ec;
+  border-radius:8px;background:#f7f8fa;font-size:13px;color:#1e293b;
+  outline:none;transition:border-color .15s;
+  font-family:inherit;
+}
+.topbar-search input:focus{border-color:var(--accent);background:#fff;}
+.topbar-search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#94a3b8;}
+.topbar-period{
+  display:flex;gap:2px;background:#f1f5f9;border-radius:8px;padding:3px;margin-left:auto;
+}
+.topbar-period button{
+  padding:4px 12px;border:none;background:transparent;border-radius:6px;
+  font-size:12px;font-weight:500;color:#64748b;cursor:pointer;
+  font-family:inherit;transition:background .15s,color .15s;
+}
+.topbar-period button.active{background:#fff;color:var(--accent-deep);box-shadow:0 1px 3px rgba(0,0,0,.08);}
+.topbar-bell{position:relative;cursor:pointer;display:flex;align-items:center;}
+.topbar-bell svg{color:#64748b;}
+.topbar-bell .dot{
+  position:absolute;top:-1px;right:-1px;width:8px;height:8px;
+  background:var(--amber);border-radius:50%;border:2px solid #fff;
+}
+.topbar-avatar{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--accent);display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:#fff;cursor:pointer;flex-shrink:0;
+}
+
+/* ── SCROLL BODY ─────────────────────────────────────────── */
+.body{flex:1;overflow-y:auto;padding:24px;}
+
+/* ── KPI STRIP ───────────────────────────────────────────── */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;}
+.kpi{
+  background:#fff;border-radius:10px;padding:18px 20px;
+  box-shadow:0 1px 4px rgba(0,0,0,.05);
+  display:flex;flex-direction:column;gap:6px;
+}
+.kpi-head{display:flex;align-items:flex-start;justify-content:space-between;}
+.kpi-icon{
+  width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+}
+.kpi-icon.amber{background:var(--amber-tint);color:var(--amber);}
+.kpi-icon.emerald{background:var(--emerald-tint);color:var(--emerald);}
+.kpi-icon.red{background:var(--red-tint);color:var(--red);}
+.kpi-icon.accent{background:var(--accent-tint);color:var(--accent);}
+.kpi-label{
+  font-size:11px;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;color:#64748b;
+}
+.kpi-val{
+  font-size:30px;font-weight:700;color:#1e293b;line-height:1;
+  font-variant-numeric:tabular-nums;
+}
+.kpi-foot{display:flex;align-items:center;gap:6px;margin-top:2px;}
+.chip{
+  display:inline-flex;align-items:center;gap:3px;
+  font-size:11px;font-weight:600;border-radius:6px;padding:2px 7px;
+}
+.chip.up{background:var(--emerald-tint);color:#059669;}
+.chip.down{background:var(--red-tint);color:var(--red);}
+.chip.warn{background:var(--amber-tint);color:#d97706;}
+.kpi-sub{font-size:11px;color:#94a3b8;}
+
+/* ── MAIN GRID ───────────────────────────────────────────── */
+.grid{display:grid;grid-template-columns:1fr 340px;gap:16px;}
+
+/* ── CARD ────────────────────────────────────────────────── */
+.card{
+  background:#fff;border-radius:10px;
+  box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:16px;overflow:hidden;
+}
+.card:last-child{margin-bottom:0;}
+.card-head{
+  padding:14px 20px;border-bottom:1px solid #f1f5f9;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.card-title{font-size:14px;font-weight:700;color:#1e293b;}
+.card-link{font-size:12px;color:var(--accent);text-decoration:none;font-weight:500;}
+.card-link:hover{text-decoration:underline;}
+
+/* ── APPROVALS TABLE ─────────────────────────────────────── */
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{
+  font-size:10px;letter-spacing:.07em;font-weight:600;
+  text-transform:uppercase;color:#94a3b8;
+  padding:10px 16px;text-align:left;border-bottom:1px solid #f1f5f9;
+  background:#fafbfc;
+}
+.tbl td{
+  padding:11px 16px;border-bottom:1px solid #f7f8fa;
+  font-size:13px;color:#1e293b;vertical-align:middle;
+}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tbody tr:hover{background:var(--accent-tint);}
+.tbl td.mono{font-variant-numeric:tabular-nums;font-family:"Inter",monospace;font-size:12px;color:#64748b;}
+.tbl td.amount{font-variant-numeric:tabular-nums;font-weight:600;text-align:right;}
+.tbl th.right{text-align:right;}
+
+.pill{
+  display:inline-block;padding:2px 9px;border-radius:20px;
+  font-size:11px;font-weight:600;letter-spacing:.02em;
+}
+.pill.settled{background:var(--emerald-tint);color:#059669;}
+.pill.pending{background:var(--amber-tint);color:#d97706;}
+.pill.flagged{background:var(--red-tint);color:var(--red);}
+.pill.reversed{background:#f1f5f9;color:#64748b;}
+
+.btn-approve,.btn-reject{
+  padding:4px 11px;border-radius:6px;font-size:12px;font-weight:600;
+  cursor:pointer;border:none;font-family:inherit;transition:opacity .15s;
+}
+.btn-approve{background:var(--emerald);color:#fff;}
+.btn-approve:hover{opacity:.85;}
+.btn-reject{background:var(--red-tint);color:var(--red);}
+.btn-reject:hover{opacity:.85;}
+.action-pair{display:flex;gap:6px;align-items:center;}
+
+/* filter tabs */
+.filter-tabs{display:flex;gap:2px;padding:12px 16px 0;border-bottom:1px solid #f1f5f9;}
+.filter-tabs button{
+  padding:6px 14px;border:none;background:transparent;border-radius:7px 7px 0 0;
+  font-size:12px;font-weight:500;color:#64748b;cursor:pointer;
+  font-family:inherit;border-bottom:2px solid transparent;transition:color .15s;
+}
+.filter-tabs button.active{
+  color:var(--accent-deep);border-bottom-color:var(--accent);font-weight:600;
+}
+
+/* ── RIGHT COLUMN ────────────────────────────────────────── */
+.right-col{display:flex;flex-direction:column;gap:0;}
+
+/* RISK PANEL */
+.risk-list{list-style:none;padding:8px 0;}
+.risk-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 16px;border-bottom:1px solid #f7f8fa;
+}
+.risk-item:last-child{border-bottom:none;}
+.risk-dot{
+  width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;
+}
+.risk-dot.red{background:var(--red);}
+.risk-dot.amber{background:var(--amber);}
+.risk-dot.emerald{background:var(--emerald);}
+.risk-body{flex:1;min-width:0;}
+.risk-desc{font-size:13px;color:#1e293b;font-weight:500;line-height:1.3;}
+.risk-meta{display:flex;justify-content:space-between;margin-top:3px;}
+.risk-ref{font-size:11px;color:#64748b;font-variant-numeric:tabular-nums;}
+.risk-time{font-size:11px;color:#94a3b8;}
+.risk-ack{
+  font-size:11px;color:var(--accent);font-weight:600;
+  cursor:pointer;background:none;border:none;
+  font-family:inherit;padding:0;white-space:nowrap;margin-top:2px;
+}
+
+/* THROUGHPUT CHART */
+.chart-wrap{padding:16px 16px 12px;}
+.chart-sub{font-size:11px;color:#94a3b8;margin-bottom:12px;}
+.bar-chart{
+  display:flex;align-items:flex-end;gap:5px;height:80px;
+  border-bottom:1px solid #e4e7ec;
+}
+.bar-col{display:flex;flex-direction:column;align-items:center;flex:1;}
+.bar{
+  width:100%;background:var(--accent);border-radius:3px 3px 0 0;
+  opacity:.75;transition:opacity .15s;min-height:4px;
+}
+.bar.peak{background:var(--emerald);opacity:1;}
+.bar:hover{opacity:1;}
+.bar-lbl{font-size:9px;color:#94a3b8;margin-top:5px;white-space:nowrap;}
+.chart-yaxis{
+  display:flex;justify-content:space-between;
+  font-size:10px;color:#94a3b8;margin-top:6px;
+  font-variant-numeric:tabular-nums;
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ SIDEBAR ══════════════ -->
+<aside class="sidebar">
+  <div class="sb-brand">
+    <!-- Shield / column motif -->
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+      <rect width="32" height="32" rx="8" fill="rgba(255,255,255,.12)"/>
+      <path d="M16 5L6 9v7c0 5.2 4.3 10 10 11 5.7-1 10-5.8 10-11V9L16 5z"
+            fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <rect x="12" y="14" width="2" height="7" rx="1" fill="currentColor"/>
+      <rect x="15" y="11" width="2" height="10" rx="1" fill="currentColor"/>
+      <rect x="18" y="13" width="2" height="8" rx="1" fill="currentColor"/>
+    </svg>
+    <div class="sb-brand-name">Sterling<br>Bank Ops</div>
+  </div>
+
+  <div class="sb-branch">
+    <div>
+      <div class="sb-branch-label">Branch / Unit</div>
+      <div class="sb-branch-value">Main Branch · All Units</div>
+    </div>
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <div class="sb-section">Main</div>
+  <ul class="sb-nav">
+    <li class="active">
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor"/>
+          <rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/>
+          <rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/>
+          <rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/>
+        </svg>
+        Operations Center
+      </a>
+    </li>
+    <li>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M8 4.5v3.8l2.5 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        Today's Transactions
+      </a>
+    </li>
+    <li>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M2 12V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v7" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M1 12h14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          <path d="M6.5 9h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        Clearing Room
+      </a>
+    </li>
+  </ul>
+
+  <div class="sb-section">Operations</div>
+  <ul class="sb-nav">
+    <li>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <rect x="2" y="3" width="12" height="10" rx="2" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M5 7h6M5 10h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        Approvals Queue
+        <span class="sb-badge">38</span>
+      </a>
+    </li>
+    <li>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M13 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M5.5 8l2 2 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Wire Transfers
+      </a>
+    </li>
+    <li>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M8 5v3l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        Loan Disbursements
+      </a>
+    </li>
+    <li>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M3 5h10M3 8h7M3 11h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        FX &amp; Trade
+      </a>
+    </li>
+  </ul>
+
+  <div class="sb-section">Compliance</div>
+  <ul class="sb-nav">
+    <li>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M8 2L2 5v4c0 3.3 2.7 6.4 6 7 3.3-.6 6-3.7 6-7V5L8 2z" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M5.5 8l2 2 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Risk &amp; AML
+        <span class="sb-badge" style="background:var(--amber)">12</span>
+      </a>
+    </li>
+    <li>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M8 1.5l1.8 3.6 4 .6-2.9 2.8.7 4L8 10.4l-3.6 1.9.7-4L2.2 5.7l4-.6L8 1.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+        </svg>
+        Audit Trail
+      </a>
+    </li>
+  </ul>
+
+  <div class="sb-section">Settings</div>
+  <ul class="sb-nav">
+    <li>
+      <a href="#">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.3"/>
+          <path d="M8 1v2M8 13v2M1 8h2M13 8h2M2.9 2.9l1.4 1.4M11.7 11.7l1.4 1.4M2.9 13.1l1.4-1.4M11.7 4.3l1.4-1.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        Preferences
+      </a>
+    </li>
+  </ul>
+
+  <div class="sb-foot">
+    <div class="sb-avatar">RP</div>
+    <div class="sb-foot-info">
+      <div class="sb-foot-name">Rachel Payne</div>
+      <div class="sb-foot-role">Senior Ops Officer</div>
+    </div>
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.3"/>
+      <path d="M8 1v2M8 13v2M1 8h2M13 8h2M2.9 2.9l1.4 1.4M11.7 11.7l1.4 1.4M2.9 13.1l1.4-1.4M11.7 4.3l1.4-1.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+    </svg>
+  </div>
+</aside>
+
+<!-- ══════════════ MAIN ══════════════ -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-title">
+      <span class="topbar-page">Operations Center</span>
+      <span class="topbar-crumb">Home / <span>Operations</span></span>
+    </div>
+
+    <div class="topbar-search">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M9.5 9.5l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <input type="text" placeholder="Search accounts, refs, staff…">
+    </div>
+
+    <div class="topbar-period">
+      <button class="active">Today</button>
+      <button>Week</button>
+      <button>Month</button>
+      <button>Quarter</button>
+    </div>
+
+    <div class="topbar-bell">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M10 2a6 6 0 0 0-6 6v2l-1.5 3h15L16 10V8a6 6 0 0 0-6-6z" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M8.5 16.5a1.5 1.5 0 0 0 3 0" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+      <span class="dot"></span>
+    </div>
+
+    <div class="topbar-avatar">RP</div>
+  </header>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- KPI STRIP -->
+    <div class="kpi-strip">
+
+      <div class="kpi">
+        <div class="kpi-head">
+          <div>
+            <div class="kpi-label">Pending Approvals</div>
+            <div class="kpi-val">38</div>
+          </div>
+          <div class="kpi-icon amber">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <rect x="3" y="4" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M7 8h6M7 11h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              <path d="M13 2v4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              <path d="M7 2v4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-foot">
+          <span class="chip warn">↑ 14%</span>
+          <span class="kpi-sub">vs yesterday</span>
+        </div>
+      </div>
+
+      <div class="kpi">
+        <div class="kpi-head">
+          <div>
+            <div class="kpi-label">Transactions Today</div>
+            <div class="kpi-val">1,247</div>
+          </div>
+          <div class="kpi-icon emerald">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M3 10h14M3 10l4-4M3 10l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M10 3l4 4M14 7l3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-foot">
+          <span class="chip up">↑ 8.3%</span>
+          <span class="kpi-sub">vs yesterday</span>
+        </div>
+      </div>
+
+      <div class="kpi">
+        <div class="kpi-head">
+          <div>
+            <div class="kpi-label">Flagged Items</div>
+            <div class="kpi-val">12</div>
+          </div>
+          <div class="kpi-icon red">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M10 3l7.5 13H2.5L10 3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M10 9v3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              <circle cx="10" cy="14.5" r=".7" fill="currentColor"/>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-foot">
+          <span class="chip down">↓ 2</span>
+          <span class="kpi-sub">vs yesterday</span>
+        </div>
+      </div>
+
+      <div class="kpi">
+        <div class="kpi-head">
+          <div>
+            <div class="kpi-label">SLA Met</div>
+            <div class="kpi-val">96.4%</div>
+          </div>
+          <div class="kpi-icon accent">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M6.5 10.5l2.5 2.5 4-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-foot">
+          <span class="chip up">↑ 0.4 pp</span>
+          <span class="kpi-sub">vs last week</span>
+        </div>
+      </div>
+
+    </div><!-- /kpi-strip -->
+
+    <!-- MAIN GRID -->
+    <div class="grid">
+
+      <!-- LEFT COLUMN -->
+      <div>
+
+        <!-- APPROVALS QUEUE -->
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Pending Approvals</span>
+            <a class="card-link" href="#">View all →</a>
+          </div>
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>Request ID</th>
+                <th>Requestor</th>
+                <th>Type</th>
+                <th class="right">Amount</th>
+                <th>Submitted</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="mono">APQ-20847</td>
+                <td>Dominic Ferrara</td>
+                <td>Wire Transfer</td>
+                <td class="amount">$148,500.00</td>
+                <td class="mono">09:14 AM</td>
+                <td>
+                  <div class="action-pair">
+                    <button class="btn-approve">Approve</button>
+                    <button class="btn-reject">Reject</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="mono">APQ-20831</td>
+                <td>Silvia Okonkwo</td>
+                <td>Loan Disbursement</td>
+                <td class="amount">$62,000.00</td>
+                <td class="mono">08:52 AM</td>
+                <td>
+                  <div class="action-pair">
+                    <button class="btn-approve">Approve</button>
+                    <button class="btn-reject">Reject</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="mono">APQ-20819</td>
+                <td>Marcus Huang</td>
+                <td>Account Override</td>
+                <td class="amount">—</td>
+                <td class="mono">08:37 AM</td>
+                <td>
+                  <div class="action-pair">
+                    <button class="btn-approve">Approve</button>
+                    <button class="btn-reject">Reject</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="mono">APQ-20804</td>
+                <td>Priya Menon</td>
+                <td>Limit Increase</td>
+                <td class="amount">$500,000.00</td>
+                <td class="mono">08:11 AM</td>
+                <td>
+                  <div class="action-pair">
+                    <button class="btn-approve">Approve</button>
+                    <button class="btn-reject">Reject</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="mono">APQ-20798</td>
+                <td>James Oduya</td>
+                <td>FX Trade</td>
+                <td class="amount">€230,000.00</td>
+                <td class="mono">07:58 AM</td>
+                <td>
+                  <div class="action-pair">
+                    <button class="btn-approve">Approve</button>
+                    <button class="btn-reject">Reject</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- TRANSACTIONS TABLE -->
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Today's Transactions</span>
+            <a class="card-link" href="#">Export CSV →</a>
+          </div>
+          <div class="filter-tabs">
+            <button class="active">All</button>
+            <button>Credit</button>
+            <button>Debit</button>
+            <button>Pending</button>
+            <button>Flagged</button>
+          </div>
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>Txn ID</th>
+                <th>Account</th>
+                <th>Type</th>
+                <th class="right">Amount</th>
+                <th>Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="mono">SB-88412</td>
+                <td>Nora Castillo &nbsp;<span style="color:#94a3b8;font-size:11px;">··3471</span></td>
+                <td>Credit</td>
+                <td class="amount" style="color:#059669">+$9,200.00</td>
+                <td class="mono">10:02 AM</td>
+                <td><span class="pill settled">Settled</span></td>
+              </tr>
+              <tr>
+                <td class="mono">SB-88401</td>
+                <td>Elias Drummond &nbsp;<span style="color:#94a3b8;font-size:11px;">··7823</span></td>
+                <td>Debit</td>
+                <td class="amount" style="color:#1e293b">−$3,450.00</td>
+                <td class="mono">09:51 AM</td>
+                <td><span class="pill settled">Settled</span></td>
+              </tr>
+              <tr>
+                <td class="mono">SB-88389</td>
+                <td>Fatoumata Diallo &nbsp;<span style="color:#94a3b8;font-size:11px;">··0054</span></td>
+                <td>Wire Out</td>
+                <td class="amount" style="color:#1e293b">−$28,750.00</td>
+                <td class="mono">09:38 AM</td>
+                <td><span class="pill pending">Pending</span></td>
+              </tr>
+              <tr>
+                <td class="mono">SB-88372</td>
+                <td>Kenji Watanabe &nbsp;<span style="color:#94a3b8;font-size:11px;">··6610</span></td>
+                <td>FX Buy</td>
+                <td class="amount" style="color:#1e293b">−$14,900.00</td>
+                <td class="mono">09:21 AM</td>
+                <td><span class="pill flagged">Flagged</span></td>
+              </tr>
+              <tr>
+                <td class="mono">SB-88360</td>
+                <td>Grace Adebayo &nbsp;<span style="color:#94a3b8;font-size:11px;">··2298</span></td>
+                <td>Credit</td>
+                <td class="amount" style="color:#059669">+$1,200.00</td>
+                <td class="mono">09:07 AM</td>
+                <td><span class="pill settled">Settled</span></td>
+              </tr>
+              <tr>
+                <td class="mono">SB-88341</td>
+                <td>Victor Lemos &nbsp;<span style="color:#94a3b8;font-size:11px;">··9987</span></td>
+                <td>Debit</td>
+                <td class="amount" style="color:#1e293b">−$520.00</td>
+                <td class="mono">08:49 AM</td>
+                <td><span class="pill reversed">Reversed</span></td>
+              </tr>
+              <tr>
+                <td class="mono">SB-88325</td>
+                <td>Amara Sow &nbsp;<span style="color:#94a3b8;font-size:11px;">··4410</span></td>
+                <td>Wire In</td>
+                <td class="amount" style="color:#059669">+$75,000.00</td>
+                <td class="mono">08:31 AM</td>
+                <td><span class="pill pending">Pending</span></td>
+              </tr>
+              <tr>
+                <td class="mono">SB-88301</td>
+                <td>Brett Harrington &nbsp;<span style="color:#94a3b8;font-size:11px;">··1174</span></td>
+                <td>Loan Credit</td>
+                <td class="amount" style="color:#059669">+$62,000.00</td>
+                <td class="mono">08:14 AM</td>
+                <td><span class="pill settled">Settled</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div><!-- /left-col -->
+
+      <!-- RIGHT COLUMN -->
+      <div class="right-col">
+
+        <!-- RISK & EXCEPTIONS -->
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Risk &amp; Exceptions</span>
+            <a class="card-link" href="#">View all →</a>
+          </div>
+          <ul class="risk-list">
+            <li class="risk-item">
+              <span class="risk-dot red"></span>
+              <div class="risk-body">
+                <div class="risk-desc">Velocity limit breach — 6 txns in 4 min</div>
+                <div class="risk-meta">
+                  <span class="risk-ref">SB-88372 · ··6610</span>
+                  <span class="risk-time">09:21 AM</span>
+                </div>
+                <button class="risk-ack">Acknowledge</button>
+              </div>
+            </li>
+            <li class="risk-item">
+              <span class="risk-dot red"></span>
+              <div class="risk-body">
+                <div class="risk-desc">Unverified beneficiary — large wire out</div>
+                <div class="risk-meta">
+                  <span class="risk-ref">APQ-20847 · D. Ferrara</span>
+                  <span class="risk-time">09:14 AM</span>
+                </div>
+                <button class="risk-ack">Acknowledge</button>
+              </div>
+            </li>
+            <li class="risk-item">
+              <span class="risk-dot amber"></span>
+              <div class="risk-body">
+                <div class="risk-desc">Dormant account reactivated with debit</div>
+                <div class="risk-meta">
+                  <span class="risk-ref">SB-88341 · ··9987</span>
+                  <span class="risk-time">08:49 AM</span>
+                </div>
+                <button class="risk-ack">Acknowledge</button>
+              </div>
+            </li>
+            <li class="risk-item">
+              <span class="risk-dot amber"></span>
+              <div class="risk-body">
+                <div class="risk-desc">FX trade exceeds daily threshold by 12%</div>
+                <div class="risk-meta">
+                  <span class="risk-ref">APQ-20798 · J. Oduya</span>
+                  <span class="risk-time">07:58 AM</span>
+                </div>
+                <button class="risk-ack">Acknowledge</button>
+              </div>
+            </li>
+            <li class="risk-item">
+              <span class="risk-dot emerald"></span>
+              <div class="risk-body">
+                <div class="risk-desc">AML screening cleared — large inbound</div>
+                <div class="risk-meta">
+                  <span class="risk-ref">SB-88325 · A. Sow</span>
+                  <span class="risk-time">08:31 AM</span>
+                </div>
+                <button class="risk-ack" style="color:#059669">Reviewed</button>
+              </div>
+            </li>
+            <li class="risk-item">
+              <span class="risk-dot amber"></span>
+              <div class="risk-body">
+                <div class="risk-desc">Approval SLA at 28 min — nearing limit</div>
+                <div class="risk-meta">
+                  <span class="risk-ref">APQ-20819 · M. Huang</span>
+                  <span class="risk-time">08:37 AM</span>
+                </div>
+                <button class="risk-ack">Acknowledge</button>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- THROUGHPUT CHART -->
+        <div class="card" style="margin-top:16px;">
+          <div class="card-head">
+            <span class="card-title">Transaction Throughput</span>
+          </div>
+          <div class="chart-wrap">
+            <div class="chart-sub">Settlements per hour — today</div>
+            <!--
+              Hours:    08  09  10  11  12  13  14  15  16  17  18  19
+              Counts:   42  87  134 118 96  143 129 107 91  68  44  21
+              Max=143 → peak bar at 13:00
+              Heights scaled to 80px max: val/143*80
+            -->
+            <div class="bar-chart">
+              <!-- 08:00  42  → 23px -->
+              <div class="bar-col">
+                <div class="bar" style="height:23px" title="08:00 — 42 settled"></div>
+                <span class="bar-lbl">08</span>
+              </div>
+              <!-- 09:00  87  → 49px -->
+              <div class="bar-col">
+                <div class="bar" style="height:49px" title="09:00 — 87 settled"></div>
+                <span class="bar-lbl">09</span>
+              </div>
+              <!-- 10:00  134 → 75px -->
+              <div class="bar-col">
+                <div class="bar" style="height:75px" title="10:00 — 134 settled"></div>
+                <span class="bar-lbl">10</span>
+              </div>
+              <!-- 11:00  118 → 66px -->
+              <div class="bar-col">
+                <div class="bar" style="height:66px" title="11:00 — 118 settled"></div>
+                <span class="bar-lbl">11</span>
+              </div>
+              <!-- 12:00  96  → 54px -->
+              <div class="bar-col">
+                <div class="bar" style="height:54px" title="12:00 — 96 settled"></div>
+                <span class="bar-lbl">12</span>
+              </div>
+              <!-- 13:00  143 → 80px PEAK -->
+              <div class="bar-col">
+                <div class="bar peak" style="height:80px" title="13:00 — 143 settled (peak)"></div>
+                <span class="bar-lbl">13</span>
+              </div>
+              <!-- 14:00  129 → 72px -->
+              <div class="bar-col">
+                <div class="bar" style="height:72px" title="14:00 — 129 settled"></div>
+                <span class="bar-lbl">14</span>
+              </div>
+              <!-- 15:00  107 → 60px -->
+              <div class="bar-col">
+                <div class="bar" style="height:60px" title="15:00 — 107 settled"></div>
+                <span class="bar-lbl">15</span>
+              </div>
+              <!-- 16:00  91  → 51px -->
+              <div class="bar-col">
+                <div class="bar" style="height:51px" title="16:00 — 91 settled"></div>
+                <span class="bar-lbl">16</span>
+              </div>
+              <!-- 17:00  68  → 38px -->
+              <div class="bar-col">
+                <div class="bar" style="height:38px" title="17:00 — 68 settled"></div>
+                <span class="bar-lbl">17</span>
+              </div>
+              <!-- 18:00  44  → 25px -->
+              <div class="bar-col">
+                <div class="bar" style="height:25px" title="18:00 — 44 settled"></div>
+                <span class="bar-lbl">18</span>
+              </div>
+              <!-- 19:00  21  → 12px (in progress) -->
+              <div class="bar-col">
+                <div class="bar" style="height:12px;opacity:.4" title="19:00 — in progress"></div>
+                <span class="bar-lbl">19</span>
+              </div>
+            </div>
+            <div class="chart-yaxis">
+              <span>0</span><span>50</span><span>100</span><span>143</span>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /right-col -->
+
+    </div><!-- /grid -->
+
+  </div><!-- /body -->
+</div><!-- /main -->
+
+</body>
+</html>

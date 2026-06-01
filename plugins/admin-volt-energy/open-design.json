@@ -1,0 +1,97 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "wxcode-admin-volt-energy",
+  "title": "Volt Energy Admin",
+  "version": "0.1.0",
+  "description": "Dark-mode utility grid operations control-room dashboard — KPI tiles, regions/sites status board, dual-series load/generation chart, alerts table, and sites side panel. Amber + cyan accent on deep navy. Original archetype for energy and infrastructure operations.",
+  "license": "MIT",
+  "author": {
+    "name": "WXCode",
+    "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+  },
+  "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-volt-energy",
+  "tags": [
+    "wxcode-plugin",
+    "wxcode",
+    "first-party",
+    "prototype",
+    "operations",
+    "web",
+    "admin",
+    "energy",
+    "utilities",
+    "dark-mode",
+    "control-room",
+    "grid-operations",
+    "amber-accent",
+    "cyan-accent",
+    "infrastructure"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "prototype",
+    "scenario": "operations",
+    "surface": "web",
+    "preview": {
+      "type": "html",
+      "entry": "./example.html"
+    },
+    "useCase": {
+      "query": {
+        "en": "Build me a dark-mode energy grid operations dashboard — control-room style, KPI tiles for load/generation/outages/efficiency, regional sites status board, dual-series load chart, alerts table.",
+        "zh-CN": "使用这个插件完成以下任务：Build me a dark-mode energy grid operations dashboard — control-room style, KPI tiles for load/generation/outages/efficiency, regional sites status board, dual-series load chart, alerts table."
+      },
+      "exampleOutputs": [
+        {
+          "path": "./example.html",
+          "title": "Volt Energy Admin"
+        }
+      ]
+    },
+    "context": {
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ],
+      "designSystem": {
+        "primary": true
+      },
+      "craft": [
+        "pixel-discipline",
+        "laws-of-ux"
+      ],
+      "assets": [
+        "./example.html"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ],
+    "provenance": {
+      "category": "admin-dashboards",
+      "note": "original archetype; no third-party template reproduced"
+    }
+  }
+}

@@ -1,0 +1,833 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dense Grid Admin — NovexOps Terminal</title>
+<style>
+/* ── Design tokens ─────────────────────────────────────────────── */
+:root {
+  --accent-green:  #22c55e;
+  --accent-red:    #ef4444;
+  --accent-blue:   #3b82f6;
+  --text-primary:  #d7dde4;
+  --text-muted:    #7b8694;
+
+  --mono: ui-monospace, Menlo, 'Courier New', monospace;
+  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ── Reset ─────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: #0c0f12;
+  color: var(--text-primary);
+  font-family: var(--sans);
+  font-size: 12px;
+  line-height: 1.4;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; }
+button { cursor: pointer; font-family: inherit; font-size: 11px; }
+input { font-family: inherit; font-size: 12px; }
+
+/* ── Utilities ─────────────────────────────────────────────────── */
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.up   { color: var(--accent-green); }
+.dn   { color: var(--accent-red); }
+.muted{ color: var(--text-muted); }
+.caps { text-transform: uppercase; letter-spacing: 0.06em; font-size: 11px; }
+.bold { font-weight: 600; }
+
+/* ── Toolbar ───────────────────────────────────────────────────── */
+.toolbar {
+  height: 36px;
+  background: #12161b;
+  border-bottom: 1px solid #232a31;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.brand-mark {
+  width: 20px; height: 20px;
+  background: var(--accent-blue);
+  border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.brand-name {
+  font-size: 13px; font-weight: 600; color: var(--text-primary); white-space: nowrap;
+}
+.toolbar-sep {
+  width: 1px; height: 20px; background: #232a31; flex-shrink: 0;
+}
+.filter-chips {
+  display: flex; gap: 4px; align-items: center; flex-shrink: 0;
+}
+.chip {
+  height: 22px; padding: 0 8px; border-radius: 3px; border: 1px solid #232a31;
+  background: transparent; color: var(--text-muted);
+  font-size: 11px; letter-spacing: 0.04em;
+  transition: border-color 0.15s, color 0.15s;
+}
+.chip.active, .chip:hover {
+  border-color: var(--accent-blue); color: var(--accent-blue);
+}
+.tb-search {
+  flex: 1; min-width: 0; max-width: 260px;
+  position: relative;
+}
+.tb-search input {
+  width: 100%; height: 22px; background: #0c0f12; border: 1px solid #232a31;
+  border-radius: 3px; color: var(--text-primary); padding: 0 8px 0 26px;
+  outline: none; transition: border-color 0.15s, width 0.2s cubic-bezier(0.23,1,0.32,1);
+}
+.tb-search input:focus { border-color: var(--accent-blue); }
+.tb-search svg { position: absolute; left: 7px; top: 50%; transform: translateY(-50%); }
+.toolbar-right {
+  margin-left: auto; display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+}
+.live-clock {
+  font-family: var(--mono); font-size: 11px; color: var(--text-muted);
+  white-space: nowrap;
+}
+.conn-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent-green);
+  box-shadow: 0 0 0 2px rgba(34,197,94,0.25);
+}
+.tb-bell { position: relative; background: none; border: none; padding: 2px; color: var(--text-muted); }
+.tb-bell:hover { color: var(--text-primary); }
+.badge {
+  position: absolute; top: -1px; right: -2px;
+  background: var(--accent-red); border-radius: 50%;
+  width: 12px; height: 12px;
+  font-size: 8px; color: #fff; display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono);
+}
+.avatar {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--accent-blue); color: #fff;
+  font-size: 10px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── Main grid ─────────────────────────────────────────────────── */
+.main-grid {
+  flex: 1; display: flex; gap: 0; min-height: 0;
+  overflow: hidden;
+}
+.col-left {
+  flex: 0 0 62%; display: flex; flex-direction: column;
+  border-right: 1px solid #232a31; overflow: auto;
+}
+.col-right {
+  flex: 0 0 38%; display: flex; flex-direction: column; overflow: auto;
+}
+
+/* ── Panel shared ──────────────────────────────────────────────── */
+.panel {
+  background: #12161b;
+  border-bottom: 1px solid #232a31;
+}
+.panel-hdr {
+  height: 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 10px;
+  border-bottom: 1px solid #232a31;
+}
+.panel-title {
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.panel-meta { font-size: 11px; color: var(--text-muted); }
+.panel-action {
+  font-size: 11px; color: var(--accent-blue); background: none; border: none; padding: 0;
+}
+.panel-action:hover { text-decoration: underline; }
+
+/* ── Watchlist table ───────────────────────────────────────────── */
+.watchlist {
+  flex: 0 0 auto;
+}
+.wl-table th {
+  background: #0c0f12;
+  font-size: 10px; font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 4px 8px;
+  border-bottom: 1px solid #232a31;
+  white-space: nowrap;
+}
+.wl-table td {
+  padding: 3px 8px;
+  border-bottom: 1px solid rgba(35,42,49,0.6);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.wl-table tr:hover td { background: #191e25; }
+.wl-table tr.sel td {
+  background: rgba(59,130,246,0.08);
+  border-left: 2px solid var(--accent-blue);
+}
+.sym-cell { font-weight: 600; color: var(--text-primary); font-size: 12px; }
+.sym-cell:hover { color: var(--accent-blue); }
+.wl-footer {
+  height: 24px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 10px; border-top: 1px solid #232a31;
+}
+.wl-footer span { font-size: 10px; color: var(--text-muted); }
+.pg-btn {
+  background: none; border: 1px solid #232a31; border-radius: 2px;
+  color: var(--text-muted); padding: 1px 5px; font-size: 10px;
+}
+.pg-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+
+/* ── Positions table ───────────────────────────────────────────── */
+.pos-table th {
+  background: #0c0f12;
+  font-size: 10px; font-weight: 600; color: var(--text-muted);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 4px 8px; border-bottom: 1px solid #232a31;
+  white-space: nowrap;
+}
+.pos-table td { padding: 3px 8px; border-bottom: 1px solid rgba(35,42,49,0.6); font-size: 12px; white-space: nowrap; }
+.pos-table tr:hover td { background: #191e25; }
+.side-buy  { background: rgba(34,197,94,0.15); color: var(--accent-green); border-radius: 2px; padding: 1px 5px; font-size: 10px; font-weight: 700; letter-spacing: 0.04em; }
+.side-sell { background: rgba(239,68,68,0.15);  color: var(--accent-red);   border-radius: 2px; padding: 1px 5px; font-size: 10px; font-weight: 700; letter-spacing: 0.04em; }
+
+/* ── Sparkline strip ───────────────────────────────────────────── */
+.spark-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 8px;
+}
+.spark-card {
+  background: #0c0f12;
+  border: 1px solid #232a31;
+  border-radius: 3px;
+  padding: 6px 8px 4px;
+  display: flex; flex-direction: column;
+}
+.spark-top {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 4px;
+}
+.spark-sym { font-size: 10px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+.spark-last { font-family: var(--mono); font-size: 11px; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.spark-svg { display: block; }
+.spark-bot {
+  display: flex; justify-content: flex-end; margin-top: 3px;
+}
+.spark-delta { font-family: var(--mono); font-size: 10px; font-variant-numeric: tabular-nums; }
+
+/* ── Order book ────────────────────────────────────────────────── */
+.ob-cols {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+}
+.ob-side { padding: 4px 0; }
+.ob-hdr-row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  padding: 2px 8px; font-size: 10px; font-weight: 600;
+  color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase;
+  border-bottom: 1px solid #232a31;
+}
+.ob-bid-hdr { border-right: 1px solid #232a31; }
+.ob-bid-hdr span:last-child, .ob-ask-hdr span:last-child { text-align: right; }
+.ob-bid-hdr { grid-column: 1; }
+.ob-ask-hdr { grid-column: 1; }
+.ob-row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  padding: 2px 8px;
+  position: relative;
+  font-family: var(--mono); font-size: 11px; font-variant-numeric: tabular-nums;
+}
+.ob-row::before {
+  content: '';
+  position: absolute; top: 0; bottom: 0;
+  border-radius: 1px;
+  pointer-events: none;
+}
+.bid-row { color: var(--accent-green); border-right: 1px solid #232a31; }
+.bid-row::before { right: 0; left: auto; background: rgba(34,197,94,0.10); }
+.ask-row { color: var(--accent-red); }
+.ask-row::before { left: 0; right: auto; background: rgba(239,68,68,0.10); }
+.ob-row span:last-child { text-align: right; color: var(--text-muted); }
+.ob-spread {
+  text-align: center; font-family: var(--mono); font-size: 10px;
+  color: var(--text-muted); padding: 3px 0;
+  border-top: 1px solid #232a31; border-bottom: 1px solid #232a31;
+  background: #0c0f12;
+  letter-spacing: 0.04em;
+}
+
+/* ── Stats row ─────────────────────────────────────────────────── */
+.stats-row {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 0; padding: 0;
+}
+.stat-tile {
+  padding: 8px 10px 6px;
+  border-right: 1px solid #232a31;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.stat-tile:last-child { border-right: none; }
+.stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.stat-val { font-family: var(--mono); font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stat-chip {
+  font-family: var(--mono); font-size: 10px; color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Right col panel headers ───────────────────────────────────── */
+.right-panel-hdr {
+  height: 26px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 10px; border-bottom: 1px solid #232a31;
+  background: #0c0f12;
+}
+.right-panel-title {
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.right-panel-sub { font-size: 11px; color: var(--accent-blue); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TOOLBAR
+═══════════════════════════════════════════════════════════════ -->
+<header class="toolbar">
+  <div class="brand">
+    <div class="brand-mark">NO</div>
+    <span class="brand-name">NovexOps</span>
+  </div>
+
+  <div class="toolbar-sep"></div>
+
+  <div class="filter-chips">
+    <button class="chip active">All</button>
+    <button class="chip">Active</button>
+    <button class="chip">Flagged</button>
+    <button class="chip">Alerts&nbsp;<span style="font-size:10px;background:var(--accent-red);color:#fff;border-radius:2px;padding:0 4px;">3</span></button>
+  </div>
+
+  <div class="tb-search">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+      <circle cx="5" cy="5" r="3.5" stroke="#7b8694" stroke-width="1.2"/>
+      <line x1="8" y1="8" x2="11" y2="11" stroke="#7b8694" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>
+    <input type="text" placeholder="Search symbol or name…" aria-label="Search">
+  </div>
+
+  <div class="toolbar-right">
+    <span class="live-clock mono" id="clk">14:37:52</span>
+    <div class="conn-dot" title="Live connection"></div>
+    <button class="tb-bell" aria-label="Notifications">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M7 1.5a4 4 0 0 1 4 4v2.5l1 1.5H2L3 8V5.5a4 4 0 0 1 4-4z" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M5.5 11.5a1.5 1.5 0 0 0 3 0" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+      <span class="badge">5</span>
+    </button>
+    <div class="avatar" title="Rael Muto">RM</div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════════════════
+     MAIN GRID
+═══════════════════════════════════════════════════════════════ -->
+<div class="main-grid">
+
+  <!-- ═══ LEFT COLUMN ══════════════════════════════════════════ -->
+  <div class="col-left">
+
+    <!-- Watchlist -->
+    <div class="panel watchlist">
+      <div class="panel-hdr">
+        <span class="panel-title">Watchlist</span>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span class="panel-meta">12 instruments</span>
+          <button class="panel-action">Manage</button>
+        </div>
+      </div>
+      <table class="wl-table">
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th class="mono">Last</th>
+            <th class="mono">Chg</th>
+            <th class="mono">Chg%</th>
+            <th class="mono">Volume</th>
+            <th class="mono">Open</th>
+            <th class="mono">High</th>
+            <th class="mono">Low</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="sel">
+            <td class="sym-cell">NOVQ</td>
+            <td class="mono">284.40</td>
+            <td class="mono up">▲ 3.72</td>
+            <td class="mono up">+1.33%</td>
+            <td class="mono muted">4.1M</td>
+            <td class="mono muted">280.68</td>
+            <td class="mono muted">286.15</td>
+            <td class="mono muted">279.90</td>
+          </tr>
+          <tr>
+            <td class="sym-cell">ELTX</td>
+            <td class="mono">117.08</td>
+            <td class="mono dn">▼ 1.44</td>
+            <td class="mono dn">-1.21%</td>
+            <td class="mono muted">2.8M</td>
+            <td class="mono muted">118.52</td>
+            <td class="mono muted">119.01</td>
+            <td class="mono muted">116.74</td>
+          </tr>
+          <tr>
+            <td class="sym-cell">MRFA</td>
+            <td class="mono">52.16</td>
+            <td class="mono up">▲ 0.89</td>
+            <td class="mono up">+1.74%</td>
+            <td class="mono muted">890K</td>
+            <td class="mono muted">51.27</td>
+            <td class="mono muted">52.50</td>
+            <td class="mono muted">51.10</td>
+          </tr>
+          <tr>
+            <td class="sym-cell">ZYLK</td>
+            <td class="mono">938.72</td>
+            <td class="mono dn">▼ 11.30</td>
+            <td class="mono dn">-1.19%</td>
+            <td class="mono muted">1.2M</td>
+            <td class="mono muted">950.02</td>
+            <td class="mono muted">952.40</td>
+            <td class="mono muted">935.50</td>
+          </tr>
+          <tr>
+            <td class="sym-cell">ORBN</td>
+            <td class="mono">73.55</td>
+            <td class="mono up">▲ 2.10</td>
+            <td class="mono up">+2.94%</td>
+            <td class="mono muted">3.6M</td>
+            <td class="mono muted">71.45</td>
+            <td class="mono muted">74.20</td>
+            <td class="mono muted">71.00</td>
+          </tr>
+          <tr>
+            <td class="sym-cell">FXDT</td>
+            <td class="mono">1,204.50</td>
+            <td class="mono dn">▼ 8.75</td>
+            <td class="mono dn">-0.72%</td>
+            <td class="mono muted">540K</td>
+            <td class="mono muted">1,213.25</td>
+            <td class="mono muted">1,218.00</td>
+            <td class="mono muted">1,200.10</td>
+          </tr>
+          <tr>
+            <td class="sym-cell">VELM</td>
+            <td class="mono">29.84</td>
+            <td class="mono up">▲ 0.42</td>
+            <td class="mono up">+1.43%</td>
+            <td class="mono muted">1.9M</td>
+            <td class="mono muted">29.42</td>
+            <td class="mono muted">30.10</td>
+            <td class="mono muted">29.30</td>
+          </tr>
+          <tr>
+            <td class="sym-cell">KRUX</td>
+            <td class="mono">481.00</td>
+            <td class="mono dn">▼ 5.60</td>
+            <td class="mono dn">-1.15%</td>
+            <td class="mono muted">670K</td>
+            <td class="mono muted">486.60</td>
+            <td class="mono muted">488.90</td>
+            <td class="mono muted">479.50</td>
+          </tr>
+          <tr>
+            <td class="sym-cell">TAQL</td>
+            <td class="mono">8.37</td>
+            <td class="mono up">▲ 0.15</td>
+            <td class="mono up">+1.82%</td>
+            <td class="mono muted">7.2M</td>
+            <td class="mono muted">8.22</td>
+            <td class="mono muted">8.44</td>
+            <td class="mono muted">8.18</td>
+          </tr>
+          <tr>
+            <td class="sym-cell">SNVX</td>
+            <td class="mono">155.30</td>
+            <td class="mono dn">▼ 3.20</td>
+            <td class="mono dn">-2.02%</td>
+            <td class="mono muted">2.1M</td>
+            <td class="mono muted">158.50</td>
+            <td class="mono muted">159.00</td>
+            <td class="mono muted">154.80</td>
+          </tr>
+          <tr>
+            <td class="sym-cell">BQRF</td>
+            <td class="mono">340.12</td>
+            <td class="mono up">▲ 6.88</td>
+            <td class="mono up">+2.07%</td>
+            <td class="mono muted">980K</td>
+            <td class="mono muted">333.24</td>
+            <td class="mono muted">341.50</td>
+            <td class="mono muted">332.80</td>
+          </tr>
+          <tr>
+            <td class="sym-cell">LXPR</td>
+            <td class="mono">66.44</td>
+            <td class="mono dn">▼ 0.92</td>
+            <td class="mono dn">-1.37%</td>
+            <td class="mono muted">1.5M</td>
+            <td class="mono muted">67.36</td>
+            <td class="mono muted">67.80</td>
+            <td class="mono muted">66.10</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="wl-footer">
+        <span>1–12 of 48 instruments</span>
+        <div style="display:flex;gap:4px;">
+          <button class="pg-btn">‹ Prev</button>
+          <button class="pg-btn">Next ›</button>
+        </div>
+      </div>
+    </div><!-- /watchlist -->
+
+    <!-- Positions -->
+    <div class="panel" style="flex:1;">
+      <div class="panel-hdr">
+        <span class="panel-title">Positions</span>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span class="panel-meta" style="color:var(--accent-blue);">6 open</span>
+          <button class="panel-action">Close all</button>
+        </div>
+      </div>
+      <table class="pos-table">
+        <thead>
+          <tr>
+            <th>Sym</th>
+            <th>Side</th>
+            <th class="mono">Qty</th>
+            <th class="mono">Avg Price</th>
+            <th class="mono">Mark</th>
+            <th class="mono">Unrl P&amp;L</th>
+            <th class="mono">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="bold">NOVQ</td>
+            <td><span class="side-buy">BUY</span></td>
+            <td class="mono">200</td>
+            <td class="mono">281.50</td>
+            <td class="mono">284.40</td>
+            <td class="mono up">+580.00</td>
+            <td><span style="color:var(--accent-green);font-size:10px;">OPEN</span></td>
+          </tr>
+          <tr>
+            <td class="bold">ELTX</td>
+            <td><span class="side-sell">SELL</span></td>
+            <td class="mono">500</td>
+            <td class="mono">118.90</td>
+            <td class="mono">117.08</td>
+            <td class="mono up">+910.00</td>
+            <td><span style="color:var(--accent-green);font-size:10px;">OPEN</span></td>
+          </tr>
+          <tr>
+            <td class="bold">ZYLK</td>
+            <td><span class="side-buy">BUY</span></td>
+            <td class="mono">50</td>
+            <td class="mono">925.00</td>
+            <td class="mono">938.72</td>
+            <td class="mono up">+686.00</td>
+            <td><span style="color:var(--accent-green);font-size:10px;">OPEN</span></td>
+          </tr>
+          <tr>
+            <td class="bold">FXDT</td>
+            <td><span class="side-sell">SELL</span></td>
+            <td class="mono">10</td>
+            <td class="mono">1,190.00</td>
+            <td class="mono">1,204.50</td>
+            <td class="mono dn">-145.00</td>
+            <td><span style="color:var(--accent-red);font-size:10px;">OPEN</span></td>
+          </tr>
+          <tr>
+            <td class="bold">VELM</td>
+            <td><span class="side-buy">BUY</span></td>
+            <td class="mono">1200</td>
+            <td class="mono">29.10</td>
+            <td class="mono">29.84</td>
+            <td class="mono up">+888.00</td>
+            <td><span style="color:var(--accent-green);font-size:10px;">OPEN</span></td>
+          </tr>
+          <tr>
+            <td class="bold">SNVX</td>
+            <td><span class="side-buy">BUY</span></td>
+            <td class="mono">300</td>
+            <td class="mono">160.40</td>
+            <td class="mono">155.30</td>
+            <td class="mono dn">-1,530.00</td>
+            <td><span style="color:var(--accent-red);font-size:10px;">OPEN</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div><!-- /positions -->
+
+  </div><!-- /col-left -->
+
+  <!-- ═══ RIGHT COLUMN ═════════════════════════════════════════ -->
+  <div class="col-right">
+
+    <!-- Sparklines -->
+    <div class="panel" style="flex:0 0 auto;">
+      <div class="right-panel-hdr">
+        <span class="right-panel-title">Sparklines</span>
+        <span class="right-panel-sub">Live feed</span>
+      </div>
+      <div class="spark-grid">
+
+        <!-- NOVQ up -->
+        <div class="spark-card">
+          <div class="spark-top">
+            <span class="spark-sym">NOVQ</span>
+            <span class="spark-last mono">284.40</span>
+          </div>
+          <svg class="spark-svg" width="100%" height="32" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="gU" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--accent-green)" stop-opacity="0.25"/>
+                <stop offset="100%" stop-color="var(--accent-green)" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <polygon points="0,28 10,24 20,26 30,20 40,22 50,16 60,14 70,10 80,8 90,6 100,4 100,32 0,32" fill="url(#gU)"/>
+            <polyline points="0,28 10,24 20,26 30,20 40,22 50,16 60,14 70,10 80,8 90,6 100,4" fill="none" stroke="var(--accent-green)" stroke-width="1.2"/>
+          </svg>
+          <div class="spark-bot"><span class="spark-delta up mono">+1.33%</span></div>
+        </div>
+
+        <!-- ELTX down -->
+        <div class="spark-card">
+          <div class="spark-top">
+            <span class="spark-sym">ELTX</span>
+            <span class="spark-last mono">117.08</span>
+          </div>
+          <svg class="spark-svg" width="100%" height="32" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="gD1" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--accent-red)" stop-opacity="0.25"/>
+                <stop offset="100%" stop-color="var(--accent-red)" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <polygon points="0,8 10,10 20,9 30,14 40,12 50,18 60,20 70,22 80,24 90,26 100,28 100,32 0,32" fill="url(#gD1)"/>
+            <polyline points="0,8 10,10 20,9 30,14 40,12 50,18 60,20 70,22 80,24 90,26 100,28" fill="none" stroke="var(--accent-red)" stroke-width="1.2"/>
+          </svg>
+          <div class="spark-bot"><span class="spark-delta dn mono">-1.21%</span></div>
+        </div>
+
+        <!-- MRFA up -->
+        <div class="spark-card">
+          <div class="spark-top">
+            <span class="spark-sym">MRFA</span>
+            <span class="spark-last mono">52.16</span>
+          </div>
+          <svg class="spark-svg" width="100%" height="32" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="gU2" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--accent-green)" stop-opacity="0.25"/>
+                <stop offset="100%" stop-color="var(--accent-green)" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <polygon points="0,22 10,20 20,21 30,18 40,19 50,15 60,13 70,11 80,10 90,8 100,6 100,32 0,32" fill="url(#gU2)"/>
+            <polyline points="0,22 10,20 20,21 30,18 40,19 50,15 60,13 70,11 80,10 90,8 100,6" fill="none" stroke="var(--accent-green)" stroke-width="1.2"/>
+          </svg>
+          <div class="spark-bot"><span class="spark-delta up mono">+1.74%</span></div>
+        </div>
+
+        <!-- ORBN up -->
+        <div class="spark-card">
+          <div class="spark-top">
+            <span class="spark-sym">ORBN</span>
+            <span class="spark-last mono">73.55</span>
+          </div>
+          <svg class="spark-svg" width="100%" height="32" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="gU3" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--accent-green)" stop-opacity="0.25"/>
+                <stop offset="100%" stop-color="var(--accent-green)" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <polygon points="0,26 10,23 20,25 30,19 40,17 50,13 60,15 70,10 80,7 90,5 100,3 100,32 0,32" fill="url(#gU3)"/>
+            <polyline points="0,26 10,23 20,25 30,19 40,17 50,13 60,15 70,10 80,7 90,5 100,3" fill="none" stroke="var(--accent-green)" stroke-width="1.2"/>
+          </svg>
+          <div class="spark-bot"><span class="spark-delta up mono">+2.94%</span></div>
+        </div>
+
+        <!-- ZYLK down -->
+        <div class="spark-card">
+          <div class="spark-top">
+            <span class="spark-sym">ZYLK</span>
+            <span class="spark-last mono">938.72</span>
+          </div>
+          <svg class="spark-svg" width="100%" height="32" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="gD2" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--accent-red)" stop-opacity="0.25"/>
+                <stop offset="100%" stop-color="var(--accent-red)" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <polygon points="0,6 10,8 20,7 30,12 40,14 50,16 60,18 70,20 80,22 90,25 100,28 100,32 0,32" fill="url(#gD2)"/>
+            <polyline points="0,6 10,8 20,7 30,12 40,14 50,16 60,18 70,20 80,22 90,25 100,28" fill="none" stroke="var(--accent-red)" stroke-width="1.2"/>
+          </svg>
+          <div class="spark-bot"><span class="spark-delta dn mono">-1.19%</span></div>
+        </div>
+
+        <!-- VELM up -->
+        <div class="spark-card">
+          <div class="spark-top">
+            <span class="spark-sym">VELM</span>
+            <span class="spark-last mono">29.84</span>
+          </div>
+          <svg class="spark-svg" width="100%" height="32" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="gU4" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--accent-green)" stop-opacity="0.25"/>
+                <stop offset="100%" stop-color="var(--accent-green)" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <polygon points="0,20 10,18 20,22 30,16 40,14 50,16 60,12 70,10 80,8 90,7 100,5 100,32 0,32" fill="url(#gU4)"/>
+            <polyline points="0,20 10,18 20,22 30,16 40,14 50,16 60,12 70,10 80,8 90,7 100,5" fill="none" stroke="var(--accent-green)" stroke-width="1.2"/>
+          </svg>
+          <div class="spark-bot"><span class="spark-delta up mono">+1.43%</span></div>
+        </div>
+
+      </div>
+    </div><!-- /sparklines -->
+
+    <!-- Order book -->
+    <div class="panel" style="flex:0 0 auto;">
+      <div class="right-panel-hdr">
+        <span class="right-panel-title">Order Book</span>
+        <span class="right-panel-sub">NOVQ</span>
+      </div>
+      <div class="ob-cols">
+        <!-- BID side -->
+        <div class="ob-side" style="border-right:1px solid #232a31;">
+          <div class="ob-hdr-row ob-bid-hdr" style="color:var(--accent-green);">
+            <span>Bid</span><span style="text-align:right;">Size</span>
+          </div>
+          <div class="ob-row bid-row" style="--depth:72%;"><span>284.38</span><span>1,200</span></div>
+          <div class="ob-row bid-row" style="--depth:58%;"><span>284.35</span><span>  850</span></div>
+          <div class="ob-row bid-row" style="--depth:45%;"><span>284.30</span><span>2,400</span></div>
+          <div class="ob-row bid-row" style="--depth:38%;"><span>284.25</span><span>  600</span></div>
+          <div class="ob-row bid-row" style="--depth:30%;"><span>284.20</span><span>3,100</span></div>
+          <div class="ob-row bid-row" style="--depth:22%;"><span>284.15</span><span>  420</span></div>
+          <div class="ob-row bid-row" style="--depth:18%;"><span>284.10</span><span>1,750</span></div>
+          <div class="ob-row bid-row" style="--depth:12%;"><span>284.05</span><span>  990</span></div>
+        </div>
+        <!-- ASK side -->
+        <div class="ob-side">
+          <div class="ob-hdr-row ob-ask-hdr" style="color:var(--accent-red);">
+            <span>Ask</span><span style="text-align:right;">Size</span>
+          </div>
+          <div class="ob-row ask-row"><span>284.42</span><span>  780</span></div>
+          <div class="ob-row ask-row"><span>284.46</span><span>1,350</span></div>
+          <div class="ob-row ask-row"><span>284.50</span><span>2,200</span></div>
+          <div class="ob-row ask-row"><span>284.55</span><span>  500</span></div>
+          <div class="ob-row ask-row"><span>284.60</span><span>1,800</span></div>
+          <div class="ob-row ask-row"><span>284.65</span><span>  310</span></div>
+          <div class="ob-row ask-row"><span>284.70</span><span>2,050</span></div>
+          <div class="ob-row ask-row"><span>284.75</span><span>  640</span></div>
+        </div>
+      </div>
+      <div class="ob-spread">Spread: 0.02 &nbsp;·&nbsp; Mid: 284.40</div>
+    </div><!-- /order book -->
+
+    <!-- Stats row -->
+    <div class="panel" style="flex:0 0 auto;">
+      <div class="right-panel-hdr" style="border-bottom:1px solid #232a31;">
+        <span class="right-panel-title">Session Stats</span>
+        <span class="muted" style="font-size:10px;">Today · UTC</span>
+      </div>
+      <div class="stats-row">
+        <div class="stat-tile">
+          <span class="stat-label">Total Vol</span>
+          <span class="stat-val mono" style="color:var(--text-primary);">24.8M</span>
+          <span class="stat-chip muted">▲ 3.1M vs yest</span>
+        </div>
+        <div class="stat-tile">
+          <span class="stat-label">Day Trades</span>
+          <span class="stat-val mono" style="color:var(--text-primary);">142</span>
+          <span class="stat-chip muted">+18 from avg</span>
+        </div>
+        <div class="stat-tile">
+          <span class="stat-label">Win Rate</span>
+          <span class="stat-val mono" style="color:var(--accent-green);">64.1%</span>
+          <span class="stat-chip up">▲ 2.4pp</span>
+        </div>
+        <div class="stat-tile">
+          <span class="stat-label">Drawdown</span>
+          <span class="stat-val mono" style="color:var(--accent-red);">-1.8%</span>
+          <span class="stat-chip dn">Max today</span>
+        </div>
+        <div class="stat-tile">
+          <span class="stat-label">Net P&amp;L</span>
+          <span class="stat-val mono" style="color:var(--accent-green);">+3,389</span>
+          <span class="stat-chip up">▲ vs target</span>
+        </div>
+      </div>
+    </div><!-- /stats -->
+
+    <!-- Extra space -->
+    <div style="flex:1;background:#0c0f12;"></div>
+
+  </div><!-- /col-right -->
+
+</div><!-- /main-grid -->
+
+<script>
+/* Live clock update */
+(function(){
+  function pad(n){return String(n).padStart(2,'0');}
+  function tick(){
+    var d=new Date();
+    document.getElementById('clk').textContent=pad(d.getUTCHours())+':'+pad(d.getUTCMinutes())+':'+pad(d.getUTCSeconds());
+  }
+  tick();
+  setInterval(tick,1000);
+
+  /* Filter chip toggle */
+  document.querySelectorAll('.chip').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      document.querySelectorAll('.chip').forEach(function(b){b.classList.remove('active');});
+      btn.classList.add('active');
+    });
+  });
+
+  /* Watchlist row selection */
+  document.querySelectorAll('.wl-table tbody tr').forEach(function(row){
+    row.addEventListener('click',function(){
+      document.querySelectorAll('.wl-table tbody tr').forEach(function(r){r.classList.remove('sel');});
+      row.classList.add('sel');
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

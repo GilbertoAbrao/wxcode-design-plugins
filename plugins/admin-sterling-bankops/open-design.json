@@ -1,0 +1,99 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "wxcode-admin-sterling-bankops",
+  "title": "Sterling Bank Ops Admin",
+  "version": "0.1.0",
+  "description": "Retail banking back-office operations dashboard — sober slate-blue and emerald palette, left sidebar with branch switcher, topbar with period picker, 4 KPI cards, an approvals queue, a transactions table, a risk/exceptions panel, and an inline SVG throughput chart. Designed for trust and clarity.",
+  "license": "MIT",
+  "author": {
+    "name": "WXCode",
+    "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+  },
+  "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-sterling-bankops",
+  "tags": [
+    "wxcode-plugin",
+    "wxcode",
+    "first-party",
+    "prototype",
+    "operations",
+    "web",
+    "admin",
+    "banking",
+    "back-office",
+    "retail-banking",
+    "approvals",
+    "transactions",
+    "light-mode",
+    "slate-blue",
+    "emerald",
+    "trust",
+    "finance"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "prototype",
+    "scenario": "operations",
+    "surface": "web",
+    "preview": {
+      "type": "html",
+      "entry": "./example.html"
+    },
+    "useCase": {
+      "query": {
+        "en": "Build me a retail banking back-office operations admin dashboard — left sidebar with branch switcher, topbar with period picker, 4 KPI cards (pending approvals, transactions today, flagged items, SLA met %), an approvals queue with Approve/Reject actions, a transactions table, a risk/exceptions side panel, and an inline SVG throughput chart.",
+        "zh-CN": "使用这个插件完成以下任务：Build me a retail banking back-office operations admin dashboard — left sidebar with branch switcher, topbar with period picker, 4 KPI cards, an approvals queue with Approve/Reject actions, a transactions table, a risk/exceptions side panel, and a throughput chart."
+      },
+      "exampleOutputs": [
+        {
+          "path": "./example.html",
+          "title": "Sterling Bank Ops Admin"
+        }
+      ]
+    },
+    "context": {
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ],
+      "designSystem": {
+        "primary": true
+      },
+      "craft": [
+        "pixel-discipline",
+        "laws-of-ux"
+      ],
+      "assets": [
+        "./example.html"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ],
+    "provenance": {
+      "category": "admin-dashboards",
+      "note": "original archetype; no third-party template reproduced"
+    }
+  }
+}

@@ -1,0 +1,1292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Estate Realty Admin</title>
+<style>
+:root {
+  --color-accent:           #0d9488;
+  --color-accent-mid:       #14b8a6;
+  --color-accent-active:    #5eead4;
+  --color-accent-hover:     #0b7a70;
+  --color-accent-light:     #ccfbf1;
+  --color-accent-faint:     #f0fdfa;
+  --color-success:          #16a34a;
+  --color-success-bg:       #dcfce7;
+  --color-success-border:   #bbf7d0;
+  --color-success-faint:    #f0fdf4;
+  --color-warning:          #d97706;
+  --color-warning-bg:       #fef3c7;
+  --color-danger:           #dc2626;
+  --color-danger-bg:        #fee2e2;
+  --color-text:             #1e2d2b;
+  --color-muted:            #64748b;
+  --color-border:           #e3e9e9;
+  --color-surface:          #ffffff;
+  --color-bg:               #f7f9f9;
+  --color-bg-subtle:        #fafcfc;
+  --color-sidebar:          #0f2623;
+  --color-sidebar-item:     rgba(255,255,255,0.07);
+  --color-sidebar-text:     #a8c5c2;
+  --color-sidebar-active:   #e2f0ef;
+  --color-sidebar-head:     rgba(255,255,255,0.30);
+  --color-pill-blue:        #1d4ed8;
+  --color-pill-blue-bg:     #dbeafe;
+  --color-pill-violet:      #6d28d9;
+  --color-pill-violet-bg:   #ede9fe;
+  --color-pill-amber:       #854d0e;
+  --color-pill-amber-bg:    #fef9c3;
+  --color-rank-gold:        #b45309;
+  --color-rank-silver:      #64748b;
+  --color-rank-bronze:      #92400e;
+  --radius-card:            12px;
+  --shadow-card:            0 2px 10px rgba(13,148,136,0.07);
+  --font-sans:              "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+  display: flex;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 240px;
+  min-height: 100vh;
+  background: var(--color-sidebar);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 22px 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+.brand-mark {
+  width: 36px;
+  height: 36px;
+  background: var(--color-accent);
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.brand-name {
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+.brand-name span {
+  display: block;
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--color-sidebar-text);
+  letter-spacing: 0.03em;
+}
+
+.office-switcher {
+  margin: 14px 14px 8px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  gap: 6px;
+}
+.office-switcher-label {
+  font-size: 12px;
+  color: var(--color-sidebar-text);
+  letter-spacing: 0.02em;
+  flex: 1;
+  min-width: 0;
+}
+.office-switcher-name {
+  color: #e2f0ef;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-section {
+  padding: 10px 14px 2px;
+}
+.nav-section-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--color-sidebar-head);
+  padding: 0 6px;
+  margin-bottom: 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  color: var(--color-sidebar-text);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  margin-bottom: 1px;
+  position: relative;
+  text-decoration: none;
+}
+.nav-item:hover {
+  background: var(--color-sidebar-item);
+  color: #e2f0ef;
+}
+.nav-item.active {
+  background: rgba(20,184,166,0.18);
+  color: var(--color-accent-active);
+}
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  background: var(--color-accent-mid);
+  border-radius: 0 3px 3px 0;
+}
+.nav-badge {
+  margin-left: auto;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 20px;
+  line-height: 1.6;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sidebar-footer-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.sidebar-footer-info { flex: 1; min-width: 0; }
+.sidebar-footer-name {
+  color: #e2f0ef;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sidebar-footer-role {
+  color: var(--color-sidebar-text);
+  font-size: 10.5px;
+}
+
+/* ── MAIN ── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  height: 60px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.topbar-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+.topbar-search {
+  flex: 1;
+  max-width: 380px;
+  margin: 0 auto;
+  position: relative;
+}
+.topbar-search input {
+  width: 100%;
+  padding: 7px 14px 7px 34px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--color-text);
+  background: var(--color-bg);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.topbar-search input::placeholder { color: var(--color-muted); }
+.topbar-search input:focus { border-color: var(--color-accent-mid); }
+.topbar-search-icon {
+  position: absolute;
+  left: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-muted);
+  pointer-events: none;
+}
+.region-select {
+  padding: 6px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  color: var(--color-text);
+  background: var(--color-surface);
+  cursor: pointer;
+  outline: none;
+}
+.topbar-bell {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  color: var(--color-muted);
+  flex-shrink: 0;
+}
+.bell-dot {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-danger);
+  border: 1.5px solid var(--color-surface);
+}
+.topbar-avatar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.topbar-avatar-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+.topbar-avatar-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* ── PAGE BODY ── */
+.page-body { padding: 24px; display: flex; flex-direction: column; gap: 22px; }
+
+/* ── PAGE HEADER ── */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.page-header h1 {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+}
+.page-header p {
+  font-size: 13px;
+  color: var(--color-muted);
+  margin-top: 2px;
+}
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--color-accent);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-primary:hover { background: var(--color-accent-hover); }
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: transparent;
+  color: var(--color-muted);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  cursor: pointer;
+  margin-right: 8px;
+  transition: border-color 0.15s;
+}
+.btn-ghost:hover { border-color: var(--color-accent-mid); color: var(--color-accent); }
+
+/* ── KPI CARDS ── */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.kpi-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 18px 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.kpi-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+.kpi-value {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--color-text);
+  line-height: 1.1;
+}
+.kpi-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+.kpi-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 20px;
+}
+.kpi-delta.up   { color: var(--color-success); background: var(--color-success-bg); }
+.kpi-delta.down { color: var(--color-danger);  background: var(--color-danger-bg);  }
+.kpi-delta.flat { color: var(--color-warning); background: var(--color-warning-bg); }
+.kpi-sparkline { flex-shrink: 0; }
+
+/* ── MAIN GRID ── */
+.content-grid {
+  display: grid;
+  grid-template-columns: 60fr 40fr;
+  gap: 18px;
+  align-items: start;
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+.card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+.card-sub { font-size: 12px; color: var(--color-muted); margin-top: 1px; }
+.card-link {
+  font-size: 12.5px;
+  color: var(--color-accent);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.card-link:hover { text-decoration: underline; }
+
+/* ── LISTINGS TABLE ── */
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  padding: 10px 16px;
+  text-align: left;
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+}
+tbody tr {
+  border-bottom: 1px solid var(--color-border);
+  transition: background 0.12s;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:nth-child(even) { background: var(--color-bg-subtle); }
+tbody tr:hover { background: var(--color-accent-faint); }
+tbody td { padding: 11px 16px; font-size: 13px; color: var(--color-text); }
+
+.prop-cell { display: flex; align-items: center; gap: 10px; }
+.prop-thumb {
+  width: 40px;
+  height: 32px;
+  border-radius: 5px;
+  background: var(--color-accent-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--color-accent);
+}
+.prop-address { font-weight: 600; font-size: 12.5px; color: var(--color-text); }
+.prop-mls { font-size: 10.5px; color: var(--color-muted); }
+
+.price-cell { font-weight: 700; color: var(--color-text); }
+
+.pill {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.pill-residential { background: var(--color-pill-blue-bg);   color: var(--color-pill-blue);   }
+.pill-commercial  { background: var(--color-pill-violet-bg); color: var(--color-pill-violet); }
+.pill-land        { background: var(--color-pill-amber-bg);  color: var(--color-pill-amber);  }
+.pill-active       { background: var(--color-success-bg); color: var(--color-success); }
+.pill-pending      { background: var(--color-warning-bg); color: var(--color-warning); }
+.pill-contract     { background: var(--color-pill-blue-bg); color: var(--color-pill-blue); }
+.pill-sold         { background: #f1f5f9; color: var(--color-muted); }
+
+.agent-cell { display: flex; align-items: center; gap: 7px; }
+.agent-initials {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--color-accent-light);
+  color: var(--color-accent);
+  font-size: 10px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.table-footer {
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--color-border);
+  font-size: 12px;
+  color: var(--color-muted);
+}
+.pagination { display: flex; gap: 4px; }
+.page-btn {
+  width: 28px; height: 28px; border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--color-muted);
+}
+.page-btn.active {
+  background: var(--color-accent);
+  color: #fff;
+  border-color: var(--color-accent);
+}
+
+/* ── LEADERBOARD ── */
+.leaderboard-list { padding: 4px 0; }
+.leaderboard-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 20px;
+  border-bottom: 1px solid var(--color-border);
+  transition: background 0.12s;
+}
+.leaderboard-row:last-child { border-bottom: none; }
+.leaderboard-row:hover { background: var(--color-accent-faint); }
+.rank {
+  width: 22px;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+  color: var(--color-muted);
+  flex-shrink: 0;
+}
+.rank.gold    { color: var(--color-rank-gold);   }
+.rank.silver  { color: var(--color-rank-silver); }
+.rank.bronze  { color: var(--color-rank-bronze); }
+.rank.rank-num { font-size: 13px; font-weight: 700; }
+.lb-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--color-accent-light);
+  color: var(--color-accent);
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.lb-info { flex: 1; min-width: 0; }
+.lb-name { font-size: 13px; font-weight: 600; color: var(--color-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lb-stats { font-size: 11px; color: var(--color-muted); }
+.lb-right { text-align: right; flex-shrink: 0; }
+.lb-gci { font-size: 13px; font-weight: 700; color: var(--color-accent); }
+.lb-bar-wrap { width: 64px; height: 4px; background: var(--color-border); border-radius: 2px; margin-top: 4px; }
+.lb-bar { height: 4px; background: var(--color-accent); border-radius: 2px; }
+
+/* ── PIPELINE ── */
+.pipeline-card { margin-top: 0; }
+.pipeline-stages {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  padding: 18px 20px 20px;
+}
+.pipeline-stage {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.pipeline-stage + .pipeline-stage::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 20px;
+  width: 1px;
+  height: 50px;
+  background: var(--color-border);
+}
+.stage-header {
+  padding: 0 14px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.stage-name {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+.stage-badge {
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--color-accent-light);
+  color: var(--color-accent);
+  border-radius: 20px;
+  padding: 1px 7px;
+}
+.stage-badge.closed {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+.stage-deals { display: flex; flex-direction: column; gap: 6px; padding: 0 14px; }
+.deal-chip {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  padding: 7px 10px;
+  font-size: 11.5px;
+}
+.deal-chip-addr { font-weight: 600; color: var(--color-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.deal-chip-price { font-size: 10.5px; color: var(--color-muted); margin-top: 1px; }
+.deal-chip.highlight {
+  border-color: var(--color-accent-mid);
+  background: var(--color-accent-faint);
+}
+.deal-chip.closed-deal { border-color: var(--color-success-border); background: var(--color-success-faint); }
+
+/* ── RESPONSIVE NUDGE ── */
+@media (max-width: 1100px) {
+  .kpi-row { grid-template-columns: repeat(2,1fr); }
+  .content-grid { grid-template-columns: 1fr; }
+  .pipeline-stages { grid-template-columns: repeat(3,1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-mark">
+      <!-- house icon -->
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" fill="currentColor" fill-opacity=".3" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/>
+        <rect x="7.5" y="11.5" width="5" height="6.5" rx="1" fill="#fff"/>
+      </svg>
+    </div>
+    <div class="brand-name">
+      Meridian Realty
+      <span>Brokerage Group</span>
+    </div>
+  </div>
+
+  <div class="office-switcher">
+    <div>
+      <div class="office-switcher-label">Office</div>
+      <div class="office-switcher-name">Downtown SF</div>
+    </div>
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:var(--color-sidebar-text);flex-shrink:0">
+      <path d="M3.5 5.5L7 9l3.5-3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Overview</div>
+    <a class="nav-item active" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" fill="currentColor"/><rect x="9" y="2" width="5" height="5" rx="1" fill="currentColor" fill-opacity=".5"/><rect x="2" y="9" width="5" height="5" rx="1" fill="currentColor" fill-opacity=".5"/><rect x="9" y="9" width="5" height="5" rx="1" fill="currentColor"/></svg>
+      Dashboard
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 5.5C2 4.12 3.12 3 4.5 3h7C12.88 3 14 4.12 14 5.5v5c0 1.38-1.12 2.5-2.5 2.5h-7C3.12 13 2 11.88 2 10.5v-5z" stroke="currentColor" stroke-width="1.3"/><path d="M5.5 6.5h5M5.5 9h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Reports
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Listings</div>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8.5L8 2l6 6.5V14a.5.5 0 01-.5.5h-11A.5.5 0 012 14V8.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><rect x="6" y="10" width="4" height="4.5" rx=".6" fill="currentColor" fill-opacity=".35"/></svg>
+      Active Listings
+      <span class="nav-badge">47</span>
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 5.5v2.75l1.75 1.75" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Pending Review
+      <span class="nav-badge">9</span>
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 3h10v10H3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6 7l1.5 1.5L10 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Sold Archive
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Deals</div>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 13l3.5-4.5L8 11l2.5-5L14 13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Pipeline
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      New Deal
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Team</div>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 13c0-2.485 2.015-4.5 4.5-4.5s4.5 2.015 4.5 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="11.5" cy="5" r="2" stroke="currentColor" stroke-width="1.1"/><path d="M13.5 12.5c0-1.657-1.12-3-2.5-3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+      Agents
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 3.5h12M2 8h12M2 12.5h8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Commission Splits
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v3.5h2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Settings
+    </a>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-footer-avatar">PR</div>
+    <div class="sidebar-footer-info">
+      <div class="sidebar-footer-name">Patricia Ruiz</div>
+      <div class="sidebar-footer-role">Broker of Record</div>
+    </div>
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="color:var(--color-sidebar-text);flex-shrink:0;cursor:pointer">
+      <circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.3"/>
+      <path d="M8 2v1.5M8 12.5V14M14 8h-1.5M3.5 8H2M12.07 3.93l-1.06 1.06M4.99 11.01l-1.06 1.06M12.07 12.07l-1.06-1.06M4.99 4.99L3.93 3.93" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+    </svg>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-title">Dashboard</div>
+    <div class="topbar-search">
+      <svg class="topbar-search-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
+        <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M10.5 10.5L13 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <input type="text" placeholder="Search address, MLS#, or agent…">
+    </div>
+    <select class="region-select">
+      <option>All Regions</option>
+      <option>Downtown SF</option>
+      <option>East Bay</option>
+      <option>Peninsula</option>
+      <option>North Bay</option>
+    </select>
+    <div class="topbar-bell">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M8 2a4.5 4.5 0 00-4.5 4.5v2.25L2 11h12l-1.5-2.25V6.5A4.5 4.5 0 008 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+        <path d="M6.5 11.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3"/>
+      </svg>
+      <span class="bell-dot"></span>
+    </div>
+    <div class="topbar-avatar">
+      <div class="topbar-avatar-circle">PR</div>
+      <span class="topbar-avatar-name">Patricia R.</span>
+    </div>
+  </header>
+
+  <!-- PAGE BODY -->
+  <div class="page-body">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div>
+        <h1>Operations Overview</h1>
+        <p>June 2026 · Downtown SF Office</p>
+      </div>
+      <div>
+        <button class="btn-ghost">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Export
+        </button>
+        <button class="btn-primary">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Add Listing
+        </button>
+      </div>
+    </div>
+
+    <!-- KPI CARDS -->
+    <div class="kpi-row">
+
+      <!-- Active Listings -->
+      <div class="kpi-card">
+        <div class="kpi-label">Active Listings</div>
+        <div class="kpi-value">47</div>
+        <div class="kpi-footer">
+          <span class="kpi-delta up">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 8V2M2 5l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            +6 vs last mo.
+          </span>
+          <svg class="kpi-sparkline" width="56" height="22" viewBox="0 0 56 22" fill="none">
+            <polyline points="2,18 14,13 26,15 38,8 50,5" stroke="var(--color-accent)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+            <circle cx="50" cy="5" r="2.5" fill="var(--color-accent)"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Deals in Progress -->
+      <div class="kpi-card">
+        <div class="kpi-label">Deals in Progress</div>
+        <div class="kpi-value">23</div>
+        <div class="kpi-footer">
+          <span class="kpi-delta up">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 8V2M2 5l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            +3 this week
+          </span>
+          <svg class="kpi-sparkline" width="56" height="22" viewBox="0 0 56 22" fill="none">
+            <polyline points="2,16 14,12 26,14 38,10 50,7" stroke="var(--color-accent)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+            <circle cx="50" cy="7" r="2.5" fill="var(--color-accent)"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Avg Days on Market -->
+      <div class="kpi-card">
+        <div class="kpi-label">Avg Days on Market</div>
+        <div class="kpi-value">18</div>
+        <div class="kpi-footer">
+          <span class="kpi-delta down">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 2v6M2 5l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            −4 days
+          </span>
+          <svg class="kpi-sparkline" width="56" height="22" viewBox="0 0 56 22" fill="none">
+            <polyline points="2,5 14,8 26,11 38,14 50,17" stroke="var(--color-danger)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+            <circle cx="50" cy="17" r="2.5" fill="var(--color-danger)"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Commission MTD -->
+      <div class="kpi-card">
+        <div class="kpi-label">Commission MTD</div>
+        <div class="kpi-value">$412k</div>
+        <div class="kpi-footer">
+          <span class="kpi-delta flat">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            ±0.8%
+          </span>
+          <svg class="kpi-sparkline" width="56" height="22" viewBox="0 0 56 22" fill="none">
+            <polyline points="2,10 14,8 26,12 38,9 50,10" stroke="var(--color-warning)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+            <circle cx="50" cy="10" r="2.5" fill="var(--color-warning)"/>
+          </svg>
+        </div>
+      </div>
+
+    </div><!-- /kpi-row -->
+
+    <!-- MAIN CONTENT GRID -->
+    <div class="content-grid">
+
+      <!-- LISTINGS TABLE -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Active Listings</div>
+            <div class="card-sub">47 properties · 3 new today</div>
+          </div>
+          <a class="card-link" href="#">View all →</a>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Price</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Agent</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="prop-cell">
+                  <div class="prop-thumb">
+                    <svg width="20" height="16" viewBox="0 0 20 16" fill="none"><path d="M2 8L10 1l8 7v7a.5.5 0 01-.5.5h-15A.5.5 0 012 15V8z" fill="currentColor" fill-opacity=".4" stroke="currentColor" stroke-width="1.2"/><rect x="7" y="10" width="6" height="5.5" rx=".5" fill="currentColor" fill-opacity=".6"/></svg>
+                  </div>
+                  <div>
+                    <div class="prop-address">1842 Lombard St #3</div>
+                    <div class="prop-mls">MLS# 2024-8831</div>
+                  </div>
+                </div>
+              </td>
+              <td class="price-cell">$1,250,000</td>
+              <td><span class="pill pill-residential">Residential</span></td>
+              <td><span class="pill pill-active">Active</span></td>
+              <td><div class="agent-cell"><div class="agent-initials">KL</div>Kara Lee</div></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="prop-cell">
+                  <div class="prop-thumb">
+                    <svg width="20" height="16" viewBox="0 0 20 16" fill="none"><path d="M2 8L10 1l8 7v7a.5.5 0 01-.5.5h-15A.5.5 0 012 15V8z" fill="currentColor" fill-opacity=".4" stroke="currentColor" stroke-width="1.2"/><rect x="7" y="10" width="6" height="5.5" rx=".5" fill="currentColor" fill-opacity=".6"/></svg>
+                  </div>
+                  <div>
+                    <div class="prop-address">500 California St, Fl 12</div>
+                    <div class="prop-mls">MLS# 2024-9042</div>
+                  </div>
+                </div>
+              </td>
+              <td class="price-cell">$3,875,000</td>
+              <td><span class="pill pill-commercial">Commercial</span></td>
+              <td><span class="pill pill-pending">Pending</span></td>
+              <td><div class="agent-cell"><div class="agent-initials">RM</div>Ryan Morales</div></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="prop-cell">
+                  <div class="prop-thumb">
+                    <svg width="20" height="16" viewBox="0 0 20 16" fill="none"><path d="M2 8L10 1l8 7v7a.5.5 0 01-.5.5h-15A.5.5 0 012 15V8z" fill="currentColor" fill-opacity=".4" stroke="currentColor" stroke-width="1.2"/><rect x="7" y="10" width="6" height="5.5" rx=".5" fill="currentColor" fill-opacity=".6"/></svg>
+                  </div>
+                  <div>
+                    <div class="prop-address">78 Belvedere Ave</div>
+                    <div class="prop-mls">MLS# 2024-7765</div>
+                  </div>
+                </div>
+              </td>
+              <td class="price-cell">$892,500</td>
+              <td><span class="pill pill-residential">Residential</span></td>
+              <td><span class="pill pill-contract">Under Contract</span></td>
+              <td><div class="agent-cell"><div class="agent-initials">ST</div>Sofia Torres</div></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="prop-cell">
+                  <div class="prop-thumb">
+                    <svg width="20" height="16" viewBox="0 0 20 16" fill="none"><path d="M2 8L10 1l8 7v7a.5.5 0 01-.5.5h-15A.5.5 0 012 15V8z" fill="currentColor" fill-opacity=".4" stroke="currentColor" stroke-width="1.2"/><rect x="7" y="10" width="6" height="5.5" rx=".5" fill="currentColor" fill-opacity=".6"/></svg>
+                  </div>
+                  <div>
+                    <div class="prop-address">24.7 Acres — Napa Rd</div>
+                    <div class="prop-mls">MLS# 2024-6110</div>
+                  </div>
+                </div>
+              </td>
+              <td class="price-cell">$560,000</td>
+              <td><span class="pill pill-land">Land</span></td>
+              <td><span class="pill pill-active">Active</span></td>
+              <td><div class="agent-cell"><div class="agent-initials">JC</div>James Cho</div></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="prop-cell">
+                  <div class="prop-thumb">
+                    <svg width="20" height="16" viewBox="0 0 20 16" fill="none"><path d="M2 8L10 1l8 7v7a.5.5 0 01-.5.5h-15A.5.5 0 012 15V8z" fill="currentColor" fill-opacity=".4" stroke="currentColor" stroke-width="1.2"/><rect x="7" y="10" width="6" height="5.5" rx=".5" fill="currentColor" fill-opacity=".6"/></svg>
+                  </div>
+                  <div>
+                    <div class="prop-address">3301 Mission St #22B</div>
+                    <div class="prop-mls">MLS# 2024-9204</div>
+                  </div>
+                </div>
+              </td>
+              <td class="price-cell">$748,000</td>
+              <td><span class="pill pill-residential">Residential</span></td>
+              <td><span class="pill pill-active">Active</span></td>
+              <td><div class="agent-cell"><div class="agent-initials">KL</div>Kara Lee</div></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="prop-cell">
+                  <div class="prop-thumb">
+                    <svg width="20" height="16" viewBox="0 0 20 16" fill="none"><path d="M2 8L10 1l8 7v7a.5.5 0 01-.5.5h-15A.5.5 0 012 15V8z" fill="currentColor" fill-opacity=".4" stroke="currentColor" stroke-width="1.2"/><rect x="7" y="10" width="6" height="5.5" rx=".5" fill="currentColor" fill-opacity=".6"/></svg>
+                  </div>
+                  <div>
+                    <div class="prop-address">601 Van Ness Ave, Ste 800</div>
+                    <div class="prop-mls">MLS# 2024-8803</div>
+                  </div>
+                </div>
+              </td>
+              <td class="price-cell">$2,100,000</td>
+              <td><span class="pill pill-commercial">Commercial</span></td>
+              <td><span class="pill pill-pending">Pending</span></td>
+              <td><div class="agent-cell"><div class="agent-initials">AW</div>Aisha Whitfield</div></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="prop-cell">
+                  <div class="prop-thumb">
+                    <svg width="20" height="16" viewBox="0 0 20 16" fill="none"><path d="M2 8L10 1l8 7v7a.5.5 0 01-.5.5h-15A.5.5 0 02 15V8z" fill="currentColor" fill-opacity=".4" stroke="currentColor" stroke-width="1.2"/><rect x="7" y="10" width="6" height="5.5" rx=".5" fill="currentColor" fill-opacity=".6"/></svg>
+                  </div>
+                  <div>
+                    <div class="prop-address">115 Juniper Ln, Sausalito</div>
+                    <div class="prop-mls">MLS# 2024-7488</div>
+                  </div>
+                </div>
+              </td>
+              <td class="price-cell">$1,680,000</td>
+              <td><span class="pill pill-residential">Residential</span></td>
+              <td><span class="pill pill-sold">Sold</span></td>
+              <td><div class="agent-cell"><div class="agent-initials">RM</div>Ryan Morales</div></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="prop-cell">
+                  <div class="prop-thumb">
+                    <svg width="20" height="16" viewBox="0 0 20 16" fill="none"><path d="M2 8L10 1l8 7v7a.5.5 0 01-.5.5h-15A.5.5 0 012 15V8z" fill="currentColor" fill-opacity=".4" stroke="currentColor" stroke-width="1.2"/><rect x="7" y="10" width="6" height="5.5" rx=".5" fill="currentColor" fill-opacity=".6"/></svg>
+                  </div>
+                  <div>
+                    <div class="prop-address">88 Pacific Heights Blvd</div>
+                    <div class="prop-mls">MLS# 2024-9361</div>
+                  </div>
+                </div>
+              </td>
+              <td class="price-cell">$4,500,000</td>
+              <td><span class="pill pill-residential">Residential</span></td>
+              <td><span class="pill pill-active">Active</span></td>
+              <td><div class="agent-cell"><div class="agent-initials">ST</div>Sofia Torres</div></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="table-footer">
+          <span>Showing 8 of 47 listings</span>
+          <div class="pagination">
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">›</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AGENT LEADERBOARD -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Top Agents</div>
+            <div class="card-sub">June 2026 · by Gross Commission Income</div>
+          </div>
+          <a class="card-link" href="#">Full roster →</a>
+        </div>
+        <div class="leaderboard-list">
+
+          <div class="leaderboard-row">
+            <div class="rank gold">🥇</div>
+            <div class="lb-avatar">KL</div>
+            <div class="lb-info">
+              <div class="lb-name">Kara Lee</div>
+              <div class="lb-stats">14 listings · 9 closed</div>
+            </div>
+            <div class="lb-right">
+              <div class="lb-gci">$87,400</div>
+              <div class="lb-bar-wrap"><div class="lb-bar" style="width:100%"></div></div>
+            </div>
+          </div>
+
+          <div class="leaderboard-row">
+            <div class="rank silver">🥈</div>
+            <div class="lb-avatar">RM</div>
+            <div class="lb-info">
+              <div class="lb-name">Ryan Morales</div>
+              <div class="lb-stats">11 listings · 7 closed</div>
+            </div>
+            <div class="lb-right">
+              <div class="lb-gci">$71,200</div>
+              <div class="lb-bar-wrap"><div class="lb-bar" style="width:82%"></div></div>
+            </div>
+          </div>
+
+          <div class="leaderboard-row">
+            <div class="rank bronze">🥉</div>
+            <div class="lb-avatar">ST</div>
+            <div class="lb-info">
+              <div class="lb-name">Sofia Torres</div>
+              <div class="lb-stats">9 listings · 6 closed</div>
+            </div>
+            <div class="lb-right">
+              <div class="lb-gci">$64,800</div>
+              <div class="lb-bar-wrap"><div class="lb-bar" style="width:74%"></div></div>
+            </div>
+          </div>
+
+          <div class="leaderboard-row">
+            <div class="rank rank-num">4</div>
+            <div class="lb-avatar">AW</div>
+            <div class="lb-info">
+              <div class="lb-name">Aisha Whitfield</div>
+              <div class="lb-stats">8 listings · 5 closed</div>
+            </div>
+            <div class="lb-right">
+              <div class="lb-gci">$52,300</div>
+              <div class="lb-bar-wrap"><div class="lb-bar" style="width:60%"></div></div>
+            </div>
+          </div>
+
+          <div class="leaderboard-row">
+            <div class="rank rank-num">5</div>
+            <div class="lb-avatar">JC</div>
+            <div class="lb-info">
+              <div class="lb-name">James Cho</div>
+              <div class="lb-stats">7 listings · 4 closed</div>
+            </div>
+            <div class="lb-right">
+              <div class="lb-gci">$43,600</div>
+              <div class="lb-bar-wrap"><div class="lb-bar" style="width:50%"></div></div>
+            </div>
+          </div>
+
+          <div class="leaderboard-row">
+            <div class="rank rank-num">6</div>
+            <div class="lb-avatar">DV</div>
+            <div class="lb-info">
+              <div class="lb-name">Diana Vance</div>
+              <div class="lb-stats">5 listings · 3 closed</div>
+            </div>
+            <div class="lb-right">
+              <div class="lb-gci">$31,150</div>
+              <div class="lb-bar-wrap"><div class="lb-bar" style="width:36%"></div></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /content-grid -->
+
+    <!-- DEALS PIPELINE -->
+    <div class="card pipeline-card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Deals Pipeline</div>
+          <div class="card-sub">23 active deals · updated 4 min ago</div>
+        </div>
+        <a class="card-link" href="#">Manage pipeline →</a>
+      </div>
+      <div class="pipeline-stages">
+
+        <!-- Stage 1 -->
+        <div class="pipeline-stage">
+          <div class="stage-header">
+            <div class="stage-name">Prospect</div>
+            <span class="stage-badge">7</span>
+          </div>
+          <div class="stage-deals">
+            <div class="deal-chip">
+              <div class="deal-chip-addr">2410 Pine St #4A</div>
+              <div class="deal-chip-price">$680k · KL</div>
+            </div>
+            <div class="deal-chip">
+              <div class="deal-chip-addr">Old Mint District Lot</div>
+              <div class="deal-chip-price">$310k · DV</div>
+            </div>
+            <div class="deal-chip">
+              <div class="deal-chip-addr">1903 Haight St</div>
+              <div class="deal-chip-price">$995k · JC</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stage 2 -->
+        <div class="pipeline-stage">
+          <div class="stage-header">
+            <div class="stage-name">Offer Made</div>
+            <span class="stage-badge">5</span>
+          </div>
+          <div class="stage-deals">
+            <div class="deal-chip highlight">
+              <div class="deal-chip-addr">500 California St, Fl 12</div>
+              <div class="deal-chip-price">$3.875M · RM</div>
+            </div>
+            <div class="deal-chip">
+              <div class="deal-chip-addr">601 Van Ness Ste 800</div>
+              <div class="deal-chip-price">$2.1M · AW</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stage 3 -->
+        <div class="pipeline-stage">
+          <div class="stage-header">
+            <div class="stage-name">Under Contract</div>
+            <span class="stage-badge">6</span>
+          </div>
+          <div class="stage-deals">
+            <div class="deal-chip highlight">
+              <div class="deal-chip-addr">78 Belvedere Ave</div>
+              <div class="deal-chip-price">$892.5k · ST</div>
+            </div>
+            <div class="deal-chip highlight">
+              <div class="deal-chip-addr">190 Fillmore St #8</div>
+              <div class="deal-chip-price">$1.12M · KL</div>
+            </div>
+            <div class="deal-chip">
+              <div class="deal-chip-addr">345 Brannan St #205</div>
+              <div class="deal-chip-price">$799k · RM</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stage 4 -->
+        <div class="pipeline-stage">
+          <div class="stage-header">
+            <div class="stage-name">Inspection</div>
+            <span class="stage-badge">3</span>
+          </div>
+          <div class="stage-deals">
+            <div class="deal-chip highlight">
+              <div class="deal-chip-addr">88 Pacific Heights Blvd</div>
+              <div class="deal-chip-price">$4.5M · ST</div>
+            </div>
+            <div class="deal-chip">
+              <div class="deal-chip-addr">7 Crestmoor Dr, Tiburon</div>
+              <div class="deal-chip-price">$2.25M · AW</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stage 5 -->
+        <div class="pipeline-stage">
+          <div class="stage-header">
+            <div class="stage-name">Closed</div>
+            <span class="stage-badge closed">2</span>
+          </div>
+          <div class="stage-deals">
+            <div class="deal-chip closed-deal">
+              <div class="deal-chip-addr">115 Juniper Ln, Sausalito</div>
+              <div class="deal-chip-price">$1.68M · RM</div>
+            </div>
+            <div class="deal-chip closed-deal">
+              <div class="deal-chip-addr">42 Presidio Terr</div>
+              <div class="deal-chip-price">$3.2M · KL</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /pipeline-stages -->
+    </div><!-- /pipeline-card -->
+
+  </div><!-- /page-body -->
+</div><!-- /main -->
+
+</body>
+</html>
