@@ -1,10 +1,10 @@
 {
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
-  "name": "wxcode/admin-sprout-iot",
+  "name": "wxcode-admin-sprout-iot",
   "title": "Sprout IoT Admin",
   "version": "0.1.0",
-  "description": "Dark-mode IoT device-fleet and telemetry console — left rail nav, gateway/site switcher, 4 KPI cards (online/offline/signal/alerts), multi-series sparkline telemetry panel, active alerts list, and a devices table with signal bars and firmware status.",
+  "description": "Dark-mode IoT device-fleet and telemetry console \u2014 left rail nav, gateway/site switcher, 4 KPI cards (online/offline/signal/alerts), multi-series sparkline telemetry panel, active alerts list, and a devices table with signal bars and firmware status.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -47,8 +47,8 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a dark IoT admin console for a device fleet — left nav rail, site/gateway switcher, 4 KPI cards showing online/offline counts, average signal strength, and open alerts, a telemetry sparkline panel for temperature/humidity/power, an active alerts list with severity pills, and a devices table with firmware version and signal bars.",
-        "zh-CN": "使用这个插件完成以下任务：Build me a dark IoT admin console for a device fleet — left nav rail, site/gateway switcher, 4 KPI cards showing online/offline counts, average signal strength, and open alerts, a telemetry sparkline panel for temperature/humidity/power, an active alerts list with severity pills, and a devices table with firmware version and signal bars."
+        "en": "Build me a dark IoT admin console for a device fleet \u2014 left nav rail, site/gateway switcher, 4 KPI cards showing online/offline counts, average signal strength, and open alerts, a telemetry sparkline panel for temperature/humidity/power, an active alerts list with severity pills, and a devices table with firmware version and signal bars.",
+        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me a dark IoT admin console for a device fleet \u2014 left nav rail, site/gateway switcher, 4 KPI cards showing online/offline counts, average signal strength, and open alerts, a telemetry sparkline panel for temperature/humidity/power, an active alerts list with severity pills, and a devices table with firmware version and signal bars."
       },
       "exampleOutputs": [
         {

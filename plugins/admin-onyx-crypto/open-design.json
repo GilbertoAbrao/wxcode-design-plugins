@@ -1,10 +1,10 @@
 {
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
-  "name": "wxcode/admin-onyx-crypto",
+  "name": "wxcode-admin-onyx-crypto",
   "title": "Onyx Crypto Admin",
   "version": "0.1.0",
-  "description": "Dark-mode digital-asset portfolio console — left rail nav, topbar with network/wallet switcher, 4 KPI cards, area price chart, holdings table, and market movers side list. Sleek neon aesthetic with emerald and violet accents.",
+  "description": "Dark-mode digital-asset portfolio console \u2014 left rail nav, topbar with network/wallet switcher, 4 KPI cards, area price chart, holdings table, and market movers side list. Sleek neon aesthetic with emerald and violet accents.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -47,8 +47,8 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a dark-mode crypto portfolio admin console — left rail nav, topbar with network and wallet switcher, 4 KPI cards, area price chart with timeframe tabs, holdings table with colored deltas, and a market movers side panel.",
-        "zh-CN": "使用这个插件完成以下任务：Build me a dark-mode crypto portfolio admin console — left rail nav, topbar with network and wallet switcher, 4 KPI cards, area price chart with timeframe tabs, holdings table with colored deltas, and a market movers side panel."
+        "en": "Build me a dark-mode crypto portfolio admin console \u2014 left rail nav, topbar with network and wallet switcher, 4 KPI cards, area price chart with timeframe tabs, holdings table with colored deltas, and a market movers side panel.",
+        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me a dark-mode crypto portfolio admin console \u2014 left rail nav, topbar with network and wallet switcher, 4 KPI cards, area price chart with timeframe tabs, holdings table with colored deltas, and a market movers side panel."
       },
       "exampleOutputs": [
         {

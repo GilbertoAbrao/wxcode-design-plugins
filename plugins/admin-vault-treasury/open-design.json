@@ -1,10 +1,10 @@
 {
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
-  "name": "wxcode/admin-vault-treasury",
+  "name": "wxcode-admin-vault-treasury",
   "title": "Vault Treasury Admin",
   "version": "0.1.0",
-  "description": "Premium dark-mode corporate treasury dashboard — amber/gold accent on deep navy, left rail nav, entity/period switcher, 4 KPI cards (balance · inflows · outflows · runway), cashflow SVG area chart, allocation donut, recent transactions table with status pills.",
+  "description": "Premium dark-mode corporate treasury dashboard \u2014 amber/gold accent on deep navy, left rail nav, entity/period switcher, 4 KPI cards (balance \u00b7 inflows \u00b7 outflows \u00b7 runway), cashflow SVG area chart, allocation donut, recent transactions table with status pills.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -47,8 +47,8 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a premium dark-mode corporate treasury admin dashboard — left rail nav, entity/period switcher, 4 KPI cards for cash position, inflows, outflows, runway, cashflow area chart, allocation donut, recent transactions table.",
-        "zh-CN": "使用这个插件完成以下任务：Build me a premium dark-mode corporate treasury admin dashboard — left rail nav, entity/period switcher, 4 KPI cards for cash position, inflows, outflows, runway, cashflow area chart, allocation donut, recent transactions table."
+        "en": "Build me a premium dark-mode corporate treasury admin dashboard \u2014 left rail nav, entity/period switcher, 4 KPI cards for cash position, inflows, outflows, runway, cashflow area chart, allocation donut, recent transactions table.",
+        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me a premium dark-mode corporate treasury admin dashboard \u2014 left rail nav, entity/period switcher, 4 KPI cards for cash position, inflows, outflows, runway, cashflow area chart, allocation donut, recent transactions table."
       },
       "exampleOutputs": [
         {

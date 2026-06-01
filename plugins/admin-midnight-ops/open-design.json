@@ -1,37 +1,93 @@
 {
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
-  "name": "wxcode/admin-midnight-ops",
+  "name": "wxcode-admin-midnight-ops",
   "title": "Midnight Ops Console",
   "version": "0.1.0",
-  "description": "A production-grade dark-mode operations and observability dashboard built for on-call engineers and SRE teams. Features a compact left icon rail, four live metric tiles with inline trend sparklines, a time-series throughput chart, an active incidents table with severity pills, and a per-service health status list — all in a high-contrast teal-on-midnight palette optimised for 3 AM focus.",
+  "description": "A production-grade dark-mode operations and observability dashboard built for on-call engineers and SRE teams. Features a compact left icon rail, four live metric tiles with inline trend sparklines, a time-series throughput chart, an active incidents table with severity pills, and a per-service health status list \u2014 all in a high-contrast teal-on-midnight palette optimised for 3 AM focus.",
   "license": "MIT",
-  "author": { "name": "WXCode", "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins" },
+  "author": {
+    "name": "WXCode",
+    "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+  },
   "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-midnight-ops",
-  "tags": ["wxcode-plugin","wxcode","first-party","prototype","operations","web","admin","observability","dark-mode","teal","ops-console"],
-  "compat": { "agentSkills": [ { "path": "./SKILL.md" } ] },
+  "tags": [
+    "wxcode-plugin",
+    "wxcode",
+    "first-party",
+    "prototype",
+    "operations",
+    "web",
+    "admin",
+    "observability",
+    "dark-mode",
+    "teal",
+    "ops-console"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
   "od": {
     "kind": "scenario",
     "taskKind": "new-generation",
     "mode": "prototype",
     "scenario": "operations",
     "surface": "web",
-    "preview": { "type": "html", "entry": "./example.html" },
-    "provenance": { "category": "themeforest-admin-templates", "note": "category design-language reference only; original implementation" },
+    "preview": {
+      "type": "html",
+      "entry": "./example.html"
+    },
+    "provenance": {
+      "category": "themeforest-admin-templates",
+      "note": "category design-language reference only; original implementation"
+    },
     "useCase": {
       "query": {
-        "en": "Build me a dark-mode operations console — top navbar, icon rail, 4 metric tiles with trends, a time-series chart, an active incidents table with status pills, and a service-health list.",
-        "zh-CN": "使用这个插件完成以下任务：Build me a dark-mode operations console — top navbar, icon rail, 4 metric tiles with trends, a time-series chart, an active incidents table with status pills, and a service-health list."
+        "en": "Build me a dark-mode operations console \u2014 top navbar, icon rail, 4 metric tiles with trends, a time-series chart, an active incidents table with status pills, and a service-health list.",
+        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me a dark-mode operations console \u2014 top navbar, icon rail, 4 metric tiles with trends, a time-series chart, an active incidents table with status pills, and a service-health list."
       },
-      "exampleOutputs": [ { "path": "./example.html", "title": "Midnight Ops Console" } ]
+      "exampleOutputs": [
+        {
+          "path": "./example.html",
+          "title": "Midnight Ops Console"
+        }
+      ]
     },
     "context": {
-      "skills": [ { "path": "./SKILL.md" } ],
-      "designSystem": { "primary": true },
-      "craft": ["pixel-discipline","state-coverage"],
-      "assets": ["./example.html"]
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ],
+      "designSystem": {
+        "primary": true
+      },
+      "craft": [
+        "pixel-discipline",
+        "state-coverage"
+      ],
+      "assets": [
+        "./example.html"
+      ]
     },
-    "pipeline": { "stages": [ { "id": "generate", "atoms": ["file-write","live-artifact"] } ] },
-    "capabilities": ["prompt:inject","fs:write"]
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ]
   }
 }

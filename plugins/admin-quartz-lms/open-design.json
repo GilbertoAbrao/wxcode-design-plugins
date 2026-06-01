@@ -1,10 +1,10 @@
 {
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
-  "name": "wxcode/admin-quartz-lms",
+  "name": "wxcode-admin-quartz-lms",
   "title": "Quartz LMS Admin",
   "version": "0.1.0",
-  "description": "Friendly-academic LMS administration dashboard — purple accent, left sidebar with school/program switcher, topbar with term selector, 4 KPI tiles (active students, courses, completion rate, avg score), enrollment/completion chart, courses table with progress bars, and upcoming assignments panel.",
+  "description": "Friendly-academic LMS administration dashboard \u2014 purple accent, left sidebar with school/program switcher, topbar with term selector, 4 KPI tiles (active students, courses, completion rate, avg score), enrollment/completion chart, courses table with progress bars, and upcoming assignments panel.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -45,8 +45,8 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a friendly academic LMS admin dashboard — left sidebar with school switcher, topbar with term selector, 4 KPI tiles (active students, courses, completion rate, avg score), enrollment/completion chart, courses table, and upcoming assignments panel.",
-        "zh-CN": "使用这个插件完成以下任务：Build me a friendly academic LMS admin dashboard — left sidebar with school switcher, topbar with term selector, 4 KPI tiles (active students, courses, completion rate, avg score), enrollment/completion chart, courses table, and upcoming assignments panel."
+        "en": "Build me a friendly academic LMS admin dashboard \u2014 left sidebar with school switcher, topbar with term selector, 4 KPI tiles (active students, courses, completion rate, avg score), enrollment/completion chart, courses table, and upcoming assignments panel.",
+        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me a friendly academic LMS admin dashboard \u2014 left sidebar with school switcher, topbar with term selector, 4 KPI tiles (active students, courses, completion rate, avg score), enrollment/completion chart, courses table, and upcoming assignments panel."
       },
       "exampleOutputs": [
         {

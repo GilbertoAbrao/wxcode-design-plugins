@@ -1,37 +1,93 @@
 {
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
-  "name": "wxcode/admin-slate-commerce",
+  "name": "wxcode-admin-slate-commerce",
   "title": "Slate Commerce Admin",
   "version": "0.1.0",
-  "description": "A clean, light-mode e-commerce back-office dashboard with warm neutral surfaces, emerald accents, and amber highlights. Ships with a sidebar store switcher, topbar date range selector, four KPI cards with inline sparklines, a revenue bar chart, a recent orders table with status badges, and a top products list — everything a merchant needs at a glance.",
+  "description": "A clean, light-mode e-commerce back-office dashboard with warm neutral surfaces, emerald accents, and amber highlights. Ships with a sidebar store switcher, topbar date range selector, four KPI cards with inline sparklines, a revenue bar chart, a recent orders table with status badges, and a top products list \u2014 everything a merchant needs at a glance.",
   "license": "MIT",
-  "author": { "name": "WXCode", "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins" },
+  "author": {
+    "name": "WXCode",
+    "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+  },
   "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-slate-commerce",
-  "tags": ["wxcode-plugin","wxcode","first-party","prototype","e-commerce","web","admin","back-office","light-mode","emerald","orders"],
-  "compat": { "agentSkills": [ { "path": "./SKILL.md" } ] },
+  "tags": [
+    "wxcode-plugin",
+    "wxcode",
+    "first-party",
+    "prototype",
+    "e-commerce",
+    "web",
+    "admin",
+    "back-office",
+    "light-mode",
+    "emerald",
+    "orders"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
   "od": {
     "kind": "scenario",
     "taskKind": "new-generation",
     "mode": "prototype",
     "scenario": "e-commerce",
     "surface": "web",
-    "preview": { "type": "html", "entry": "./example.html" },
-    "provenance": { "category": "themeforest-admin-templates", "note": "category design-language reference only; original implementation" },
+    "preview": {
+      "type": "html",
+      "entry": "./example.html"
+    },
+    "provenance": {
+      "category": "themeforest-admin-templates",
+      "note": "category design-language reference only; original implementation"
+    },
     "useCase": {
       "query": {
-        "en": "Build me a light-mode e-commerce back-office dashboard — sidebar with store switcher, topbar with date range, 4 KPI cards with sparklines, a revenue bar chart, a recent orders table with status badges, and a top products list.",
-        "zh-CN": "使用这个插件完成以下任务：Build me a light-mode e-commerce back-office dashboard — sidebar with store switcher, topbar with date range, 4 KPI cards with sparklines, a revenue bar chart, a recent orders table with status badges, and a top products list."
+        "en": "Build me a light-mode e-commerce back-office dashboard \u2014 sidebar with store switcher, topbar with date range, 4 KPI cards with sparklines, a revenue bar chart, a recent orders table with status badges, and a top products list.",
+        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me a light-mode e-commerce back-office dashboard \u2014 sidebar with store switcher, topbar with date range, 4 KPI cards with sparklines, a revenue bar chart, a recent orders table with status badges, and a top products list."
       },
-      "exampleOutputs": [ { "path": "./example.html", "title": "Slate Commerce Admin" } ]
+      "exampleOutputs": [
+        {
+          "path": "./example.html",
+          "title": "Slate Commerce Admin"
+        }
+      ]
     },
     "context": {
-      "skills": [ { "path": "./SKILL.md" } ],
-      "designSystem": { "primary": true },
-      "craft": ["pixel-discipline","typographic-rhythm"],
-      "assets": ["./example.html"]
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ],
+      "designSystem": {
+        "primary": true
+      },
+      "craft": [
+        "pixel-discipline",
+        "typographic-rhythm"
+      ],
+      "assets": [
+        "./example.html"
+      ]
     },
-    "pipeline": { "stages": [ { "id": "generate", "atoms": ["file-write","live-artifact"] } ] },
-    "capabilities": ["prompt:inject","fs:write"]
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ]
   }
 }

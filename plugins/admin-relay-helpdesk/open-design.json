@@ -1,10 +1,10 @@
 {
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
-  "name": "wxcode/admin-relay-helpdesk",
+  "name": "wxcode-admin-relay-helpdesk",
   "title": "Relay Helpdesk Admin",
   "version": "0.1.0",
-  "description": "Friendly light-mode helpdesk operations dashboard — left inbox sidebar, topbar with search and assignee filter, 4 KPI cards (open tickets, avg first response, SLA compliance, CSAT), SLA-by-priority bar set, ticket queue table, and team load panel. Accent violet with green/amber/red status semantics.",
+  "description": "Friendly light-mode helpdesk operations dashboard \u2014 left inbox sidebar, topbar with search and assignee filter, 4 KPI cards (open tickets, avg first response, SLA compliance, CSAT), SLA-by-priority bar set, ticket queue table, and team load panel. Accent violet with green/amber/red status semantics.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -47,8 +47,8 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a helpdesk admin dashboard — left inbox sidebar, topbar with search and assignee filter, 4 KPI cards (open tickets, first response time, SLA compliance, CSAT), SLA priority bars, ticket queue table with priority and status pills, and a team load panel.",
-        "zh-CN": "使用这个插件完成以下任务：Build me a helpdesk admin dashboard — left inbox sidebar, topbar with search and assignee filter, 4 KPI cards (open tickets, first response time, SLA compliance, CSAT), SLA priority bars, ticket queue table with priority and status pills, and a team load panel."
+        "en": "Build me a helpdesk admin dashboard \u2014 left inbox sidebar, topbar with search and assignee filter, 4 KPI cards (open tickets, first response time, SLA compliance, CSAT), SLA priority bars, ticket queue table with priority and status pills, and a team load panel.",
+        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me a helpdesk admin dashboard \u2014 left inbox sidebar, topbar with search and assignee filter, 4 KPI cards (open tickets, first response time, SLA compliance, CSAT), SLA priority bars, ticket queue table with priority and status pills, and a team load panel."
       },
       "exampleOutputs": [
         {

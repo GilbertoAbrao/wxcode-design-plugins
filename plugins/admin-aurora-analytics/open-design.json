@@ -1,37 +1,93 @@
 {
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
-  "name": "wxcode/admin-aurora-analytics",
+  "name": "wxcode-admin-aurora-analytics",
   "title": "Aurora Analytics Admin",
   "version": "0.1.0",
-  "description": "Aurora Analytics Admin is a polished light-mode dashboard for product and growth teams who need at-a-glance visibility into sessions, conversion, and retention. It pairs a fixed left sidebar with a top search bar, four live KPI tiles, an area chart of weekly sessions, a recent-sessions table, and a right-rail insights panel — all rendered in a single self-contained HTML file. Designed for clarity over decoration: indigo-violet accents on a crisp slate-and-white canvas.",
+  "description": "Aurora Analytics Admin is a polished light-mode dashboard for product and growth teams who need at-a-glance visibility into sessions, conversion, and retention. It pairs a fixed left sidebar with a top search bar, four live KPI tiles, an area chart of weekly sessions, a recent-sessions table, and a right-rail insights panel \u2014 all rendered in a single self-contained HTML file. Designed for clarity over decoration: indigo-violet accents on a crisp slate-and-white canvas.",
   "license": "MIT",
-  "author": { "name": "WXCode", "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins" },
+  "author": {
+    "name": "WXCode",
+    "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+  },
   "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-aurora-analytics",
-  "tags": ["wxcode-plugin","wxcode","first-party","prototype","operations","web","admin","analytics","light-mode","indigo","clean-cards"],
-  "compat": { "agentSkills": [ { "path": "./SKILL.md" } ] },
+  "tags": [
+    "wxcode-plugin",
+    "wxcode",
+    "first-party",
+    "prototype",
+    "operations",
+    "web",
+    "admin",
+    "analytics",
+    "light-mode",
+    "indigo",
+    "clean-cards"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
   "od": {
     "kind": "scenario",
     "taskKind": "new-generation",
     "mode": "prototype",
     "scenario": "operations",
     "surface": "web",
-    "preview": { "type": "html", "entry": "./example.html" },
-    "provenance": { "category": "themeforest-admin-templates", "note": "category design-language reference only; original implementation" },
+    "preview": {
+      "type": "html",
+      "entry": "./example.html"
+    },
+    "provenance": {
+      "category": "themeforest-admin-templates",
+      "note": "category design-language reference only; original implementation"
+    },
     "useCase": {
       "query": {
-        "en": "Build me a polished light-mode analytics admin dashboard — left sidebar, topbar with search, 4 KPI cards with sparklines, a sessions area chart, a recent sessions table, and an insights side panel.",
-        "zh-CN": "使用这个插件完成以下任务：Build me a polished light-mode analytics admin dashboard — left sidebar, topbar with search, 4 KPI cards with sparklines, a sessions area chart, a recent sessions table, and an insights side panel."
+        "en": "Build me a polished light-mode analytics admin dashboard \u2014 left sidebar, topbar with search, 4 KPI cards with sparklines, a sessions area chart, a recent sessions table, and an insights side panel.",
+        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me a polished light-mode analytics admin dashboard \u2014 left sidebar, topbar with search, 4 KPI cards with sparklines, a sessions area chart, a recent sessions table, and an insights side panel."
       },
-      "exampleOutputs": [ { "path": "./example.html", "title": "Aurora Analytics Admin" } ]
+      "exampleOutputs": [
+        {
+          "path": "./example.html",
+          "title": "Aurora Analytics Admin"
+        }
+      ]
     },
     "context": {
-      "skills": [ { "path": "./SKILL.md" } ],
-      "designSystem": { "primary": true },
-      "craft": ["pixel-discipline","typographic-rhythm"],
-      "assets": ["./example.html"]
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ],
+      "designSystem": {
+        "primary": true
+      },
+      "craft": [
+        "pixel-discipline",
+        "typographic-rhythm"
+      ],
+      "assets": [
+        "./example.html"
+      ]
     },
-    "pipeline": { "stages": [ { "id": "generate", "atoms": ["file-write","live-artifact"] } ] },
-    "capabilities": ["prompt:inject","fs:write"]
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ]
   }
 }

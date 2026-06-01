@@ -1,10 +1,10 @@
 {
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
-  "name": "wxcode/admin-harbor-banking",
+  "name": "wxcode-admin-harbor-banking",
   "title": "Harbor Banking Admin",
   "version": "0.1.0",
-  "description": "Digital banking / personal finance operations console — light mode, navy-blue accent, teal secondary. Left account sidebar, topbar with search and notifications, hero payment-card SVG, 3 KPI tiles, spending donut chart, recent transactions table, and quick-transfer payees panel.",
+  "description": "Digital banking / personal finance operations console \u2014 light mode, navy-blue accent, teal secondary. Left account sidebar, topbar with search and notifications, hero payment-card SVG, 3 KPI tiles, spending donut chart, recent transactions table, and quick-transfer payees panel.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -49,8 +49,8 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a digital banking admin console — accounts sidebar, topbar, a stylized payment card, 3 KPI tiles (balance / income / spending), a spending-by-category chart, recent transactions table, and a quick-transfer payees panel.",
-        "zh-CN": "使用这个插件完成以下任务：Build me a digital banking admin console — accounts sidebar, topbar, a stylized payment card, 3 KPI tiles (balance / income / spending), a spending-by-category chart, recent transactions table, and a quick-transfer payees panel."
+        "en": "Build me a digital banking admin console \u2014 accounts sidebar, topbar, a stylized payment card, 3 KPI tiles (balance / income / spending), a spending-by-category chart, recent transactions table, and a quick-transfer payees panel.",
+        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me a digital banking admin console \u2014 accounts sidebar, topbar, a stylized payment card, 3 KPI tiles (balance / income / spending), a spending-by-category chart, recent transactions table, and a quick-transfer payees panel."
       },
       "exampleOutputs": [
         {

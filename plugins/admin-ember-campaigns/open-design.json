@@ -1,10 +1,10 @@
 {
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
-  "name": "wxcode/admin-ember-campaigns",
+  "name": "wxcode-admin-ember-campaigns",
   "title": "Ember Campaigns Admin",
   "version": "0.1.0",
-  "description": "Vibrant-but-clean marketing command centre — left sidebar, topbar with date-range filter, 4 KPI cards (reach / CTR / spend / ROAS) with inline SVG sparklines, a multi-series campaign performance chart, a conversion funnel, and a campaigns table with channel chips and status pills. Rose-pink accent on white/slate canvas.",
+  "description": "Vibrant-but-clean marketing command centre \u2014 left sidebar, topbar with date-range filter, 4 KPI cards (reach / CTR / spend / ROAS) with inline SVG sparklines, a multi-series campaign performance chart, a conversion funnel, and a campaigns table with channel chips and status pills. Rose-pink accent on white/slate canvas.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -46,8 +46,8 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a marketing campaign analytics admin — left sidebar, date-range topbar, 4 KPI cards with sparklines, multi-series performance chart, conversion funnel, and campaigns table with channel chips.",
-        "zh-CN": "使用这个插件完成以下任务：Build me a marketing campaign analytics admin — left sidebar, date-range topbar, 4 KPI cards with sparklines, multi-series performance chart, conversion funnel, and campaigns table with channel chips."
+        "en": "Build me a marketing campaign analytics admin \u2014 left sidebar, date-range topbar, 4 KPI cards with sparklines, multi-series performance chart, conversion funnel, and campaigns table with channel chips.",
+        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me a marketing campaign analytics admin \u2014 left sidebar, date-range topbar, 4 KPI cards with sparklines, multi-series performance chart, conversion funnel, and campaigns table with channel chips."
       },
       "exampleOutputs": [
         {

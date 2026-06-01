@@ -1,10 +1,10 @@
 {
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
-  "name": "wxcode/admin-verdant-clinic",
+  "name": "wxcode-admin-verdant-clinic",
   "title": "Verdant Clinic Admin",
   "version": "0.1.0",
-  "description": "Calm, clinical light-mode admin dashboard for clinic and healthcare operations — left sidebar with department switcher, topbar with search and clinician avatar, 4 KPI cards (patients today, appointments, avg wait, bed occupancy), today's appointment schedule, vitals occupancy mini-chart, and a recent patients table. Emerald-to-teal accent palette with triage status colors.",
+  "description": "Calm, clinical light-mode admin dashboard for clinic and healthcare operations \u2014 left sidebar with department switcher, topbar with search and clinician avatar, 4 KPI cards (patients today, appointments, avg wait, bed occupancy), today's appointment schedule, vitals occupancy mini-chart, and a recent patients table. Emerald-to-teal accent palette with triage status colors.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -47,8 +47,8 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a clinic operations admin dashboard — left sidebar with department switcher, topbar with search and clinician avatar, 4 KPI cards (patients today, appointments, avg wait, bed occupancy), a today's appointments schedule list, a mini occupancy chart, and a recent patients table.",
-        "zh-CN": "使用这个插件完成以下任务：Build me a clinic operations admin dashboard — left sidebar with department switcher, topbar with search and clinician avatar, 4 KPI cards, appointments schedule, occupancy chart, recent patients table."
+        "en": "Build me a clinic operations admin dashboard \u2014 left sidebar with department switcher, topbar with search and clinician avatar, 4 KPI cards (patients today, appointments, avg wait, bed occupancy), a today's appointments schedule list, a mini occupancy chart, and a recent patients table.",
+        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me a clinic operations admin dashboard \u2014 left sidebar with department switcher, topbar with search and clinician avatar, 4 KPI cards, appointments schedule, occupancy chart, recent patients table."
       },
       "exampleOutputs": [
         {
