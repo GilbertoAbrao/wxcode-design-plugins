@@ -18,8 +18,11 @@
   --c-indigo:      #6366f1;
   --c-indigo-lt:   #eef2ff;
   --c-indigo-mid:  #818cf8;
+  --c-indigo-pale: #a5b4fc;
+  --c-indigo-pale2:#e0e7ff;
   --c-violet:      #7c3aed;
   --c-violet-lt:   #f5f3ff;
+  --c-violet-lt2:  #faf5ff;
 
   --c-green:       #10b981;
   --c-green-lt:    #ecfdf5;
@@ -29,6 +32,14 @@
   --c-amber-lt:    #fffbeb;
   --c-sky:         #0ea5e9;
   --c-sky-lt:      #f0f9ff;
+
+  --c-blue:        #3b82f6;
+  --c-blue-lt:     #eff6ff;
+  --c-orange:      #f97316;
+  --c-orange-lt:   #fff7ed;
+  --c-rose:        #f43f5e;
+  --c-rose-lt:     #fff1f2;
+  --c-pink:        #db2777;
 
   --sidebar-w:     240px;
   --topbar-h:      60px;
@@ -604,10 +615,10 @@ tbody td:last-child  { padding-right: 24px; }
   <div class="sidebar-logo">
     <!-- Aurora SVG logo mark -->
     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="28" height="28" rx="8" fill="#6366f1"/>
+      <rect width="28" height="28" rx="8" fill="var(--c-indigo)"/>
       <path d="M7 20 Q14 6 21 20" stroke="white" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-      <path d="M10 20 Q14 11 18 20" stroke="#a5b4fc" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-      <circle cx="14" cy="9.5" r="2" fill="#e0e7ff"/>
+      <path d="M10 20 Q14 11 18 20" stroke="var(--c-indigo-pale)" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <circle cx="14" cy="9.5" r="2" fill="var(--c-indigo-pale2)"/>
     </svg>
     <span class="sidebar-logo-text">Aurora<span>.</span></span>
   </div>
@@ -680,7 +691,7 @@ tbody td:last-child  { padding-right: 24px; }
         <div class="sidebar-user-name">Marta Alves</div>
         <div class="sidebar-user-role">Growth Lead</div>
       </div>
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"><path d="M3 5l4 4 4-4"/></svg>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--c-faint)" stroke-width="1.5" stroke-linecap="round"><path d="M3 5l4 4 4-4"/></svg>
     </div>
   </div>
 </aside>
@@ -697,7 +708,7 @@ tbody td:last-child  { padding-right: 24px; }
     </nav>
 
     <div class="topbar-search">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"><circle cx="6" cy="6" r="4"/><path d="M10 10l2.5 2.5"/></svg>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--c-faint)" stroke-width="1.5" stroke-linecap="round"><circle cx="6" cy="6" r="4"/><path d="M10 10l2.5 2.5"/></svg>
       <input type="text" placeholder="Search users, events, pages…">
       <span style="font-size:11px;color:var(--c-faint);white-space:nowrap">⌘K</span>
     </div>
@@ -740,7 +751,7 @@ tbody td:last-child  { padding-right: 24px; }
         <div class="kpi-header">
           <span class="kpi-label">Total Sessions</span>
           <div class="kpi-icon" style="background:var(--c-indigo-lt)">
-            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="#6366f1" stroke-width="1.6" stroke-linecap="round"><circle cx="7.5" cy="7.5" r="5.5"/><path d="M5 9l1.5-3L9 8l1.5-2"/></svg>
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="var(--c-indigo)" stroke-width="1.6" stroke-linecap="round"><circle cx="7.5" cy="7.5" r="5.5"/><path d="M5 9l1.5-3L9 8l1.5-2"/></svg>
           </div>
         </div>
         <div class="kpi-value">48,312</div>
@@ -752,11 +763,11 @@ tbody td:last-child  { padding-right: 24px; }
           <svg class="sparkline" width="72" height="28" viewBox="0 0 72 28" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="sg1" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#6366f1" stop-opacity=".25"/>
-                <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+                <stop offset="0%" stop-color="var(--c-indigo)" stop-opacity=".25"/>
+                <stop offset="100%" stop-color="var(--c-indigo)" stop-opacity="0"/>
               </linearGradient>
             </defs>
-            <path d="M0 22 8 18 16 20 24 14 32 16 40 10 48 12 56 7 64 9 72 4" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M0 22 8 18 16 20 24 14 32 16 40 10 48 12 56 7 64 9 72 4" stroke="var(--c-indigo)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
             <path d="M0 22 8 18 16 20 24 14 32 16 40 10 48 12 56 7 64 9 72 4 72 28 0 28Z" fill="url(#sg1)"/>
           </svg>
         </div>
@@ -767,7 +778,7 @@ tbody td:last-child  { padding-right: 24px; }
         <div class="kpi-header">
           <span class="kpi-label">Unique Users</span>
           <div class="kpi-icon" style="background:var(--c-violet-lt)">
-            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="#7c3aed" stroke-width="1.6" stroke-linecap="round"><circle cx="6" cy="5" r="2.5"/><path d="M1.5 13c0-2.5 2-4.5 4.5-4.5s4.5 2 4.5 4.5"/><circle cx="11.5" cy="5" r="1.8"/><path d="M10 13c0-1.5.9-2.8 2-3.3"/></svg>
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="var(--c-violet)" stroke-width="1.6" stroke-linecap="round"><circle cx="6" cy="5" r="2.5"/><path d="M1.5 13c0-2.5 2-4.5 4.5-4.5s4.5 2 4.5 4.5"/><circle cx="11.5" cy="5" r="1.8"/><path d="M10 13c0-1.5.9-2.8 2-3.3"/></svg>
           </div>
         </div>
         <div class="kpi-value">19,847</div>
@@ -779,11 +790,11 @@ tbody td:last-child  { padding-right: 24px; }
           <svg class="sparkline" width="72" height="28" viewBox="0 0 72 28" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="sg2" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#7c3aed" stop-opacity=".2"/>
-                <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/>
+                <stop offset="0%" stop-color="var(--c-violet)" stop-opacity=".2"/>
+                <stop offset="100%" stop-color="var(--c-violet)" stop-opacity="0"/>
               </linearGradient>
             </defs>
-            <path d="M0 24 8 22 16 19 24 21 32 15 40 17 48 13 56 10 64 11 72 6" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M0 24 8 22 16 19 24 21 32 15 40 17 48 13 56 10 64 11 72 6" stroke="var(--c-violet)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
             <path d="M0 24 8 22 16 19 24 21 32 15 40 17 48 13 56 10 64 11 72 6 72 28 0 28Z" fill="url(#sg2)"/>
           </svg>
         </div>
@@ -794,7 +805,7 @@ tbody td:last-child  { padding-right: 24px; }
         <div class="kpi-header">
           <span class="kpi-label">Conversion Rate</span>
           <div class="kpi-icon" style="background:var(--c-green-lt)">
-            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="#10b981" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l4-5 3 4 3-5 1.5 2"/></svg>
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="var(--c-green)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l4-5 3 4 3-5 1.5 2"/></svg>
           </div>
         </div>
         <div class="kpi-value">3.81%</div>
@@ -806,11 +817,11 @@ tbody td:last-child  { padding-right: 24px; }
           <svg class="sparkline" width="72" height="28" viewBox="0 0 72 28" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="sg3" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#10b981" stop-opacity=".2"/>
-                <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+                <stop offset="0%" stop-color="var(--c-green)" stop-opacity=".2"/>
+                <stop offset="100%" stop-color="var(--c-green)" stop-opacity="0"/>
               </linearGradient>
             </defs>
-            <path d="M0 20 8 19 16 17 24 18 32 15 40 14 48 13 56 11 64 10 72 8" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M0 20 8 19 16 17 24 18 32 15 40 14 48 13 56 11 64 10 72 8" stroke="var(--c-green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
             <path d="M0 20 8 19 16 17 24 18 32 15 40 14 48 13 56 11 64 10 72 8 72 28 0 28Z" fill="url(#sg3)"/>
           </svg>
         </div>
@@ -821,7 +832,7 @@ tbody td:last-child  { padding-right: 24px; }
         <div class="kpi-header">
           <span class="kpi-label">Avg. Session</span>
           <div class="kpi-icon" style="background:var(--c-amber-lt)">
-            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="#f59e0b" stroke-width="1.6" stroke-linecap="round"><circle cx="7.5" cy="7.5" r="5.5"/><path d="M7.5 4.5V8l2 1.5"/></svg>
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="var(--c-amber)" stroke-width="1.6" stroke-linecap="round"><circle cx="7.5" cy="7.5" r="5.5"/><path d="M7.5 4.5V8l2 1.5"/></svg>
           </div>
         </div>
         <div class="kpi-value">4m 22s</div>
@@ -833,11 +844,11 @@ tbody td:last-child  { padding-right: 24px; }
           <svg class="sparkline" width="72" height="28" viewBox="0 0 72 28" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="sg4" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#f59e0b" stop-opacity=".2"/>
-                <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+                <stop offset="0%" stop-color="var(--c-amber)" stop-opacity=".2"/>
+                <stop offset="100%" stop-color="var(--c-amber)" stop-opacity="0"/>
               </linearGradient>
             </defs>
-            <path d="M0 8 8 9 16 7 24 10 32 11 40 13 48 14 56 15 64 17 72 20" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M0 8 8 9 16 7 24 10 32 11 40 13 48 14 56 15 64 17 72 20" stroke="var(--c-amber)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
             <path d="M0 8 8 9 16 7 24 10 32 11 40 13 48 14 56 15 64 17 72 20 72 28 0 28Z" fill="url(#sg4)"/>
           </svg>
         </div>
@@ -871,12 +882,12 @@ tbody td:last-child  { padding-right: 24px; }
           <svg viewBox="0 0 760 220" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="areaGrad1" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#6366f1" stop-opacity=".18"/>
-                <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+                <stop offset="0%" stop-color="var(--c-indigo)" stop-opacity=".18"/>
+                <stop offset="100%" stop-color="var(--c-indigo)" stop-opacity="0"/>
               </linearGradient>
               <linearGradient id="areaGrad2" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#7c3aed" stop-opacity=".14"/>
-                <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/>
+                <stop offset="0%" stop-color="var(--c-violet)" stop-opacity=".14"/>
+                <stop offset="100%" stop-color="var(--c-violet)" stop-opacity="0"/>
               </linearGradient>
             </defs>
 
@@ -888,46 +899,46 @@ tbody td:last-child  { padding-right: 24px; }
             <line x1="0" y1="180" x2="760" y2="180" stroke="#e2e8f0" stroke-width="1"/>
 
             <!-- Y labels -->
-            <text x="0" y="18"  font-size="9" fill="#94a3b8" font-family="Inter,system-ui,sans-serif">60k</text>
-            <text x="0" y="58"  font-size="9" fill="#94a3b8" font-family="Inter,system-ui,sans-serif">45k</text>
-            <text x="0" y="98"  font-size="9" fill="#94a3b8" font-family="Inter,system-ui,sans-serif">30k</text>
-            <text x="0" y="138" font-size="9" fill="#94a3b8" font-family="Inter,system-ui,sans-serif">15k</text>
-            <text x="0" y="178" font-size="9" fill="#94a3b8" font-family="Inter,system-ui,sans-serif">0</text>
+            <text x="0" y="18"  font-size="9" fill="var(--c-faint)" font-family="Inter,system-ui,sans-serif">60k</text>
+            <text x="0" y="58"  font-size="9" fill="var(--c-faint)" font-family="Inter,system-ui,sans-serif">45k</text>
+            <text x="0" y="98"  font-size="9" fill="var(--c-faint)" font-family="Inter,system-ui,sans-serif">30k</text>
+            <text x="0" y="138" font-size="9" fill="var(--c-faint)" font-family="Inter,system-ui,sans-serif">15k</text>
+            <text x="0" y="178" font-size="9" fill="var(--c-faint)" font-family="Inter,system-ui,sans-serif">0</text>
 
             <!-- Sessions area -->
             <path d="M28 148 90 130 152 120 214 108 276 98 338 80 400 72 462 60 524 54 586 50 648 40 710 32"
-              stroke="#6366f1" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              stroke="var(--c-indigo)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M28 148 90 130 152 120 214 108 276 98 338 80 400 72 462 60 524 54 586 50 648 40 710 32 710 180 28 180Z"
               fill="url(#areaGrad1)"/>
 
             <!-- Unique users area (lower) -->
             <path d="M28 162 90 150 152 144 214 135 276 128 338 114 400 108 462 96 524 90 586 85 648 74 710 66"
-              stroke="#7c3aed" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0"/>
+              stroke="var(--c-violet)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0"/>
             <path d="M28 162 90 150 152 144 214 135 276 128 338 114 400 108 462 96 524 90 586 85 648 74 710 66 710 180 28 180Z"
               fill="url(#areaGrad2)"/>
 
             <!-- Data point dots — sessions -->
-            <circle cx="28"  cy="148" r="3.5" fill="#fff" stroke="#6366f1" stroke-width="2"/>
-            <circle cx="152" cy="120" r="3.5" fill="#fff" stroke="#6366f1" stroke-width="2"/>
-            <circle cx="276" cy="98"  r="3.5" fill="#fff" stroke="#6366f1" stroke-width="2"/>
-            <circle cx="400" cy="72"  r="3.5" fill="#fff" stroke="#6366f1" stroke-width="2"/>
-            <circle cx="524" cy="54"  r="3.5" fill="#fff" stroke="#6366f1" stroke-width="2"/>
-            <circle cx="648" cy="40"  r="3.5" fill="#fff" stroke="#6366f1" stroke-width="2"/>
-            <circle cx="710" cy="32"  r="5" fill="#6366f1" stroke="#fff" stroke-width="2"/>
+            <circle cx="28"  cy="148" r="3.5" fill="#fff" stroke="var(--c-indigo)" stroke-width="2"/>
+            <circle cx="152" cy="120" r="3.5" fill="#fff" stroke="var(--c-indigo)" stroke-width="2"/>
+            <circle cx="276" cy="98"  r="3.5" fill="#fff" stroke="var(--c-indigo)" stroke-width="2"/>
+            <circle cx="400" cy="72"  r="3.5" fill="#fff" stroke="var(--c-indigo)" stroke-width="2"/>
+            <circle cx="524" cy="54"  r="3.5" fill="#fff" stroke="var(--c-indigo)" stroke-width="2"/>
+            <circle cx="648" cy="40"  r="3.5" fill="#fff" stroke="var(--c-indigo)" stroke-width="2"/>
+            <circle cx="710" cy="32"  r="5" fill="var(--c-indigo)" stroke="#fff" stroke-width="2"/>
 
             <!-- X labels -->
-            <text x="22"  y="198" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="Inter,system-ui,sans-serif">Mar 17</text>
-            <text x="90"  y="198" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="Inter,system-ui,sans-serif">Mar 24</text>
-            <text x="152" y="198" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="Inter,system-ui,sans-serif">Mar 31</text>
-            <text x="214" y="198" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="Inter,system-ui,sans-serif">Apr 7</text>
-            <text x="276" y="198" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="Inter,system-ui,sans-serif">Apr 14</text>
-            <text x="338" y="198" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="Inter,system-ui,sans-serif">Apr 21</text>
-            <text x="400" y="198" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="Inter,system-ui,sans-serif">Apr 28</text>
-            <text x="462" y="198" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="Inter,system-ui,sans-serif">May 5</text>
-            <text x="524" y="198" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="Inter,system-ui,sans-serif">May 12</text>
-            <text x="586" y="198" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="Inter,system-ui,sans-serif">May 19</text>
-            <text x="648" y="198" font-size="9" fill="#94a3b8" text-anchor="middle" font-family="Inter,system-ui,sans-serif">May 26</text>
-            <text x="710" y="198" font-size="9" fill="#6366f1" text-anchor="middle" font-weight="600" font-family="Inter,system-ui,sans-serif">Jun 1</text>
+            <text x="22"  y="198" font-size="9" fill="var(--c-faint)" text-anchor="middle" font-family="Inter,system-ui,sans-serif">Mar 17</text>
+            <text x="90"  y="198" font-size="9" fill="var(--c-faint)" text-anchor="middle" font-family="Inter,system-ui,sans-serif">Mar 24</text>
+            <text x="152" y="198" font-size="9" fill="var(--c-faint)" text-anchor="middle" font-family="Inter,system-ui,sans-serif">Mar 31</text>
+            <text x="214" y="198" font-size="9" fill="var(--c-faint)" text-anchor="middle" font-family="Inter,system-ui,sans-serif">Apr 7</text>
+            <text x="276" y="198" font-size="9" fill="var(--c-faint)" text-anchor="middle" font-family="Inter,system-ui,sans-serif">Apr 14</text>
+            <text x="338" y="198" font-size="9" fill="var(--c-faint)" text-anchor="middle" font-family="Inter,system-ui,sans-serif">Apr 21</text>
+            <text x="400" y="198" font-size="9" fill="var(--c-faint)" text-anchor="middle" font-family="Inter,system-ui,sans-serif">Apr 28</text>
+            <text x="462" y="198" font-size="9" fill="var(--c-faint)" text-anchor="middle" font-family="Inter,system-ui,sans-serif">May 5</text>
+            <text x="524" y="198" font-size="9" fill="var(--c-faint)" text-anchor="middle" font-family="Inter,system-ui,sans-serif">May 12</text>
+            <text x="586" y="198" font-size="9" fill="var(--c-faint)" text-anchor="middle" font-family="Inter,system-ui,sans-serif">May 19</text>
+            <text x="648" y="198" font-size="9" fill="var(--c-faint)" text-anchor="middle" font-family="Inter,system-ui,sans-serif">May 26</text>
+            <text x="710" y="198" font-size="9" fill="var(--c-indigo)" text-anchor="middle" font-weight="600" font-family="Inter,system-ui,sans-serif">Jun 1</text>
           </svg>
         </div>
       </div>
@@ -960,14 +971,14 @@ tbody td:last-child  { padding-right: 24px; }
               <tr>
                 <td>
                   <div class="user-cell">
-                    <div class="user-mini-avatar" style="background:linear-gradient(135deg,#6366f1,#7c3aed)">RK</div>
+                    <div class="user-mini-avatar" style="background:linear-gradient(135deg,var(--c-indigo),var(--c-violet))">RK</div>
                     <div>
                       <div style="font-weight:600">Riya Kapoor</div>
                       <div class="user-email">riya.k@orbitlabs.io</div>
                     </div>
                   </div>
                 </td>
-                <td><span class="source-pill" style="background:#eff6ff;color:#3b82f6">Organic Search</span></td>
+                <td><span class="source-pill" style="background:var(--c-blue-lt);color:var(--c-blue)">Organic Search</span></td>
                 <td><span class="flag">🇮🇳</span> India</td>
                 <td>7m 14s</td>
                 <td>9</td>
@@ -976,14 +987,14 @@ tbody td:last-child  { padding-right: 24px; }
               <tr>
                 <td>
                   <div class="user-cell">
-                    <div class="user-mini-avatar" style="background:linear-gradient(135deg,#0ea5e9,#6366f1)">TM</div>
+                    <div class="user-mini-avatar" style="background:linear-gradient(135deg,var(--c-sky),var(--c-indigo))">TM</div>
                     <div>
                       <div style="font-weight:600">Tobias Müller</div>
                       <div class="user-email">t.muller@syntaxcraft.de</div>
                     </div>
                   </div>
                 </td>
-                <td><span class="source-pill" style="background:#faf5ff;color:#7c3aed">Paid Search</span></td>
+                <td><span class="source-pill" style="background:var(--c-violet-lt2);color:var(--c-violet)">Paid Search</span></td>
                 <td><span class="flag">🇩🇪</span> Germany</td>
                 <td>3m 05s</td>
                 <td>4</td>
@@ -992,14 +1003,14 @@ tbody td:last-child  { padding-right: 24px; }
               <tr>
                 <td>
                   <div class="user-cell">
-                    <div class="user-mini-avatar" style="background:linear-gradient(135deg,#10b981,#0ea5e9)">SL</div>
+                    <div class="user-mini-avatar" style="background:linear-gradient(135deg,var(--c-green),var(--c-sky))">SL</div>
                     <div>
                       <div style="font-weight:600">Sofia Lima</div>
                       <div class="user-email">sofia@designbloc.br</div>
                     </div>
                   </div>
                 </td>
-                <td><span class="source-pill" style="background:#ecfdf5;color:#10b981">Referral</span></td>
+                <td><span class="source-pill" style="background:var(--c-green-lt);color:var(--c-green)">Referral</span></td>
                 <td><span class="flag">🇧🇷</span> Brazil</td>
                 <td>12m 48s</td>
                 <td>16</td>
@@ -1008,14 +1019,14 @@ tbody td:last-child  { padding-right: 24px; }
               <tr>
                 <td>
                   <div class="user-cell">
-                    <div class="user-mini-avatar" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">JW</div>
+                    <div class="user-mini-avatar" style="background:linear-gradient(135deg,var(--c-amber),var(--c-red))">JW</div>
                     <div>
                       <div style="font-weight:600">James Wu</div>
                       <div class="user-email">jwu@cloudspire.ai</div>
                     </div>
                   </div>
                 </td>
-                <td><span class="source-pill" style="background:#fff7ed;color:#f97316">Social</span></td>
+                <td><span class="source-pill" style="background:var(--c-orange-lt);color:var(--c-orange)">Social</span></td>
                 <td><span class="flag">🇺🇸</span> United States</td>
                 <td>2m 33s</td>
                 <td>3</td>
@@ -1024,14 +1035,14 @@ tbody td:last-child  { padding-right: 24px; }
               <tr>
                 <td>
                   <div class="user-cell">
-                    <div class="user-mini-avatar" style="background:linear-gradient(135deg,#7c3aed,#db2777)">AP</div>
+                    <div class="user-mini-avatar" style="background:linear-gradient(135deg,var(--c-violet),var(--c-pink))">AP</div>
                     <div>
                       <div style="font-weight:600">Amélie Petit</div>
                       <div class="user-email">amelie.p@datavault.fr</div>
                     </div>
                   </div>
                 </td>
-                <td><span class="source-pill" style="background:#fff1f2;color:#f43f5e">Email</span></td>
+                <td><span class="source-pill" style="background:var(--c-rose-lt);color:var(--c-rose)">Email</span></td>
                 <td><span class="flag">🇫🇷</span> France</td>
                 <td>5m 59s</td>
                 <td>7</td>
@@ -1040,14 +1051,14 @@ tbody td:last-child  { padding-right: 24px; }
               <tr>
                 <td>
                   <div class="user-cell">
-                    <div class="user-mini-avatar" style="background:linear-gradient(135deg,#0ea5e9,#10b981)">NK</div>
+                    <div class="user-mini-avatar" style="background:linear-gradient(135deg,var(--c-sky),var(--c-green))">NK</div>
                     <div>
                       <div style="font-weight:600">Nour Khalil</div>
                       <div class="user-email">nkhalil@stackpilot.com</div>
                     </div>
                   </div>
                 </td>
-                <td><span class="source-pill" style="background:#eff6ff;color:#3b82f6">Organic Search</span></td>
+                <td><span class="source-pill" style="background:var(--c-blue-lt);color:var(--c-blue)">Organic Search</span></td>
                 <td><span class="flag">🇦🇪</span> UAE</td>
                 <td>9m 11s</td>
                 <td>11</td>
@@ -1069,19 +1080,19 @@ tbody td:last-child  { padding-right: 24px; }
         <div class="donut-wrap">
           <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
             <!-- Organic 38% -->
-            <circle cx="50" cy="50" r="38" fill="none" stroke="#6366f1" stroke-width="14"
+            <circle cx="50" cy="50" r="38" fill="none" stroke="var(--c-indigo)" stroke-width="14"
               stroke-dasharray="90.5 148.9" stroke-dashoffset="0" transform="rotate(-90 50 50)"/>
             <!-- Paid 24% -->
-            <circle cx="50" cy="50" r="38" fill="none" stroke="#7c3aed" stroke-width="14"
+            <circle cx="50" cy="50" r="38" fill="none" stroke="var(--c-violet)" stroke-width="14"
               stroke-dasharray="57.2 182.2" stroke-dashoffset="-90.5" transform="rotate(-90 50 50)"/>
             <!-- Referral 19% -->
-            <circle cx="50" cy="50" r="38" fill="none" stroke="#0ea5e9" stroke-width="14"
+            <circle cx="50" cy="50" r="38" fill="none" stroke="var(--c-sky)" stroke-width="14"
               stroke-dasharray="45.2 194.2" stroke-dashoffset="-147.7" transform="rotate(-90 50 50)"/>
             <!-- Social 12% -->
-            <circle cx="50" cy="50" r="38" fill="none" stroke="#10b981" stroke-width="14"
+            <circle cx="50" cy="50" r="38" fill="none" stroke="var(--c-green)" stroke-width="14"
               stroke-dasharray="28.6 210.8" stroke-dashoffset="-192.9" transform="rotate(-90 50 50)"/>
             <!-- Email 7% -->
-            <circle cx="50" cy="50" r="38" fill="none" stroke="#f59e0b" stroke-width="14"
+            <circle cx="50" cy="50" r="38" fill="none" stroke="var(--c-amber)" stroke-width="14"
               stroke-dasharray="16.6 222.8" stroke-dashoffset="-221.5" transform="rotate(-90 50 50)"/>
           </svg>
           <div class="donut-center">
@@ -1092,43 +1103,43 @@ tbody td:last-child  { padding-right: 24px; }
         <div class="channel-list">
           <div>
             <div class="channel-row">
-              <div class="channel-dot" style="background:#6366f1"></div>
+              <div class="channel-dot" style="background:var(--c-indigo)"></div>
               <div class="channel-name">Organic Search</div>
               <div class="channel-pct">38%</div>
             </div>
-            <div class="channel-bar-track"><div class="channel-bar-fill" style="width:38%;background:#6366f1"></div></div>
+            <div class="channel-bar-track"><div class="channel-bar-fill" style="width:38%;background:var(--c-indigo)"></div></div>
           </div>
           <div>
             <div class="channel-row">
-              <div class="channel-dot" style="background:#7c3aed"></div>
+              <div class="channel-dot" style="background:var(--c-violet)"></div>
               <div class="channel-name">Paid Search</div>
               <div class="channel-pct">24%</div>
             </div>
-            <div class="channel-bar-track"><div class="channel-bar-fill" style="width:24%;background:#7c3aed"></div></div>
+            <div class="channel-bar-track"><div class="channel-bar-fill" style="width:24%;background:var(--c-violet)"></div></div>
           </div>
           <div>
             <div class="channel-row">
-              <div class="channel-dot" style="background:#0ea5e9"></div>
+              <div class="channel-dot" style="background:var(--c-sky)"></div>
               <div class="channel-name">Referral</div>
               <div class="channel-pct">19%</div>
             </div>
-            <div class="channel-bar-track"><div class="channel-bar-fill" style="width:19%;background:#0ea5e9"></div></div>
+            <div class="channel-bar-track"><div class="channel-bar-fill" style="width:19%;background:var(--c-sky)"></div></div>
           </div>
           <div>
             <div class="channel-row">
-              <div class="channel-dot" style="background:#10b981"></div>
+              <div class="channel-dot" style="background:var(--c-green)"></div>
               <div class="channel-name">Social</div>
               <div class="channel-pct">12%</div>
             </div>
-            <div class="channel-bar-track"><div class="channel-bar-fill" style="width:12%;background:#10b981"></div></div>
+            <div class="channel-bar-track"><div class="channel-bar-fill" style="width:12%;background:var(--c-green)"></div></div>
           </div>
           <div>
             <div class="channel-row">
-              <div class="channel-dot" style="background:#f59e0b"></div>
+              <div class="channel-dot" style="background:var(--c-amber)"></div>
               <div class="channel-name">Email</div>
               <div class="channel-pct">7%</div>
             </div>
-            <div class="channel-bar-track"><div class="channel-bar-fill" style="width:7%;background:#f59e0b"></div></div>
+            <div class="channel-bar-track"><div class="channel-bar-fill" style="width:7%;background:var(--c-amber)"></div></div>
           </div>
         </div>
       </div>
@@ -1139,19 +1150,19 @@ tbody td:last-child  { padding-right: 24px; }
         <div>
           <div class="insight-item">
             <div class="insight-icon" style="background:var(--c-indigo-lt)">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#6366f1" stroke-width="1.6" stroke-linecap="round"><path d="M7 1v2M7 11v2M1 7h2M11 7h2"/><circle cx="7" cy="7" r="3"/></svg>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--c-indigo)" stroke-width="1.6" stroke-linecap="round"><path d="M7 1v2M7 11v2M1 7h2M11 7h2"/><circle cx="7" cy="7" r="3"/></svg>
             </div>
             <div class="insight-text"><strong>Organic traffic up 22%</strong> this week after the May 26 blog post on event tracking best practices.</div>
           </div>
           <div class="insight-item">
             <div class="insight-icon" style="background:var(--c-amber-lt)">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#f59e0b" stroke-width="1.6" stroke-linecap="round"><path d="M7 2v5M7 10v1"/><circle cx="7" cy="12" r=".8" fill="#f59e0b" stroke="none"/></svg>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--c-amber)" stroke-width="1.6" stroke-linecap="round"><path d="M7 2v5M7 10v1"/><circle cx="7" cy="12" r=".8" fill="var(--c-amber)" stroke="none"/></svg>
             </div>
             <div class="insight-text"><strong>Avg. session duration</strong> dropped 5.1% — mobile bounce rate on the pricing page needs review.</div>
           </div>
           <div class="insight-item">
             <div class="insight-icon" style="background:var(--c-green-lt)">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#10b981" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l3-4 3 3 3-4"/></svg>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--c-green)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l3-4 3 3 3-4"/></svg>
             </div>
             <div class="insight-text"><strong>Conversion rate reached 3.81%</strong> — highest since December 2024. Email retargeting campaign drove 63 paid upgrades.</div>
           </div>
@@ -1163,35 +1174,35 @@ tbody td:last-child  { padding-right: 24px; }
         <div class="rail-title">Activity Feed</div>
         <div>
           <div class="activity-item">
-            <div class="activity-dot-wrap"><div class="activity-dot" style="background:#6366f1"></div></div>
+            <div class="activity-dot-wrap"><div class="activity-dot" style="background:var(--c-indigo)"></div></div>
             <div class="activity-content">
               <div class="activity-title">New goal created: "Checkout Complete"</div>
               <div class="activity-time">Marta Alves · 42 min ago</div>
             </div>
           </div>
           <div class="activity-item">
-            <div class="activity-dot-wrap"><div class="activity-dot" style="background:#10b981"></div></div>
+            <div class="activity-dot-wrap"><div class="activity-dot" style="background:var(--c-green)"></div></div>
             <div class="activity-content">
               <div class="activity-title">A/B test "Hero CTA v3" reached significance</div>
               <div class="activity-time">Auto · 1h 15m ago</div>
             </div>
           </div>
           <div class="activity-item">
-            <div class="activity-dot-wrap"><div class="activity-dot" style="background:#f59e0b"></div></div>
+            <div class="activity-dot-wrap"><div class="activity-dot" style="background:var(--c-amber)"></div></div>
             <div class="activity-content">
               <div class="activity-title">Alert triggered: bounce rate &gt; 65% on /pricing</div>
               <div class="activity-time">System · 2h 03m ago</div>
             </div>
           </div>
           <div class="activity-item">
-            <div class="activity-dot-wrap"><div class="activity-dot" style="background:#7c3aed"></div></div>
+            <div class="activity-dot-wrap"><div class="activity-dot" style="background:var(--c-violet)"></div></div>
             <div class="activity-content">
               <div class="activity-title">Segment "High-intent Trials" exported to CSV</div>
               <div class="activity-time">Diego Ferraz · 3h 50m ago</div>
             </div>
           </div>
           <div class="activity-item">
-            <div class="activity-dot-wrap"><div class="activity-dot" style="background:#0ea5e9"></div></div>
+            <div class="activity-dot-wrap"><div class="activity-dot" style="background:var(--c-sky)"></div></div>
             <div class="activity-content">
               <div class="activity-title">Campaign "Spring Reactivation" connected</div>
               <div class="activity-time">Marta Alves · Yesterday</div>
