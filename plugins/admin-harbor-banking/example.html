@@ -1,0 +1,818 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Harbor Banking Admin</title>
+<style>
+/* ── Design tokens ─────────────────────────────────────────── */
+:root {
+  --c-navy:         #1e3a8a;
+  --c-blue:         #2563eb;
+  --c-blue-light:   #dbeafe;
+  --c-teal:         #0d9488;
+  --c-teal-light:   #ccfbf1;
+  --c-green:        #16a34a;
+  --c-green-light:  #dcfce7;
+  --c-red:          #ef4444;
+  --c-red-light:    #fee2e2;
+  --c-amber:        #d97706;
+  --c-amber-light:  #fef3c7;
+  --c-violet:       #7c3aed;
+  --c-violet-light: #ede9fe;
+  --c-rose:         #e11d48;
+  --c-rose-light:   #ffe4e6;
+  --c-canvas:       #f6f8fb;
+  --c-surface:      #ffffff;
+  --c-border:       #e4e8ef;
+  --c-border-focus: #93c5fd;
+  --c-text-primary: #1e293b;
+  --c-text-muted:   #64748b;
+  --c-text-faint:   #94a3b8;
+  --c-sidebar-bg:   #0f2460;
+  --c-sidebar-text: #c7d4f0;
+  --c-sidebar-active-bg: rgba(255,255,255,.10);
+  --c-sidebar-active-bar: #38bdf8;
+  --c-shadow-sm:    0 1px 3px rgba(30,58,138,.07), 0 1px 2px rgba(30,58,138,.04);
+  --c-shadow-md:    0 4px 12px rgba(30,58,138,.09), 0 2px 4px rgba(30,58,138,.05);
+  --r-card:         10px;
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+/* ── Reset ─────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);font-size:14px;color:var(--c-text-primary);background:var(--c-canvas);line-height:1.5;min-height:100vh;display:flex}
+button,input,select{font:inherit}
+.tabnum{font-variant-numeric:tabular-nums}
+
+/* ── Shell ─────────────────────────────────────────────────── */
+.shell{display:flex;width:100%;min-height:100vh;overflow:hidden}
+
+/* ── Sidebar ───────────────────────────────────────────────── */
+.sidebar{width:260px;min-width:260px;background:var(--c-sidebar-bg);display:flex;flex-direction:column;padding:0;overflow:hidden}
+.sb-brand{display:flex;align-items:center;gap:10px;padding:22px 20px 20px;border-bottom:1px solid rgba(255,255,255,.07)}
+.sb-logo{width:34px;height:34px;flex-shrink:0}
+.sb-wordmark{font-size:16px;font-weight:700;color:#fff;letter-spacing:.02em}
+.sb-wordmark span{color:#38bdf8}
+.sb-accounts{padding:20px 16px 12px}
+.sb-section-label{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(199,212,240,.45);padding:0 4px 8px}
+.sb-account{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;transition:background .15s}
+.sb-account:hover{background:var(--c-sidebar-active-bg)}
+.sb-account.active{background:var(--c-sidebar-active-bg)}
+.sb-acct-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.sb-acct-info{flex:1;min-width:0}
+.sb-acct-name{font-size:.8rem;font-weight:600;color:#e2e8f4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-acct-mask{font-size:.7rem;color:var(--c-sidebar-text);font-variant-numeric:tabular-nums}
+.sb-acct-bal{font-size:.8rem;font-weight:600;color:#fff;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sb-nav{padding:8px 16px;flex:1}
+.sb-nav-group{margin-bottom:20px}
+.sb-nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;color:var(--c-sidebar-text);font-size:.85rem;font-weight:500;transition:background .15s,color .15s;position:relative}
+.sb-nav-item:hover{background:var(--c-sidebar-active-bg);color:#fff}
+.sb-nav-item.active{background:var(--c-sidebar-active-bg);color:#fff}
+.sb-nav-item.active::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;border-radius:0 3px 3px 0;background:var(--c-sidebar-active-bar)}
+.sb-nav-icon{width:18px;height:18px;flex-shrink:0;opacity:.75}
+.sb-nav-item.active .sb-nav-icon,.sb-nav-item:hover .sb-nav-icon{opacity:1}
+.sb-nav-badge{margin-left:auto;background:var(--c-blue);color:#fff;font-size:.65rem;font-weight:700;padding:1px 6px;border-radius:99px;min-width:18px;text-align:center}
+.sb-user{display:flex;align-items:center;gap:10px;padding:16px 20px;border-top:1px solid rgba(255,255,255,.07)}
+.sb-user-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--c-blue),var(--c-teal));display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:#fff;flex-shrink:0}
+.sb-user-name{font-size:.82rem;font-weight:600;color:#e2e8f4}
+.sb-user-role{font-size:.7rem;color:var(--c-sidebar-text)}
+
+/* ── Main area ─────────────────────────────────────────────── */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:auto}
+
+/* ── Topbar ────────────────────────────────────────────────── */
+.topbar{height:60px;background:var(--c-surface);border-bottom:1px solid var(--c-border);display:flex;align-items:center;gap:12px;padding:0 24px;position:sticky;top:0;z-index:10;box-shadow:var(--c-shadow-sm)}
+.topbar-title{font-size:1rem;font-weight:700;color:var(--c-text-primary);white-space:nowrap;min-width:120px}
+.topbar-search{flex:1;max-width:340px;position:relative;margin:0 auto}
+.topbar-search input{width:100%;height:36px;border:1px solid var(--c-border);border-radius:8px;padding:0 12px 0 36px;font-size:.84rem;color:var(--c-text-primary);background:var(--c-canvas);outline:none;transition:border-color .15s}
+.topbar-search input:focus{border-color:var(--c-border-focus);background:#fff}
+.topbar-search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--c-text-faint);pointer-events:none}
+.topbar-spacer{flex:1}
+.topbar-actions{display:flex;align-items:center;gap:6px}
+.icon-btn{width:36px;height:36px;border-radius:8px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--c-text-muted);position:relative;transition:background .15s}
+.icon-btn:hover{background:var(--c-canvas)}
+.notif-badge{position:absolute;top:7px;right:7px;width:8px;height:8px;border-radius:50%;background:var(--c-red);border:2px solid var(--c-surface)}
+.topbar-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--c-navy),var(--c-teal));display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:#fff;cursor:pointer;flex-shrink:0;border:2px solid var(--c-border)}
+.topbar-user-info{display:flex;flex-direction:column;line-height:1.2;cursor:pointer}
+.topbar-user-name{font-size:.82rem;font-weight:600;color:var(--c-text-primary)}
+.topbar-user-role{font-size:.7rem;color:var(--c-text-muted)}
+
+/* ── Page content ──────────────────────────────────────────── */
+.page{padding:24px;display:flex;flex-direction:column;gap:20px}
+
+/* ── Page header ───────────────────────────────────────────── */
+.page-header{display:flex;align-items:center;justify-content:space-between}
+.page-header-left h1{font-size:1.15rem;font-weight:700;color:var(--c-text-primary)}
+.page-header-left p{font-size:.82rem;color:var(--c-text-muted);margin-top:2px}
+.page-header-actions{display:flex;gap:8px}
+.btn{height:34px;padding:0 14px;border-radius:8px;border:none;cursor:pointer;font-size:.82rem;font-weight:600;display:inline-flex;align-items:center;gap:6px;transition:opacity .15s}
+.btn-ghost{background:transparent;color:var(--c-text-muted);border:1px solid var(--c-border)}
+.btn-ghost:hover{background:var(--c-canvas)}
+.btn-primary{background:linear-gradient(135deg,var(--c-navy),var(--c-blue));color:#fff}
+.btn-primary:hover{opacity:.9}
+.btn-teal{background:var(--c-teal);color:#fff}
+.btn-teal:hover{opacity:.9}
+
+/* ── Hero row ──────────────────────────────────────────────── */
+.hero-row{display:grid;grid-template-columns:1.45fr 1fr 1fr 1fr;gap:16px}
+
+/* ── Payment card ──────────────────────────────────────────── */
+.payment-card-wrap{border-radius:var(--r-card);overflow:hidden;box-shadow:var(--c-shadow-md)}
+.payment-card{width:100%;aspect-ratio:1.586;position:relative;background:linear-gradient(135deg,var(--c-navy) 0%,#1d4ed8 55%,var(--c-teal) 100%);border-radius:var(--r-card);padding:22px 24px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;color:#fff}
+.pc-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.pc-bottom-info{display:flex;flex-direction:column;gap:2px}
+.pc-label{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;opacity:.65}
+.pc-number{font-size:1rem;font-weight:600;letter-spacing:.18em;font-variant-numeric:tabular-nums}
+.pc-row{display:flex;align-items:flex-end;justify-content:space-between}
+.pc-expiry-block,.pc-holder-block{display:flex;flex-direction:column;gap:1px}
+.pc-val{font-size:.85rem;font-weight:600;font-variant-numeric:tabular-nums}
+.pc-brand{font-size:1.1rem;font-weight:800;letter-spacing:.04em;text-shadow:0 1px 4px rgba(0,0,0,.25)}
+.pc-brand span{opacity:.7}
+.pc-chip-row{display:flex;align-items:center;justify-content:space-between}
+.pc-network{display:flex;gap:-4px}
+
+/* ── KPI tile ──────────────────────────────────────────────── */
+.kpi-tile{background:var(--c-surface);border-radius:var(--r-card);padding:18px 20px;box-shadow:var(--c-shadow-sm);display:flex;flex-direction:column;gap:10px;border:1px solid var(--c-border)}
+.kpi-header{display:flex;align-items:center;justify-content:space-between}
+.kpi-label{font-size:.65rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--c-text-muted)}
+.kpi-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.kpi-icon-blue{background:var(--c-blue-light);color:var(--c-blue)}
+.kpi-icon-green{background:var(--c-green-light);color:var(--c-green)}
+.kpi-icon-red{background:var(--c-red-light);color:var(--c-red)}
+.kpi-value{font-size:1.45rem;font-weight:700;color:var(--c-text-primary);font-variant-numeric:tabular-nums}
+.kpi-footer{display:flex;align-items:center;gap:6px}
+.kpi-delta{display:inline-flex;align-items:center;gap:3px;font-size:.75rem;font-weight:600;padding:2px 7px;border-radius:99px}
+.kpi-delta-up{background:var(--c-green-light);color:var(--c-green)}
+.kpi-delta-down{background:var(--c-red-light);color:var(--c-red)}
+.kpi-period{font-size:.75rem;color:var(--c-text-muted)}
+
+/* ── Content grid ──────────────────────────────────────────── */
+.content-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px;align-items:start}
+
+/* ── Card shell ────────────────────────────────────────────── */
+.card{background:var(--c-surface);border-radius:var(--r-card);border:1px solid var(--c-border);box-shadow:var(--c-shadow-sm);overflow:hidden}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 0}
+.card-title{font-size:.9rem;font-weight:700;color:var(--c-text-primary)}
+.card-action{font-size:.78rem;color:var(--c-blue);font-weight:600;cursor:pointer;text-decoration:none}
+.card-action:hover{text-decoration:underline}
+.period-tabs{display:flex;gap:4px}
+.period-tab{font-size:.75rem;font-weight:600;padding:4px 10px;border-radius:6px;border:none;background:transparent;cursor:pointer;color:var(--c-text-muted);transition:background .15s,color .15s}
+.period-tab.active{background:var(--c-blue-light);color:var(--c-blue)}
+.period-tab:hover:not(.active){background:var(--c-canvas)}
+
+/* ── Donut chart ───────────────────────────────────────────── */
+.donut-section{padding:16px 20px}
+.donut-wrap{display:flex;align-items:center;gap:24px}
+.donut-chart{flex-shrink:0}
+.donut-legend{display:flex;flex-direction:column;gap:8px;flex:1;min-width:0}
+.legend-item{display:flex;align-items:center;gap:8px}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.legend-label{font-size:.8rem;color:var(--c-text-primary);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.legend-amt{font-size:.8rem;font-weight:600;color:var(--c-text-primary);font-variant-numeric:tabular-nums;white-space:nowrap}
+.legend-pct{font-size:.72rem;color:var(--c-text-muted);white-space:nowrap;min-width:32px;text-align:right}
+.legend-bar-wrap{flex:1;max-width:60px;height:4px;background:var(--c-border);border-radius:99px;overflow:hidden}
+.legend-bar{height:100%;border-radius:99px}
+
+/* ── Transactions table ────────────────────────────────────── */
+.txn-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.txn-table thead th{padding:10px 20px;text-align:left;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--c-text-muted);border-bottom:1px solid var(--c-border);background:var(--c-canvas)}
+.txn-table tbody tr{transition:background .12s}
+.txn-table tbody tr:hover{background:#f0f4fb}
+.txn-table tbody td{padding:12px 20px;border-bottom:1px solid var(--c-border);vertical-align:middle}
+.txn-table tbody tr:last-child td{border-bottom:none}
+.txn-merchant{display:flex;align-items:center;gap:10px}
+.txn-merchant-icon{width:32px;height:32px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.85rem}
+.txn-merchant-name{font-weight:600;color:var(--c-text-primary)}
+.txn-merchant-sub{font-size:.72rem;color:var(--c-text-muted)}
+.chip{display:inline-block;padding:2px 8px;border-radius:99px;font-size:.7rem;font-weight:600}
+.chip-blue{background:var(--c-blue-light);color:var(--c-blue)}
+.chip-teal{background:var(--c-teal-light);color:var(--c-teal)}
+.chip-amber{background:var(--c-amber-light);color:var(--c-amber)}
+.chip-violet{background:var(--c-violet-light);color:var(--c-violet)}
+.chip-rose{background:var(--c-rose-light);color:var(--c-rose)}
+.chip-green{background:var(--c-green-light);color:var(--c-green)}
+.chip-red{background:var(--c-red-light);color:var(--c-red)}
+.amount-debit{color:var(--c-red);font-weight:700;font-variant-numeric:tabular-nums}
+.amount-credit{color:var(--c-green);font-weight:700;font-variant-numeric:tabular-nums}
+.status-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;font-size:.7rem;font-weight:600}
+.status-completed{background:var(--c-green-light);color:var(--c-green)}
+.status-pending{background:var(--c-amber-light);color:var(--c-amber)}
+.status-failed{background:var(--c-red-light);color:var(--c-red)}
+.status-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+
+/* ── Right panel ───────────────────────────────────────────── */
+.right-col{display:flex;flex-direction:column;gap:16px}
+
+/* ── Quick transfer ────────────────────────────────────────── */
+.qtr-payees{display:flex;gap:10px;overflow-x:auto;padding:4px 2px;scrollbar-width:none}
+.qtr-payees::-webkit-scrollbar{display:none}
+.qtr-payee{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;min-width:52px}
+.qtr-payee-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;color:#fff;border:2px solid transparent;transition:border-color .15s,box-shadow .15s}
+.qtr-payee.active .qtr-payee-avatar{border-color:var(--c-teal);box-shadow:0 0 0 3px var(--c-teal-light)}
+.qtr-payee-name{font-size:.7rem;color:var(--c-text-muted);white-space:nowrap}
+.qtr-form{padding:0 20px 16px;display:flex;flex-direction:column;gap:10px}
+.form-label{font-size:.72rem;font-weight:600;color:var(--c-text-muted);margin-bottom:3px;display:block}
+.form-input-wrap{position:relative}
+.form-currency{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:.9rem;font-weight:600;color:var(--c-text-muted);pointer-events:none}
+.form-input{width:100%;height:38px;border:1px solid var(--c-border);border-radius:8px;padding:0 12px 0 28px;font-size:.9rem;font-weight:600;color:var(--c-text-primary);outline:none;background:var(--c-canvas);transition:border-color .15s}
+.form-input:focus{border-color:var(--c-border-focus);background:#fff}
+.form-input-plain{padding-left:12px}
+.qtr-btn{height:40px;border-radius:8px;border:none;background:var(--c-teal);color:#fff;font-size:.85rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s}
+.qtr-btn:hover{opacity:.88}
+.qtr-payees-wrap{padding:0 20px 12px}
+
+/* ── Scheduled payments ─────────────────────────────────────── */
+.sched-list{padding:0 20px 16px;display:flex;flex-direction:column;gap:0}
+.sched-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--c-border)}
+.sched-item:last-child{border-bottom:none}
+.sched-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.sched-info{flex:1;min-width:0}
+.sched-name{font-size:.82rem;font-weight:600;color:var(--c-text-primary)}
+.sched-date{font-size:.72rem;color:var(--c-text-muted)}
+.sched-amt{font-size:.82rem;font-weight:700;color:var(--c-text-primary);font-variant-numeric:tabular-nums;white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ── Sidebar ──────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <!-- Original shield SVG mark -->
+      <svg class="sb-logo" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect width="34" height="34" rx="8" fill="rgba(255,255,255,.1)"/>
+        <path d="M17 5 L28 9.5 V18 C28 23.5 22.8 28.3 17 30 C11.2 28.3 6 23.5 6 18 V9.5 Z" fill="none" stroke="rgba(56,189,248,.8)" stroke-width="1.5"/>
+        <path d="M17 8 L25.5 11.5 V18 C25.5 22.3 21.6 26.1 17 27.5 C12.4 26.1 8.5 22.3 8.5 18 V11.5 Z" fill="rgba(37,99,235,.35)"/>
+        <path d="M13 17.5 L15.5 20 L21 14.5" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="sb-wordmark">Harbor<span>Bank</span></span>
+    </div>
+
+    <!-- Accounts -->
+    <div class="sb-accounts">
+      <div class="sb-section-label">My Accounts</div>
+      <div class="sb-account active">
+        <div class="sb-acct-dot" style="background:var(--c-blue)"></div>
+        <div class="sb-acct-info">
+          <div class="sb-acct-name">Primary Checking</div>
+          <div class="sb-acct-mask">····4821</div>
+        </div>
+        <div class="sb-acct-bal">$12,480.55</div>
+      </div>
+      <div class="sb-account">
+        <div class="sb-acct-dot" style="background:var(--c-teal)"></div>
+        <div class="sb-acct-info">
+          <div class="sb-acct-name">Savings Vault</div>
+          <div class="sb-acct-mask">····7093</div>
+        </div>
+        <div class="sb-acct-bal">$34,210.00</div>
+      </div>
+      <div class="sb-account">
+        <div class="sb-acct-dot" style="background:var(--c-amber)"></div>
+        <div class="sb-acct-info">
+          <div class="sb-acct-name">Investment Port.</div>
+          <div class="sb-acct-mask">····2255</div>
+        </div>
+        <div class="sb-acct-bal">$58,740.30</div>
+      </div>
+    </div>
+
+    <!-- Nav -->
+    <nav class="sb-nav">
+      <div class="sb-nav-group">
+        <div class="sb-section-label">Overview</div>
+        <div class="sb-nav-item active">
+          <svg class="sb-nav-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="11" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="11" width="6" height="6" rx="1.5"/><rect x="11" y="11" width="6" height="6" rx="1.5"/></svg>
+          Dashboard
+        </div>
+        <div class="sb-nav-item">
+          <svg class="sb-nav-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2 9h14M9 2v14" stroke-linecap="round"/><circle cx="9" cy="9" r="7.5"/></svg>
+          Analytics
+        </div>
+        <div class="sb-nav-item">
+          <svg class="sb-nav-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M9 1.5 L16.5 5.5 V12.5 C16.5 14.7 13 16.8 9 17.5 C5 16.8 1.5 14.7 1.5 12.5 V5.5 Z" stroke-linejoin="round"/></svg>
+          Accounts
+        </div>
+      </div>
+      <div class="sb-nav-group">
+        <div class="sb-section-label">Payments</div>
+        <div class="sb-nav-item">
+          <svg class="sb-nav-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="1.5" y="4" width="15" height="11" rx="2"/><path d="M1.5 8h15" stroke-linecap="round"/></svg>
+          Cards
+          <span class="sb-nav-badge">2</span>
+        </div>
+        <div class="sb-nav-item">
+          <svg class="sb-nav-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 9l4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="9" r="7.5"/></svg>
+          Transfers
+        </div>
+        <div class="sb-nav-item">
+          <svg class="sb-nav-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M9 1v16M5 5l4-4 4 4M5 13l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Transactions
+        </div>
+      </div>
+      <div class="sb-nav-group">
+        <div class="sb-section-label">Settings</div>
+        <div class="sb-nav-item">
+          <svg class="sb-nav-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="9" cy="9" r="2.5"/><path d="M9 1v2.5M9 14.5V17M1 9h2.5M14.5 9H17M3.05 3.05l1.77 1.77M13.18 13.18l1.77 1.77M3.05 14.95l1.77-1.77M13.18 4.82l1.77-1.77" stroke-linecap="round"/></svg>
+          Settings
+        </div>
+      </div>
+    </nav>
+
+    <div class="sb-user">
+      <div class="sb-user-avatar">MR</div>
+      <div>
+        <div class="sb-user-name">Maya Reyes</div>
+        <div class="sb-user-role">Account Holder</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main ─────────────────────────────────────────────── -->
+  <div class="main">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-title">Dashboard</div>
+      <div class="topbar-search">
+        <svg class="topbar-search-icon" width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="6.5" cy="6.5" r="5.5"/><path d="M11 11 L14 14" stroke-linecap="round"/></svg>
+        <input type="search" placeholder="Search transactions, accounts…" aria-label="Search">
+      </div>
+      <div class="topbar-spacer"></div>
+      <div class="topbar-actions">
+        <button class="icon-btn" aria-label="Help">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="9" cy="9" r="7.5"/><path d="M6.5 6.8a2.5 2.5 0 0 1 5 .8c0 1.4-1.5 2-2.5 2.7" stroke-linecap="round"/><circle cx="9" cy="13" r=".8" fill="currentColor"/></svg>
+        </button>
+        <button class="icon-btn" aria-label="Notifications">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M9 1.5a5.5 5.5 0 0 1 5.5 5.5c0 3 .8 4.5 1.5 5.5H2c.7-1 1.5-2.5 1.5-5.5A5.5 5.5 0 0 1 9 1.5Z"/><path d="M7.5 15.5a1.5 1.5 0 0 0 3 0" stroke-linecap="round"/></svg>
+          <span class="notif-badge"></span>
+        </button>
+        <div class="topbar-avatar" aria-label="Account">MR</div>
+        <div class="topbar-user-info">
+          <span class="topbar-user-name">Maya Reyes</span>
+          <span class="topbar-user-role">Personal</span>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--c-text-muted)" stroke-width="1.8" aria-hidden="true"><path d="M3 5l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </header>
+
+    <!-- Page -->
+    <main class="page">
+
+      <!-- Page header -->
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1>Good morning, Maya 👋</h1>
+          <p>Monday, June 2 · 2026 · Here's your financial summary</p>
+        </div>
+        <div class="page-header-actions">
+          <button class="btn btn-ghost">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 10.5v2h2L11 5.5 9 3.5 2 10.5Z M9 3.5l1.5-1.5 1 1L10 4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Export
+          </button>
+          <button class="btn btn-primary">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M7 2v10M2 7h10" stroke-linecap="round"/></svg>
+            New Transfer
+          </button>
+        </div>
+      </div>
+
+      <!-- Hero row: card + KPIs -->
+      <div class="hero-row">
+
+        <!-- Payment card -->
+        <div class="payment-card-wrap">
+          <div class="payment-card" role="img" aria-label="Harbor Bank card ending in 4821">
+            <!-- Background abstract geometry -->
+            <svg class="pc-bg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+              <defs>
+                <radialGradient id="glowA" cx="80%" cy="20%">
+                  <stop offset="0%" stop-color="rgba(255,255,255,.12)"/>
+                  <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+                </radialGradient>
+                <radialGradient id="glowB" cx="20%" cy="80%">
+                  <stop offset="0%" stop-color="rgba(13,148,136,.18)"/>
+                  <stop offset="100%" stop-color="rgba(13,148,136,0)"/>
+                </radialGradient>
+              </defs>
+              <ellipse cx="260" cy="40" rx="140" ry="100" fill="url(#glowA)"/>
+              <ellipse cx="60" cy="160" rx="100" ry="70" fill="url(#glowB)"/>
+              <!-- Abstract circuit traces -->
+              <path d="M30 140 h40 v-20 h60 v20 h80" stroke="rgba(255,255,255,.12)" stroke-width="1" fill="none"/>
+              <path d="M60 100 h20 v-30 h50 v10 h30 v-10 h30" stroke="rgba(255,255,255,.10)" stroke-width="1" fill="none"/>
+              <circle cx="70" cy="140" r="3" fill="rgba(255,255,255,.18)"/>
+              <circle cx="130" cy="120" r="2" fill="rgba(255,255,255,.15)"/>
+              <circle cx="190" cy="90" r="2.5" fill="rgba(56,189,248,.3)"/>
+              <circle cx="250" cy="130" r="3" fill="rgba(56,189,248,.2)"/>
+            </svg>
+
+            <!-- Top row: chip + brand -->
+            <div class="pc-chip-row">
+              <!-- Abstract EMV-style chip SVG -->
+              <svg width="36" height="28" viewBox="0 0 36 28" fill="none" aria-hidden="true">
+                <rect x="1" y="1" width="34" height="26" rx="4" fill="rgba(255,255,255,.15)" stroke="rgba(255,255,255,.3)" stroke-width=".8"/>
+                <rect x="1" y="9" width="34" height="1.5" fill="rgba(255,255,255,.25)"/>
+                <rect x="1" y="17.5" width="34" height="1.5" fill="rgba(255,255,255,.25)"/>
+                <rect x="13" y="1" width="1.5" height="26" fill="rgba(255,255,255,.25)"/>
+                <rect x="21.5" y="1" width="1.5" height="26" fill="rgba(255,255,255,.25)"/>
+                <rect x="5" y="5" width="26" height="18" rx="2" fill="rgba(255,255,255,.07)"/>
+              </svg>
+              <div class="pc-brand">Harbor<span>Bank</span></div>
+            </div>
+
+            <!-- Card number -->
+            <div class="pc-number">····  ····  ····  4821</div>
+
+            <!-- Bottom row: holder + expiry + network marks -->
+            <div class="pc-row">
+              <div class="pc-holder-block">
+                <span class="pc-label">Card Holder</span>
+                <span class="pc-val">Maya A. Reyes</span>
+              </div>
+              <div class="pc-expiry-block">
+                <span class="pc-label">Expires</span>
+                <span class="pc-val">09 / 29</span>
+              </div>
+              <!-- Abstract dual-circle network mark (fictional) -->
+              <div class="pc-network">
+                <svg width="44" height="28" viewBox="0 0 44 28" fill="none" aria-hidden="true" aria-label="HarborPay network">
+                  <circle cx="16" cy="14" r="12" fill="rgba(255,255,255,.25)"/>
+                  <circle cx="28" cy="14" r="12" fill="rgba(56,189,248,.35)"/>
+                  <text x="22" y="19" font-size="6" font-weight="800" fill="rgba(255,255,255,.8)" text-anchor="middle" font-family="system-ui,sans-serif">HP</text>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI: Balance -->
+        <div class="kpi-tile">
+          <div class="kpi-header">
+            <span class="kpi-label">Total Balance</span>
+            <div class="kpi-icon kpi-icon-blue">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="1" y="4" width="14" height="10" rx="2"/><path d="M5 4V2.5a3 3 0 0 1 6 0V4" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value tabnum">$105,430.85</div>
+          <div class="kpi-footer">
+            <span class="kpi-delta kpi-delta-up">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><path d="M5 2 L8.5 7 H1.5 Z"/></svg>
+              +2.4%
+            </span>
+            <span class="kpi-period">vs last month</span>
+          </div>
+        </div>
+
+        <!-- KPI: Income -->
+        <div class="kpi-tile">
+          <div class="kpi-header">
+            <span class="kpi-label">Monthly Income</span>
+            <div class="kpi-icon kpi-icon-green">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 2v12M4 9l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value tabnum">$7,250.00</div>
+          <div class="kpi-footer">
+            <span class="kpi-delta kpi-delta-up">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><path d="M5 2 L8.5 7 H1.5 Z"/></svg>
+              +5.1%
+            </span>
+            <span class="kpi-period">vs May 2026</span>
+          </div>
+        </div>
+
+        <!-- KPI: Spending -->
+        <div class="kpi-tile">
+          <div class="kpi-header">
+            <span class="kpi-label">Monthly Spending</span>
+            <div class="kpi-icon kpi-icon-red">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 14V2M4 7l4-4 4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="kpi-value tabnum">$3,148.62</div>
+          <div class="kpi-footer">
+            <span class="kpi-delta kpi-delta-down">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><path d="M5 8 L8.5 3 H1.5 Z"/></svg>
+              +8.3%
+            </span>
+            <span class="kpi-period">vs May 2026</span>
+          </div>
+        </div>
+
+      </div><!-- /hero-row -->
+
+      <!-- Content grid -->
+      <div class="content-grid">
+
+        <!-- Left column -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+
+          <!-- Donut chart card -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Spending by Category</span>
+              <div class="period-tabs">
+                <button class="period-tab active">This Month</button>
+                <button class="period-tab">Last Month</button>
+                <button class="period-tab">3 Months</button>
+              </div>
+            </div>
+            <div class="donut-section">
+              <div class="donut-wrap">
+                <!-- Original inline SVG donut -->
+                <svg class="donut-chart" width="130" height="130" viewBox="0 0 130 130" aria-label="Spending by category donut chart" role="img">
+                  <defs>
+                    <style>
+                      .seg{fill:none;stroke-width:18;stroke-linecap:butt}
+                    </style>
+                  </defs>
+                  <!-- r=46, circumference ≈ 289, center=65 -->
+                  <!-- Housing: 32% → 92.5px, start=0 -->
+                  <circle class="seg" cx="65" cy="65" r="46" stroke="var(--c-blue)"    stroke-dasharray="92.5 196.5"  stroke-dashoffset="0"     transform="rotate(-90 65 65)"/>
+                  <!-- Food: 22% → 63.6px, start=92.5 -->
+                  <circle class="seg" cx="65" cy="65" r="46" stroke="var(--c-teal)"    stroke-dasharray="63.6 225.4"  stroke-dashoffset="-92.5"  transform="rotate(-90 65 65)"/>
+                  <!-- Transport: 16% → 46.2px, start=156.1 -->
+                  <circle class="seg" cx="65" cy="65" r="46" stroke="var(--c-amber)"   stroke-dasharray="46.2 242.8"  stroke-dashoffset="-156.1" transform="rotate(-90 65 65)"/>
+                  <!-- Entertainment: 13% → 37.6px, start=202.3 -->
+                  <circle class="seg" cx="65" cy="65" r="46" stroke="var(--c-violet)"  stroke-dasharray="37.6 251.4"  stroke-dashoffset="-202.3" transform="rotate(-90 65 65)"/>
+                  <!-- Health: 10% → 28.9px, start=239.9 -->
+                  <circle class="seg" cx="65" cy="65" r="46" stroke="var(--c-rose)"    stroke-dasharray="28.9 260.1"  stroke-dashoffset="-239.9" transform="rotate(-90 65 65)"/>
+                  <!-- Other: 7% → 20.2px, start=268.8 -->
+                  <circle class="seg" cx="65" cy="65" r="46" stroke="var(--c-text-faint)" stroke-dasharray="20.2 268.8" stroke-dashoffset="-268.8" transform="rotate(-90 65 65)"/>
+                  <!-- Center label -->
+                  <text x="65" y="60" text-anchor="middle" font-size="11" font-weight="700" fill="var(--c-text-primary)" font-family="system-ui,sans-serif">Total</text>
+                  <text x="65" y="75" text-anchor="middle" font-size="13" font-weight="800" fill="var(--c-navy)" font-family="system-ui,sans-serif" font-variant-numeric="tabular-nums">$3,148</text>
+                </svg>
+
+                <!-- Legend -->
+                <div class="donut-legend">
+                  <div class="legend-item">
+                    <div class="legend-dot" style="background:var(--c-blue)"></div>
+                    <span class="legend-label">Housing</span>
+                    <span class="legend-amt">$1,006</span>
+                    <div class="legend-bar-wrap"><div class="legend-bar" style="width:32%;background:var(--c-blue)"></div></div>
+                    <span class="legend-pct">32%</span>
+                  </div>
+                  <div class="legend-item">
+                    <div class="legend-dot" style="background:var(--c-teal)"></div>
+                    <span class="legend-label">Food &amp; Dining</span>
+                    <span class="legend-amt">$693</span>
+                    <div class="legend-bar-wrap"><div class="legend-bar" style="width:22%;background:var(--c-teal)"></div></div>
+                    <span class="legend-pct">22%</span>
+                  </div>
+                  <div class="legend-item">
+                    <div class="legend-dot" style="background:var(--c-amber)"></div>
+                    <span class="legend-label">Transport</span>
+                    <span class="legend-amt">$503</span>
+                    <div class="legend-bar-wrap"><div class="legend-bar" style="width:16%;background:var(--c-amber)"></div></div>
+                    <span class="legend-pct">16%</span>
+                  </div>
+                  <div class="legend-item">
+                    <div class="legend-dot" style="background:var(--c-violet)"></div>
+                    <span class="legend-label">Entertainment</span>
+                    <span class="legend-amt">$409</span>
+                    <div class="legend-bar-wrap"><div class="legend-bar" style="width:13%;background:var(--c-violet)"></div></div>
+                    <span class="legend-pct">13%</span>
+                  </div>
+                  <div class="legend-item">
+                    <div class="legend-dot" style="background:var(--c-rose)"></div>
+                    <span class="legend-label">Health</span>
+                    <span class="legend-amt">$315</span>
+                    <div class="legend-bar-wrap"><div class="legend-bar" style="width:10%;background:var(--c-rose)"></div></div>
+                    <span class="legend-pct">10%</span>
+                  </div>
+                  <div class="legend-item">
+                    <div class="legend-dot" style="background:var(--c-text-faint)"></div>
+                    <span class="legend-label">Other</span>
+                    <span class="legend-amt">$222</span>
+                    <div class="legend-bar-wrap"><div class="legend-bar" style="width:7%;background:var(--c-text-faint)"></div></div>
+                    <span class="legend-pct">7%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Transactions table card -->
+          <div class="card">
+            <div class="card-header" style="padding-bottom:12px">
+              <span class="card-title">Recent Transactions</span>
+              <a href="#" class="card-action">View all</a>
+            </div>
+            <table class="txn-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Merchant</th>
+                  <th>Category</th>
+                  <th class="tabnum">Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="color:var(--c-text-muted);white-space:nowrap">Jun 01, 2026</td>
+                  <td>
+                    <div class="txn-merchant">
+                      <div class="txn-merchant-icon" style="background:var(--c-teal-light);color:var(--c-teal)">🛒</div>
+                      <div>
+                        <div class="txn-merchant-name">Verdana Fresh Market</div>
+                        <div class="txn-merchant-sub">Supermarket · Downtown</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="chip chip-teal">Food</span></td>
+                  <td class="amount-debit">−$84.30</td>
+                  <td><span class="status-pill status-completed"><span class="status-dot"></span>Completed</span></td>
+                </tr>
+                <tr>
+                  <td style="color:var(--c-text-muted);white-space:nowrap">May 31, 2026</td>
+                  <td>
+                    <div class="txn-merchant">
+                      <div class="txn-merchant-icon" style="background:var(--c-blue-light);color:var(--c-blue)">💼</div>
+                      <div>
+                        <div class="txn-merchant-name">Nexora Corp. Payroll</div>
+                        <div class="txn-merchant-sub">Direct Deposit</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="chip chip-blue">Income</span></td>
+                  <td class="amount-credit">+$3,625.00</td>
+                  <td><span class="status-pill status-completed"><span class="status-dot"></span>Completed</span></td>
+                </tr>
+                <tr>
+                  <td style="color:var(--c-text-muted);white-space:nowrap">May 30, 2026</td>
+                  <td>
+                    <div class="txn-merchant">
+                      <div class="txn-merchant-icon" style="background:var(--c-amber-light);color:var(--c-amber)">🚗</div>
+                      <div>
+                        <div class="txn-merchant-name">Orbita Fuel Station</div>
+                        <div class="txn-merchant-sub">Gas &amp; Automotive</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="chip chip-amber">Transport</span></td>
+                  <td class="amount-debit">−$62.15</td>
+                  <td><span class="status-pill status-completed"><span class="status-dot"></span>Completed</span></td>
+                </tr>
+                <tr>
+                  <td style="color:var(--c-text-muted);white-space:nowrap">May 29, 2026</td>
+                  <td>
+                    <div class="txn-merchant">
+                      <div class="txn-merchant-icon" style="background:var(--c-violet-light);color:var(--c-violet)">🎬</div>
+                      <div>
+                        <div class="txn-merchant-name">Luminae Streaming</div>
+                        <div class="txn-merchant-sub">Subscription · Monthly</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="chip chip-violet">Entertainment</span></td>
+                  <td class="amount-debit">−$16.90</td>
+                  <td><span class="status-pill status-completed"><span class="status-dot"></span>Completed</span></td>
+                </tr>
+                <tr>
+                  <td style="color:var(--c-text-muted);white-space:nowrap">May 28, 2026</td>
+                  <td>
+                    <div class="txn-merchant">
+                      <div class="txn-merchant-icon" style="background:var(--c-rose-light);color:var(--c-rose)">💊</div>
+                      <div>
+                        <div class="txn-merchant-name">Altera Pharmacy</div>
+                        <div class="txn-merchant-sub">Health &amp; Wellness</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="chip chip-rose">Health</span></td>
+                  <td class="amount-debit">−$43.80</td>
+                  <td><span class="status-pill status-pending"><span class="status-dot"></span>Pending</span></td>
+                </tr>
+                <tr>
+                  <td style="color:var(--c-text-muted);white-space:nowrap">May 27, 2026</td>
+                  <td>
+                    <div class="txn-merchant">
+                      <div class="txn-merchant-icon" style="background:var(--c-blue-light);color:var(--c-blue)">🏠</div>
+                      <div>
+                        <div class="txn-merchant-name">Crestline Rentals LLC</div>
+                        <div class="txn-merchant-sub">Housing · Rent</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="chip chip-blue">Housing</span></td>
+                  <td class="amount-debit">−$1,006.00</td>
+                  <td><span class="status-pill status-completed"><span class="status-dot"></span>Completed</span></td>
+                </tr>
+                <tr>
+                  <td style="color:var(--c-text-muted);white-space:nowrap">May 26, 2026</td>
+                  <td>
+                    <div class="txn-merchant">
+                      <div class="txn-merchant-icon" style="background:var(--c-teal-light);color:var(--c-teal)">☕</div>
+                      <div>
+                        <div class="txn-merchant-name">Brewer &amp; Stone Café</div>
+                        <div class="txn-merchant-sub">Coffee &amp; Bakery</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="chip chip-teal">Food</span></td>
+                  <td class="amount-debit">−$12.40</td>
+                  <td><span class="status-pill status-failed"><span class="status-dot"></span>Failed</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div><!-- /left col -->
+
+        <!-- Right column -->
+        <div class="right-col">
+
+          <!-- Quick Transfer card -->
+          <div class="card">
+            <div class="card-header" style="padding-bottom:14px">
+              <span class="card-title">Quick Transfer</span>
+              <a href="#" class="card-action">All payees</a>
+            </div>
+            <div class="qtr-payees-wrap">
+              <div class="qtr-payees">
+                <div class="qtr-payee active">
+                  <div class="qtr-payee-avatar" style="background:linear-gradient(135deg,var(--c-blue),var(--c-teal))">TK</div>
+                  <span class="qtr-payee-name">Theo</span>
+                </div>
+                <div class="qtr-payee">
+                  <div class="qtr-payee-avatar" style="background:linear-gradient(135deg,var(--c-violet),var(--c-rose))">SL</div>
+                  <span class="qtr-payee-name">Sylvia</span>
+                </div>
+                <div class="qtr-payee">
+                  <div class="qtr-payee-avatar" style="background:linear-gradient(135deg,var(--c-amber),#f59e0b)">RC</div>
+                  <span class="qtr-payee-name">Ravi</span>
+                </div>
+                <div class="qtr-payee">
+                  <div class="qtr-payee-avatar" style="background:linear-gradient(135deg,var(--c-teal),var(--c-green))">NP</div>
+                  <span class="qtr-payee-name">Nadia</span>
+                </div>
+                <div class="qtr-payee">
+                  <div class="qtr-payee-avatar" style="background:linear-gradient(135deg,#9333ea,var(--c-blue))">+</div>
+                  <span class="qtr-payee-name">Add</span>
+                </div>
+              </div>
+            </div>
+            <div class="qtr-form">
+              <div>
+                <label class="form-label" for="transfer-amount">Amount</label>
+                <div class="form-input-wrap">
+                  <span class="form-currency">$</span>
+                  <input class="form-input tabnum" id="transfer-amount" type="text" placeholder="0.00" value="200.00">
+                </div>
+              </div>
+              <div>
+                <label class="form-label" for="transfer-note">Note (optional)</label>
+                <input class="form-input form-input-plain" id="transfer-note" type="text" placeholder="e.g. Dinner split">
+              </div>
+              <button class="qtr-btn">
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 7.5h11M8.5 3l4.5 4.5L8.5 12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Send Money
+              </button>
+            </div>
+          </div>
+
+          <!-- Scheduled payments card -->
+          <div class="card">
+            <div class="card-header" style="padding-bottom:4px">
+              <span class="card-title">Upcoming Payments</span>
+              <a href="#" class="card-action">See all</a>
+            </div>
+            <div class="sched-list">
+              <div class="sched-item">
+                <div class="sched-icon" style="background:var(--c-blue-light);color:var(--c-blue)">💡</div>
+                <div class="sched-info">
+                  <div class="sched-name">Voltara Electric Co.</div>
+                  <div class="sched-date">Due Jun 05, 2026</div>
+                </div>
+                <div class="sched-amt tabnum">$128.40</div>
+              </div>
+              <div class="sched-item">
+                <div class="sched-icon" style="background:var(--c-violet-light);color:var(--c-violet)">📡</div>
+                <div class="sched-info">
+                  <div class="sched-name">Nexlink Internet</div>
+                  <div class="sched-date">Due Jun 08, 2026</div>
+                </div>
+                <div class="sched-amt tabnum">$59.99</div>
+              </div>
+              <div class="sched-item">
+                <div class="sched-icon" style="background:var(--c-teal-light);color:var(--c-teal)">🏋️</div>
+                <div class="sched-info">
+                  <div class="sched-name">Apexform Fitness</div>
+                  <div class="sched-date">Due Jun 12, 2026</div>
+                </div>
+                <div class="sched-amt tabnum">$45.00</div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /right col -->
+
+      </div><!-- /content-grid -->
+
+    </main><!-- /page -->
+  </div><!-- /main -->
+</div><!-- /shell -->
+</body>
+</html>

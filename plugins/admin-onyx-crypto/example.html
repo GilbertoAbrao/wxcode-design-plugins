@@ -1,0 +1,900 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onyx Crypto Admin</title>
+<style>
+:root {
+  --bg-base:      #0a0a0f;
+  --bg-surface:   #14141c;
+  --bg-elevated:  #1c1c28;
+  --bg-hover:     #222232;
+  --border:       #262633;
+  --border-light: #2e2e40;
+
+  --text-primary: #e8e8f0;
+  --text-muted:   #8a8aa0;
+  --text-dim:     #55556a;
+
+  --accent-emerald:     #10b981;
+  --accent-emerald-dim: #0d9166;
+  --accent-emerald-bg:  rgba(16,185,129,.10);
+  --accent-emerald-glow:rgba(16,185,129,.18);
+
+  --accent-violet:      #8b5cf6;
+  --accent-violet-bg:   rgba(139,92,246,.12);
+
+  --gain:    #10b981;
+  --gain-bg: rgba(16,185,129,.12);
+  --loss:    #f43f5e;
+  --loss-bg: rgba(244,63,94,.12);
+
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --radius-card: 10px;
+  --rail-w: 220px;
+  --topbar-h: 60px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  font-size: 14px;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  display: flex;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Left Rail ── */
+.rail {
+  width: var(--rail-w);
+  min-height: 100vh;
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 20;
+}
+
+.rail-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.rail-brand-mark {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--accent-emerald), var(--accent-violet));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.rail-brand-name { font-weight: 700; font-size: 15px; letter-spacing: -.3px; }
+.rail-brand-name span { color: var(--accent-emerald); }
+
+.rail-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 16px 18px 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 18px;
+  border-radius: 0;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 13.5px;
+  font-weight: 500;
+  position: relative;
+  transition: background .15s, color .15s;
+  text-decoration: none;
+}
+.nav-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+.nav-item.active {
+  color: var(--accent-emerald);
+  background: var(--accent-emerald-bg);
+}
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 6px; bottom: 6px;
+  width: 3px;
+  background: var(--accent-emerald);
+  border-radius: 0 3px 3px 0;
+}
+.nav-item svg { flex-shrink: 0; opacity: .8; }
+.nav-item.active svg { opacity: 1; }
+.nav-badge {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 20px;
+  background: var(--accent-violet-bg);
+  color: var(--accent-violet);
+}
+
+.rail-nav { flex: 1; overflow-y: auto; padding-bottom: 8px; }
+
+.rail-footer {
+  border-top: 1px solid var(--border);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rail-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-violet), var(--accent-emerald));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; flex-shrink: 0;
+}
+.rail-user-name { font-size: 13px; font-weight: 600; }
+.rail-user-role { font-size: 11px; color: var(--text-muted); }
+
+/* ── Main ── */
+.main {
+  margin-left: var(--rail-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ── Topbar ── */
+.topbar {
+  height: var(--topbar-h);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.network-pill {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 12.5px; font-weight: 600;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+.net-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent-emerald);
+  box-shadow: 0 0 6px var(--accent-emerald);
+}
+.wallet-switcher {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 12px; font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.wallet-addr { font-variant-numeric: tabular-nums; font-family: monospace; font-size: 11.5px; }
+
+.topbar-search {
+  flex: 1;
+  max-width: 320px;
+  margin: 0 auto;
+}
+.search-wrap {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 12px;
+}
+.search-wrap input {
+  background: none; border: none; outline: none;
+  color: var(--text-primary);
+  font-family: var(--font);
+  font-size: 13px;
+  width: 100%;
+}
+.search-wrap input::placeholder { color: var(--text-dim); }
+
+.topbar-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+.icon-btn {
+  width: 36px; height: 36px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: var(--text-muted);
+  position: relative;
+}
+.icon-btn:hover { color: var(--text-primary); }
+.notif-dot {
+  position: absolute; top: 7px; right: 7px;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--loss);
+  border: 1px solid var(--bg-surface);
+}
+.top-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-emerald), var(--accent-violet));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+  cursor: pointer;
+}
+
+/* ── Page Content ── */
+.page {
+  padding: 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Page Header ── */
+.page-header {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+}
+.page-title { font-size: 20px; font-weight: 700; letter-spacing: -.4px; }
+.page-sub { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+.page-actions { display: flex; gap: 10px; }
+.btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: 8px;
+  font-family: var(--font); font-size: 13px; font-weight: 600;
+  cursor: pointer; border: none;
+}
+.btn-ghost {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+.btn-ghost:hover { border-color: var(--border-light); color: var(--text-primary); }
+.btn-primary {
+  background: var(--accent-emerald);
+  color: #fff;
+}
+.btn-primary:hover { background: var(--accent-emerald-dim); }
+
+/* ── KPI Cards ── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.kpi-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 18px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 0 0 0 transparent;
+  transition: border-color .2s, box-shadow .2s;
+}
+.kpi-card:hover {
+  border-color: var(--accent-emerald);
+  box-shadow: 0 0 16px var(--accent-emerald-glow);
+}
+.kpi-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.kpi-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; }
+.kpi-value {
+  font-size: 24px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.5px;
+  line-height: 1;
+}
+.kpi-sparkline { flex-shrink: 0; }
+.kpi-footer { display: flex; align-items: center; gap: 6px; }
+.delta-chip {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 11.5px; font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  padding: 2px 7px; border-radius: 20px;
+}
+.delta-chip.gain { background: var(--gain-bg); color: var(--gain); }
+.delta-chip.loss { background: var(--loss-bg); color: var(--loss); }
+.kpi-sub { font-size: 11.5px; color: var(--text-muted); }
+
+/* ── Mid Grid ── */
+.mid-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 16px;
+}
+
+/* ── Chart Card ── */
+.card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+.card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.card-title { font-size: 14px; font-weight: 700; }
+.card-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.timeframe-tabs { display: flex; gap: 4px; }
+.tf-tab {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  font-family: var(--font);
+}
+.tf-tab:hover { color: var(--text-primary); background: var(--bg-hover); }
+.tf-tab.active {
+  background: var(--accent-emerald-bg);
+  color: var(--accent-emerald);
+}
+.chart-wrap {
+  padding: 12px 20px 16px;
+  position: relative;
+}
+.chart-callout {
+  display: flex; align-items: baseline; gap: 10px;
+  margin-bottom: 10px;
+}
+.chart-callout-val {
+  font-size: 28px; font-weight: 700;
+  font-variant-numeric: tabular-nums; letter-spacing: -.6px;
+}
+.chart-callout-delta {
+  font-size: 13px; font-weight: 600;
+  color: var(--gain);
+  font-variant-numeric: tabular-nums;
+}
+.chart-callout-period { font-size: 12px; color: var(--text-muted); }
+
+/* ── Market Movers ── */
+.movers-list { padding: 0; }
+.mover-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--border);
+  transition: background .12s;
+}
+.mover-item:last-child { border-bottom: none; }
+.mover-item:hover { background: var(--bg-hover); }
+.mover-badge {
+  width: 34px; height: 34px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; flex-shrink: 0;
+  font-family: monospace;
+}
+.mover-info { flex: 1; min-width: 0; }
+.mover-ticker { font-size: 13px; font-weight: 700; }
+.mover-name { font-size: 11px; color: var(--text-muted); }
+.mover-right { text-align: right; }
+.mover-price { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.mover-delta { font-size: 11.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.mover-delta.gain { color: var(--gain); }
+.mover-delta.loss { color: var(--loss); }
+
+/* ── Holdings Table ── */
+.table-wrap { overflow-x: auto; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+thead th {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 10px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+thead th:last-child { text-align: right; }
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background .12s;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--bg-hover); }
+tbody td {
+  padding: 12px 16px;
+  font-size: 13.5px;
+  font-variant-numeric: tabular-nums;
+  vertical-align: middle;
+}
+tbody td:last-child { text-align: right; }
+.asset-cell { display: flex; align-items: center; gap: 10px; }
+.asset-icon {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800; flex-shrink: 0;
+}
+.asset-ticker { font-size: 13.5px; font-weight: 700; }
+.asset-name { font-size: 11.5px; color: var(--text-muted); }
+.pct-cell { font-weight: 700; font-size: 13px; }
+.pct-cell.gain { color: var(--gain); }
+.pct-cell.loss { color: var(--loss); }
+.action-btn {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 12px; font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: var(--font);
+}
+.action-btn:hover { border-color: var(--accent-emerald); color: var(--accent-emerald); }
+</style>
+</head>
+<body>
+
+<!-- ── Left Rail ── -->
+<nav class="rail" role="navigation" aria-label="Primary navigation">
+  <div class="rail-brand">
+    <div class="rail-brand-mark">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+        <polygon points="9,2 16,6 16,12 9,16 2,12 2,6" fill="none" stroke="white" stroke-width="1.6"/>
+        <circle cx="9" cy="9" r="2.5" fill="white"/>
+      </svg>
+    </div>
+    <div>
+      <div class="rail-brand-name">Onyx<span>X</span></div>
+    </div>
+  </div>
+
+  <div class="rail-nav">
+    <div class="rail-section-label">Portfolio</div>
+    <a class="nav-item active" href="#" aria-current="page">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>
+      Overview
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><polyline points="1,11 5,6 9,8 14,3"/><polyline points="11,3 14,3 14,6"/></svg>
+      Performance
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5v3.5l2.5 1.5"/></svg>
+      History
+      <span class="nav-badge">12</span>
+    </a>
+
+    <div class="rail-section-label">Markets</div>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><line x1="1.5" y1="13.5" x2="14.5" y2="13.5"/><rect x="2.5" y="7.5" width="3" height="6"/><rect x="6.5" y="4.5" width="3" height="9"/><rect x="10.5" y="2.5" width="3" height="11"/></svg>
+      Spot Market
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8a5 5 0 1 0 10 0A5 5 0 0 0 3 8z"/><path d="M8 5v3l2 2"/></svg>
+      Derivatives
+      <span class="nav-badge">3</span>
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2 10l4-4 3 3 5-6"/></svg>
+      Screener
+    </a>
+
+    <div class="rail-section-label">Manage</div>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="1.5" y="5.5" width="13" height="9" rx="1"/><path d="M5 5.5V4a3 3 0 0 1 6 0v1.5"/></svg>
+      Wallets
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="8" cy="5" r="2.5"/><path d="M2.5 13.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/></svg>
+      API Keys
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.22 3.22l1.41 1.41M11.37 11.37l1.41 1.41M3.22 12.78l1.41-1.41M11.37 4.63l1.41-1.41"/></svg>
+      Settings
+    </a>
+  </div>
+
+  <div class="rail-footer">
+    <div class="rail-avatar" aria-hidden="true">KL</div>
+    <div>
+      <div class="rail-user-name">Kai Lorne</div>
+      <div class="rail-user-role">Portfolio Manager</div>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Main ── -->
+<div class="main">
+
+  <!-- Topbar -->
+  <header class="topbar" role="banner">
+    <div class="topbar-left">
+      <div class="network-pill" title="NovaSphere Mainnet">
+        <span class="net-dot"></span>
+        NovaSphere Mainnet
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><path d="M2 3.5l3 3 3-3"/></svg>
+      </div>
+      <div class="wallet-switcher" title="Active wallet">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x=".5" y="2.5" width="12" height="9" rx="1"/><path d="M.5 5.5h12"/><circle cx="9.5" cy="8" r="1.2" fill="currentColor" stroke="none"/></svg>
+        <span class="wallet-addr">0x4f8a…c3d2</span>
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><path d="M2 3.5l3 3 3-3"/></svg>
+      </div>
+    </div>
+
+    <div class="topbar-search">
+      <div class="search-wrap">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="6" cy="6" r="4"/><line x1="9.5" y1="9.5" x2="13" y2="13"/></svg>
+        <input type="search" placeholder="Search assets, tx, wallets…" aria-label="Search">
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <div class="icon-btn" title="Notifications" role="button" tabindex="0">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 1a5 5 0 0 1 5 5v3l1 2H2l1-2V6a5 5 0 0 1 5-5z"/><path d="M6.5 13.5a1.5 1.5 0 0 0 3 0"/></svg>
+        <span class="notif-dot" aria-label="4 unread notifications"></span>
+      </div>
+      <div class="icon-btn" title="Apps" role="button" tabindex="0">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="1" y="1" width="5" height="5" rx="1"/><rect x="9" y="1" width="5" height="5" rx="1"/><rect x="1" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>
+      </div>
+      <div class="top-avatar" title="Kai Lorne" role="button" tabindex="0" aria-label="User menu">KL</div>
+    </div>
+  </header>
+
+  <!-- Page Content -->
+  <main class="page" id="main-content">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Portfolio Overview</h1>
+        <div class="page-sub">May 27 – Jun 1, 2026 &nbsp;·&nbsp; Auto-refreshing every 15s</div>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-ghost">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M7 1v8M4 6l3 3 3-3"/><path d="M1 11h12v2H1z"/></svg>
+          Export CSV
+        </button>
+        <button class="btn btn-primary">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="white" stroke-width="1.8" aria-hidden="true"><line x1="7" y1="2" x2="7" y2="12"/><line x1="2" y1="7" x2="12" y2="7"/></svg>
+          Deposit
+        </button>
+      </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid" role="list" aria-label="Portfolio key metrics">
+      <!-- Card 1: Portfolio Value -->
+      <div class="kpi-card" role="listitem">
+        <div class="kpi-label">Portfolio Value</div>
+        <div class="kpi-row">
+          <div class="kpi-value">$284,912</div>
+          <svg class="kpi-sparkline" width="72" height="32" viewBox="0 0 72 32" fill="none" aria-hidden="true">
+            <polyline points="2,24 10,20 18,22 26,14 34,16 42,10 50,12 58,6 66,8 70,4"
+              fill="none" stroke="var(--accent-emerald)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="kpi-footer">
+          <span class="delta-chip gain">
+            <svg width="9" height="9" viewBox="0 0 9 9" fill="currentColor" aria-hidden="true"><path d="M4.5 1.5l3 4H1.5z"/></svg>
+            +8.34%
+          </span>
+          <span class="kpi-sub">vs last week</span>
+        </div>
+      </div>
+
+      <!-- Card 2: 24h Change -->
+      <div class="kpi-card" role="listitem">
+        <div class="kpi-label">24h Change</div>
+        <div class="kpi-row">
+          <div class="kpi-value" style="color: var(--gain)">+$6,241</div>
+          <svg class="kpi-sparkline" width="72" height="32" viewBox="0 0 72 32" fill="none" aria-hidden="true">
+            <polyline points="2,22 10,20 18,24 26,18 34,20 42,14 50,16 58,12 66,10 70,6"
+              fill="none" stroke="var(--accent-emerald)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="kpi-footer">
+          <span class="delta-chip gain">
+            <svg width="9" height="9" viewBox="0 0 9 9" fill="currentColor" aria-hidden="true"><path d="M4.5 1.5l3 4H1.5z"/></svg>
+            +2.24%
+          </span>
+          <span class="kpi-sub">since yesterday</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Staked -->
+      <div class="kpi-card" role="listitem">
+        <div class="kpi-label">Staked Assets</div>
+        <div class="kpi-row">
+          <div class="kpi-value">$98,450</div>
+          <svg class="kpi-sparkline" width="72" height="32" viewBox="0 0 72 32" fill="none" aria-hidden="true">
+            <polyline points="2,16 10,14 18,16 26,14 34,15 42,13 50,14 58,12 66,13 70,12"
+              fill="none" stroke="var(--accent-violet)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="kpi-footer">
+          <span class="delta-chip gain">
+            <svg width="9" height="9" viewBox="0 0 9 9" fill="currentColor" aria-hidden="true"><path d="M4.5 1.5l3 4H1.5z"/></svg>
+            +0.71%
+          </span>
+          <span class="kpi-sub">APY 12.4%</span>
+        </div>
+      </div>
+
+      <!-- Card 4: Available -->
+      <div class="kpi-card" role="listitem">
+        <div class="kpi-label">Available Balance</div>
+        <div class="kpi-row">
+          <div class="kpi-value">$41,307</div>
+          <svg class="kpi-sparkline" width="72" height="32" viewBox="0 0 72 32" fill="none" aria-hidden="true">
+            <polyline points="2,18 10,22 18,20 26,24 34,22 42,26 50,22 58,24 66,20 70,22"
+              fill="none" stroke="var(--loss)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="kpi-footer">
+          <span class="delta-chip loss">
+            <svg width="9" height="9" viewBox="0 0 9 9" fill="currentColor" aria-hidden="true"><path d="M4.5 7.5l3-4H1.5z"/></svg>
+            -3.10%
+          </span>
+          <span class="kpi-sub">from withdrawals</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mid Grid: Chart + Movers -->
+    <div class="mid-grid">
+
+      <!-- Area Chart Card -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Asset Value</div>
+            <div class="card-sub">Total portfolio USD value over time</div>
+          </div>
+          <div class="timeframe-tabs" role="tablist" aria-label="Chart timeframe">
+            <button class="tf-tab" role="tab" aria-selected="false">1H</button>
+            <button class="tf-tab active" role="tab" aria-selected="true" aria-current="true">24H</button>
+            <button class="tf-tab" role="tab" aria-selected="false">7D</button>
+            <button class="tf-tab" role="tab" aria-selected="false">30D</button>
+            <button class="tf-tab" role="tab" aria-selected="false">ALL</button>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <div class="chart-callout">
+            <span class="chart-callout-val">$284,912</span>
+            <span class="chart-callout-delta">↑ +$6,241 (2.24%)</span>
+            <span class="chart-callout-period">last 24 hours</span>
+          </div>
+          <!-- Inline SVG area chart -->
+          <svg width="100%" viewBox="0 0 680 180" preserveAspectRatio="none" aria-label="Portfolio value area chart" role="img">
+            <defs>
+              <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--accent-emerald)" stop-opacity=".30"/>
+                <stop offset="85%" stop-color="var(--accent-emerald)" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <!-- Grid lines -->
+            <line x1="0" y1="30"  x2="680" y2="30"  stroke="var(--border)" stroke-width=".8"/>
+            <line x1="0" y1="70"  x2="680" y2="70"  stroke="var(--border)" stroke-width=".8"/>
+            <line x1="0" y1="110" x2="680" y2="110" stroke="var(--border)" stroke-width=".8"/>
+            <line x1="0" y1="150" x2="680" y2="150" stroke="var(--border)" stroke-width=".8"/>
+            <!-- Y-axis labels -->
+            <text x="4" y="28"  font-size="9" fill="var(--text-dim)" font-family="var(--font)">$295k</text>
+            <text x="4" y="68"  font-size="9" fill="var(--text-dim)" font-family="var(--font)">$285k</text>
+            <text x="4" y="108" font-size="9" fill="var(--text-dim)" font-family="var(--font)">$275k</text>
+            <text x="4" y="148" font-size="9" fill="var(--text-dim)" font-family="var(--font)">$265k</text>
+            <!-- X-axis labels -->
+            <text x="30"  y="176" font-size="9" fill="var(--text-dim)" font-family="var(--font)" text-anchor="middle">00:00</text>
+            <text x="145" y="176" font-size="9" fill="var(--text-dim)" font-family="var(--font)" text-anchor="middle">06:00</text>
+            <text x="258" y="176" font-size="9" fill="var(--text-dim)" font-family="var(--font)" text-anchor="middle">12:00</text>
+            <text x="370" y="176" font-size="9" fill="var(--text-dim)" font-family="var(--font)" text-anchor="middle">16:00</text>
+            <text x="485" y="176" font-size="9" fill="var(--text-dim)" font-family="var(--font)" text-anchor="middle">20:00</text>
+            <text x="650" y="176" font-size="9" fill="var(--text-dim)" font-family="var(--font)" text-anchor="middle">Now</text>
+            <!-- Area fill -->
+            <path d="M30,140 C60,138 90,132 120,128 C150,124 180,118 210,112 C240,106 270,100 300,96 C330,92 360,88 390,82 C420,76 450,72 480,66 C510,60 540,56 570,52 C600,48 630,44 650,40 L650,160 L30,160 Z"
+              fill="url(#areaGrad)"/>
+            <!-- Stroke line -->
+            <path d="M30,140 C60,138 90,132 120,128 C150,124 180,118 210,112 C240,106 270,100 300,96 C330,92 360,88 390,82 C420,76 450,72 480,66 C510,60 540,56 570,52 C600,48 630,44 650,40"
+              fill="none" stroke="var(--accent-emerald)" stroke-width="2" stroke-linejoin="round"/>
+            <!-- Current value dot -->
+            <circle cx="650" cy="40" r="5" fill="var(--accent-emerald)" stroke="var(--bg-elevated)" stroke-width="2.5"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Market Movers -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Market Movers</div>
+            <div class="card-sub">Top gainers &amp; losers · 24h</div>
+          </div>
+        </div>
+        <div class="movers-list" role="list" aria-label="Market movers">
+          <div class="mover-item" role="listitem">
+            <div class="mover-badge" style="background:rgba(16,185,129,.14);color:var(--accent-emerald)">NOV</div>
+            <div class="mover-info"><div class="mover-ticker">NOVA</div><div class="mover-name">NovaChain</div></div>
+            <div class="mover-right"><div class="mover-price">$4.872</div><div class="mover-delta gain">+18.4%</div></div>
+          </div>
+          <div class="mover-item" role="listitem">
+            <div class="mover-badge" style="background:rgba(139,92,246,.14);color:var(--accent-violet)">ZPH</div>
+            <div class="mover-info"><div class="mover-ticker">ZEPH</div><div class="mover-name">ZephyrX</div></div>
+            <div class="mover-right"><div class="mover-price">$12.540</div><div class="mover-delta gain">+14.7%</div></div>
+          </div>
+          <div class="mover-item" role="listitem">
+            <div class="mover-badge" style="background:rgba(16,185,129,.10);color:var(--accent-emerald)">ARX</div>
+            <div class="mover-info"><div class="mover-ticker">ARXA</div><div class="mover-name">Arxana</div></div>
+            <div class="mover-right"><div class="mover-price">$0.3841</div><div class="mover-delta gain">+9.2%</div></div>
+          </div>
+          <div class="mover-item" role="listitem">
+            <div class="mover-badge" style="background:rgba(244,63,94,.12);color:var(--loss)">KRY</div>
+            <div class="mover-info"><div class="mover-ticker">KRYO</div><div class="mover-name">Kryonite</div></div>
+            <div class="mover-right"><div class="mover-price">$7.219</div><div class="mover-delta loss">-11.3%</div></div>
+          </div>
+          <div class="mover-item" role="listitem">
+            <div class="mover-badge" style="background:rgba(244,63,94,.10);color:var(--loss)">PLX</div>
+            <div class="mover-info"><div class="mover-ticker">PLIX</div><div class="mover-name">Plixel</div></div>
+            <div class="mover-right"><div class="mover-price">$1.064</div><div class="mover-delta loss">-8.6%</div></div>
+          </div>
+          <div class="mover-item" role="listitem">
+            <div class="mover-badge" style="background:rgba(16,185,129,.12);color:var(--accent-emerald)">SOL</div>
+            <div class="mover-info"><div class="mover-ticker">SOLV</div><div class="mover-name">Solvara</div></div>
+            <div class="mover-right"><div class="mover-price">$22.310</div><div class="mover-delta gain">+6.1%</div></div>
+          </div>
+          <div class="mover-item" role="listitem">
+            <div class="mover-badge" style="background:rgba(244,63,94,.10);color:var(--loss)">VRX</div>
+            <div class="mover-info"><div class="mover-ticker">VREX</div><div class="mover-name">VortexNet</div></div>
+            <div class="mover-right"><div class="mover-price">$0.0921</div><div class="mover-delta loss">-5.9%</div></div>
+          </div>
+          <div class="mover-item" role="listitem">
+            <div class="mover-badge" style="background:rgba(139,92,246,.12);color:var(--accent-violet)">OXN</div>
+            <div class="mover-info"><div class="mover-ticker">OXYN</div><div class="mover-name">Onyx Native</div></div>
+            <div class="mover-right"><div class="mover-price">$3.608</div><div class="mover-delta gain">+4.3%</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Holdings Table -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Holdings</div>
+          <div class="card-sub">6 assets · updated Jun 1, 2026 at 08:42 UTC</div>
+        </div>
+        <a href="#" style="font-size:13px;font-weight:600;color:var(--accent-emerald);text-decoration:none;">View All →</a>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Asset</th>
+              <th>Price</th>
+              <th>24h %</th>
+              <th>Holdings</th>
+              <th>Value (USD)</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="asset-cell">
+                  <div class="asset-icon" style="background:rgba(16,185,129,.16);color:var(--accent-emerald)">N</div>
+                  <div><div class="asset-ticker">NOVA</div><div class="asset-name">NovaChain</div></div>
+                </div>
+              </td>
+              <td>$4.872</td>
+              <td class="pct-cell gain">+18.40%</td>
+              <td>18,400 NOVA</td>
+              <td>$89,644</td>
+              <td><button class="action-btn">Trade</button></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="asset-cell">
+                  <div class="asset-icon" style="background:rgba(139,92,246,.16);color:var(--accent-violet)">Z</div>
+                  <div><div class="asset-ticker">ZEPH</div><div class="asset-name">ZephyrX</div></div>
+                </div>
+              </td>
+              <td>$12.540</td>
+              <td class="pct-cell gain">+14.70%</td>
+              <td>4,800 ZEPH</td>
+              <td>$60,192</td>
+              <td><button class="action-btn">Trade</button></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="asset-cell">
+                  <div class="asset-icon" style="background:rgba(244,63,94,.14);color:var(--loss)">K</div>
+                  <div><div class="asset-ticker">KRYO</div><div class="asset-name">Kryonite</div></div>
+                </div>
+              </td>
+              <td>$7.219</td>
+              <td class="pct-cell loss">-11.30%</td>
+              <td>7,100 KRYO</td>
+              <td>$51,255</td>
+              <td><button class="action-btn">Trade</button></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="asset-cell">
+                  <div class="asset-icon" style="background:rgba(16,185,129,.12);color:var(--accent-emerald)">S</div>
+                  <div><div class="asset-ticker">SOLV</div><div class="asset-name">Solvara</div></div>
+                </div>
+              </td>
+              <td>$22.310</td>
+              <td class="pct-cell gain">+6.10%</td>
+              <td>1,960 SOLV</td>
+              <td>$43,727</td>
+              <td><button class="action-btn">Trade</button></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="asset-cell">
+                  <div class="asset-icon" style="background:rgba(139,92,246,.12);color:var(--accent-violet)">A</div>
+                  <div><div class="asset-ticker">ARXA</div><div class="asset-name">Arxana</div></div>
+                </div>
+              </td>
+              <td>$0.3841</td>
+              <td class="pct-cell gain">+9.20%</td>
+              <td>72,000 ARXA</td>
+              <td>$27,655</td>
+              <td><button class="action-btn">Trade</button></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="asset-cell">
+                  <div class="asset-icon" style="background:rgba(244,63,94,.10);color:var(--loss)">P</div>
+                  <div><div class="asset-ticker">PLIX</div><div class="asset-name">Plixel</div></div>
+                </div>
+              </td>
+              <td>$1.064</td>
+              <td class="pct-cell loss">-8.60%</td>
+              <td>12,500 PLIX</td>
+              <td>$13,300</td>
+              <td><button class="action-btn">Trade</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>

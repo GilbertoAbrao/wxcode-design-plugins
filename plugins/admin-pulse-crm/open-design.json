@@ -1,0 +1,96 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "wxcode/admin-pulse-crm",
+  "title": "Pulse CRM Admin",
+  "version": "0.1.0",
+  "description": "Airy light-mode sales CRM admin — left sidebar with workspace switcher, topbar with search and filters, 4 pipeline KPI tiles with sparklines, horizontal pipeline-by-stage strip, recent deals table with stage pills, and a right-side activity and tasks panel. Sky-blue accent on a white/slate canvas.",
+  "license": "MIT",
+  "author": {
+    "name": "WXCode",
+    "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+  },
+  "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-pulse-crm",
+  "tags": [
+    "wxcode-plugin",
+    "wxcode",
+    "first-party",
+    "prototype",
+    "sales",
+    "web",
+    "admin",
+    "crm",
+    "pipeline",
+    "deals",
+    "light-mode",
+    "airy",
+    "sky-blue",
+    "slate"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "prototype",
+    "scenario": "sales",
+    "surface": "web",
+    "preview": {
+      "type": "html",
+      "entry": "./example.html"
+    },
+    "useCase": {
+      "query": {
+        "en": "Build me a CRM admin dashboard for a sales team — left sidebar with workspace switcher, topbar with search and filters, 4 pipeline KPI tiles, pipeline-by-stage strip, recent deals table, and an activity/tasks side panel.",
+        "zh-CN": "使用这个插件完成以下任务：Build me a CRM admin dashboard for a sales team — left sidebar with workspace switcher, topbar with search and filters, 4 pipeline KPI tiles, pipeline-by-stage strip, recent deals table, and an activity/tasks side panel."
+      },
+      "exampleOutputs": [
+        {
+          "path": "./example.html",
+          "title": "Pulse CRM Admin"
+        }
+      ]
+    },
+    "context": {
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ],
+      "designSystem": {
+        "primary": true
+      },
+      "craft": [
+        "pixel-discipline",
+        "laws-of-ux"
+      ],
+      "assets": [
+        "./example.html"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ],
+    "provenance": {
+      "category": "themeforest-admin-templates",
+      "note": "category design-language reference only; original implementation"
+    }
+  }
+}

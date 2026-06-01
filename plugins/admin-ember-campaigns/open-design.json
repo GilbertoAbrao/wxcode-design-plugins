@@ -1,0 +1,96 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "wxcode/admin-ember-campaigns",
+  "title": "Ember Campaigns Admin",
+  "version": "0.1.0",
+  "description": "Vibrant-but-clean marketing command centre — left sidebar, topbar with date-range filter, 4 KPI cards (reach / CTR / spend / ROAS) with inline SVG sparklines, a multi-series campaign performance chart, a conversion funnel, and a campaigns table with channel chips and status pills. Rose-pink accent on white/slate canvas.",
+  "license": "MIT",
+  "author": {
+    "name": "WXCode",
+    "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+  },
+  "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-ember-campaigns",
+  "tags": [
+    "wxcode-plugin",
+    "wxcode",
+    "first-party",
+    "prototype",
+    "marketing",
+    "web",
+    "admin",
+    "campaigns",
+    "analytics",
+    "light-mode",
+    "rose-accent",
+    "vibrant",
+    "funnel",
+    "campaign-management"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "prototype",
+    "scenario": "marketing",
+    "surface": "web",
+    "preview": {
+      "type": "html",
+      "entry": "./example.html"
+    },
+    "useCase": {
+      "query": {
+        "en": "Build me a marketing campaign analytics admin — left sidebar, date-range topbar, 4 KPI cards with sparklines, multi-series performance chart, conversion funnel, and campaigns table with channel chips.",
+        "zh-CN": "使用这个插件完成以下任务：Build me a marketing campaign analytics admin — left sidebar, date-range topbar, 4 KPI cards with sparklines, multi-series performance chart, conversion funnel, and campaigns table with channel chips."
+      },
+      "exampleOutputs": [
+        {
+          "path": "./example.html",
+          "title": "Ember Campaigns Admin"
+        }
+      ]
+    },
+    "context": {
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ],
+      "designSystem": {
+        "primary": true
+      },
+      "craft": [
+        "pixel-discipline",
+        "laws-of-ux"
+      ],
+      "assets": [
+        "./example.html"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ],
+    "provenance": {
+      "category": "themeforest-admin-templates",
+      "note": "category design-language reference only; original implementation"
+    }
+  }
+}

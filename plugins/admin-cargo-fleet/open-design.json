@@ -1,0 +1,97 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "wxcode/admin-cargo-fleet",
+  "title": "Cargo Fleet Admin",
+  "version": "0.1.0",
+  "description": "Industrial-clean logistics admin for fleet & shipment operations — left hub/region sidebar, topbar with region filter, 4 KPI cards (in-transit / on-time rate / active fleet / warehouse utilization), a Kanban-style shipment status board, an original abstract route/region SVG visualization, and a live active-shipments table. Orange-amber accent on white/slate canvas.",
+  "license": "MIT",
+  "author": {
+    "name": "WXCode",
+    "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+  },
+  "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-cargo-fleet",
+  "tags": [
+    "wxcode-plugin",
+    "wxcode",
+    "first-party",
+    "prototype",
+    "operations",
+    "web",
+    "admin",
+    "logistics",
+    "fleet",
+    "shipments",
+    "light-mode",
+    "industrial-clean",
+    "orange-accent",
+    "kanban",
+    "status-board"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "prototype",
+    "scenario": "operations",
+    "surface": "web",
+    "preview": {
+      "type": "html",
+      "entry": "./example.html"
+    },
+    "useCase": {
+      "query": {
+        "en": "Build me an industrial-clean cargo fleet admin dashboard — left sidebar with hub/region switcher, topbar with search and region filter, 4 KPI cards (in transit, on-time rate, active fleet, warehouse utilization), a shipment status board (Pending / Loading / In Transit / Delivered), a route/region visualization, and an active shipments table.",
+        "zh-CN": "使用这个插件完成以下任务：Build me an industrial-clean cargo fleet admin dashboard — left sidebar with hub/region switcher, topbar with search and region filter, 4 KPI cards (in transit, on-time rate, active fleet, warehouse utilization), a shipment status board, a route visualization, and an active shipments table."
+      },
+      "exampleOutputs": [
+        {
+          "path": "./example.html",
+          "title": "Cargo Fleet Admin"
+        }
+      ]
+    },
+    "context": {
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ],
+      "designSystem": {
+        "primary": true
+      },
+      "craft": [
+        "pixel-discipline",
+        "laws-of-ux"
+      ],
+      "assets": [
+        "./example.html"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ],
+    "provenance": {
+      "category": "themeforest-admin-templates",
+      "note": "category design-language reference only; original implementation"
+    }
+  }
+}

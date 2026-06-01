@@ -1,0 +1,98 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "wxcode/admin-cobalt-projects",
+  "title": "Cobalt Projects Admin",
+  "version": "0.1.0",
+  "description": "Focused project and work-management admin dashboard — light mode with cobalt-blue accent, left sidebar project list, topbar search and view switch, 4 KPI cards, a compact gantt-style timeline strip, a My Tasks table, and a Team/Milestones side panel.",
+  "license": "MIT",
+  "author": {
+    "name": "WXCode",
+    "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+  },
+  "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-cobalt-projects",
+  "tags": [
+    "wxcode-plugin",
+    "wxcode",
+    "first-party",
+    "prototype",
+    "operations",
+    "web",
+    "admin",
+    "project-management",
+    "tasks",
+    "light-mode",
+    "cobalt",
+    "gantt",
+    "timeline",
+    "work-management",
+    "focused",
+    "clean-cards"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "prototype",
+    "scenario": "operations",
+    "surface": "web",
+    "preview": {
+      "type": "html",
+      "entry": "./example.html"
+    },
+    "useCase": {
+      "query": {
+        "en": "Build me a focused project management admin dashboard — left sidebar with project list, topbar with search and view switcher, 4 KPI cards (active projects, tasks due, completion rate, overdue), a compact gantt timeline, a My Tasks table with priority and status pills, and a team milestones side panel.",
+        "zh-CN": "使用这个插件完成以下任务：Build me a focused project management admin dashboard — left sidebar with project list, topbar with search and view switcher, 4 KPI cards (active projects, tasks due, completion rate, overdue), a compact gantt timeline, a My Tasks table with priority and status pills, and a team milestones side panel."
+      },
+      "exampleOutputs": [
+        {
+          "path": "./example.html",
+          "title": "Cobalt Projects Admin"
+        }
+      ]
+    },
+    "context": {
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ],
+      "designSystem": {
+        "primary": true
+      },
+      "craft": [
+        "pixel-discipline",
+        "laws-of-ux"
+      ],
+      "assets": [
+        "./example.html"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ],
+    "provenance": {
+      "category": "themeforest-admin-templates",
+      "note": "category design-language reference only; original implementation"
+    }
+  }
+}

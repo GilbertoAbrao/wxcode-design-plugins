@@ -1,0 +1,1421 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quartz LMS Admin</title>
+<style>
+/* ── DESIGN TOKENS ─────────────────────────────────────── */
+:root {
+  /* primary accent */
+  --clr-purple-700: #7e22ce;
+  --clr-purple-600: #9333ea;
+  --clr-purple-500: #a855f7;
+  --clr-purple-200: #e9d5ff;
+  --clr-purple-100: #f3e8ff;
+  --clr-purple-50:  #faf5ff;
+
+  /* chart second line */
+  --clr-teal-600:   #0d9488;
+  --clr-teal-400:   #2dd4bf;
+  --clr-teal-100:   #ccfbf1;
+
+  /* status */
+  --clr-green-700:  #15803d;
+  --clr-green-500:  #22c55e;
+  --clr-green-100:  #dcfce7;
+  --clr-amber-700:  #b45309;
+  --clr-amber-500:  #f59e0b;
+  --clr-amber-100:  #fef3c7;
+  --clr-red-600:    #dc2626;
+  --clr-red-100:    #fee2e2;
+
+  /* subject category accents */
+  --clr-cat-science:    #0d9488; /* teal  */
+  --clr-cat-arts:       #ea580c; /* orange */
+  --clr-cat-tech:       #4f46e5; /* indigo */
+  --clr-cat-language:   #e11d48; /* rose   */
+  --clr-cat-math:       #2563eb; /* blue   */
+  --clr-cat-humanities: #16a34a; /* green  */
+
+  /* subject tag bg tints */
+  --clr-cat-arts-bg:       #ffedd5;
+  --clr-cat-tech-bg:       #e0e7ff;
+  --clr-cat-math-bg:       #dbeafe;
+  --clr-cat-language-bg:   #ffe4e6;
+  --clr-cat-humanities-bg: #dcfce7;
+  --clr-cat-archived-bg:   #f1f5f9;
+
+  /* neutrals (no token needed, structural only) */
+  --surface:      #faf9fc;
+  --surface-card: #ffffff;
+  --border:       #ebe7f1;
+  --sidebar-bg:   #ffffff;
+  --text-900:     #1e293b;
+  --text-600:     #475569;
+  --text-400:     #94a3b8;
+  --sidebar-w:    260px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--surface);
+  color: var(--text-900);
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+  display: flex;
+}
+
+/* ── SIDEBAR ────────────────────────────────────────────── */
+.sidebar {
+  width: var(--sidebar-w);
+  min-width: var(--sidebar-w);
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.brand-mark {
+  width: 34px; height: 34px; flex-shrink: 0;
+}
+.brand-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-900);
+  letter-spacing: -0.3px;
+}
+.brand-tagline {
+  font-size: 10px;
+  color: var(--text-400);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.school-switcher {
+  margin: 14px 16px 8px;
+  background: var(--clr-purple-50);
+  border: 1px solid var(--clr-purple-200);
+  border-radius: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.school-switcher-icon {
+  width: 28px; height: 28px; flex-shrink: 0;
+}
+.school-switcher-info { flex: 1; min-width: 0; }
+.school-switcher-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--clr-purple-600);
+  font-weight: 600;
+}
+.school-switcher-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-900);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.switcher-chevron { color: var(--text-400); }
+
+.nav-section {
+  padding: 16px 16px 4px;
+}
+.nav-section-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-400);
+  font-weight: 700;
+  padding: 0 6px;
+  margin-bottom: 4px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-600);
+  font-size: 13.5px;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s;
+  position: relative;
+  margin-bottom: 1px;
+  text-decoration: none;
+}
+.nav-item:hover { background: var(--clr-purple-50); color: var(--clr-purple-600); }
+.nav-item.active {
+  background: var(--clr-purple-100);
+  color: var(--clr-purple-700);
+  font-weight: 600;
+}
+.nav-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 6px; bottom: 6px;
+  width: 3px;
+  background: var(--clr-purple-600);
+  border-radius: 0 3px 3px 0;
+}
+.nav-icon { width: 16px; height: 16px; flex-shrink: 0; }
+.nav-badge {
+  margin-left: auto;
+  background: var(--clr-purple-600);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 20px;
+  padding: 1px 6px;
+  min-width: 18px;
+  text-align: center;
+}
+.nav-badge.amber {
+  background: var(--clr-amber-500);
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  border-top: 1px solid var(--border);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sidebar-footer a {
+  font-size: 12px;
+  color: var(--text-400);
+  text-decoration: none;
+}
+.sidebar-footer a:hover { color: var(--clr-purple-600); }
+.version-tag {
+  font-size: 11px;
+  color: var(--text-400);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+
+/* ── MAIN CONTENT ───────────────────────────────────────── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* ── TOPBAR ─────────────────────────────────────────────── */
+.topbar {
+  height: 60px;
+  background: var(--surface-card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.topbar-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-900);
+  white-space: nowrap;
+}
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--text-400);
+}
+.breadcrumb span { color: var(--text-400); }
+.breadcrumb .current { color: var(--clr-purple-600); font-weight: 500; }
+.topbar-search {
+  flex: 1;
+  max-width: 320px;
+  margin: 0 auto;
+  position: relative;
+}
+.topbar-search input {
+  width: 100%;
+  padding: 8px 14px 8px 34px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text-900);
+  background: var(--surface);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.topbar-search input:focus { border-color: var(--clr-purple-500); }
+.topbar-search input::placeholder { color: var(--text-400); }
+.search-icon {
+  position: absolute;
+  left: 10px; top: 50%; transform: translateY(-50%);
+  color: var(--text-400);
+}
+.term-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 12.5px;
+  color: var(--text-600);
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.term-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--clr-green-500);
+}
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.icon-btn {
+  width: 36px; height: 36px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-600);
+  position: relative;
+  transition: background 0.15s;
+}
+.icon-btn:hover { background: var(--clr-purple-50); color: var(--clr-purple-600); }
+.notif-dot {
+  position: absolute;
+  top: 6px; right: 6px;
+  width: 8px; height: 8px;
+  background: var(--clr-red-600);
+  border-radius: 50%;
+  border: 1.5px solid #fff;
+}
+.avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--clr-purple-600);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.avatar-info { display: flex; flex-direction: column; }
+.avatar-name { font-size: 13px; font-weight: 600; color: var(--text-900); line-height: 1.2; }
+.avatar-role { font-size: 11px; color: var(--text-400); }
+
+/* ── PAGE BODY ──────────────────────────────────────────── */
+.page-body {
+  padding: 24px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ── GREETING STRIP ─────────────────────────────────────── */
+.greeting-strip {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.greeting-text h1 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-900);
+  letter-spacing: -0.3px;
+}
+.greeting-text p {
+  font-size: 13px;
+  color: var(--text-400);
+  margin-top: 2px;
+}
+.greeting-actions { display: flex; gap: 10px; }
+.btn-ghost {
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-card);
+  color: var(--text-600);
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.btn-ghost:hover { border-color: var(--clr-purple-500); color: var(--clr-purple-600); }
+.btn-primary {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--clr-purple-600);
+  color: #fff;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  display: flex; align-items: center; gap: 6px;
+}
+.btn-primary:hover { background: var(--clr-purple-700); }
+
+/* ── KPI TILES ──────────────────────────────────────────── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 22px;
+}
+.kpi-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 18px 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.kpi-top { display: flex; align-items: flex-start; justify-content: space-between; }
+.kpi-label {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  font-weight: 700;
+  color: var(--text-400);
+}
+.kpi-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+}
+.kpi-icon.purple { background: var(--clr-purple-100); color: var(--clr-purple-600); }
+.kpi-icon.teal   { background: var(--clr-teal-100);   color: var(--clr-teal-600);   }
+.kpi-icon.green  { background: var(--clr-green-100);  color: var(--clr-green-700);  }
+.kpi-icon.blue   { background: var(--clr-cat-math-bg); color: var(--clr-cat-math);   }
+
+.kpi-value {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-900);
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+.kpi-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.kpi-delta {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 20px;
+  display: flex; align-items: center; gap: 3px;
+}
+.kpi-delta.up   { background: var(--clr-green-100); color: var(--clr-green-700); }
+.kpi-delta.down { background: var(--clr-red-100);   color: var(--clr-red-600);   }
+.kpi-sparkline { flex-shrink: 0; }
+
+/* ── MAIN GRID ──────────────────────────────────────────── */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+/* ── CARD BASE ──────────────────────────────────────────── */
+.card {
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  overflow: hidden;
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.card-title { font-size: 14px; font-weight: 700; color: var(--text-900); }
+.card-subtitle { font-size: 12px; color: var(--text-400); margin-top: 1px; }
+.card-body { padding: 16px 20px; }
+.view-all {
+  font-size: 12.5px;
+  color: var(--clr-purple-600);
+  text-decoration: none;
+  font-weight: 500;
+}
+.view-all:hover { text-decoration: underline; }
+
+/* ── PERIOD TABS ────────────────────────────────────────── */
+.period-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 3px;
+}
+.period-tab {
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-400);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+.period-tab.active {
+  background: var(--surface-card);
+  color: var(--clr-purple-700);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* ── CHART LEGEND ───────────────────────────────────────── */
+.chart-legend {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 12px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-600);
+}
+.legend-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+}
+
+/* ── AREA CHART (SVG) ───────────────────────────────────── */
+.chart-wrap { overflow: hidden; border-radius: 4px; }
+
+/* ── UPCOMING PANEL ─────────────────────────────────────── */
+.upcoming-list { display: flex; flex-direction: column; gap: 0; }
+.upcoming-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 13px 20px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s;
+}
+.upcoming-item:last-child { border-bottom: none; }
+.upcoming-item:hover { background: var(--clr-purple-50); }
+.upcoming-type-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+.upcoming-info { flex: 1; min-width: 0; }
+.upcoming-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-900);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.upcoming-course {
+  font-size: 11.5px;
+  color: var(--text-400);
+  margin-top: 1px;
+}
+.upcoming-meta {
+  text-align: right;
+  flex-shrink: 0;
+}
+.upcoming-due {
+  font-size: 11.5px;
+  color: var(--text-600);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.upcoming-days {
+  font-size: 10.5px;
+  margin-top: 2px;
+}
+.upcoming-days.urgent { color: var(--clr-red-600); font-weight: 600; }
+.upcoming-days.soon   { color: var(--clr-amber-700); font-weight: 500; }
+.upcoming-days.later  { color: var(--text-400); }
+
+/* ── SUBJECT TAG ────────────────────────────────────────── */
+.subject-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 1px 7px;
+  border-radius: 20px;
+  margin-top: 4px;
+}
+.subject-tag.science    { background: var(--clr-teal-100);          color: var(--clr-cat-science); }
+.subject-tag.arts       { background: var(--clr-cat-arts-bg);        color: var(--clr-cat-arts);    }
+.subject-tag.tech       { background: var(--clr-cat-tech-bg);        color: var(--clr-cat-tech);    }
+.subject-tag.language   { background: var(--clr-cat-language-bg);    color: var(--clr-cat-language); }
+.subject-tag.math       { background: var(--clr-cat-math-bg);        color: var(--clr-cat-math);    }
+.subject-tag.humanities { background: var(--clr-cat-humanities-bg);  color: var(--clr-cat-humanities); }
+
+/* ── COURSES TABLE ──────────────────────────────────────── */
+.table-wrap { overflow-x: auto; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+thead th {
+  text-align: left;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-weight: 700;
+  color: var(--text-400);
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+tbody tr {
+  transition: background 0.1s;
+  cursor: default;
+}
+tbody tr:hover { background: var(--clr-purple-50); }
+tbody td {
+  padding: 13px 16px;
+  font-size: 13px;
+  color: var(--text-600);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+tbody tr:last-child td { border-bottom: none; }
+.course-name {
+  font-weight: 600;
+  color: var(--text-900);
+  display: block;
+  margin-bottom: 2px;
+}
+.instructor-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.instr-avatar {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+.progress-wrap {
+  display: flex; align-items: center; gap: 8px;
+}
+.progress-bar-bg {
+  width: 88px; height: 5px;
+  background: var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: var(--clr-purple-500);
+  border-radius: 20px;
+}
+.progress-pct {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-600);
+  min-width: 30px;
+}
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.status-pill.active   { background: var(--clr-green-100); color: var(--clr-green-700); }
+.status-pill.draft    { background: var(--clr-amber-100); color: var(--clr-amber-700); }
+.status-pill.archived { background: var(--clr-cat-archived-bg); color: var(--text-400); }
+.status-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+/* ── RESPONSIVE COLLAPSE ────────────────────────────────── */
+@media (max-width: 1100px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .main-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+  .sidebar { display: none; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+
+
+  <div class="sidebar-brand">
+    <svg class="brand-mark" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="34" height="34" rx="9" fill="var(--clr-purple-600)"/>
+
+      <path d="M17 8C12.029 8 8 12.029 8 17s4.029 9 9 9a8.96 8.96 0 0 0 5.4-1.8l1.8 1.8 1.41-1.41-1.8-1.8A8.96 8.96 0 0 0 26 17c0-4.971-4.029-9-9-9Zm0 16a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z" fill="#fff"/>
+    </svg>
+    <div>
+      <div class="brand-name">Quartz LMS</div>
+      <div class="brand-tagline">Learning Platform</div>
+    </div>
+  </div>
+
+
+  <div class="school-switcher" role="button" aria-label="Switch school or program">
+    <svg class="school-switcher-icon" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="28" height="28" rx="7" fill="var(--clr-purple-100)"/>
+      <path d="M14 6 L22 10 V12 H6 V10 Z" fill="var(--clr-purple-600)" opacity="0.9"/>
+      <rect x="8" y="12" width="3" height="8" rx="1" fill="var(--clr-purple-600)"/>
+      <rect x="12.5" y="12" width="3" height="8" rx="1" fill="var(--clr-purple-600)"/>
+      <rect x="17" y="12" width="3" height="8" rx="1" fill="var(--clr-purple-600)"/>
+      <rect x="6" y="20" width="16" height="2" rx="1" fill="var(--clr-purple-700)"/>
+    </svg>
+    <div class="school-switcher-info">
+      <div class="school-switcher-label">Active School</div>
+      <div class="school-switcher-name">Meridian University</div>
+    </div>
+    <svg class="switcher-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+      <path d="M3 4.5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+
+  <div class="nav-section">
+    <div class="nav-section-label">Overview</div>
+    <a class="nav-item active" href="#">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.9"/>
+        <rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.5"/>
+        <rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.5"/>
+        <rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.5"/>
+      </svg>
+      Dashboard
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M8 5v4l2.5 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      Analytics
+      <span class="nav-badge amber">New</span>
+    </a>
+  </div>
+
+
+  <div class="nav-section">
+    <div class="nav-section-label">Academic</div>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M2 12 L8 4 L14 12 H2Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+        <path d="M5 12 L5 16 L11 16 L11 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+      Courses
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <circle cx="5" cy="5" r="3" stroke="currentColor" stroke-width="1.4"/>
+        <circle cx="11" cy="5" r="3" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M1 15c0-2.21 1.79-4 4-4M15 15c0-2.21-1.79-4-4-4M8 11a3 3 0 1 0 0-6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+      Students
+      <span class="nav-badge">1 204</span>
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M5 7h6M5 10h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+      Assignments
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M8 5v3.5l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+      Schedule
+    </a>
+  </div>
+
+
+  <div class="nav-section">
+    <div class="nav-section-label">Manage</div>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <circle cx="6" cy="5" r="3" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M1 14c0-2.76 2.24-5 5-5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <path d="M12 10v4M10 12h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      Instructors
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M8 2L10 6H14L11 9L12 13L8 10.5L4 13L5 9L2 6H6Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+      </svg>
+      Certificates
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <rect x="2" y="4" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M5 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" stroke="currentColor" stroke-width="1.3"/>
+        <path d="M8 8v1M8 9l-2 2M8 9l2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      Reports
+    </a>
+  </div>
+
+
+  <div class="nav-section">
+    <div class="nav-section-label">Settings</div>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.22 3.22l1.42 1.42M11.36 11.36l1.42 1.42M3.22 12.78l1.42-1.42M11.36 4.64l1.42-1.42" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+      Settings
+    </a>
+  </div>
+
+
+  <div class="sidebar-footer">
+    <a href="#">Help &amp; Support</a>
+    <span class="version-tag">v3.1.4</span>
+  </div>
+
+</aside>
+
+<div class="main">
+
+
+  <header class="topbar">
+    <div>
+      <div class="topbar-title">Dashboard</div>
+      <div class="breadcrumb">
+        <span>Home</span>
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+          <path d="M3.5 2l3 3-3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="current">Overview</span>
+      </div>
+    </div>
+
+    <div class="topbar-search" role="search">
+      <svg class="search-icon" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M9.5 9.5l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <input type="search" placeholder="Search courses, students…" aria-label="Search">
+    </div>
+
+    <div class="term-selector" role="button" aria-label="Select term">
+      <span class="term-dot" aria-hidden="true"></span>
+      Spring 2026 Term
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+        <path d="M2.5 4l2.5 2.5L7.5 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <div class="topbar-actions">
+      <button class="icon-btn" aria-label="Notifications">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+          <path d="M9 2a5 5 0 0 0-5 5v3l-1.5 2.5h13L14 10V7a5 5 0 0 0-5-5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M7.5 15a1.5 1.5 0 0 0 3 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span class="notif-dot" aria-label="3 unread notifications"></span>
+      </button>
+      <button class="icon-btn" aria-label="Messages">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+          <rect x="2" y="3" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M5 7h8M5 10h5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="avatar" role="button" aria-label="User menu" tabindex="0">RV</div>
+      <div class="avatar-info">
+        <span class="avatar-name">Renata Voss</span>
+        <span class="avatar-role">Academic Admin</span>
+      </div>
+    </div>
+  </header>
+
+
+  <main class="page-body">
+
+
+    <div class="greeting-strip">
+      <div class="greeting-text">
+        <h1>Welcome back, Renata 👋</h1>
+        <p>Sunday, June 1, 2026 &nbsp;·&nbsp; Spring Term — Week 14 of 16</p>
+      </div>
+      <div class="greeting-actions">
+        <button class="btn-ghost">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true" style="display:inline;vertical-align:middle;margin-right:4px;">
+            <path d="M2 9.5v2h2l5.5-5.5-2-2L2 9.5ZM11.5 4l-2-2L8 3.5l2 2L11.5 4Z" fill="currentColor"/>
+          </svg>
+          Download Report
+        </button>
+        <button class="btn-primary">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+            <path d="M6.5 2v9M2 6.5h9" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          Add Course
+        </button>
+      </div>
+    </div>
+
+
+    <div class="kpi-grid">
+
+
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-label">Active Students</div>
+          <div class="kpi-icon purple" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="5" cy="5" r="2.5" fill="currentColor"/>
+              <circle cx="11" cy="5" r="2.5" fill="currentColor" opacity="0.6"/>
+              <path d="M1 14c0-2.21 1.79-4 4-4s4 1.79 4 4" fill="currentColor"/>
+              <path d="M11 10c1.5 0 4 .9 4 4" fill="currentColor" opacity="0.6"/>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-value">1,204</div>
+        <div class="kpi-bottom">
+          <span class="kpi-delta up">
+            <svg width="9" height="9" viewBox="0 0 9 9" fill="none" aria-hidden="true"><path d="M4.5 1.5v6M2 4l2.5-2.5L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            +48 this week
+          </span>
+          <svg class="kpi-sparkline" width="56" height="22" viewBox="0 0 56 22" fill="none" aria-label="Student trend sparkline">
+            <polyline points="2,18 10,14 18,16 26,10 34,12 42,7 50,4 56,5" stroke="var(--clr-purple-500)" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-label">Active Courses</div>
+          <div class="kpi-icon teal" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M2 14V4l6-2 6 2v10" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+              <rect x="6" y="8" width="4" height="6" rx="1" fill="currentColor"/>
+              <path d="M8 2v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-value">38</div>
+        <div class="kpi-bottom">
+          <span class="kpi-delta up">
+            <svg width="9" height="9" viewBox="0 0 9 9" fill="none" aria-hidden="true"><path d="M4.5 1.5v6M2 4l2.5-2.5L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            +3 new term
+          </span>
+          <svg class="kpi-sparkline" width="56" height="22" viewBox="0 0 56 22" fill="none" aria-label="Courses trend sparkline">
+            <polyline points="2,16 10,15 18,14 26,12 34,11 42,9 50,8 56,8" stroke="var(--clr-teal-600)" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-label">Completion Rate</div>
+          <div class="kpi-icon green" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M5 8.5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-value">72.4%</div>
+        <div class="kpi-bottom">
+          <span class="kpi-delta up">
+            <svg width="9" height="9" viewBox="0 0 9 9" fill="none" aria-hidden="true"><path d="M4.5 1.5v6M2 4l2.5-2.5L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            +4.1% vs last
+          </span>
+
+          <svg class="kpi-sparkline" width="22" height="22" viewBox="0 0 22 22" fill="none" aria-label="72% donut">
+            <circle cx="11" cy="11" r="8" stroke="var(--border)" stroke-width="4"/>
+            <circle cx="11" cy="11" r="8" stroke="var(--clr-green-500)" stroke-width="4"
+              stroke-dasharray="36.2 14"
+              stroke-dashoffset="12.6"
+              stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+
+
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <div class="kpi-label">Avg Score</div>
+          <div class="kpi-icon blue" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 2L9.8 6.2H14L10.5 8.8l1.4 4.2L8 10.4 4.1 13l1.4-4.2L2 6.2h4.2Z" fill="currentColor" opacity="0.85"/>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-value">81.6</div>
+        <div class="kpi-bottom">
+          <span class="kpi-delta down">
+            <svg width="9" height="9" viewBox="0 0 9 9" fill="none" aria-hidden="true"><path d="M4.5 7.5v-6M2 5l2.5 2.5L7 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            −1.3 vs last
+          </span>
+          <svg class="kpi-sparkline" width="56" height="22" viewBox="0 0 56 22" fill="none" aria-label="Avg score sparkline">
+            <polyline points="2,6 10,7 18,5 26,8 34,7 42,10 50,11 56,12" stroke="var(--clr-cat-math)" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="main-grid">
+
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Enrollment vs Completion</div>
+            <div class="card-subtitle">Student activity across the current term</div>
+          </div>
+          <div class="period-tabs" role="tablist" aria-label="Period">
+            <button class="period-tab" role="tab">Week</button>
+            <button class="period-tab active" role="tab" aria-selected="true">Month</button>
+            <button class="period-tab" role="tab">Term</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="chart-legend">
+            <div class="legend-item">
+              <span class="legend-dot" style="background:var(--clr-purple-500)"></span>
+              Enrolled
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot" style="background:var(--clr-teal-600)"></span>
+              Completed
+            </div>
+          </div>
+
+          <div class="chart-wrap">
+            <svg viewBox="0 0 600 180" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;" aria-label="Enrollment and completion line chart" role="img">
+              <defs>
+                <linearGradient id="grad-enroll" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="var(--clr-purple-500)" stop-opacity="0.22"/>
+                  <stop offset="100%" stop-color="var(--clr-purple-500)" stop-opacity="0.0"/>
+                </linearGradient>
+                <linearGradient id="grad-complete" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="var(--clr-teal-600)" stop-opacity="0.18"/>
+                  <stop offset="100%" stop-color="var(--clr-teal-600)" stop-opacity="0.0"/>
+                </linearGradient>
+              </defs>
+
+
+              <line x1="50" y1="20"  x2="590" y2="20"  stroke="var(--border)" stroke-width="1" stroke-dasharray="4 3"/>
+              <line x1="50" y1="55"  x2="590" y2="55"  stroke="var(--border)" stroke-width="1" stroke-dasharray="4 3"/>
+              <line x1="50" y1="90"  x2="590" y2="90"  stroke="var(--border)" stroke-width="1" stroke-dasharray="4 3"/>
+              <line x1="50" y1="125" x2="590" y2="125" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 3"/>
+              <line x1="50" y1="160" x2="590" y2="160" stroke="var(--border)" stroke-width="1"/>
+
+
+              <text x="42" y="23"  font-size="10" fill="var(--text-400)" text-anchor="end">1 400</text>
+              <text x="42" y="58"  font-size="10" fill="var(--text-400)" text-anchor="end">1 050</text>
+              <text x="42" y="93"  font-size="10" fill="var(--text-400)" text-anchor="end">700</text>
+              <text x="42" y="128" font-size="10" fill="var(--text-400)" text-anchor="end">350</text>
+              <text x="42" y="163" font-size="10" fill="var(--text-400)" text-anchor="end">0</text>
+
+
+              <text x="82"  y="174" font-size="10" fill="var(--text-400)" text-anchor="middle">W1</text>
+              <text x="154" y="174" font-size="10" fill="var(--text-400)" text-anchor="middle">W2</text>
+              <text x="226" y="174" font-size="10" fill="var(--text-400)" text-anchor="middle">W3</text>
+              <text x="298" y="174" font-size="10" fill="var(--text-400)" text-anchor="middle">W4</text>
+              <text x="370" y="174" font-size="10" fill="var(--text-400)" text-anchor="middle">W5</text>
+              <text x="442" y="174" font-size="10" fill="var(--text-400)" text-anchor="middle">W6</text>
+              <text x="514" y="174" font-size="10" fill="var(--text-400)" text-anchor="middle">W7</text>
+              <text x="586" y="174" font-size="10" fill="var(--text-400)" text-anchor="middle">W8</text>
+
+
+
+
+              <path d="
+                M82,98
+                L154,85
+                L226,71
+                L298,58
+                L370,50
+                L442,42
+                L514,40
+                L586,40
+                L586,160 L82,160 Z"
+                fill="url(#grad-enroll)"/>
+              <polyline
+                points="82,98 154,85 226,71 298,58 370,50 442,42 514,40 586,40"
+                stroke="var(--clr-purple-500)" stroke-width="2.2" fill="none"
+                stroke-linecap="round" stroke-linejoin="round"/>
+
+
+
+              <path d="
+                M82,152
+                L154,141
+                L226,128
+                L298,115
+                L370,102
+                L442,88
+                L514,78
+                L586,73
+                L586,160 L82,160 Z"
+                fill="url(#grad-complete)"/>
+              <polyline
+                points="82,152 154,141 226,128 298,115 370,102 442,88 514,78 586,73"
+                stroke="var(--clr-teal-600)" stroke-width="2.2" fill="none"
+                stroke-linecap="round" stroke-linejoin="round"/>
+
+
+              <circle cx="586" cy="40" r="4" fill="var(--clr-purple-500)" stroke="#fff" stroke-width="1.5"/>
+              <circle cx="586" cy="73" r="4" fill="var(--clr-teal-600)"   stroke="#fff" stroke-width="1.5"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Upcoming Deadlines</div>
+            <div class="card-subtitle">Next 7 days</div>
+          </div>
+          <a href="#" class="view-all">View all</a>
+        </div>
+        <div class="upcoming-list">
+
+          <div class="upcoming-item">
+            <span class="upcoming-type-dot" style="background:var(--clr-cat-tech)" aria-hidden="true"></span>
+            <div class="upcoming-info">
+              <div class="upcoming-title">Project Submission</div>
+              <div class="upcoming-course">Intro to Cloud Computing</div>
+              <span class="subject-tag tech">Tech</span>
+            </div>
+            <div class="upcoming-meta">
+              <div class="upcoming-due">Jun 2</div>
+              <div class="upcoming-days urgent">Tomorrow</div>
+            </div>
+          </div>
+
+          <div class="upcoming-item">
+            <span class="upcoming-type-dot" style="background:var(--clr-cat-math)" aria-hidden="true"></span>
+            <div class="upcoming-info">
+              <div class="upcoming-title">Mid-term Quiz</div>
+              <div class="upcoming-course">Calculus III</div>
+              <span class="subject-tag math">Math</span>
+            </div>
+            <div class="upcoming-meta">
+              <div class="upcoming-due">Jun 3</div>
+              <div class="upcoming-days soon">2 days</div>
+            </div>
+          </div>
+
+          <div class="upcoming-item">
+            <span class="upcoming-type-dot" style="background:var(--clr-cat-science)" aria-hidden="true"></span>
+            <div class="upcoming-info">
+              <div class="upcoming-title">Lab Report #4</div>
+              <div class="upcoming-course">Molecular Biology</div>
+              <span class="subject-tag science">Science</span>
+            </div>
+            <div class="upcoming-meta">
+              <div class="upcoming-due">Jun 4</div>
+              <div class="upcoming-days soon">3 days</div>
+            </div>
+          </div>
+
+          <div class="upcoming-item">
+            <span class="upcoming-type-dot" style="background:var(--clr-cat-language)" aria-hidden="true"></span>
+            <div class="upcoming-info">
+              <div class="upcoming-title">Essay Draft Review</div>
+              <div class="upcoming-course">Academic Writing</div>
+              <span class="subject-tag language">Language</span>
+            </div>
+            <div class="upcoming-meta">
+              <div class="upcoming-due">Jun 5</div>
+              <div class="upcoming-days later">4 days</div>
+            </div>
+          </div>
+
+          <div class="upcoming-item">
+            <span class="upcoming-type-dot" style="background:var(--clr-cat-arts)" aria-hidden="true"></span>
+            <div class="upcoming-info">
+              <div class="upcoming-title">Portfolio Critique</div>
+              <div class="upcoming-course">Visual Design Studio</div>
+              <span class="subject-tag arts">Arts</span>
+            </div>
+            <div class="upcoming-meta">
+              <div class="upcoming-due">Jun 6</div>
+              <div class="upcoming-days later">5 days</div>
+            </div>
+          </div>
+
+          <div class="upcoming-item">
+            <span class="upcoming-type-dot" style="background:var(--clr-cat-humanities)" aria-hidden="true"></span>
+            <div class="upcoming-info">
+              <div class="upcoming-title">Discussion Board Post</div>
+              <div class="upcoming-course">Ethics in Society</div>
+              <span class="subject-tag humanities">Humanities</span>
+            </div>
+            <div class="upcoming-meta">
+              <div class="upcoming-due">Jun 7</div>
+              <div class="upcoming-days later">6 days</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Courses This Term</div>
+          <div class="card-subtitle">Spring 2026 — 38 active courses</div>
+        </div>
+        <a href="#" class="view-all">View all courses →</a>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Course</th>
+              <th>Instructor</th>
+              <th>Enrolled</th>
+              <th>Progress</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr>
+              <td>
+                <span class="course-name">Intro to Cloud Computing</span>
+                <span class="subject-tag tech">Tech</span>
+              </td>
+              <td>
+                <div class="instructor-cell">
+                  <div class="instr-avatar" style="background:var(--clr-cat-tech)">MS</div>
+                  Maya Steinfeld
+                </div>
+              </td>
+              <td>94</td>
+              <td>
+                <div class="progress-wrap">
+                  <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:78%"></div></div>
+                  <span class="progress-pct">78%</span>
+                </div>
+              </td>
+              <td><span class="status-pill active"><span class="status-dot"></span>Active</span></td>
+            </tr>
+
+            <tr>
+              <td>
+                <span class="course-name">Calculus III</span>
+                <span class="subject-tag math">Math</span>
+              </td>
+              <td>
+                <div class="instructor-cell">
+                  <div class="instr-avatar" style="background:var(--clr-cat-math)">OB</div>
+                  Olivier Beaumont
+                </div>
+              </td>
+              <td>67</td>
+              <td>
+                <div class="progress-wrap">
+                  <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:65%"></div></div>
+                  <span class="progress-pct">65%</span>
+                </div>
+              </td>
+              <td><span class="status-pill active"><span class="status-dot"></span>Active</span></td>
+            </tr>
+
+            <tr>
+              <td>
+                <span class="course-name">Molecular Biology</span>
+                <span class="subject-tag science">Science</span>
+              </td>
+              <td>
+                <div class="instructor-cell">
+                  <div class="instr-avatar" style="background:var(--clr-cat-science)">LK</div>
+                  Lena Krueger
+                </div>
+              </td>
+              <td>52</td>
+              <td>
+                <div class="progress-wrap">
+                  <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:82%"></div></div>
+                  <span class="progress-pct">82%</span>
+                </div>
+              </td>
+              <td><span class="status-pill active"><span class="status-dot"></span>Active</span></td>
+            </tr>
+
+            <tr>
+              <td>
+                <span class="course-name">Academic Writing</span>
+                <span class="subject-tag language">Language</span>
+              </td>
+              <td>
+                <div class="instructor-cell">
+                  <div class="instr-avatar" style="background:var(--clr-cat-language)">CF</div>
+                  Clara Fontaine
+                </div>
+              </td>
+              <td>110</td>
+              <td>
+                <div class="progress-wrap">
+                  <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:71%"></div></div>
+                  <span class="progress-pct">71%</span>
+                </div>
+              </td>
+              <td><span class="status-pill active"><span class="status-dot"></span>Active</span></td>
+            </tr>
+
+            <tr>
+              <td>
+                <span class="course-name">Visual Design Studio</span>
+                <span class="subject-tag arts">Arts</span>
+              </td>
+              <td>
+                <div class="instructor-cell">
+                  <div class="instr-avatar" style="background:var(--clr-cat-arts)">TW</div>
+                  Tobias Wren
+                </div>
+              </td>
+              <td>41</td>
+              <td>
+                <div class="progress-wrap">
+                  <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:88%"></div></div>
+                  <span class="progress-pct">88%</span>
+                </div>
+              </td>
+              <td><span class="status-pill active"><span class="status-dot"></span>Active</span></td>
+            </tr>
+
+            <tr>
+              <td>
+                <span class="course-name">Ethics in Society</span>
+                <span class="subject-tag humanities">Humanities</span>
+              </td>
+              <td>
+                <div class="instructor-cell">
+                  <div class="instr-avatar" style="background:var(--clr-cat-humanities)">PA</div>
+                  Priya Acharya
+                </div>
+              </td>
+              <td>88</td>
+              <td>
+                <div class="progress-wrap">
+                  <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:60%"></div></div>
+                  <span class="progress-pct">60%</span>
+                </div>
+              </td>
+              <td><span class="status-pill active"><span class="status-dot"></span>Active</span></td>
+            </tr>
+
+            <tr>
+              <td>
+                <span class="course-name">Quantum Mechanics I</span>
+                <span class="subject-tag science">Science</span>
+              </td>
+              <td>
+                <div class="instructor-cell">
+                  <div class="instr-avatar" style="background:var(--clr-cat-tech)">RN</div>
+                  Ravi Narayan
+                </div>
+              </td>
+              <td>38</td>
+              <td>
+                <div class="progress-wrap">
+                  <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:55%"></div></div>
+                  <span class="progress-pct">55%</span>
+                </div>
+              </td>
+              <td><span class="status-pill draft"><span class="status-dot"></span>Draft</span></td>
+            </tr>
+
+            <tr>
+              <td>
+                <span class="course-name">Digital Marketing</span>
+                <span class="subject-tag tech">Tech</span>
+              </td>
+              <td>
+                <div class="instructor-cell">
+                  <div class="instr-avatar" style="background:var(--clr-purple-500)">SH</div>
+                  Sofia Holt
+                </div>
+              </td>
+              <td>0</td>
+              <td>
+                <div class="progress-wrap">
+                  <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:0%"></div></div>
+                  <span class="progress-pct">—</span>
+                </div>
+              </td>
+              <td><span class="status-pill archived"><span class="status-dot"></span>Archived</span></td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>

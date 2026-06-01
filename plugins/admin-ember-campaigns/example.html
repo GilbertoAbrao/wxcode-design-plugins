@@ -1,0 +1,945 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ember Campaigns Admin</title>
+<style>
+/* ── Palette tokens ──────────────────────────────────────── */
+:root {
+  --color-accent:       #e11d48;
+  --color-accent-soft:  #ec4899;
+  --color-accent-bg:    #fff1f5;
+  --color-indigo:       #4f46e5;
+  --color-indigo-soft:  #6366f1;
+  --color-indigo-bg:    #eef2ff;
+  --color-sky:          #0ea5e9;
+  --color-sky-bg:       #f0f9ff;
+  --color-amber:        #d97706;
+  --color-amber-bg:     #fffbeb;
+  --color-success:      #16a34a;
+  --color-success-bg:   #f0fdf4;
+  --color-warning:      #d97706;
+  --color-warning-bg:   #fffbeb;
+  --color-danger:       #dc2626;
+  --color-danger-bg:    #fef2f2;
+}
+
+/* ── Reset / base ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #0f172a;
+  background: #fafafa;
+  display: flex;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────── */
+.sidebar {
+  width: 240px;
+  min-height: 100vh;
+  background: #ffffff;
+  border-right: 1px solid #ececf0;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+}
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid #ececf0;
+}
+.brand-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-soft));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.brand-icon svg { display: block; }
+.brand-name {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: #0f172a;
+}
+.brand-tagline {
+  font-size: 10px;
+  color: #94a3b8;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.sidebar-nav { flex: 1; padding: 14px 0; overflow-y: auto; }
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  color: #94a3b8;
+  padding: 14px 18px 6px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  color: #475569;
+  font-size: 13.5px;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s;
+  text-decoration: none;
+}
+.nav-item:hover { background: #fafafa; color: #0f172a; }
+.nav-item.active {
+  border-left-color: var(--color-accent);
+  background: var(--color-accent-bg);
+  color: var(--color-accent);
+  font-weight: 600;
+}
+.nav-item svg { flex-shrink: 0; }
+.nav-badge {
+  margin-left: auto;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 20px;
+  padding: 1px 7px;
+}
+
+.sidebar-footer {
+  border-top: 1px solid #ececf0;
+  padding: 14px 18px;
+}
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-indigo), var(--color-indigo-soft));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.user-name { font-size: 13px; font-weight: 600; color: #0f172a; }
+.user-role { font-size: 11px; color: #94a3b8; }
+.upgrade-btn {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-soft));
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+}
+
+/* ── Main content ─────────────────────────────────────────── */
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ── Topbar ──────────────────────────────────────────────── */
+.topbar {
+  height: 60px;
+  background: #ffffff;
+  border-bottom: 1px solid #ececf0;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.topbar-title { font-size: 17px; font-weight: 700; color: #0f172a; white-space: nowrap; }
+.topbar-breadcrumb {
+  font-size: 12px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.topbar-breadcrumb span { color: #64748b; }
+.topbar-sep { flex: 1; }
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f1f5f9;
+  border: 1px solid #ececf0;
+  border-radius: 8px;
+  padding: 7px 12px;
+  min-width: 200px;
+}
+.search-box input {
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  color: #0f172a;
+  outline: none;
+  width: 100%;
+}
+.search-box input::placeholder { color: #94a3b8; }
+.date-range-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid #ececf0;
+  border-radius: 8px;
+  padding: 7px 13px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #334155;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.date-range-btn:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.topbar-bell {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #ececf0;
+  cursor: pointer;
+  position: relative;
+}
+.topbar-bell:hover { border-color: var(--color-accent); }
+.bell-dot {
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  width: 7px;
+  height: 7px;
+  background: var(--color-accent);
+  border-radius: 50%;
+  border: 1.5px solid #fff;
+}
+.topbar-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-soft));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ── Content area ─────────────────────────────────────────── */
+.content { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+
+/* ── Page header strip ────────────────────────────────────── */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.page-header-left h1 { font-size: 20px; font-weight: 700; color: #0f172a; }
+.page-header-left p { font-size: 13px; color: #64748b; margin-top: 2px; }
+.page-header-actions { display: flex; gap: 10px; }
+.btn-ghost {
+  padding: 8px 16px;
+  border: 1px solid #ececf0;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
+  cursor: pointer;
+}
+.btn-ghost:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.btn-primary {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-soft));
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── KPI cards ───────────────────────────────────────────── */
+.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.kpi-card {
+  background: #fff;
+  border: 1px solid #ececf0;
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.kpi-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.65px;
+  color: #94a3b8;
+}
+.kpi-value-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+}
+.kpi-value { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; color: #0f172a; }
+.kpi-sparkline { flex-shrink: 0; color: var(--color-accent); }
+.kpi-footer { display: flex; align-items: center; gap: 6px; }
+.kpi-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 20px;
+}
+.kpi-delta.up { background: var(--color-success-bg); color: var(--color-success); }
+.kpi-delta.down { background: var(--color-danger-bg); color: var(--color-danger); }
+.kpi-period { font-size: 11px; color: #94a3b8; }
+
+/* ── Middle row ──────────────────────────────────────────── */
+.mid-row { display: grid; grid-template-columns: 7fr 5fr; gap: 16px; }
+.card {
+  background: #fff;
+  border: 1px solid #ececf0;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.card-title { font-size: 15px; font-weight: 700; color: #0f172a; }
+.card-subtitle { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+.chart-legend { display: flex; gap: 16px; }
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #64748b; }
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* ── Funnel ──────────────────────────────────────────────── */
+.funnel { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+.funnel-row { display: flex; flex-direction: column; gap: 4px; }
+.funnel-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+.funnel-step-name { font-weight: 600; color: #0f172a; }
+.funnel-count { color: #64748b; }
+.funnel-drop { font-size: 10.5px; color: var(--color-danger); font-weight: 600; }
+.funnel-bar-track {
+  height: 12px;
+  background: #f1f5f9;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.funnel-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-soft));
+  transition: width 0.3s;
+}
+.funnel-connector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+  color: #94a3b8;
+  font-size: 11px;
+}
+.funnel-connector-line { flex: 1; height: 1px; background: #e2e8f0; }
+
+/* ── Table ───────────────────────────────────────────────── */
+.table-card { background: #fff; border: 1px solid #ececf0; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.04); overflow: hidden; }
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 14px;
+}
+.table-header-right { display: flex; gap: 10px; align-items: center; }
+.view-all { font-size: 12px; color: var(--color-accent); font-weight: 600; cursor: pointer; text-decoration: none; }
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #94a3b8;
+  background: #f8fafc;
+  border-bottom: 1px solid #ececf0;
+}
+tbody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #fff7f8; }
+td {
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #334155;
+  vertical-align: middle;
+}
+.campaign-name { font-weight: 600; color: #0f172a; }
+.campaign-desc { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+.channel-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.channel-paid   { background: var(--color-indigo-bg); color: var(--color-indigo); }
+.channel-social { background: var(--color-accent-bg); color: var(--color-accent); }
+.channel-email  { background: var(--color-sky-bg);    color: var(--color-sky); }
+.channel-display{ background: var(--color-amber-bg);  color: var(--color-amber); }
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.status-live    { background: var(--color-success-bg); color: var(--color-success); }
+.status-paused  { background: var(--color-warning-bg); color: var(--color-warning); }
+.status-ended   { background: var(--color-danger-bg);  color: var(--color-danger); }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.num { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ SIDEBAR ═══════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">
+      <!-- flame / ember SVG -->
+      <svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9 0C9 0 3 5.5 3 10.5C3 13.538 5.686 16 9 16C12.314 16 15 13.538 15 10.5C15 8.2 13.5 6.3 13.5 6.3C13.5 6.3 13 9 11 10C11 10 12 7.5 10.5 5.5C10.5 5.5 10.2 8.5 8 9.5C8 9.5 9.5 6 9 0Z" fill="#ffffff"/>
+        <path d="M9 13C7.9 13 7 13.9 7 15C7 16.1 7.9 17 9 17C10.1 17 11 16.1 11 15C11 13.9 10.1 13 9 13Z" fill="#ffffff" opacity="0.7"/>
+      </svg>
+    </div>
+    <div>
+      <div class="brand-name">Ember</div>
+      <div class="brand-tagline">Campaigns</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Overview</div>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".4"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".4"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".4"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".4"/></svg>
+      Dashboard
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><polyline points="1,11 5,6 8,9 11,4 15,7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      Analytics
+    </a>
+
+    <div class="nav-section-label">Campaigns</div>
+    <a class="nav-item active" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h9M2 12h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      All Campaigns
+      <span class="nav-badge">8</span>
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+      Audiences
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M5 7h6M5 10h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      Creatives
+    </a>
+
+    <div class="nav-section-label">Reports</div>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M5 9.5V11M8 7V11M11 4.5V11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      Performance
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1L10.5 6H15L11.5 9.5L13 14L8 11L3 14L4.5 9.5L1 6H5.5L8 1Z" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round"/></svg>
+      Attribution
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l2 2 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/><rect x="1.5" y="1.5" width="13" height="13" rx="2.5" stroke="currentColor" stroke-width="1.4" fill="none"/></svg>
+      Export
+    </a>
+
+    <div class="nav-section-label">Settings</div>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6.3 2.1a1 1 0 011.4 0l.7.8a1 1 0 001.2.2l.9-.4a1 1 0 011.3.5l.4.9a1 1 0 00.9.6h1a1 1 0 011 1v1a1 1 0 00-.6.9l.4.9a1 1 0 01-.5 1.3l-.9.4a1 1 0 00-.5 1.1l.3 1a1 1 0 01-.7 1.2l-1 .3a1 1 0 00-.8.8l-.3 1a1 1 0 01-1.2.7l-1-.3a1 1 0 00-1.1.4l-.6.8a1 1 0 01-1.4 0l-.6-.8a1 1 0 00-1.1-.4l-1 .3a1 1 0 01-1.2-.7l-.3-1a1 1 0 00-.8-.8l-1-.3A1 1 0 011 12l.3-1a1 1 0 00-.5-1.1l-.9-.4A1 1 0 01-.6 8.2l.4-.9A1 1 0 00-.8 6.4H-1a1 1 0 01-1-1V4.4a1 1 0 011-1h1a1 1 0 00.9-.6l.4-.9A1 1 0 012.6 1.4l.9.4a1 1 0 001.2-.2l.6-.8z" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>
+      Integrations
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/></svg>
+      Team
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="user-avatar">SM</div>
+      <div>
+        <div class="user-name">Sofia Morales</div>
+        <div class="user-role">Marketing Lead</div>
+      </div>
+    </div>
+    <button class="upgrade-btn">Upgrade to Pro →</button>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════════ MAIN ═══════════════════════════════════════ -->
+<div class="main">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div>
+      <div class="topbar-title">Campaigns</div>
+      <div class="topbar-breadcrumb">
+        <span>Home</span>
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3.5 2l3 3-3 3" stroke="#94a3b8" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span style="color:#0f172a;font-weight:600;">Campaigns</span>
+      </div>
+    </div>
+    <div class="topbar-sep"></div>
+    <div class="search-box">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="#94a3b8" stroke-width="1.4"/><path d="M9.5 9.5l2.5 2.5" stroke="#94a3b8" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <input type="text" placeholder="Search campaigns…">
+    </div>
+    <button class="date-range-btn">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="2.5" width="11" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M4.5 1v3M9.5 1v3M1.5 6h11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      May 1 – May 31, 2026
+    </button>
+    <div class="topbar-bell">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a5 5 0 00-5 5v3l-1 1h12l-1-1V7a5 5 0 00-5-5z" stroke="#64748b" stroke-width="1.4" fill="none"/><path d="M6.5 13a1.5 1.5 0 003 0" stroke="#64748b" stroke-width="1.4" stroke-linecap="round" fill="none"/></svg>
+      <span class="bell-dot"></span>
+    </div>
+    <div class="topbar-avatar" title="Sofia Morales">SM</div>
+  </header>
+
+  <!-- Content -->
+  <main class="content">
+
+    <!-- Page header -->
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>May 2026 Overview</h1>
+        <p>Tracking 8 active campaigns · Last refreshed 4 min ago</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn-ghost">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="display:inline;vertical-align:-2px"><path d="M2 9v3h10V9M7 1v7M4 5l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+          Export CSV
+        </button>
+        <button class="btn-primary">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+          New Campaign
+        </button>
+      </div>
+    </div>
+
+    <!-- KPI cards -->
+    <div class="kpi-row">
+
+      <!-- Reach -->
+      <div class="kpi-card">
+        <div class="kpi-label">Total Reach</div>
+        <div class="kpi-value-row">
+          <div class="kpi-value">4.2M</div>
+          <svg class="kpi-sparkline" width="52" height="26" viewBox="0 0 52 26" fill="none">
+            <polyline points="2,20 9,16 16,18 23,11 30,13 37,7 44,9 50,4" stroke="var(--color-accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <polyline points="2,20 9,16 16,18 23,11 30,13 37,7 44,9 50,4 50,26 2,26" fill="var(--color-accent)" opacity="0.10"/>
+          </svg>
+        </div>
+        <div class="kpi-footer">
+          <span class="kpi-delta up">
+            <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M4.5 7.5V1.5M1.5 4.5L4.5 1.5L7.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            +12.4%
+          </span>
+          <span class="kpi-period">vs last month</span>
+        </div>
+      </div>
+
+      <!-- CTR -->
+      <div class="kpi-card">
+        <div class="kpi-label">Avg. CTR</div>
+        <div class="kpi-value-row">
+          <div class="kpi-value">3.81%</div>
+          <svg class="kpi-sparkline" width="52" height="26" viewBox="0 0 52 26" fill="none">
+            <polyline points="2,14 9,12 16,17 23,9 30,14 37,11 44,8 50,11" stroke="var(--color-accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <polyline points="2,14 9,12 16,17 23,9 30,14 37,11 44,8 50,11 50,26 2,26" fill="var(--color-accent)" opacity="0.10"/>
+          </svg>
+        </div>
+        <div class="kpi-footer">
+          <span class="kpi-delta up">
+            <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M4.5 7.5V1.5M1.5 4.5L4.5 1.5L7.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            +0.6pp
+          </span>
+          <span class="kpi-period">vs last month</span>
+        </div>
+      </div>
+
+      <!-- Spend -->
+      <div class="kpi-card">
+        <div class="kpi-label">Total Spend</div>
+        <div class="kpi-value-row">
+          <div class="kpi-value">$84.3K</div>
+          <svg class="kpi-sparkline" width="52" height="26" viewBox="0 0 52 26" fill="none">
+            <polyline points="2,8 9,10 16,7 23,12 30,9 37,15 44,12 50,18" stroke="var(--color-accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <polyline points="2,8 9,10 16,7 23,12 30,9 37,15 44,12 50,18 50,26 2,26" fill="var(--color-accent)" opacity="0.10"/>
+          </svg>
+        </div>
+        <div class="kpi-footer">
+          <span class="kpi-delta down">
+            <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M4.5 1.5V7.5M1.5 4.5L4.5 7.5L7.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            −$3.1K
+          </span>
+          <span class="kpi-period">vs last month</span>
+        </div>
+      </div>
+
+      <!-- ROAS -->
+      <div class="kpi-card">
+        <div class="kpi-label">ROAS</div>
+        <div class="kpi-value-row">
+          <div class="kpi-value">5.2×</div>
+          <svg class="kpi-sparkline" width="52" height="26" viewBox="0 0 52 26" fill="none">
+            <polyline points="2,18 9,14 16,16 23,10 30,8 37,6 44,5 50,3" stroke="var(--color-accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <polyline points="2,18 9,14 16,16 23,10 30,8 37,6 44,5 50,3 50,26 2,26" fill="var(--color-accent)" opacity="0.10"/>
+          </svg>
+        </div>
+        <div class="kpi-footer">
+          <span class="kpi-delta up">
+            <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M4.5 7.5V1.5M1.5 4.5L4.5 1.5L7.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            +0.4×
+          </span>
+          <span class="kpi-period">vs last month</span>
+        </div>
+      </div>
+
+    </div><!-- /kpi-row -->
+
+    <!-- Middle row: chart + funnel -->
+    <div class="mid-row">
+
+      <!-- Performance chart -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Campaign Performance</div>
+            <div class="card-subtitle">Impressions · Clicks · Conversions — May 2026</div>
+          </div>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="legend-dot" style="background:var(--color-accent)"></span>Impressions</span>
+            <span class="legend-item"><span class="legend-dot" style="background:var(--color-indigo-soft)"></span>Clicks</span>
+            <span class="legend-item"><span class="legend-dot" style="background:var(--color-sky)"></span>Conversions</span>
+          </div>
+        </div>
+        <!-- Inline SVG chart -->
+        <svg width="100%" height="180" viewBox="0 0 560 180" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- grid lines -->
+          <line x1="40" y1="10"  x2="555" y2="10"  stroke="#ececf0" stroke-width="1"/>
+          <line x1="40" y1="47"  x2="555" y2="47"  stroke="#ececf0" stroke-width="1"/>
+          <line x1="40" y1="84"  x2="555" y2="84"  stroke="#ececf0" stroke-width="1"/>
+          <line x1="40" y1="121" x2="555" y2="121" stroke="#ececf0" stroke-width="1"/>
+          <line x1="40" y1="158" x2="555" y2="158" stroke="#ececf0" stroke-width="1"/>
+          <!-- y-axis labels -->
+          <text x="34" y="13"  text-anchor="end" font-size="9" fill="#94a3b8">400K</text>
+          <text x="34" y="50"  text-anchor="end" font-size="9" fill="#94a3b8">300K</text>
+          <text x="34" y="87"  text-anchor="end" font-size="9" fill="#94a3b8">200K</text>
+          <text x="34" y="124" text-anchor="end" font-size="9" fill="#94a3b8">100K</text>
+          <text x="34" y="161" text-anchor="end" font-size="9" fill="#94a3b8">0</text>
+          <!-- x-axis labels -->
+          <text x="67"  y="174" text-anchor="middle" font-size="9" fill="#94a3b8">May 3</text>
+          <text x="137" y="174" text-anchor="middle" font-size="9" fill="#94a3b8">May 7</text>
+          <text x="207" y="174" text-anchor="middle" font-size="9" fill="#94a3b8">May 12</text>
+          <text x="277" y="174" text-anchor="middle" font-size="9" fill="#94a3b8">May 17</text>
+          <text x="347" y="174" text-anchor="middle" font-size="9" fill="#94a3b8">May 22</text>
+          <text x="417" y="174" text-anchor="middle" font-size="9" fill="#94a3b8">May 26</text>
+          <text x="487" y="174" text-anchor="middle" font-size="9" fill="#94a3b8">May 31</text>
+          <!-- Impressions area -->
+          <defs>
+            <linearGradient id="grad-imp" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#e11d48" stop-opacity="0.18"/>
+              <stop offset="100%" stop-color="#e11d48" stop-opacity="0"/>
+            </linearGradient>
+            <linearGradient id="grad-clk" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#6366f1" stop-opacity="0.15"/>
+              <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+            </linearGradient>
+            <linearGradient id="grad-cnv" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.13"/>
+              <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <polygon points="67,108 137,90 207,68 277,52 347,60 417,38 487,30 487,158 67,158" fill="url(#grad-imp)"/>
+          <polyline points="67,108 137,90 207,68 277,52 347,60 417,38 487,30" stroke="#e11d48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <!-- Clicks area -->
+          <polygon points="67,130 137,118 207,104 277,94 347,98 417,82 487,78 487,158 67,158" fill="url(#grad-clk)"/>
+          <polyline points="67,130 137,118 207,104 277,94 347,98 417,82 487,78" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <!-- Conversions area -->
+          <polygon points="67,148 137,143 207,138 277,132 347,135 417,126 487,122 487,158 67,158" fill="url(#grad-cnv)"/>
+          <polyline points="67,148 137,143 207,138 277,132 347,135 417,126 487,122" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <!-- data dots – Impressions -->
+          <circle cx="277" cy="52"  r="3.5" fill="#e11d48"/>
+          <circle cx="417" cy="38"  r="3.5" fill="#e11d48"/>
+        </svg>
+      </div>
+
+      <!-- Funnel -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Conversion Funnel</div>
+            <div class="card-subtitle">Aggregate — all channels</div>
+          </div>
+        </div>
+        <div class="funnel">
+
+          <div class="funnel-row">
+            <div class="funnel-meta">
+              <span class="funnel-step-name">Impressions</span>
+              <span class="funnel-count">4,218,340</span>
+            </div>
+            <div class="funnel-bar-track">
+              <div class="funnel-bar-fill" style="width:100%;background:linear-gradient(90deg,var(--color-accent),var(--color-accent-soft))"></div>
+            </div>
+          </div>
+
+          <div class="funnel-connector">
+            <div class="funnel-connector-line"></div>
+            <span style="color:var(--color-danger);font-weight:600;">↓ 96.2% drop</span>
+            <div class="funnel-connector-line"></div>
+          </div>
+
+          <div class="funnel-row">
+            <div class="funnel-meta">
+              <span class="funnel-step-name">Clicks</span>
+              <span class="funnel-count">160,456</span>
+            </div>
+            <div class="funnel-bar-track">
+              <div class="funnel-bar-fill" style="width:62%;background:linear-gradient(90deg,var(--color-indigo),var(--color-indigo-soft))"></div>
+            </div>
+          </div>
+
+          <div class="funnel-connector">
+            <div class="funnel-connector-line"></div>
+            <span style="color:var(--color-danger);font-weight:600;">↓ 88.3% drop</span>
+            <div class="funnel-connector-line"></div>
+          </div>
+
+          <div class="funnel-row">
+            <div class="funnel-meta">
+              <span class="funnel-step-name">Leads</span>
+              <span class="funnel-count">18,752</span>
+            </div>
+            <div class="funnel-bar-track">
+              <div class="funnel-bar-fill" style="width:36%;background:linear-gradient(90deg,var(--color-sky),#38bdf8)"></div>
+            </div>
+          </div>
+
+          <div class="funnel-connector">
+            <div class="funnel-connector-line"></div>
+            <span style="color:var(--color-success);font-weight:600;">↓ 73.8% drop</span>
+            <div class="funnel-connector-line"></div>
+          </div>
+
+          <div class="funnel-row">
+            <div class="funnel-meta">
+              <span class="funnel-step-name">Customers</span>
+              <span class="funnel-count">4,908</span>
+            </div>
+            <div class="funnel-bar-track">
+              <div class="funnel-bar-fill" style="width:17%;background:linear-gradient(90deg,#16a34a,#22c55e)"></div>
+            </div>
+          </div>
+
+          <div style="margin-top:14px;padding:10px 12px;background:var(--color-success-bg);border-radius:8px;display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:12px;font-weight:600;color:#15803d;">Overall conversion rate</span>
+            <span style="font-size:15px;font-weight:800;color:var(--color-success);">0.116%</span>
+          </div>
+
+        </div>
+      </div>
+    </div><!-- /mid-row -->
+
+    <!-- Campaigns table -->
+    <div class="table-card">
+      <div class="table-header">
+        <div>
+          <div class="card-title">Active Campaigns</div>
+          <div class="card-subtitle">May 2026 · 8 campaigns running</div>
+        </div>
+        <div class="table-header-right">
+          <a class="view-all" href="#">View all →</a>
+          <button class="btn-primary">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+            New Campaign
+          </button>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Campaign</th>
+            <th>Channel</th>
+            <th>Impressions</th>
+            <th>Clicks</th>
+            <th>Spend</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="campaign-name">Spring Launch — Search</div>
+              <div class="campaign-desc">Branded + non-branded keywords</div>
+            </td>
+            <td><span class="channel-chip channel-paid">Paid Search</span></td>
+            <td class="num">982,410</td>
+            <td class="num">42,180</td>
+            <td class="num">$21,340</td>
+            <td><span class="status-pill status-live"><span class="status-dot"></span>Live</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="campaign-name">Summer Tease — Instagram</div>
+              <div class="campaign-desc">Carousel + Reels creatives</div>
+            </td>
+            <td><span class="channel-chip channel-social">Social</span></td>
+            <td class="num">748,920</td>
+            <td class="num">29,560</td>
+            <td class="num">$14,880</td>
+            <td><span class="status-pill status-live"><span class="status-dot"></span>Live</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="campaign-name">Newsletter Re-engagement</div>
+              <div class="campaign-desc">3-step drip for lapsed subscribers</div>
+            </td>
+            <td><span class="channel-chip channel-email">Email</span></td>
+            <td class="num">312,000</td>
+            <td class="num">18,744</td>
+            <td class="num">$2,150</td>
+            <td><span class="status-pill status-live"><span class="status-dot"></span>Live</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="campaign-name">Display Retargeting — Q2</div>
+              <div class="campaign-desc">Site-visitors 7-day window</div>
+            </td>
+            <td><span class="channel-chip channel-display">Display</span></td>
+            <td class="num">624,500</td>
+            <td class="num">8,320</td>
+            <td class="num">$9,760</td>
+            <td><span class="status-pill status-paused"><span class="status-dot"></span>Paused</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="campaign-name">Founder Story — LinkedIn</div>
+              <div class="campaign-desc">Thought-leadership sponsored posts</div>
+            </td>
+            <td><span class="channel-chip channel-social">Social</span></td>
+            <td class="num">215,800</td>
+            <td class="num">5,394</td>
+            <td class="num">$11,200</td>
+            <td><span class="status-pill status-live"><span class="status-dot"></span>Live</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="campaign-name">Performance Max — eComm</div>
+              <div class="campaign-desc">Automated Google asset groups</div>
+            </td>
+            <td><span class="channel-chip channel-paid">Paid Search</span></td>
+            <td class="num">487,210</td>
+            <td class="num">31,470</td>
+            <td class="num">$18,960</td>
+            <td><span class="status-pill status-live"><span class="status-dot"></span>Live</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="campaign-name">Winback — Churned Jan–Mar</div>
+              <div class="campaign-desc">Personalised offer sequence</div>
+            </td>
+            <td><span class="channel-chip channel-email">Email</span></td>
+            <td class="num">89,400</td>
+            <td class="num">6,248</td>
+            <td class="num">$1,490</td>
+            <td><span class="status-pill status-paused"><span class="status-dot"></span>Paused</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="campaign-name">Brand Awareness — Apr</div>
+              <div class="campaign-desc">Top-of-funnel display burst</div>
+            </td>
+            <td><span class="channel-chip channel-display">Display</span></td>
+            <td class="num">758,100</td>
+            <td class="num">18,540</td>
+            <td class="num">$4,520</td>
+            <td><span class="status-pill status-ended"><span class="status-dot"></span>Ended</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div><!-- /table-card -->
+
+  </main>
+</div><!-- /main -->
+
+</body>
+</html>

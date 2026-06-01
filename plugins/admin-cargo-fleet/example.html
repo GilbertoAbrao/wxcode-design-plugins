@@ -1,0 +1,1357 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cargo Fleet Admin — Status Board</title>
+<style>
+/* ── Design tokens ── */
+:root {
+  --accent:        #ea580c;
+  --accent-hover:  #c2410c;
+  --accent-light:  #fff7ed;
+  --amber:         #f59e0b;
+  --amber-light:   #fffbeb;
+  --success:       #16a34a;
+  --success-light: #f0fdf4;
+  --danger:        #dc2626;
+  --danger-light:  #fef2f2;
+  --warn:          #d97706;
+  --surface:       #ffffff;
+  --bg:            #f8f9fb;
+  --border:        #e6e9ee;
+  --text:          #1e293b;
+  --muted:         #64748b;
+  --sidebar-bg:    #1a2235;
+  --sidebar-text:  #94a3b8;
+  --sidebar-active:#ffffff;
+  --radius-sm:     6px;
+  --radius-md:     10px;
+  --shadow-card:   0 1px 4px rgba(0,0,0,0.06);
+  --shadow-hover:  0 4px 12px rgba(0,0,0,0.10);
+  --font:          "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ── Reset / base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font);
+  font-size: 14px;
+  color: var(--text);
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex;
+}
+a { color: inherit; text-decoration: none; }
+button { font-family: var(--font); cursor: pointer; border: none; outline: none; }
+input { font-family: var(--font); }
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.sidebar-brand-icon {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+}
+.sidebar-brand-name {
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+.sidebar-brand-sub {
+  color: var(--sidebar-text);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Hub switcher */
+.hub-switcher {
+  margin: 14px 12px 8px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+.hub-switcher-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--sidebar-text);
+  margin-bottom: 2px;
+}
+.hub-switcher-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+}
+.hub-caret {
+  color: var(--sidebar-text);
+}
+
+/* Nav */
+.nav-group { margin-top: 18px; }
+.nav-group-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: rgba(148,163,184,0.55);
+  padding: 0 18px;
+  margin-bottom: 4px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--sidebar-text);
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: background 0.15s, color 0.15s;
+  position: relative;
+}
+.nav-item:hover {
+  background: rgba(255,255,255,0.04);
+  color: #fff;
+}
+.nav-item.active {
+  background: rgba(234,88,12,0.15);
+  border-left-color: var(--accent);
+  color: var(--sidebar-active);
+}
+.nav-item.active .nav-icon { color: var(--accent); }
+.nav-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  opacity: 0.75;
+}
+.nav-item.active .nav-icon { opacity: 1; }
+.nav-badge {
+  margin-left: auto;
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+
+/* Sidebar footer */
+.sidebar-footer {
+  margin-top: auto;
+  padding: 14px 16px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sidebar-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.sidebar-user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+}
+.sidebar-user-role {
+  font-size: 10px;
+  color: var(--sidebar-text);
+}
+
+/* ── Main layout ── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Topbar */
+.topbar {
+  height: 60px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.topbar-breadcrumb { flex: 0 0 auto; }
+.topbar-page { font-size: 15px; font-weight: 700; color: var(--text); }
+.topbar-crumb { font-size: 12px; color: var(--muted); margin-top: 1px; }
+.topbar-search {
+  flex: 1;
+  max-width: 380px;
+  margin-left: 20px;
+  position: relative;
+}
+.topbar-search input {
+  width: 100%;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg);
+  padding: 0 14px 0 36px;
+  font-size: 13px;
+  color: var(--text);
+  transition: border-color 0.15s;
+}
+.topbar-search input::placeholder { color: var(--muted); }
+.topbar-search input:focus { border-color: var(--accent); outline: none; }
+.search-icon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+}
+.topbar-spacer { flex: 1; }
+.region-filter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+}
+.region-filter svg { color: var(--muted); }
+.topbar-bell {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  color: var(--muted);
+}
+.bell-dot {
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--amber);
+  border: 1.5px solid var(--surface);
+}
+.topbar-avatar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.topbar-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--amber));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+.topbar-username {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ── Page body ── */
+.page-body {
+  flex: 1;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* ── KPI row ── */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px 20px 14px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+}
+.kpi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.kpi-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.kpi-icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.kpi-icon-orange { background: var(--accent-light); color: var(--accent); }
+.kpi-icon-green  { background: var(--success-light); color: var(--success); }
+.kpi-icon-slate  { background: #f1f5f9; color: #475569; }
+.kpi-icon-amber  { background: var(--amber-light); color: var(--amber); }
+
+.kpi-value {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.kpi-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2px;
+}
+.kpi-delta {
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.delta-up   { color: var(--success); background: var(--success-light); }
+.delta-down { color: var(--danger);  background: var(--danger-light); }
+.delta-warn { color: var(--warn);    background: var(--amber-light); }
+
+.kpi-spark { opacity: 0.7; }
+
+/* Progress bar for warehouse */
+.kpi-progress-wrap {
+  margin-top: 8px;
+  background: var(--border);
+  height: 4px;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.kpi-progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--amber));
+}
+
+/* ── Middle grid ── */
+.mid-grid {
+  display: grid;
+  grid-template-columns: 7fr 5fr;
+  gap: 16px;
+  align-items: start;
+}
+
+/* Status board */
+.board-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.card-action {
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+}
+.card-action:hover { color: var(--accent-hover); }
+
+.board-columns {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  padding: 16px;
+  gap: 12px;
+}
+.board-col { display: flex; flex-direction: column; gap: 8px; }
+.board-col-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0 8px;
+}
+.board-col-name {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.col-name-pending  { color: #475569; }
+.col-name-loading  { color: var(--warn); }
+.col-name-transit  { color: var(--accent); }
+.col-name-delivered{ color: var(--success); }
+
+.col-count {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+.count-pending  { background: #f1f5f9; color: #475569; }
+.count-loading  { background: var(--amber-light); color: var(--warn); }
+.count-transit  { background: var(--accent-light); color: var(--accent); }
+.count-delivered{ background: var(--success-light); color: var(--success); }
+
+.shp-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  cursor: default;
+  transition: box-shadow 0.15s, transform 0.15s;
+  position: relative;
+}
+.shp-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-1px); }
+.shp-card::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  border-radius: 3px 0 0 3px;
+}
+.shp-card.pending::before  { background: #94a3b8; }
+.shp-card.loading::before  { background: var(--amber); }
+.shp-card.transit::before  { background: var(--accent); }
+.shp-card.delivered::before{ background: var(--success); }
+
+.shp-id {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+.shp-route {
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.shp-route-arrow { color: var(--accent); font-size: 10px; }
+.shp-carrier {
+  font-size: 10px;
+  color: var(--muted);
+}
+.shp-eta {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text);
+  margin-top: 2px;
+}
+.shp-eta span { color: var(--muted); font-weight: 400; }
+
+/* Route viz card */
+.route-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+.route-viz {
+  padding: 16px;
+  background: var(--bg);
+}
+.route-legend {
+  display: flex;
+  gap: 14px;
+  padding: 10px 16px 14px;
+  flex-wrap: wrap;
+}
+.legend-dot {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 500;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-active  { background: var(--accent); }
+.dot-busy    { background: var(--amber); }
+.dot-idle    { background: #94a3b8; }
+
+/* ── Shipments table ── */
+.table-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.table-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.table-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.table-count {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--accent-light);
+  color: var(--accent);
+}
+.table-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.btn-ghost {
+  height: 32px;
+  padding: 0 14px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: border-color 0.15s, color 0.15s;
+}
+.btn-ghost:hover { border-color: var(--muted); color: var(--text); }
+.btn-primary {
+  height: 32px;
+  padding: 0 14px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: background 0.15s;
+}
+.btn-primary:hover { background: var(--accent-hover); }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+thead th {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 10px 20px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  white-space: nowrap;
+}
+tbody tr {
+  transition: background 0.1s;
+  border-bottom: 1px solid var(--border);
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:nth-child(odd) { background: var(--bg); }
+tbody tr:hover { background: var(--accent-light); }
+tbody td {
+  padding: 10px 20px;
+  font-size: 13px;
+  color: var(--text);
+  white-space: nowrap;
+}
+.td-id {
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+}
+.td-route {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+.td-route-arrow { color: var(--muted); }
+.td-carrier { font-size: 12px; color: var(--muted); }
+.td-vehicle {
+  font-size: 11px;
+  font-family: "SF Mono", "Consolas", monospace;
+  background: var(--bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+.td-eta { font-size: 12px; font-weight: 500; }
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.pill-pending   { background: #f1f5f9; color: #475569; }
+.pill-loading   { background: var(--amber-light); color: var(--warn); }
+.pill-transit   { background: var(--accent-light); color: var(--accent); }
+.pill-delayed   { background: var(--danger-light); color: var(--danger); }
+.pill-delivered { background: var(--success-light); color: var(--success); }
+
+/* ── Route SVG animation ── */
+@keyframes travel {
+  0%   { offset-distance: 0%; }
+  100% { offset-distance: 100%; }
+}
+.traveler {
+  offset-path: path("M 80 210 Q 140 80 240 130 Q 310 170 340 90");
+  animation: travel 3.2s cubic-bezier(0.45,0,0.55,1) infinite;
+  offset-rotate: auto;
+}
+@keyframes pulse-node {
+  0%, 100% { r: 8; opacity: 1; }
+  50%       { r: 11; opacity: 0.75; }
+}
+.node-active { animation: pulse-node 2s ease-in-out infinite; }
+</style>
+</head>
+<body>
+
+<!-- ══ Sidebar ══ -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <!-- Brand icon: stylized hexagon with a cargo box inside -->
+    <svg class="sidebar-brand-icon" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="17,2 31,9.5 31,24.5 17,32 3,24.5 3,9.5" fill="var(--accent)" opacity="0.9"/>
+      <rect x="10" y="13" width="14" height="9" rx="1.5" fill="white" opacity="0.95"/>
+      <path d="M10 16h14" stroke="var(--accent)" stroke-width="1.2"/>
+      <rect x="13" y="11" width="8" height="4" rx="1" fill="white" opacity="0.7"/>
+    </svg>
+    <div>
+      <div class="sidebar-brand-name">VexCargo</div>
+      <div class="sidebar-brand-sub">Fleet Ops</div>
+    </div>
+  </div>
+
+  <!-- Hub switcher -->
+  <div class="hub-switcher">
+    <div>
+      <div class="hub-switcher-label">Active Hub</div>
+      <div class="hub-switcher-value">North Central</div>
+    </div>
+    <svg class="hub-caret" width="12" height="12" viewBox="0 0 12 12" fill="none">
+      <path d="M3 4.5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <!-- Nav: DISPATCH -->
+  <nav class="nav-group">
+    <div class="nav-group-label">Dispatch</div>
+    <div class="nav-item">
+      <!-- Overview icon -->
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+        <rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor" opacity="0.6"/>
+        <rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor" opacity="0.6"/>
+        <rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor" opacity="0.6"/>
+        <rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor" opacity="0.6"/>
+      </svg>
+      Overview
+    </div>
+    <div class="nav-item">
+      <!-- Live map icon -->
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M8 11v4M4 7H1M15 7h-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="8" cy="7" r="1.5" fill="currentColor"/>
+      </svg>
+      Live Map
+      <span class="nav-badge">3</span>
+    </div>
+    <div class="nav-item active">
+      <!-- Status board icon -->
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+        <rect x="1" y="2" width="3" height="12" rx="1" fill="currentColor"/>
+        <rect x="6" y="5" width="3" height="9" rx="1" fill="currentColor"/>
+        <rect x="11" y="1" width="3" height="13" rx="1" fill="currentColor"/>
+      </svg>
+      Status Board
+    </div>
+  </nav>
+
+  <!-- Nav: FLEET -->
+  <nav class="nav-group">
+    <div class="nav-group-label">Fleet</div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+        <rect x="1" y="6" width="10" height="6" rx="1" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M11 8h2l2 2v2h-4V8z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+        <circle cx="4" cy="13" r="1.5" fill="currentColor"/>
+        <circle cx="12" cy="13" r="1.5" fill="currentColor"/>
+      </svg>
+      Vehicles
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      Drivers
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M8 4v4l3 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      Maintenance
+    </div>
+  </nav>
+
+  <!-- Nav: WAREHOUSE -->
+  <nav class="nav-group">
+    <div class="nav-group-label">Warehouse</div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+        <path d="M1 6L8 1l7 5v9H1V6z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+        <rect x="5" y="9" width="6" height="6" rx="0.5" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+      Inventory
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+        <rect x="1" y="2" width="14" height="12" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M1 6h14M5 2v4M11 2v4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <rect x="4" y="9" width="3" height="2" rx="0.5" fill="currentColor" opacity="0.5"/>
+        <rect x="9" y="9" width="3" height="2" rx="0.5" fill="currentColor" opacity="0.5"/>
+      </svg>
+      Dock Schedule
+    </div>
+  </nav>
+
+  <!-- Nav: SETTINGS -->
+  <nav class="nav-group">
+    <div class="nav-group-label">Settings</div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.42 1.42M11.53 11.53l1.42 1.42M3.05 12.95l1.42-1.42M11.53 4.47l1.42-1.42" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+      Integrations
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+        <circle cx="6" cy="5" r="2.5" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M1 14c0-2.8 2.2-5 5-5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        <path d="M12 9l1.5 1.5L16 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="10" y="7" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+      Users
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none">
+        <path d="M8 2a6 6 0 110 12A6 6 0 018 2z" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M8 5v4l2.5 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        <circle cx="13" cy="3" r="2.5" fill="var(--accent)"/>
+      </svg>
+      Alerts
+    </div>
+  </nav>
+
+  <!-- Sidebar footer -->
+  <div class="sidebar-footer">
+    <div class="sidebar-avatar">RK</div>
+    <div>
+      <div class="sidebar-user-name">Reva Koltzen</div>
+      <div class="sidebar-user-role">Fleet Supervisor</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ══ Main ══ -->
+<div class="main">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="topbar-breadcrumb">
+      <div class="topbar-page">Status Board</div>
+      <div class="topbar-crumb">Fleet Ops &rsaquo; Status Board</div>
+    </div>
+
+    <div class="topbar-search">
+      <svg class="search-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M9.5 9.5l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <input type="text" placeholder="Search shipments, carriers, routes&hellip;">
+    </div>
+
+    <div class="topbar-spacer"></div>
+
+    <!-- Region filter -->
+    <button class="region-filter">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+        <path d="M6 1a5 5 0 100 10A5 5 0 006 1z" stroke="currentColor" stroke-width="1.3"/>
+        <path d="M4 6a6.7 6.7 0 004 0" stroke="currentColor" stroke-width="1.3"/>
+        <path d="M6 1c-1.5 1.5-1.5 8.5 0 10" stroke="currentColor" stroke-width="1.1"/>
+        <path d="M1 6h10" stroke="currentColor" stroke-width="1.3"/>
+      </svg>
+      All Regions
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style="margin-left:2px">
+        <path d="M2.5 3.5l2.5 3 2.5-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <!-- Bell -->
+    <div class="topbar-bell">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M8 2a5 5 0 00-5 5c0 2.5-.8 3.5-1.5 4h13c-.7-.5-1.5-1.5-1.5-4a5 5 0 00-5-5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+        <path d="M6.5 13a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <div class="bell-dot"></div>
+    </div>
+
+    <!-- Avatar -->
+    <div class="topbar-avatar-wrap">
+      <div class="topbar-avatar">RK</div>
+      <span class="topbar-username">Reva K.</span>
+    </div>
+  </header>
+
+  <!-- Page body -->
+  <div class="page-body">
+
+    <!-- ── KPI row ── -->
+    <div class="kpi-row">
+
+      <!-- KPI 1: In Transit -->
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">In Transit</span>
+          <div class="kpi-icon-wrap kpi-icon-orange">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <rect x="1" y="7" width="11" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M12 9h2.5l2.5 2.5V14H12V9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+              <circle cx="4.5" cy="15" r="1.8" fill="currentColor"/>
+              <circle cx="13.5" cy="15" r="1.8" fill="currentColor"/>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-value">847</div>
+        <div class="kpi-footer">
+          <span class="kpi-delta delta-up">
+            <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M4 7V1M1 4l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            +12% vs yesterday
+          </span>
+          <svg class="kpi-spark" width="56" height="22" viewBox="0 0 56 22" fill="none">
+            <polyline points="0,18 9,14 18,16 27,8 36,10 45,5 56,7" stroke="var(--accent)" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- KPI 2: On-Time Rate -->
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">On-Time Rate</span>
+          <div class="kpi-icon-wrap kpi-icon-green">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M5.5 9l2.5 2.5 4.5-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-value">94.2%</div>
+        <div class="kpi-footer">
+          <span class="kpi-delta delta-up">
+            <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M4 7V1M1 4l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            +1.4pp this week
+          </span>
+          <svg class="kpi-spark" width="56" height="22" viewBox="0 0 56 22" fill="none">
+            <polyline points="0,14 9,12 18,13 27,9 36,8 45,6 56,6" stroke="var(--success)" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- KPI 3: Active Fleet -->
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Active Fleet</span>
+          <div class="kpi-icon-wrap kpi-icon-slate">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <rect x="1" y="6" width="9" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M10 8h2.5L15 11v2h-5V8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+              <circle cx="4" cy="14" r="1.7" fill="currentColor"/>
+              <circle cx="12.5" cy="14" r="1.7" fill="currentColor"/>
+              <path d="M2 6V4h7v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-value">312</div>
+        <div class="kpi-footer">
+          <span class="kpi-delta delta-down">
+            <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M4 1v6M1 4l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            −3 offline
+          </span>
+          <svg class="kpi-spark" width="56" height="22" viewBox="0 0 56 22" fill="none">
+            <polyline points="0,8 9,9 18,8 27,10 36,11 45,9 56,13" stroke="#94a3b8" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- KPI 4: Warehouse Utilization -->
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Warehouse Util.</span>
+          <div class="kpi-icon-wrap kpi-icon-amber">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M2 7L9 2l7 5v9H2V7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+              <rect x="5.5" y="10" width="7" height="6" rx="0.8" stroke="currentColor" stroke-width="1.3"/>
+              <path d="M9 10v6" stroke="currentColor" stroke-width="1.1"/>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-value">78%</div>
+        <div class="kpi-footer">
+          <span class="kpi-delta delta-warn">
+            <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M4 7V1M1 4l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            +6% capacity
+          </span>
+        </div>
+        <div class="kpi-progress-wrap" style="margin-top:10px">
+          <div class="kpi-progress-fill" style="width:78%"></div>
+        </div>
+      </div>
+
+    </div><!-- /kpi-row -->
+
+    <!-- ── Middle grid ── -->
+    <div class="mid-grid">
+
+      <!-- Shipment Status Board -->
+      <div class="board-card">
+        <div class="card-header">
+          <span class="card-title">Shipment Status Board</span>
+          <span class="card-action">View all &rarr;</span>
+        </div>
+        <div class="board-columns">
+
+          <!-- PENDING -->
+          <div class="board-col">
+            <div class="board-col-head">
+              <span class="board-col-name col-name-pending">Pending</span>
+              <span class="col-count count-pending">24</span>
+            </div>
+            <div class="shp-card pending">
+              <div class="shp-id">SHP-20481</div>
+              <div class="shp-route">Veron <span class="shp-route-arrow">›</span> Kalsted</div>
+              <div class="shp-carrier">Kaldex Logistics</div>
+              <div class="shp-eta"><span>ETA:</span> Jun 4, 14:00</div>
+            </div>
+            <div class="shp-card pending">
+              <div class="shp-id">SHP-20495</div>
+              <div class="shp-route">Gorfen <span class="shp-route-arrow">›</span> Omdra</div>
+              <div class="shp-carrier">Veron Freight</div>
+              <div class="shp-eta"><span>ETA:</span> Jun 5, 09:30</div>
+            </div>
+            <div class="shp-card pending">
+              <div class="shp-id">SHP-20503</div>
+              <div class="shp-route">Nuvex <span class="shp-route-arrow">›</span> Pelholt</div>
+              <div class="shp-carrier">Trisca Haul Co.</div>
+              <div class="shp-eta"><span>ETA:</span> Jun 6, 11:00</div>
+            </div>
+          </div>
+
+          <!-- LOADING -->
+          <div class="board-col">
+            <div class="board-col-head">
+              <span class="board-col-name col-name-loading">Loading</span>
+              <span class="col-count count-loading">11</span>
+            </div>
+            <div class="shp-card loading">
+              <div class="shp-id">SHP-20467</div>
+              <div class="shp-route">Brekka <span class="shp-route-arrow">›</span> Trisca</div>
+              <div class="shp-carrier">Veron Freight</div>
+              <div class="shp-eta"><span>Dep:</span> Today, 16:30</div>
+            </div>
+            <div class="shp-card loading">
+              <div class="shp-id">SHP-20471</div>
+              <div class="shp-route">Pelholt <span class="shp-route-arrow">›</span> Nuvex</div>
+              <div class="shp-carrier">Kaldex Logistics</div>
+              <div class="shp-eta"><span>Dep:</span> Today, 18:00</div>
+            </div>
+          </div>
+
+          <!-- IN TRANSIT -->
+          <div class="board-col">
+            <div class="board-col-head">
+              <span class="board-col-name col-name-transit">In Transit</span>
+              <span class="col-count count-transit">847</span>
+            </div>
+            <div class="shp-card transit">
+              <div class="shp-id">SHP-20440</div>
+              <div class="shp-route">Omdra <span class="shp-route-arrow">›</span> Gorfen</div>
+              <div class="shp-carrier">Orex Trans</div>
+              <div class="shp-eta"><span>ETA:</span> Jun 2, 08:45</div>
+            </div>
+            <div class="shp-card transit">
+              <div class="shp-id">SHP-20455</div>
+              <div class="shp-route">Kalsted <span class="shp-route-arrow">›</span> Veron</div>
+              <div class="shp-carrier">Trisca Haul Co.</div>
+              <div class="shp-eta"><span>ETA:</span> Jun 2, 12:00</div>
+            </div>
+            <div class="shp-card transit">
+              <div class="shp-id">SHP-20461</div>
+              <div class="shp-route">Nuvex <span class="shp-route-arrow">›</span> Brekka</div>
+              <div class="shp-carrier">Kaldex Logistics</div>
+              <div class="shp-eta"><span>ETA:</span> Jun 3, 07:15</div>
+            </div>
+          </div>
+
+          <!-- DELIVERED -->
+          <div class="board-col">
+            <div class="board-col-head">
+              <span class="board-col-name col-name-delivered">Delivered</span>
+              <span class="col-count count-delivered">1,204</span>
+            </div>
+            <div class="shp-card delivered">
+              <div class="shp-id">SHP-20412</div>
+              <div class="shp-route">Trisca <span class="shp-route-arrow">›</span> Kalsted</div>
+              <div class="shp-carrier">Orex Trans</div>
+              <div class="shp-eta"><span>Done:</span> Jun 1, 10:22</div>
+            </div>
+            <div class="shp-card delivered">
+              <div class="shp-id">SHP-20418</div>
+              <div class="shp-route">Veron <span class="shp-route-arrow">›</span> Brekka</div>
+              <div class="shp-carrier">Veron Freight</div>
+              <div class="shp-eta"><span>Done:</span> Jun 1, 14:50</div>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /board-card -->
+
+      <!-- Route Network Visualization -->
+      <div class="route-card">
+        <div class="card-header">
+          <span class="card-title">Route Network</span>
+          <span class="card-action">Full map &rarr;</span>
+        </div>
+        <div class="route-viz">
+          <!--
+            Abstract topological graph — original invention.
+            Node positions chosen for visual balance; no real geography.
+            Arcs are cubic bezier paths between invented city hubs.
+          -->
+          <svg width="100%" viewBox="0 0 400 280" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block">
+            <!-- Background grid lines -->
+            <line x1="0" y1="70" x2="400" y2="70" stroke="var(--border)" stroke-width="0.7"/>
+            <line x1="0" y1="140" x2="400" y2="140" stroke="var(--border)" stroke-width="0.7"/>
+            <line x1="0" y1="210" x2="400" y2="210" stroke="var(--border)" stroke-width="0.7"/>
+            <line x1="80" y1="0" x2="80" y2="280" stroke="var(--border)" stroke-width="0.7"/>
+            <line x1="200" y1="0" x2="200" y2="280" stroke="var(--border)" stroke-width="0.7"/>
+            <line x1="320" y1="0" x2="320" y2="280" stroke="var(--border)" stroke-width="0.7"/>
+
+            <!-- Arc paths (idle routes) -->
+            <path d="M 80 210 Q 140 270 240 230" stroke="var(--border)" stroke-width="2" stroke-dasharray="5 4"/>
+            <path d="M 240 230 Q 290 250 360 210" stroke="var(--border)" stroke-width="2" stroke-dasharray="5 4"/>
+            <path d="M 360 90 Q 310 200 360 210" stroke="var(--border)" stroke-width="2" stroke-dasharray="5 4"/>
+
+            <!-- Busy routes (amber) -->
+            <path d="M 200 50 Q 290 30 360 90" stroke="var(--amber)" stroke-width="2.2" opacity="0.7"/>
+            <path d="M 120 130 Q 155 180 240 230" stroke="var(--amber)" stroke-width="2.2" opacity="0.7"/>
+
+            <!-- Active routes (orange) — animated traveler on primary route -->
+            <path id="route-primary" d="M 80 210 Q 140 80 240 130 Q 310 170 360 90" stroke="var(--accent)" stroke-width="2.5"/>
+            <path d="M 80 210 Q 130 150 200 50" stroke="var(--accent)" stroke-width="2.5" opacity="0.7"/>
+            <path d="M 200 50 Q 270 60 360 90" stroke="var(--accent)" stroke-width="2.2" opacity="0.6"/>
+
+            <!-- Animated traveler dot along primary route -->
+            <circle r="5" fill="var(--accent)" opacity="0.9">
+              <animateMotion dur="3.2s" repeatCount="indefinite" rotate="auto">
+                <mpath href="#route-primary"/>
+              </animateMotion>
+            </circle>
+
+            <!-- Secondary traveler (amber) -->
+            <circle r="4" fill="var(--amber)" opacity="0.85">
+              <animateMotion dur="4.5s" repeatCount="indefinite" begin="1.2s">
+                <mpath href="#route-primary"/>
+              </animateMotion>
+            </circle>
+
+            <!-- Node: Veron (active, orange) — top-left area -->
+            <circle cx="80" cy="210" r="10" fill="var(--accent)" opacity="0.2"/>
+            <circle cx="80" cy="210" r="7" fill="var(--accent)" class="node-active"/>
+            <circle cx="80" cy="210" r="3" fill="white"/>
+            <text x="90" y="215" font-family="Inter,system-ui,sans-serif" font-size="10" font-weight="600" fill="var(--text)">Veron</text>
+
+            <!-- Node: Kalsted (busy, amber) -->
+            <circle cx="120" cy="130" r="8" fill="var(--amber)" opacity="0.25"/>
+            <circle cx="120" cy="130" r="6" fill="var(--amber)"/>
+            <circle cx="120" cy="130" r="2.5" fill="white"/>
+            <text x="130" y="135" font-family="Inter,system-ui,sans-serif" font-size="10" font-weight="600" fill="var(--text)">Kalsted</text>
+
+            <!-- Node: Omdra (active) -->
+            <circle cx="200" cy="50" r="10" fill="var(--accent)" opacity="0.2"/>
+            <circle cx="200" cy="50" r="7" fill="var(--accent)" class="node-active" style="animation-delay:0.8s"/>
+            <circle cx="200" cy="50" r="3" fill="white"/>
+            <text x="210" y="55" font-family="Inter,system-ui,sans-serif" font-size="10" font-weight="600" fill="var(--text)">Omdra</text>
+
+            <!-- Node: Pelholt (idle) -->
+            <circle cx="240" cy="130" r="7" fill="#94a3b8" opacity="0.5"/>
+            <circle cx="240" cy="130" r="4.5" fill="#94a3b8"/>
+            <circle cx="240" cy="130" r="2" fill="white"/>
+            <text x="250" y="134" font-family="Inter,system-ui,sans-serif" font-size="10" font-weight="600" fill="var(--muted)">Pelholt</text>
+
+            <!-- Node: Trisca (busy) -->
+            <circle cx="240" cy="230" r="8" fill="var(--amber)" opacity="0.25"/>
+            <circle cx="240" cy="230" r="6" fill="var(--amber)"/>
+            <circle cx="240" cy="230" r="2.5" fill="white"/>
+            <text x="250" y="234" font-family="Inter,system-ui,sans-serif" font-size="10" font-weight="600" fill="var(--text)">Trisca</text>
+
+            <!-- Node: Nuvex (idle) -->
+            <circle cx="310" cy="170" r="7" fill="#94a3b8" opacity="0.5"/>
+            <circle cx="310" cy="170" r="4.5" fill="#94a3b8"/>
+            <circle cx="310" cy="170" r="2" fill="white"/>
+            <text x="319" y="174" font-family="Inter,system-ui,sans-serif" font-size="10" font-weight="600" fill="var(--muted)">Nuvex</text>
+
+            <!-- Node: Brekka (active) -->
+            <circle cx="360" cy="90" r="10" fill="var(--accent)" opacity="0.2"/>
+            <circle cx="360" cy="90" r="7" fill="var(--accent)" class="node-active" style="animation-delay:1.4s"/>
+            <circle cx="360" cy="90" r="3" fill="white"/>
+            <text x="330" y="86" font-family="Inter,system-ui,sans-serif" font-size="10" font-weight="600" fill="var(--text)">Brekka</text>
+
+            <!-- Node: Gorfen (idle) -->
+            <circle cx="360" cy="210" r="7" fill="#94a3b8" opacity="0.5"/>
+            <circle cx="360" cy="210" r="4.5" fill="#94a3b8"/>
+            <circle cx="360" cy="210" r="2" fill="white"/>
+            <text x="330" y="225" font-family="Inter,system-ui,sans-serif" font-size="10" font-weight="600" fill="var(--muted)">Gorfen</text>
+          </svg>
+        </div>
+        <div class="route-legend">
+          <span class="legend-dot"><span class="dot dot-active"></span>Active Route</span>
+          <span class="legend-dot"><span class="dot dot-busy"></span>Busy</span>
+          <span class="legend-dot"><span class="dot dot-idle"></span>Idle</span>
+        </div>
+      </div><!-- /route-card -->
+
+    </div><!-- /mid-grid -->
+
+    <!-- ── Active Shipments table ── -->
+    <div class="table-card">
+      <div class="table-header">
+        <div class="table-title-wrap">
+          <span class="table-title">Active Shipments</span>
+          <span class="table-count">847</span>
+        </div>
+        <div class="table-actions">
+          <button class="btn-ghost">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M1 3h10M3 6h6M5 9h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+            Filter
+          </button>
+          <button class="btn-ghost">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M6 1v7M3 6l3 3 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M1 10h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+            Export CSV
+          </button>
+          <button class="btn-primary">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            New Shipment
+          </button>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Shipment ID</th>
+            <th>Origin &rarr; Destination</th>
+            <th>Carrier</th>
+            <th>Vehicle ID</th>
+            <th>ETA</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-id">SHP-20481</td>
+            <td><span class="td-route">Veron <span class="td-route-arrow">→</span> Kalsted</span></td>
+            <td class="td-carrier">Kaldex Logistics</td>
+            <td><span class="td-vehicle">VXC-1182</span></td>
+            <td class="td-eta">Jun 4 &bull; 14:00</td>
+            <td><span class="status-pill pill-pending">Pending</span></td>
+          </tr>
+          <tr>
+            <td class="td-id">SHP-20467</td>
+            <td><span class="td-route">Brekka <span class="td-route-arrow">→</span> Trisca</span></td>
+            <td class="td-carrier">Veron Freight</td>
+            <td><span class="td-vehicle">VXC-0874</span></td>
+            <td class="td-eta">Today &bull; 16:30</td>
+            <td><span class="status-pill pill-loading">Loading</span></td>
+          </tr>
+          <tr>
+            <td class="td-id">SHP-20440</td>
+            <td><span class="td-route">Omdra <span class="td-route-arrow">→</span> Gorfen</span></td>
+            <td class="td-carrier">Orex Trans</td>
+            <td><span class="td-vehicle">VXC-2205</span></td>
+            <td class="td-eta">Jun 2 &bull; 08:45</td>
+            <td><span class="status-pill pill-transit">In Transit</span></td>
+          </tr>
+          <tr>
+            <td class="td-id">SHP-20455</td>
+            <td><span class="td-route">Kalsted <span class="td-route-arrow">→</span> Veron</span></td>
+            <td class="td-carrier">Trisca Haul Co.</td>
+            <td><span class="td-vehicle">VXC-3301</span></td>
+            <td class="td-eta">Jun 2 &bull; 12:00</td>
+            <td><span class="status-pill pill-transit">In Transit</span></td>
+          </tr>
+          <tr>
+            <td class="td-id">SHP-20499</td>
+            <td><span class="td-route">Pelholt <span class="td-route-arrow">→</span> Nuvex</span></td>
+            <td class="td-carrier">Kaldex Logistics</td>
+            <td><span class="td-vehicle">VXC-1047</span></td>
+            <td class="td-eta">Jun 3 &bull; 19:30</td>
+            <td><span class="status-pill pill-delayed">Delayed</span></td>
+          </tr>
+          <tr>
+            <td class="td-id">SHP-20461</td>
+            <td><span class="td-route">Nuvex <span class="td-route-arrow">→</span> Brekka</span></td>
+            <td class="td-carrier">Kaldex Logistics</td>
+            <td><span class="td-vehicle">VXC-0992</span></td>
+            <td class="td-eta">Jun 3 &bull; 07:15</td>
+            <td><span class="status-pill pill-transit">In Transit</span></td>
+          </tr>
+          <tr>
+            <td class="td-id">SHP-20495</td>
+            <td><span class="td-route">Gorfen <span class="td-route-arrow">→</span> Omdra</span></td>
+            <td class="td-carrier">Veron Freight</td>
+            <td><span class="td-vehicle">VXC-2540</span></td>
+            <td class="td-eta">Jun 5 &bull; 09:30</td>
+            <td><span class="status-pill pill-pending">Pending</span></td>
+          </tr>
+          <tr>
+            <td class="td-id">SHP-20412</td>
+            <td><span class="td-route">Trisca <span class="td-route-arrow">→</span> Kalsted</span></td>
+            <td class="td-carrier">Orex Trans</td>
+            <td><span class="td-vehicle">VXC-1730</span></td>
+            <td class="td-eta">Jun 1 &bull; 10:22</td>
+            <td><span class="status-pill pill-delivered">Delivered</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div><!-- /table-card -->
+
+  </div><!-- /page-body -->
+</div><!-- /main -->
+
+</body>
+</html>

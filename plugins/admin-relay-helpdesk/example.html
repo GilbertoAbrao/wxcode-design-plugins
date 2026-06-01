@@ -1,0 +1,953 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Relay Helpdesk Admin</title>
+<style>
+:root {
+  --accent:        #7c3aed;
+  --accent-light:  #8b5cf6;
+  --accent-tint:   #ede9fe;
+  --accent-bar:    #6d28d9;
+  --status-green:  #16a34a;
+  --status-green-bg: #dcfce7;
+  --status-amber:  #d97706;
+  --status-amber-bg: #fef3c7;
+  --status-red:    #dc2626;
+  --status-red-bg: #fee2e2;
+  --status-slate-bg: #f1f5f9;
+  --status-slate:  #475569;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 13px;
+  color: #334155;
+  background: #f1f5f9;
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ── Sidebar ────────────────────────────────────────── */
+.sidebar {
+  width: 240px;
+  min-width: 240px;
+  background: #fff;
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+.sidebar-logo svg { flex-shrink: 0; }
+.sidebar-logo-text {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e293b;
+  letter-spacing: -0.01em;
+}
+
+.sidebar-section { padding: 16px 12px 4px; }
+.sidebar-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #94a3b8;
+  padding: 0 8px 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 8px;
+  border-radius: 7px;
+  cursor: pointer;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 1px;
+  position: relative;
+  text-decoration: none;
+}
+.nav-item:hover { background: #f8fafc; color: #1e293b; }
+.nav-item.active {
+  background: var(--accent-tint);
+  color: var(--accent);
+}
+.nav-item.active::before {
+  content: "";
+  position: absolute;
+  left: -12px;
+  top: 4px;
+  bottom: 4px;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  background: var(--accent);
+}
+.nav-item svg { flex-shrink: 0; opacity: 0.75; }
+.nav-item.active svg { opacity: 1; color: var(--accent); }
+
+.nav-badge {
+  margin-left: auto;
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 12px 16px;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.footer-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--accent-tint);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.footer-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 1.2;
+}
+.footer-role { font-size: 11px; color: #94a3b8; }
+.presence-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--status-green);
+  margin-left: auto;
+  flex-shrink: 0;
+  border: 1.5px solid #fff;
+}
+
+/* ── Main shell ─────────────────────────────────────── */
+.main-shell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Topbar ─────────────────────────────────────────── */
+.topbar {
+  height: 56px;
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 16px;
+  flex-shrink: 0;
+}
+.topbar-title { font-size: 15px; font-weight: 700; color: #1e293b; }
+.topbar-breadcrumb { font-size: 12px; color: #94a3b8; margin-top: 1px; }
+.topbar-title-block { display: flex; flex-direction: column; }
+
+.topbar-search {
+  flex: 1;
+  max-width: 340px;
+  position: relative;
+  margin: 0 16px;
+}
+.topbar-search svg {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+}
+.topbar-search input {
+  width: 100%;
+  padding: 7px 12px 7px 32px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #334155;
+  background: #f8fafc;
+  outline: none;
+}
+.topbar-search input:focus { border-color: var(--accent-light); background: #fff; }
+
+.assignee-filter {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+  cursor: pointer;
+  font-size: 13px;
+  color: #475569;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.assignee-filter:hover { border-color: #cbd5e1; background: #fff; }
+.assignee-filter svg { color: #94a3b8; }
+
+.topbar-actions { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+
+.icon-btn {
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: #475569;
+  background: transparent;
+  border: none;
+  position: relative;
+}
+.icon-btn:hover { background: #f1f5f9; }
+.icon-btn .notif-dot {
+  position: absolute; top: 5px; right: 5px;
+  width: 7px; height: 7px;
+  background: var(--status-amber);
+  border-radius: 50%;
+  border: 1.5px solid #fff;
+}
+.topbar-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--accent-tint);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  border: 2px solid var(--accent-light);
+}
+
+/* ── Content area ───────────────────────────────────── */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  gap: 20px;
+}
+.content-main { flex: 1; display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.content-aside { width: 260px; min-width: 260px; }
+
+/* ── Cards ──────────────────────────────────────────── */
+.card {
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #e9ecf3;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+/* ── KPI row ────────────────────────────────────────── */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.kpi-card {
+  padding: 18px 20px 16px;
+}
+.kpi-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #94a3b8;
+  margin-bottom: 10px;
+}
+.kpi-value-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+}
+.kpi-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.kpi-value span { font-size: 14px; font-weight: 500; color: #64748b; }
+.kpi-chip {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.kpi-chip.up { color: var(--status-green); background: var(--status-green-bg); }
+.kpi-chip.down { color: var(--status-red); background: var(--status-red-bg); }
+.kpi-chip.neutral { color: var(--status-slate); background: var(--status-slate-bg); }
+
+.kpi-sparkline { margin-top: 10px; }
+
+/* ── SLA bars ───────────────────────────────────────── */
+.sla-card { padding: 18px 20px; }
+.sla-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.card-title { font-size: 14px; font-weight: 700; color: #1e293b; }
+.card-subtitle { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+.card-link { font-size: 12px; color: var(--accent-light); font-weight: 500; text-decoration: none; }
+.card-link:hover { text-decoration: underline; }
+
+.sla-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.sla-row:last-child { margin-bottom: 0; }
+.sla-priority-label {
+  font-size: 11px;
+  font-weight: 700;
+  width: 22px;
+  flex-shrink: 0;
+  color: #475569;
+}
+.sla-bar-track {
+  flex: 1;
+  height: 7px;
+  background: #f1f5f9;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.sla-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+.sla-bar-fill.green  { background: var(--status-green); }
+.sla-bar-fill.amber  { background: var(--status-amber); }
+.sla-bar-fill.red    { background: var(--status-red); }
+.sla-pct {
+  font-size: 11px;
+  font-weight: 700;
+  width: 34px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.sla-pct.green { color: var(--status-green); }
+.sla-pct.amber { color: var(--status-amber); }
+.sla-pct.red   { color: var(--status-red); }
+
+.sla-row-inner { display: flex; flex-direction: column; flex: 1; gap: 3px; }
+.sla-meta { display: flex; justify-content: space-between; font-size: 10px; color: #94a3b8; }
+
+/* ── Table ──────────────────────────────────────────── */
+.table-card { overflow: hidden; }
+.table-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px 0;
+  margin-bottom: 12px;
+}
+.table-meta { display: flex; align-items: baseline; gap: 8px; }
+.table-count { font-size: 12px; color: #94a3b8; }
+
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  text-align: left;
+  padding: 0 12px 8px;
+  border-bottom: 1px solid #f1f5f9;
+}
+thead th:first-child { padding-left: 20px; }
+thead th:last-child { padding-right: 20px; }
+
+tbody tr {
+  border-bottom: 1px solid #f8fafc;
+  transition: background 0.1s;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #fafbfe; }
+
+tbody td {
+  padding: 10px 12px;
+  vertical-align: middle;
+  font-size: 13px;
+  color: #334155;
+}
+tbody td:first-child { padding-left: 20px; }
+tbody td:last-child { padding-right: 20px; }
+
+.ticket-id { font-family: "SF Mono", "Fira Code", monospace; font-size: 12px; color: var(--accent); font-weight: 600; }
+.ticket-subject { font-weight: 500; color: #1e293b; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ticket-subject small { display: block; font-size: 11px; color: #94a3b8; font-weight: 400; margin-top: 1px; }
+
+.requester-cell { display: flex; align-items: center; gap: 8px; }
+.req-avatar {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.ra-blue  { background: #dbeafe; color: #1d4ed8; }
+.ra-green { background: #dcfce7; color: #15803d; }
+.ra-rose  { background: #ffe4e6; color: #be123c; }
+.ra-teal  { background: #ccfbf1; color: #0f766e; }
+.ra-amber { background: #fef3c7; color: #b45309; }
+.ra-violet { background: var(--accent-tint); color: var(--accent); }
+.ra-slate { background: #f1f5f9; color: #475569; }
+.ra-indigo { background: #e0e7ff; color: #4338ca; }
+
+.pill {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.pill-p1 { color: var(--status-red); background: var(--status-red-bg); }
+.pill-p2 { color: var(--status-amber); background: var(--status-amber-bg); }
+.pill-p3 { color: var(--accent); background: var(--accent-tint); }
+
+.pill-open     { color: var(--status-slate); background: var(--status-slate-bg); }
+.pill-pending  { color: var(--status-amber); background: var(--status-amber-bg); }
+.pill-resolved { color: var(--status-green); background: var(--status-green-bg); }
+.pill-breached { color: var(--status-red); background: var(--status-red-bg); }
+
+.agent-cell { display: flex; align-items: center; gap: 7px; }
+.agent-init {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--accent-tint);
+  color: var(--accent);
+  font-size: 10px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.age-cell { font-size: 12px; color: #94a3b8; white-space: nowrap; }
+
+.table-footer {
+  padding: 12px 20px;
+  border-top: 1px solid #f1f5f9;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.table-footer-info { font-size: 12px; color: #94a3b8; }
+.table-footer-pager { display: flex; align-items: center; gap: 4px; }
+.pager-btn {
+  width: 28px; height: 28px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  background: #fff;
+  color: #475569;
+  font-size: 12px;
+}
+.pager-btn:hover { background: #f8fafc; }
+.pager-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 700; }
+
+/* ── Team load aside ────────────────────────────────── */
+.aside-card { padding: 18px 20px; }
+.aside-header { margin-bottom: 16px; }
+.agent-list { display: flex; flex-direction: column; gap: 2px; }
+.agent-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 8px;
+  border-radius: 8px;
+}
+.agent-row:hover { background: #f8fafc; }
+.agent-presence {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.online  { background: var(--status-green); }
+.away    { background: var(--status-amber); }
+.offline { background: #cbd5e1; }
+
+.agent-avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.agent-name { font-size: 13px; font-weight: 500; color: #1e293b; }
+.agent-title { font-size: 11px; color: #94a3b8; }
+.agent-count {
+  margin-left: auto;
+  font-size: 11px; font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-tint);
+  padding: 2px 7px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.aside-footer {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+  text-align: center;
+}
+.aside-footer a { font-size: 12px; color: var(--accent-light); font-weight: 500; text-decoration: none; }
+.aside-footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ SIDEBAR ═════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="28" height="28" rx="7" fill="var(--accent)"/>
+      <path d="M7 10.5C7 9.12 8.12 8 9.5 8h9C19.88 8 21 9.12 21 10.5v5c0 1.38-1.12 2.5-2.5 2.5H15l-3 3v-3H9.5C8.12 16 7 14.88 7 13.5v-3z" fill="white"/>
+      <circle cx="10.5" cy="12" r="1" fill="var(--accent)"/>
+      <circle cx="14" cy="12" r="1" fill="var(--accent)"/>
+      <circle cx="17.5" cy="12" r="1" fill="var(--accent)"/>
+    </svg>
+    <span class="sidebar-logo-text">Relay Support</span>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Inbox</div>
+    <a class="nav-item active" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4.5C2 3.67 2.67 3 3.5 3h9c.83 0 1.5.67 1.5 1.5v7c0 .83-.67 1.5-1.5 1.5h-9C2.67 12 2 11.33 2 10.5v-7z" stroke="currentColor" stroke-width="1.25"/><path d="M2 5.5l6 4 6-4" stroke="currentColor" stroke-width="1.25"/></svg>
+      All Open
+      <span class="nav-badge">47</span>
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.25"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+      Unassigned
+      <span class="nav-badge" style="background:var(--status-amber)">12</span>
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="2.5" stroke="currentColor" stroke-width="1.25"/><path d="M3 13c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+      My Tickets
+      <span class="nav-badge">8</span>
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2.5L9.8 6.2l4.2.6-3 2.9.7 4.1L8 11.7l-3.7 1.9.7-4.1L2 6.8l4.2-.6L8 2.5z" stroke="currentColor" stroke-width="1.25"/></svg>
+      Mentions
+    </a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Views</div>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h12M2 12h8" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+      By Priority
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.25"/><path d="M8 5v3h3" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+      By SLA Breach
+      <span class="nav-badge" style="background:var(--status-red)">3</span>
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 5.5C2 4.67 2.67 4 3.5 4h9c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5h-9C2.67 11 2 10.33 2 9.5v-4z" stroke="currentColor" stroke-width="1.25"/><path d="M5 7h3M5 9h5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+      Awaiting Reply
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.25"/><path d="M5.5 8l2 2 3-3" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Resolved Today
+    </a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Settings</div>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.25"/><path d="M5 6.5h6M5 9.5h4" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+      Queues
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 4v8M8 7v5M12 2v10" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+      Automations
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.25"/><path d="M8 2v1.5M8 12.5V14M2 8h1.5M12.5 8H14M3.5 3.5l1 1M11.5 11.5l1 1M3.5 12.5l1-1M11.5 4.5l1-1" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+      SLA Policies
+    </a>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="footer-avatar">SL</div>
+    <div>
+      <div class="footer-name">Sara Lindqvist</div>
+      <div class="footer-role">Support Lead</div>
+    </div>
+    <div class="presence-dot"></div>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════ MAIN SHELL ═══════════════════════════════ -->
+<div class="main-shell">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-title-block">
+      <span class="topbar-title">Ticket Queue</span>
+      <span class="topbar-breadcrumb">Support / Ticket Queue</span>
+    </div>
+
+    <div class="topbar-search">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="6" cy="6" r="4.25" stroke="currentColor" stroke-width="1.25"/>
+        <path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
+      </svg>
+      <input type="text" placeholder="Search tickets, subjects, requesters…">
+    </div>
+
+    <div class="assignee-filter">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="5" r="2.25" stroke="currentColor" stroke-width="1.2"/><path d="M2 12c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      All Agents
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 4.5l3 3 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <div class="topbar-actions">
+      <button class="icon-btn">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2.25C6.38 2.25 4.25 4.38 4.25 7v.5L3 10h12l-1.25-2.5V7c0-2.62-2.13-4.75-4.75-4.75z" stroke="currentColor" stroke-width="1.3"/><path d="M7.5 13.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <span class="notif-dot"></span>
+      </button>
+      <div class="topbar-avatar">SL</div>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <div class="content">
+    <div class="content-main">
+
+      <!-- KPI CARDS -->
+      <div class="kpi-row">
+
+        <div class="card kpi-card">
+          <div class="kpi-label">Open Tickets</div>
+          <div class="kpi-value-row">
+            <div class="kpi-value">47</div>
+            <span class="kpi-chip down">↑ 6 vs ytd</span>
+          </div>
+          <div class="kpi-sparkline">
+            <!-- tiny 8-bar inline SVG -->
+            <svg width="80" height="24" viewBox="0 0 80 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="1"  y="14" width="7" height="10" rx="2" fill="var(--status-red-bg)"/>
+              <rect x="11" y="10" width="7" height="14" rx="2" fill="var(--status-red-bg)"/>
+              <rect x="21" y="8"  width="7" height="16" rx="2" fill="var(--status-red-bg)"/>
+              <rect x="31" y="12" width="7" height="12" rx="2" fill="var(--status-red-bg)"/>
+              <rect x="41" y="6"  width="7" height="18" rx="2" fill="var(--status-red-bg)"/>
+              <rect x="51" y="10" width="7" height="14" rx="2" fill="var(--status-red-bg)"/>
+              <rect x="61" y="4"  width="7" height="20" rx="2" fill="var(--status-red)"/>
+              <rect x="71" y="7"  width="7" height="17" rx="2" fill="var(--status-red)"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="card kpi-card">
+          <div class="kpi-label">Avg First Response</div>
+          <div class="kpi-value-row">
+            <div class="kpi-value">1h <span>24m</span></div>
+            <span class="kpi-chip up">↓ 18m</span>
+          </div>
+          <div class="kpi-sparkline">
+            <svg width="80" height="24" viewBox="0 0 80 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <polyline points="1,18 12,14 23,16 34,10 45,12 56,8 67,6 79,4" stroke="var(--status-green)" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M1 18 L12 14 L23 16 L34 10 L45 12 L56 8 L67 6 L79 4 L79 24 L1 24Z" fill="var(--status-green-bg)" opacity="0.5"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="card kpi-card">
+          <div class="kpi-label">SLA Compliance</div>
+          <div class="kpi-value-row">
+            <div class="kpi-value">91<span>%</span></div>
+            <span class="kpi-chip up">↑ 3%</span>
+          </div>
+          <div class="kpi-sparkline">
+            <!-- progress arc -->
+            <svg width="48" height="28" viewBox="0 0 48 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 26 A20 20 0 0 1 44 26" stroke="#f1f5f9" stroke-width="5" fill="none" stroke-linecap="round"/>
+              <path d="M4 26 A20 20 0 0 1 44 26" stroke="var(--status-green)" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="62.8" stroke-dashoffset="5.7"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="card kpi-card">
+          <div class="kpi-label">CSAT Score</div>
+          <div class="kpi-value-row">
+            <div class="kpi-value">4.6<span>/5</span></div>
+            <span class="kpi-chip neutral">→ 0.0</span>
+          </div>
+          <div class="kpi-sparkline">
+            <svg width="80" height="16" viewBox="0 0 80 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- 5 stars, 4.6 filled -->
+              <text x="0"  y="13" font-size="13" fill="var(--status-amber)">★</text>
+              <text x="16" y="13" font-size="13" fill="var(--status-amber)">★</text>
+              <text x="32" y="13" font-size="13" fill="var(--status-amber)">★</text>
+              <text x="48" y="13" font-size="13" fill="var(--status-amber)">★</text>
+              <text x="64" y="13" font-size="13" fill="#e2e8f0">★</text>
+              <rect x="64" y="0" width="9.6" height="16" fill="var(--status-amber)" opacity="0.9"/>
+              <text x="64" y="13" font-size="13" fill="var(--status-amber)" clip-path="inset(0 10% 0 0)">★</text>
+            </svg>
+          </div>
+        </div>
+
+      </div><!-- /kpi-row -->
+
+      <!-- SLA BY PRIORITY -->
+      <div class="card sla-card">
+        <div class="sla-card-header">
+          <div>
+            <div class="card-title">SLA by Priority</div>
+            <div class="card-subtitle">Compliance rate over rolling 7 days</div>
+          </div>
+          <a href="#" class="card-link">Details →</a>
+        </div>
+
+        <div class="sla-row">
+          <div class="sla-priority-label">P1</div>
+          <div class="sla-row-inner">
+            <div class="sla-meta"><span>Critical — 4h breach window</span><span>14 tickets</span></div>
+            <div class="sla-bar-track"><div class="sla-bar-fill amber" style="width:78%"></div></div>
+          </div>
+          <div class="sla-pct amber">78%</div>
+        </div>
+
+        <div class="sla-row">
+          <div class="sla-priority-label">P2</div>
+          <div class="sla-row-inner">
+            <div class="sla-meta"><span>High — 8h breach window</span><span>21 tickets</span></div>
+            <div class="sla-bar-track"><div class="sla-bar-fill green" style="width:94%"></div></div>
+          </div>
+          <div class="sla-pct green">94%</div>
+        </div>
+
+        <div class="sla-row">
+          <div class="sla-priority-label">P3</div>
+          <div class="sla-row-inner">
+            <div class="sla-meta"><span>Normal — 24h breach window</span><span>9 tickets</span></div>
+            <div class="sla-bar-track"><div class="sla-bar-fill green" style="width:97%"></div></div>
+          </div>
+          <div class="sla-pct green">97%</div>
+        </div>
+      </div>
+
+      <!-- TICKET QUEUE TABLE -->
+      <div class="card table-card">
+        <div class="table-header">
+          <div class="table-meta">
+            <div class="card-title">Ticket Queue</div>
+            <span class="table-count">47 tickets</span>
+          </div>
+          <a href="#" class="card-link">View all →</a>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Subject</th>
+              <th>Requester</th>
+              <th>Priority</th>
+              <th>Status</th>
+              <th>Assigned to</th>
+              <th>Age</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="ticket-id">#4821</span></td>
+              <td><span class="ticket-subject">Billing invoice shows wrong amount<small>Billing &amp; Payments</small></span></td>
+              <td><div class="requester-cell"><div class="req-avatar ra-blue">NB</div>Noah Barnes</div></td>
+              <td><span class="pill pill-p1">P1</span></td>
+              <td><span class="pill pill-breached">Breached</span></td>
+              <td><div class="agent-cell"><div class="agent-init">JK</div>Jin Kim</div></td>
+              <td class="age-cell">5h 12m</td>
+            </tr>
+            <tr>
+              <td><span class="ticket-id">#4820</span></td>
+              <td><span class="ticket-subject">SSO login failing for enterprise org<small>Authentication</small></span></td>
+              <td><div class="requester-cell"><div class="req-avatar ra-rose">AP</div>Ana Pereira</div></td>
+              <td><span class="pill pill-p1">P1</span></td>
+              <td><span class="pill pill-open">Open</span></td>
+              <td><div class="agent-cell"><div class="agent-init">SL</div>Sara Lindqvist</div></td>
+              <td class="age-cell">2h 48m</td>
+            </tr>
+            <tr>
+              <td><span class="ticket-id">#4817</span></td>
+              <td><span class="ticket-subject">Export CSV not including last month data<small>Reports</small></span></td>
+              <td><div class="requester-cell"><div class="req-avatar ra-teal">CM</div>Carlos Mejía</div></td>
+              <td><span class="pill pill-p2">P2</span></td>
+              <td><span class="pill pill-pending">Pending</span></td>
+              <td><div class="agent-cell"><div class="agent-init">RM</div>Rita Moura</div></td>
+              <td class="age-cell">6h 05m</td>
+            </tr>
+            <tr>
+              <td><span class="ticket-id">#4815</span></td>
+              <td><span class="ticket-subject">Webhook events not firing after config change<small>Integrations</small></span></td>
+              <td><div class="requester-cell"><div class="req-avatar ra-amber">LF</div>Lena Fischer</div></td>
+              <td><span class="pill pill-p2">P2</span></td>
+              <td><span class="pill pill-open">Open</span></td>
+              <td><div class="agent-cell"><div class="agent-init">JK</div>Jin Kim</div></td>
+              <td class="age-cell">9h 30m</td>
+            </tr>
+            <tr>
+              <td><span class="ticket-id">#4812</span></td>
+              <td><span class="ticket-subject">Dashboard widgets not loading on mobile<small>Web App</small></span></td>
+              <td><div class="requester-cell"><div class="req-avatar ra-violet">OW</div>Olga Wolff</div></td>
+              <td><span class="pill pill-p2">P2</span></td>
+              <td><span class="pill pill-pending">Pending</span></td>
+              <td><div class="agent-cell"><div class="agent-init">TC</div>Tariq Chen</div></td>
+              <td class="age-cell">11h 14m</td>
+            </tr>
+            <tr>
+              <td><span class="ticket-id">#4808</span></td>
+              <td><span class="ticket-subject">How to set up SCIM provisioning?<small>Onboarding</small></span></td>
+              <td><div class="requester-cell"><div class="req-avatar ra-indigo">DK</div>David Kato</div></td>
+              <td><span class="pill pill-p3">P3</span></td>
+              <td><span class="pill pill-open">Open</span></td>
+              <td><div class="agent-cell"><div class="agent-init">RM</div>Rita Moura</div></td>
+              <td class="age-cell">1d 2h</td>
+            </tr>
+            <tr>
+              <td><span class="ticket-id">#4803</span></td>
+              <td><span class="ticket-subject">Request to add new team members to plan<small>Account</small></span></td>
+              <td><div class="requester-cell"><div class="req-avatar ra-green">PV</div>Priya Venkat</div></td>
+              <td><span class="pill pill-p3">P3</span></td>
+              <td><span class="pill pill-resolved">Resolved</span></td>
+              <td><div class="agent-cell"><div class="agent-init">SL</div>Sara Lindqvist</div></td>
+              <td class="age-cell">1d 5h</td>
+            </tr>
+            <tr>
+              <td><span class="ticket-id">#4799</span></td>
+              <td><span class="ticket-subject">API rate limit hit unexpectedly in production<small>API</small></span></td>
+              <td><div class="requester-cell"><div class="req-avatar ra-slate">MR</div>Marco Rossi</div></td>
+              <td><span class="pill pill-p2">P2</span></td>
+              <td><span class="pill pill-resolved">Resolved</span></td>
+              <td><div class="agent-cell"><div class="agent-init">TC</div>Tariq Chen</div></td>
+              <td class="age-cell">1d 9h</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="table-footer">
+          <span class="table-footer-info">Showing 8 of 47 tickets</span>
+          <div class="table-footer-pager">
+            <div class="pager-btn">‹</div>
+            <div class="pager-btn active">1</div>
+            <div class="pager-btn">2</div>
+            <div class="pager-btn">3</div>
+            <div class="pager-btn">›</div>
+          </div>
+        </div>
+      </div><!-- /table-card -->
+
+    </div><!-- /content-main -->
+
+    <!-- ═══════ ASIDE — Team Load ═══════ -->
+    <aside class="content-aside">
+      <div class="card aside-card" style="height:100%;overflow-y:auto;">
+        <div class="aside-header">
+          <div class="card-title">Team Load</div>
+          <div class="card-subtitle" style="margin-top:2px;">Active agents · right now</div>
+        </div>
+
+        <div class="agent-list">
+
+          <div class="agent-row">
+            <div class="agent-presence online"></div>
+            <div class="agent-avatar ra-violet">SL</div>
+            <div><div class="agent-name">Sara Lindqvist</div><div class="footer-role">Support Lead</div></div>
+            <div class="agent-count">8</div>
+          </div>
+
+          <div class="agent-row">
+            <div class="agent-presence online"></div>
+            <div class="agent-avatar ra-teal">JK</div>
+            <div><div class="agent-name">Jin Kim</div><div class="footer-role">Senior Agent</div></div>
+            <div class="agent-count">11</div>
+          </div>
+
+          <div class="agent-row">
+            <div class="agent-presence online"></div>
+            <div class="agent-avatar ra-rose">RM</div>
+            <div><div class="agent-name">Rita Moura</div><div class="footer-role">Agent</div></div>
+            <div class="agent-count">9</div>
+          </div>
+
+          <div class="agent-row">
+            <div class="agent-presence away"></div>
+            <div class="agent-avatar ra-amber">TC</div>
+            <div><div class="agent-name">Tariq Chen</div><div class="footer-role">Agent</div></div>
+            <div class="agent-count">7</div>
+          </div>
+
+          <div class="agent-row">
+            <div class="agent-presence away"></div>
+            <div class="agent-avatar ra-indigo">PV</div>
+            <div><div class="agent-name">Priya Venkat</div><div class="footer-role">Junior Agent</div></div>
+            <div class="agent-count">5</div>
+          </div>
+
+          <div class="agent-row">
+            <div class="agent-presence offline"></div>
+            <div class="agent-avatar ra-slate">DM</div>
+            <div><div class="agent-name">Diego Márquez</div><div class="footer-role">Agent</div></div>
+            <div class="agent-count">0</div>
+          </div>
+
+        </div><!-- /agent-list -->
+
+        <!-- mini SLA reminder -->
+        <div style="margin-top:20px;padding:12px 14px;background:var(--status-red-bg);border-radius:8px;border:1px solid #fecaca;">
+          <div style="font-size:11px;font-weight:700;color:var(--status-red);margin-bottom:4px;display:flex;align-items:center;gap:5px;">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1L1 11h10L6 1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M6 5v3M6 9.5v.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            SLA at risk
+          </div>
+          <div style="font-size:12px;color:var(--status-red);">3 P1 tickets approaching breach window. Reassign or escalate now.</div>
+        </div>
+
+        <!-- CSAT tip -->
+        <div style="margin-top:12px;padding:12px 14px;background:var(--status-green-bg);border-radius:8px;border:1px solid #bbf7d0;">
+          <div style="font-size:11px;font-weight:700;color:var(--status-green);margin-bottom:4px;display:flex;align-items:center;gap:5px;">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.2"/><path d="M4 6.5c0 1.1.9 2 2 2s2-.9 2-2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="4.5" cy="4.5" r=".75" fill="currentColor"/><circle cx="7.5" cy="4.5" r=".75" fill="currentColor"/></svg>
+            CSAT on target
+          </div>
+          <div style="font-size:12px;color:var(--status-green);">4.6/5 — 2 new 5-star ratings received today.</div>
+        </div>
+
+        <div class="aside-footer">
+          <a href="#">Manage team →</a>
+        </div>
+      </div>
+    </aside>
+
+  </div><!-- /content -->
+</div><!-- /main-shell -->
+
+</body>
+</html>

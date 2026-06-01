@@ -1,0 +1,99 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "wxcode/admin-harbor-banking",
+  "title": "Harbor Banking Admin",
+  "version": "0.1.0",
+  "description": "Digital banking / personal finance operations console — light mode, navy-blue accent, teal secondary. Left account sidebar, topbar with search and notifications, hero payment-card SVG, 3 KPI tiles, spending donut chart, recent transactions table, and quick-transfer payees panel.",
+  "license": "MIT",
+  "author": {
+    "name": "WXCode",
+    "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+  },
+  "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-harbor-banking",
+  "tags": [
+    "wxcode-plugin",
+    "wxcode",
+    "first-party",
+    "prototype",
+    "operations",
+    "web",
+    "admin",
+    "banking",
+    "fintech",
+    "light-mode",
+    "navy-blue",
+    "teal",
+    "personal-finance",
+    "transactions",
+    "payment-card",
+    "trustworthy",
+    "clean-cards"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "prototype",
+    "scenario": "operations",
+    "surface": "web",
+    "preview": {
+      "type": "html",
+      "entry": "./example.html"
+    },
+    "useCase": {
+      "query": {
+        "en": "Build me a digital banking admin console — accounts sidebar, topbar, a stylized payment card, 3 KPI tiles (balance / income / spending), a spending-by-category chart, recent transactions table, and a quick-transfer payees panel.",
+        "zh-CN": "使用这个插件完成以下任务：Build me a digital banking admin console — accounts sidebar, topbar, a stylized payment card, 3 KPI tiles (balance / income / spending), a spending-by-category chart, recent transactions table, and a quick-transfer payees panel."
+      },
+      "exampleOutputs": [
+        {
+          "path": "./example.html",
+          "title": "Harbor Banking Admin"
+        }
+      ]
+    },
+    "context": {
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ],
+      "designSystem": {
+        "primary": true
+      },
+      "craft": [
+        "pixel-discipline",
+        "laws-of-ux"
+      ],
+      "assets": [
+        "./example.html"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ],
+    "provenance": {
+      "category": "themeforest-admin-templates",
+      "note": "category design-language reference only; original implementation"
+    }
+  }
+}

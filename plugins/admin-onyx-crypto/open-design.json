@@ -1,0 +1,97 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "wxcode/admin-onyx-crypto",
+  "title": "Onyx Crypto Admin",
+  "version": "0.1.0",
+  "description": "Dark-mode digital-asset portfolio console — left rail nav, topbar with network/wallet switcher, 4 KPI cards, area price chart, holdings table, and market movers side list. Sleek neon aesthetic with emerald and violet accents.",
+  "license": "MIT",
+  "author": {
+    "name": "WXCode",
+    "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+  },
+  "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-onyx-crypto",
+  "tags": [
+    "wxcode-plugin",
+    "wxcode",
+    "first-party",
+    "prototype",
+    "operations",
+    "web",
+    "admin",
+    "crypto",
+    "web3",
+    "dark-mode",
+    "neon",
+    "digital-assets",
+    "portfolio",
+    "defi",
+    "sleek"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "prototype",
+    "scenario": "operations",
+    "surface": "web",
+    "preview": {
+      "type": "html",
+      "entry": "./example.html"
+    },
+    "useCase": {
+      "query": {
+        "en": "Build me a dark-mode crypto portfolio admin console — left rail nav, topbar with network and wallet switcher, 4 KPI cards, area price chart with timeframe tabs, holdings table with colored deltas, and a market movers side panel.",
+        "zh-CN": "使用这个插件完成以下任务：Build me a dark-mode crypto portfolio admin console — left rail nav, topbar with network and wallet switcher, 4 KPI cards, area price chart with timeframe tabs, holdings table with colored deltas, and a market movers side panel."
+      },
+      "exampleOutputs": [
+        {
+          "path": "./example.html",
+          "title": "Onyx Crypto Admin"
+        }
+      ]
+    },
+    "context": {
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ],
+      "designSystem": {
+        "primary": true
+      },
+      "craft": [
+        "pixel-discipline",
+        "laws-of-ux"
+      ],
+      "assets": [
+        "./example.html"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ],
+    "provenance": {
+      "category": "themeforest-admin-templates",
+      "note": "category design-language reference only; original implementation"
+    }
+  }
+}

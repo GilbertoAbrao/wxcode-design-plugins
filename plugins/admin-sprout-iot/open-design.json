@@ -1,0 +1,97 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "wxcode/admin-sprout-iot",
+  "title": "Sprout IoT Admin",
+  "version": "0.1.0",
+  "description": "Dark-mode IoT device-fleet and telemetry console — left rail nav, gateway/site switcher, 4 KPI cards (online/offline/signal/alerts), multi-series sparkline telemetry panel, active alerts list, and a devices table with signal bars and firmware status.",
+  "license": "MIT",
+  "author": {
+    "name": "WXCode",
+    "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+  },
+  "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-sprout-iot",
+  "tags": [
+    "wxcode-plugin",
+    "wxcode",
+    "first-party",
+    "prototype",
+    "operations",
+    "web",
+    "admin",
+    "iot",
+    "telemetry",
+    "dark-mode",
+    "technical",
+    "lime-accent",
+    "cyan-accent",
+    "device-fleet",
+    "monitoring"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "prototype",
+    "scenario": "operations",
+    "surface": "web",
+    "preview": {
+      "type": "html",
+      "entry": "./example.html"
+    },
+    "useCase": {
+      "query": {
+        "en": "Build me a dark IoT admin console for a device fleet — left nav rail, site/gateway switcher, 4 KPI cards showing online/offline counts, average signal strength, and open alerts, a telemetry sparkline panel for temperature/humidity/power, an active alerts list with severity pills, and a devices table with firmware version and signal bars.",
+        "zh-CN": "使用这个插件完成以下任务：Build me a dark IoT admin console for a device fleet — left nav rail, site/gateway switcher, 4 KPI cards showing online/offline counts, average signal strength, and open alerts, a telemetry sparkline panel for temperature/humidity/power, an active alerts list with severity pills, and a devices table with firmware version and signal bars."
+      },
+      "exampleOutputs": [
+        {
+          "path": "./example.html",
+          "title": "Sprout IoT Admin"
+        }
+      ]
+    },
+    "context": {
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ],
+      "designSystem": {
+        "primary": true
+      },
+      "craft": [
+        "pixel-discipline",
+        "laws-of-ux"
+      ],
+      "assets": [
+        "./example.html"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ],
+    "provenance": {
+      "category": "themeforest-admin-templates",
+      "note": "category design-language reference only; original implementation"
+    }
+  }
+}

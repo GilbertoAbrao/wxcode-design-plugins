@@ -1,0 +1,97 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "wxcode/admin-vault-treasury",
+  "title": "Vault Treasury Admin",
+  "version": "0.1.0",
+  "description": "Premium dark-mode corporate treasury dashboard — amber/gold accent on deep navy, left rail nav, entity/period switcher, 4 KPI cards (balance · inflows · outflows · runway), cashflow SVG area chart, allocation donut, recent transactions table with status pills.",
+  "license": "MIT",
+  "author": {
+    "name": "WXCode",
+    "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+  },
+  "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-vault-treasury",
+  "tags": [
+    "wxcode-plugin",
+    "wxcode",
+    "first-party",
+    "prototype",
+    "operations",
+    "web",
+    "admin",
+    "finance",
+    "treasury",
+    "dark-mode",
+    "amber-gold",
+    "corporate",
+    "premium",
+    "cashflow",
+    "deep-navy"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "prototype",
+    "scenario": "operations",
+    "surface": "web",
+    "preview": {
+      "type": "html",
+      "entry": "./example.html"
+    },
+    "useCase": {
+      "query": {
+        "en": "Build me a premium dark-mode corporate treasury admin dashboard — left rail nav, entity/period switcher, 4 KPI cards for cash position, inflows, outflows, runway, cashflow area chart, allocation donut, recent transactions table.",
+        "zh-CN": "使用这个插件完成以下任务：Build me a premium dark-mode corporate treasury admin dashboard — left rail nav, entity/period switcher, 4 KPI cards for cash position, inflows, outflows, runway, cashflow area chart, allocation donut, recent transactions table."
+      },
+      "exampleOutputs": [
+        {
+          "path": "./example.html",
+          "title": "Vault Treasury Admin"
+        }
+      ]
+    },
+    "context": {
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ],
+      "designSystem": {
+        "primary": true
+      },
+      "craft": [
+        "pixel-discipline",
+        "laws-of-ux"
+      ],
+      "assets": [
+        "./example.html"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ],
+    "provenance": {
+      "category": "themeforest-admin-templates",
+      "note": "category design-language reference only; original implementation"
+    }
+  }
+}
