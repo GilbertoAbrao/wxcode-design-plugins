@@ -7,3 +7,8 @@ node_modules/
 
 # template-harvest transient capture bundles (never shipped)
 .harvest/
+_gallery.html
+
+# Python bytecode cache (forge/tools test runs)
+__pycache__/
+*.pyc

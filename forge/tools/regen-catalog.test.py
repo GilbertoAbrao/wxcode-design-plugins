@@ -134,7 +134,11 @@ class RegenCatalogTest(unittest.TestCase):
         self.assertEqual(plugins[1]["mode"], "deck")
         self.assertEqual(
             plugins[0]["publisher"],
-            {"id": "wxcode", "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"},
+            {
+                "id": "wxcode",
+                "github": "GilbertoAbrao",
+                "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins",
+            },
         )
         self.assertEqual(
             plugins[0]["capabilitiesSummary"], ["prompt:inject", "fs:write"]
@@ -174,6 +178,39 @@ class RegenCatalogTest(unittest.TestCase):
         stale = self._run("--check")
         self.assertEqual(stale.returncode, 1, stale.stdout + stale.stderr)
         self.assertIn("stale", stale.stdout)
+
+
+class RealCatalogRegressionTest(unittest.TestCase):
+    """Guards that the regenerator is a faithful no-op against the live repo.
+
+    Runs ``regen-catalog.py --check`` against the actual committed
+    ``registry/wxcode-marketplace.json`` (NOT a tempdir). ``--check`` is
+    read-only: it regenerates in memory and compares (ignoring
+    ``metadata.updatedAt``) without ever writing the catalog. If this fails,
+    the tool's entry shape has drifted from the live catalog.
+    """
+
+    def test_check_against_real_catalog_is_in_sync(self) -> None:
+        # forge/tools/regen-catalog.test.py -> repo root is two levels up.
+        repo_root = pathlib.Path(__file__).resolve().parents[2]
+        catalog = repo_root / "registry" / "wxcode-marketplace.json"
+        self.assertTrue(
+            catalog.exists(),
+            f"expected real catalog at {catalog}",
+        )
+
+        res = subprocess.run(
+            [sys.executable, str(SCRIPT), "--check"],
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(
+            res.returncode,
+            0,
+            f"regen-catalog.py --check reported the live catalog as stale "
+            f"(the tool is not a faithful no-op):\n{res.stdout}\n{res.stderr}",
+        )
+        self.assertIn("in sync", res.stdout)
 
 
 if __name__ == "__main__":

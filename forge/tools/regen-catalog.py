@@ -41,6 +41,7 @@ import sys
 from typing import Any
 
 PUBLISHER_ID = "wxcode"
+PUBLISHER_GITHUB = "GilbertoAbrao"
 PUBLISHER_URL = "https://github.com/GilbertoAbrao/wxcode-design-plugins"
 SOURCE_PREFIX = "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/"
 HOMEPAGE_PREFIX = (
@@ -82,7 +83,8 @@ def build_entries(repo: pathlib.Path) -> list[dict[str, Any]]:
     """Build catalog entries by walking ``<repo>/plugins/*/open-design.json``.
 
     Sorted by directory name so output order is deterministic. Each entry is
-    shaped exactly like the SKILL.md §4.5 generator.
+    shaped exactly like the live committed catalog (publisher carries the
+    ``github`` field; keys follow the live key order).
     """
     entries: list[dict[str, Any]] = []
     plugins_dir = repo / "plugins"
@@ -97,6 +99,9 @@ def build_entries(repo: pathlib.Path) -> list[dict[str, Any]]:
         mf = json.loads(manifest_path.read_text(encoding="utf-8"))
         od = mf.get("od", {})
         slug = plugin_dir.name
+        # Key order mirrors the live catalog exactly:
+        # name, title, version, source, publisher, homepage, license,
+        # capabilitiesSummary, description, tags, mode.
         entries.append(
             {
                 "name": mf["name"],
@@ -105,13 +110,14 @@ def build_entries(repo: pathlib.Path) -> list[dict[str, Any]]:
                 "source": f"{SOURCE_PREFIX}{slug}",
                 "publisher": {
                     "id": PUBLISHER_ID,
+                    "github": PUBLISHER_GITHUB,
                     "url": PUBLISHER_URL,
                 },
+                "homepage": f"{HOMEPAGE_PREFIX}{slug}",
+                "license": mf.get("license", "MIT"),
                 "capabilitiesSummary": od.get("capabilities", []),
                 "description": mf["description"],
                 "tags": mf.get("tags", []),
-                "homepage": f"{HOMEPAGE_PREFIX}{slug}",
-                "license": mf.get("license", "MIT"),
                 "mode": od.get("mode"),
             }
         )
