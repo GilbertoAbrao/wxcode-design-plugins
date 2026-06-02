@@ -263,7 +263,12 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     process.exit(2);
   }
 
-  const skillMd = readFileSync(join(dir, 'SKILL.md'), 'utf8');
+  const skillPath = join(dir, 'SKILL.md');
+  if (!existsSync(skillPath)) {
+    console.error(`no SKILL.md in ${dir}`);
+    process.exit(2);
+  }
+  const skillMd = readFileSync(skillPath, 'utf8');
   let manifest = {};
   const manifestPath = join(dir, 'open-design.json');
   if (existsSync(manifestPath)) {

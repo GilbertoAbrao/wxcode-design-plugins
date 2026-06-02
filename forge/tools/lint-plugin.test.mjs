@@ -1,6 +1,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { lintPlugin } from './lint-plugin.mjs';
+
+const LINT_CLI = join(dirname(fileURLToPath(import.meta.url)), 'lint-plugin.mjs');
 
 const COMPLIANT = `---
 name: admin-x
@@ -80,4 +87,33 @@ test('single-screen plugin warns, does not fail', () => {
                        { assetHtmlNames: ['dashboard.html'], hasLayoutsMd: false });
   assert.equal(r.ok, true);                       // warn-level, not a violation yet
   assert.ok((r.warnings || []).some(w => /example set|single.screen|crud/i.test(w)));
+});
+
+test('CLI entry: compliant dir exits 0, build-meta HTML exits 1', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'lint-plugin-cli-'));
+  try {
+    writeFileSync(join(dir, 'SKILL.md'), COMPLIANT);
+    writeFileSync(
+      join(dir, 'open-design.json'),
+      JSON.stringify({ description: 'Dark industrial admin aesthetic.' }),
+    );
+
+    // Compliant plugin → exit 0.
+    execFileSync('node', [LINT_CLI, dir], { stdio: 'pipe' });
+
+    // Add build-meta example HTML → exit 1.
+    writeFileSync(
+      join(dir, 'example.html'),
+      '<section class="panel"><h2>Regras ativas</h2><p>depende do backend</p></section>',
+    );
+    let code = 0;
+    try {
+      execFileSync('node', [LINT_CLI, dir], { stdio: 'pipe' });
+    } catch (err) {
+      code = err.status;
+    }
+    assert.equal(code, 1, 'build-meta HTML should make the CLI exit 1');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
