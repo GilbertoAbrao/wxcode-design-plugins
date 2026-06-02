@@ -9,7 +9,7 @@
     "title": "WXCode Design Plugins",
     "description": "First-party admin / dashboard / cockpit plugins curated by WXCode for Open Design daemons. Tenant VMs register this catalog as a marketplace source to consume plugins without rebuild.",
     "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins",
-    "updatedAt": "2026-06-01T23:49:38Z"
+    "updatedAt": "2026-06-02T23:25:51Z"
   },
   "plugins": [
     {
@@ -508,7 +508,7 @@
     },
     {
       "name": "wxcode-admin-forge-mes",
-      "title": "Forge MES Admin",
+      "title": "Forge Admin",
       "version": "0.1.0",
       "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-forge-mes",
       "publisher": {
@@ -522,7 +522,7 @@
         "prompt:inject",
         "fs:write"
       ],
-      "description": "Industrial dark-mode Manufacturing Execution System dashboard \u2014 shop-floor plant switcher, OEE / output / downtime / scrap KPI tiles, production lines status board, inline SVG output trend chart, work-orders table, and real-time downtime alerts panel. Original archetype for discrete manufacturing operations teams.",
+      "description": "Dark industrial-grade admin aesthetic: near-black canvas (#0c0f14), raised steel panels, molten-orange accent (#f97316), Inter type with tabular figures, and dense hairline-bordered tables. Archetype = entity-switcher navbar + icon rail + 4 KPI tiles + 2-column status board with an alerts side panel + full-width records table with status pills, plus matching list, form, and detail screens. Built for high-density operational consoles that read at a glance.",
       "tags": [
         "wxcode-plugin",
         "wxcode",
@@ -531,16 +531,12 @@
         "operations",
         "web",
         "admin",
-        "manufacturing",
-        "mes",
         "dark-mode",
         "industrial",
-        "shop-floor",
-        "oee",
-        "production",
-        "enterprise",
+        "status-board",
+        "data-dense",
         "orange-accent",
-        "status-board"
+        "enterprise"
       ],
       "mode": "prototype"
     },

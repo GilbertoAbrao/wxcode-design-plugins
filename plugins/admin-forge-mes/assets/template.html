@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Forge Admin — Shell Seed</title>
+<!--
+  SEED SKELETON — copy this file as the starting point for a new screen in the
+  Forge dark/industrial skin. It carries the :root token block and the app shell
+  (navbar + entity switcher + search + status badge + icon rail + main slot).
+  Replace the brand text, the entity-switcher label, the status-badge label, the
+  rail icons, and the <main> content with the real domain's equivalents. Mark the
+  active rail item with .active. Keep the token block intact.
+-->
+<style>
+  :root {
+    /* Accent (the one non-neutral hue) */
+    --accent:        #f97316;
+    --accent-light:  #fb923c;
+    --accent-dim:    rgba(249,115,22,.14);
+    /* Status ramp — add/remove states to match the domain */
+    --state-running: #22c55e;  --state-running-dim: rgba(34,197,94,.13);
+    --state-idle:    #f59e0b;  --state-idle-dim:    rgba(245,158,11,.13);
+    --state-down:    #ef4444;  --state-down-dim:    rgba(239,68,68,.13);
+    --state-queued:  #64748b;  --state-queued-dim:  rgba(100,116,139,.15);
+    --state-completed: #22c55e; --state-completed-dim: rgba(34,197,94,.13);
+    /* Deltas + severities */
+    --delta-up:      #4ade80;  --delta-down: #f87171;
+    --sev-critical:  #ef4444;  --sev-warn: #f59e0b;  --sev-info: #38bdf8;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+    background: #0c0f14;   /* page canvas */
+    color: #e6ebf2;        /* primary text */
+    min-height: 100vh; display: flex; flex-direction: column;
+  }
+
+  /* Neutral dark ramp (hardcoded): #0c0f14 canvas / #141922 panel / #1d2530 inset
+     / #2a3340 hairline / #3a4455 hover-border. Text: #e6ebf2 / #c5cdd7 / #8b96a5 / #64748b. */
+
+  /* ── NAVBAR ─────────────────────────────────────────────────── */
+  .navbar { height: 52px; background: #141922; border-bottom: 1px solid #2a3340; display: flex; align-items: center; padding: 0 16px; gap: 12px; position: sticky; top: 0; z-index: 100; flex-shrink: 0; }
+  .navbar-brand { display: flex; align-items: center; gap: 8px; text-decoration: none; flex-shrink: 0; }
+  .brand-text { font-size: 15px; font-weight: 700; letter-spacing: -.3px; color: #e6ebf2; line-height: 1; }
+  .brand-text span { color: var(--accent); }
+  .entity-switcher { display: flex; align-items: center; gap: 6px; margin-left: 8px; padding: 5px 10px; background: #1d2530; border: 1px solid #2a3340; border-radius: 6px; cursor: pointer; font-size: 13px; color: #e6ebf2; white-space: nowrap; }
+  .entity-switcher svg { color: #8b96a5; }
+  .navbar-search { flex: 1; max-width: 320px; margin-left: auto; display: flex; align-items: center; gap: 8px; background: #1d2530; border: 1px solid #2a3340; border-radius: 20px; padding: 6px 14px; }
+  .navbar-search input { background: transparent; border: none; outline: none; color: #e6ebf2; font-size: 13px; width: 100%; font-family: inherit; }
+  .navbar-search input::placeholder { color: #8b96a5; }
+  .status-badge { display: flex; align-items: center; gap: 6px; padding: 4px 10px; background: var(--accent-dim); border: 1px solid rgba(249,115,22,.3); border-radius: 20px; font-size: 12px; font-weight: 600; color: var(--accent-light); white-space: nowrap; }
+  .status-badge-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse-dot 2s ease-in-out infinite; }
+  @keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+  .navbar-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin-left: 8px; }
+  .icon-btn { position: relative; width: 34px; height: 34px; background: #1d2530; border: 1px solid #2a3340; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #8b96a5; }
+  .icon-btn:hover { color: #e6ebf2; border-color: #3a4455; }
+  .notif-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; background: var(--accent); border-radius: 50%; border: 1.5px solid #141922; }
+  .avatar { width: 32px; height: 32px; background: linear-gradient(135deg, var(--accent) 0%, #c2410c 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; cursor: pointer; flex-shrink: 0; }
+
+  /* ── SHELL + ICON RAIL ──────────────────────────────────────── */
+  .shell { display: flex; flex: 1; overflow: hidden; }
+  .rail { width: 56px; background: #0c0f14; border-right: 1px solid #2a3340; display: flex; flex-direction: column; align-items: center; padding: 12px 0; gap: 4px; flex-shrink: 0; }
+  .rail-item { position: relative; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #64748b; transition: background .15s, color .15s; }
+  .rail-item:hover { background: #141922; color: #8b96a5; }
+  .rail-item.active { background: var(--accent-dim); color: var(--accent); }
+  .rail-spacer { flex: 1; }
+
+  /* ── MAIN CONTENT SLOT ──────────────────────────────────────── */
+  .main { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 18px; }
+
+  /* Reusable primitives the screens build on (panel / buttons). */
+  .card { background: #141922; border: 1px solid #2a3340; border-radius: 10px; overflow: hidden; }
+  .btn-ghost { padding: 7px 14px; background: transparent; border: 1px solid #2a3340; border-radius: 7px; color: #8b96a5; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; transition: border-color .15s, color .15s; }
+  .btn-ghost:hover { border-color: #3a4455; color: #e6ebf2; }
+  .btn-primary { padding: 7px 14px; background: var(--accent); border: 1px solid var(--accent); border-radius: 7px; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background .15s; }
+  .btn-primary:hover { background: var(--accent-light); }
+</style>
+</head>
+<body>
+
+<!-- TOP NAVBAR: brand → entity switcher → search → status badge → icons + avatar -->
+<nav class="navbar">
+  <a href="#" class="navbar-brand">
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="26" height="26" rx="7" fill="#f97316"/>
+      <path d="M7 19L10 10H13L11 15H14L9.5 24L13 17H10.5L12.5 10H16L13 19H7Z" fill="white"/>
+    </svg>
+    <span class="brand-text">Brand<span>Mark</span></span>
+  </a>
+
+  <!-- ENTITY SWITCHER — relabel to the domain's primary scope (org/site/account…) -->
+  <button class="entity-switcher">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+    Active Entity
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
+
+  <div class="navbar-search">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b96a5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" placeholder="Search…">
+  </div>
+
+  <!-- LIVE STATUS BADGE — relabel to the domain's live state -->
+  <div class="status-badge"><span class="status-badge-dot"></span>Live</div>
+
+  <div class="navbar-right">
+    <div class="icon-btn">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="notif-dot"></span>
+    </div>
+    <div class="avatar">··</div>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- ICON RAIL — 4-5 destinations + a pinned settings item. Mark one .active. -->
+  <aside class="rail">
+    <div class="rail-item active" title="Overview">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>
+    </div>
+    <div class="rail-item" title="Section">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="4" rx="1"/><rect x="2" y="10" width="20" height="4" rx="1"/><rect x="2" y="17" width="20" height="4" rx="1"/></svg>
+    </div>
+    <div class="rail-item" title="Records">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="12" y2="15"/></svg>
+    </div>
+    <div class="rail-spacer"></div>
+    <div class="rail-item" title="Settings">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT SLOT — drop the screen body here (KPI tiles, status board,
+       records table, form, or detail). See assets/*.html and references/layouts.md. -->
+  <main class="main">
+    <!-- content goes here -->
+  </main>
+
+</div>
+
+</body>
+</html>

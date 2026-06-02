@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-forge-mes",
-  "title": "Forge MES Admin",
+  "title": "Forge Admin",
   "version": "0.1.0",
-  "description": "Industrial dark-mode Manufacturing Execution System dashboard — shop-floor plant switcher, OEE / output / downtime / scrap KPI tiles, production lines status board, inline SVG output trend chart, work-orders table, and real-time downtime alerts panel. Original archetype for discrete manufacturing operations teams.",
+  "description": "Dark industrial-grade admin aesthetic: near-black canvas (#0c0f14), raised steel panels, molten-orange accent (#f97316), Inter type with tabular figures, and dense hairline-bordered tables. Archetype = entity-switcher navbar + icon rail + 4 KPI tiles + 2-column status board with an alerts side panel + full-width records table with status pills, plus matching list, form, and detail screens. Built for high-density operational consoles that read at a glance.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,16 +19,12 @@
     "operations",
     "web",
     "admin",
-    "manufacturing",
-    "mes",
     "dark-mode",
     "industrial",
-    "shop-floor",
-    "oee",
-    "production",
-    "enterprise",
+    "status-board",
+    "data-dense",
     "orange-accent",
-    "status-board"
+    "enterprise"
   ],
   "compat": {
     "agentSkills": [
@@ -49,13 +45,25 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me an industrial dark-mode MES admin dashboard for a discrete manufacturing plant — plant switcher navbar, OEE / output / downtime / scrap KPI tiles, production lines status board, output trend chart, work-orders table, downtime alerts panel.",
-        "zh-CN": "使用这个插件完成以下任务：Build me an industrial dark-mode MES admin dashboard for a discrete manufacturing plant — plant switcher navbar, OEE / output / downtime / scrap KPI tiles, production lines status board, output trend chart, work-orders table, downtime alerts panel."
+        "en": "Apply this dark industrial admin aesthetic to my domain — near-black canvas, molten-orange accent, entity-switcher navbar, icon rail, 4 KPI tiles, a status board with an alerts side panel, and a dense records table with status pills, plus list / form / detail screens.",
+        "zh-CN": "将这个深色工业风格应用到我的领域：近黑底色、熔岩橙强调色、实体切换导航栏、图标侧栏、4 个 KPI 卡片、带告警侧栏的状态看板，以及带状态标签的密集记录表格，并配套列表 / 表单 / 详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Forge MES Admin"
+          "title": "Forge Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Forge Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Forge Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Forge Admin — Detail"
         }
       ]
     },
@@ -73,7 +81,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {

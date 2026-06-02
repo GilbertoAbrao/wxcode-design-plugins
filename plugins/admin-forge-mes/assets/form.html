@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Forge Admin — New Work Order</title>
+<style>
+  :root {
+    --accent:        #f97316;
+    --accent-light:  #fb923c;
+    --accent-dim:    rgba(249,115,22,.14);
+    --state-down:    #ef4444;
+    --state-down-dim: rgba(239,68,68,.12);
+    --state-ok:      #22c55e;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px; background: #0c0f14; color: #e6ebf2;
+    min-height: 100vh; display: flex; flex-direction: column;
+  }
+
+  /* ── NAVBAR (shared shell) ──────────────────────────────────── */
+  .navbar { height: 52px; background: #141922; border-bottom: 1px solid #2a3340; display: flex; align-items: center; padding: 0 16px; gap: 12px; position: sticky; top: 0; z-index: 100; flex-shrink: 0; }
+  .navbar-brand { display: flex; align-items: center; gap: 8px; text-decoration: none; flex-shrink: 0; }
+  .brand-text { font-size: 15px; font-weight: 700; letter-spacing: -.3px; color: #e6ebf2; line-height: 1; }
+  .brand-text span { color: var(--accent); }
+  .entity-switcher { display: flex; align-items: center; gap: 6px; margin-left: 8px; padding: 5px 10px; background: #1d2530; border: 1px solid #2a3340; border-radius: 6px; cursor: pointer; font-size: 13px; color: #e6ebf2; white-space: nowrap; }
+  .entity-switcher svg { color: #8b96a5; }
+  .navbar-search { flex: 1; max-width: 320px; margin-left: auto; display: flex; align-items: center; gap: 8px; background: #1d2530; border: 1px solid #2a3340; border-radius: 20px; padding: 6px 14px; }
+  .navbar-search input { background: transparent; border: none; outline: none; color: #e6ebf2; font-size: 13px; width: 100%; font-family: inherit; }
+  .navbar-search input::placeholder { color: #8b96a5; }
+  .status-badge { display: flex; align-items: center; gap: 6px; padding: 4px 10px; background: var(--accent-dim); border: 1px solid rgba(249,115,22,.3); border-radius: 20px; font-size: 12px; font-weight: 600; color: var(--accent-light); white-space: nowrap; }
+  .status-badge-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse-dot 2s ease-in-out infinite; }
+  @keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+  .navbar-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin-left: 8px; }
+  .icon-btn { position: relative; width: 34px; height: 34px; background: #1d2530; border: 1px solid #2a3340; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #8b96a5; }
+  .icon-btn:hover { color: #e6ebf2; border-color: #3a4455; }
+  .notif-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; background: var(--accent); border-radius: 50%; border: 1.5px solid #141922; }
+  .avatar { width: 32px; height: 32px; background: linear-gradient(135deg, var(--accent) 0%, #c2410c 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; cursor: pointer; flex-shrink: 0; }
+
+  /* ── SHELL + RAIL (shared) ──────────────────────────────────── */
+  .shell { display: flex; flex: 1; overflow: hidden; }
+  .rail { width: 56px; background: #0c0f14; border-right: 1px solid #2a3340; display: flex; flex-direction: column; align-items: center; padding: 12px 0; gap: 4px; flex-shrink: 0; }
+  .rail-item { position: relative; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #64748b; transition: background .15s, color .15s; }
+  .rail-item:hover { background: #141922; color: #8b96a5; }
+  .rail-item.active { background: var(--accent-dim); color: var(--accent); }
+  .rail-spacer { flex: 1; }
+
+  .main { flex: 1; overflow-y: auto; padding: 20px; }
+  .form-wrap { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+
+  .breadcrumb { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #64748b; }
+  .breadcrumb a { color: #8b96a5; text-decoration: none; }
+  .breadcrumb a:hover { color: var(--accent-light); }
+  .breadcrumb svg { color: #3a4455; }
+
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .page-title { font-size: 18px; font-weight: 700; color: #e6ebf2; }
+  .page-subtitle { font-size: 13px; color: #8b96a5; margin-top: 2px; }
+
+  /* ── FORM CARDS ─────────────────────────────────────────────── */
+  .card { background: #141922; border: 1px solid #2a3340; border-radius: 10px; overflow: hidden; }
+  .card-section-title { font-size: 11px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #8b96a5; padding: 14px 18px; border-bottom: 1px solid #2a3340; display: flex; align-items: center; gap: 7px; }
+  .card-section-title svg { color: var(--accent); }
+  .card-body { padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field.full { grid-column: 1 / -1; }
+
+  .field-label { font-size: 12.5px; font-weight: 600; color: #c5cdd7; display: flex; align-items: center; gap: 4px; }
+  .req { color: var(--accent); font-weight: 700; }
+
+  .control {
+    background: #0c0f14; border: 1px solid #2a3340; border-radius: 7px;
+    padding: 9px 12px; color: #e6ebf2; font-size: 13.5px; font-family: inherit;
+    outline: none; transition: border-color .15s, box-shadow .15s; width: 100%;
+    font-variant-numeric: tabular-nums;
+  }
+  .control::placeholder { color: #64748b; }
+  .control:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+  textarea.control { resize: vertical; min-height: 76px; line-height: 1.5; }
+  select.control { appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238b96a5' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 34px; cursor: pointer; }
+
+  .field.invalid .control { border-color: var(--state-down); }
+  .field.invalid .control:focus { box-shadow: 0 0 0 3px var(--state-down-dim); }
+
+  .helper { font-size: 11.5px; color: #64748b; line-height: 1.4; }
+  .error-msg { font-size: 11.5px; color: var(--state-down); display: flex; align-items: center; gap: 5px; line-height: 1.4; }
+  .error-msg svg { flex-shrink: 0; }
+
+  .input-affix { position: relative; display: flex; align-items: center; }
+  .input-affix .control { padding-right: 48px; }
+  .input-affix .suffix { position: absolute; right: 12px; font-size: 12px; color: #64748b; pointer-events: none; }
+
+  .priority-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .prio-opt { position: relative; flex: 1; min-width: 120px; }
+  .prio-opt input { position: absolute; opacity: 0; pointer-events: none; }
+  .prio-opt label { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #0c0f14; border: 1px solid #2a3340; border-radius: 7px; cursor: pointer; font-size: 13px; font-weight: 500; color: #8b96a5; transition: border-color .15s, color .15s; }
+  .prio-opt label .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .prio-opt:nth-child(1) label .dot { background: #ef4444; }
+  .prio-opt:nth-child(2) label .dot { background: #f59e0b; }
+  .prio-opt:nth-child(3) label .dot { background: #8b96a5; }
+  .prio-opt input:checked + label { border-color: var(--accent); color: #e6ebf2; background: var(--accent-dim); }
+
+  /* ── FORM FOOTER ────────────────────────────────────────────── */
+  .form-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 4px; }
+  .form-hint { font-size: 12px; color: #64748b; }
+  .footer-actions { display: flex; gap: 8px; }
+  .btn-ghost { padding: 9px 18px; background: transparent; border: 1px solid #2a3340; border-radius: 7px; color: #8b96a5; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; transition: border-color .15s, color .15s; }
+  .btn-ghost:hover { border-color: #3a4455; color: #e6ebf2; }
+  .btn-primary { padding: 9px 18px; background: var(--accent); border: 1px solid var(--accent); border-radius: 7px; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background .15s; }
+  .btn-primary:hover { background: var(--accent-light); }
+  .btn-primary:disabled { background: #2a3340; border-color: #2a3340; color: #64748b; cursor: not-allowed; }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="#" class="navbar-brand">
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="26" height="26" rx="7" fill="#f97316"/>
+      <path d="M7 19L10 10H13L11 15H14L9.5 24L13 17H10.5L12.5 10H16L13 19H7Z" fill="white"/>
+      <rect x="15" y="7" width="4" height="12" rx="1.5" fill="rgba(255,255,255,.55)"/>
+    </svg>
+    <span class="brand-text">Forge<span>MES</span></span>
+  </a>
+  <button class="entity-switcher">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+    Ironclad — Plant 1 · Sector A
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
+  <div class="navbar-search">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b96a5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" placeholder="Search WO, product, line…">
+  </div>
+  <div class="status-badge"><span class="status-badge-dot"></span>Shift B · 06:00–14:00</div>
+  <div class="navbar-right">
+    <div class="icon-btn">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="notif-dot"></span>
+    </div>
+    <div class="avatar">MK</div>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <aside class="rail">
+    <div class="rail-item" title="Dashboard">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>
+    </div>
+    <div class="rail-item" title="Production Lines">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="4" rx="1"/><rect x="2" y="10" width="20" height="4" rx="1"/><rect x="2" y="17" width="20" height="4" rx="1"/></svg>
+    </div>
+    <div class="rail-item active" title="Work Orders">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="12" y2="15"/></svg>
+    </div>
+    <div class="rail-item" title="Reports">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    </div>
+    <div class="rail-spacer"></div>
+    <div class="rail-item" title="Settings">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </div>
+  </aside>
+
+  <main class="main">
+    <form class="form-wrap" novalidate>
+
+      <div class="breadcrumb">
+        <a href="#">Work Orders</a>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        <span>New Work Order</span>
+      </div>
+
+      <div class="page-header">
+        <div>
+          <div class="page-title">New Work Order</div>
+          <div class="page-subtitle">Release a production order to a line on Plant 1 · Sector A</div>
+        </div>
+      </div>
+
+      <!-- Section: Order -->
+      <div class="card">
+        <div class="card-section-title">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/></svg>
+          Order Details
+        </div>
+        <div class="card-body">
+          <div class="field-grid">
+
+            <!-- Product code — required, valid -->
+            <div class="field">
+              <label class="field-label" for="product">Product Code <span class="req">*</span></label>
+              <input id="product" class="control" type="text" value="FRG-4412" autocomplete="off">
+              <span class="helper">Catalog SKU in the form FRG-NNNN. Determines routing and tooling.</span>
+            </div>
+
+            <!-- Quantity — required, INVALID (shows inline error) -->
+            <div class="field invalid">
+              <label class="field-label" for="qty">Quantity <span class="req">*</span></label>
+              <div class="input-affix">
+                <input id="qty" class="control" type="text" inputmode="numeric" value="0" aria-invalid="true">
+                <span class="suffix">pcs</span>
+              </div>
+              <span class="error-msg">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Quantity must be at least 1 and a multiple of the pack size (24).
+              </span>
+            </div>
+
+            <!-- Description — optional -->
+            <div class="field full">
+              <label class="field-label" for="desc">Description</label>
+              <textarea id="desc" class="control" placeholder="Optional notes for the line operator…">Weld + stamp, Tier-1 auto. Use fixture set RF-08.</textarea>
+              <span class="helper">Visible on the line terminal and the printed traveler.</span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Scheduling -->
+      <div class="card">
+        <div class="card-section-title">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Scheduling & Routing
+        </div>
+        <div class="card-body">
+          <div class="field-grid">
+
+            <!-- Line — required select -->
+            <div class="field">
+              <label class="field-label" for="line">Production Line <span class="req">*</span></label>
+              <select id="line" class="control">
+                <option value="">Select a line…</option>
+                <option value="a01" selected>Line A-01 — Stamping · Bay 1</option>
+                <option value="a02">Line A-02 — Welding · Bay 2</option>
+                <option value="b01">Line B-01 — Assembly · Bay 3</option>
+                <option value="b02">Line B-02 — Painting · Bay 4</option>
+                <option value="c01">Line C-01 — Quality · Bay 5</option>
+              </select>
+              <span class="helper">Only lines certified for this product code are listed.</span>
+            </div>
+
+            <!-- Due date — required, not in past -->
+            <div class="field">
+              <label class="field-label" for="due">Due Date <span class="req">*</span></label>
+              <input id="due" class="control" type="date" value="2025-06-05" min="2025-06-02">
+              <span class="helper">Must be today or later. Drives line scheduling priority.</span>
+            </div>
+
+            <!-- Priority — required radio group -->
+            <div class="field full">
+              <label class="field-label">Priority <span class="req">*</span></label>
+              <div class="priority-row">
+                <div class="prio-opt">
+                  <input type="radio" name="priority" id="p-high" value="high">
+                  <label for="p-high"><span class="dot"></span>High</label>
+                </div>
+                <div class="prio-opt">
+                  <input type="radio" name="priority" id="p-med" value="medium" checked>
+                  <label for="p-med"><span class="dot"></span>Medium</label>
+                </div>
+                <div class="prio-opt">
+                  <input type="radio" name="priority" id="p-low" value="low">
+                  <label for="p-low"><span class="dot"></span>Low</label>
+                </div>
+              </div>
+              <span class="helper">High priority preempts queued orders on the selected line.</span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="form-footer">
+        <span class="form-hint">Fields marked <span class="req">*</span> are required.</span>
+        <div class="footer-actions">
+          <button type="button" class="btn-ghost">Cancel</button>
+          <button type="submit" class="btn-primary" disabled>Create Work Order</button>
+        </div>
+      </div>
+
+    </form>
+  </main>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Forge Admin — Work Orders</title>
+<style>
+  :root {
+    --accent:        #f97316;
+    --accent-light:  #fb923c;
+    --accent-dim:    rgba(249,115,22,.14);
+    --state-running: #22c55e;
+    --state-idle:    #f59e0b;
+    --state-down:    #ef4444;
+    --state-queued:  #64748b;
+    --state-queued-dim: rgba(100,116,139,.15);
+    --state-completed: #22c55e;
+    --state-completed-dim: rgba(34,197,94,.13);
+    --state-hold:    #ef4444;
+    --state-hold-dim: rgba(239,68,68,.13);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px; background: #0c0f14; color: #e6ebf2;
+    min-height: 100vh; display: flex; flex-direction: column;
+  }
+
+  /* ── NAVBAR (shared shell) ──────────────────────────────────── */
+  .navbar { height: 52px; background: #141922; border-bottom: 1px solid #2a3340; display: flex; align-items: center; padding: 0 16px; gap: 12px; position: sticky; top: 0; z-index: 100; flex-shrink: 0; }
+  .navbar-brand { display: flex; align-items: center; gap: 8px; text-decoration: none; flex-shrink: 0; }
+  .brand-text { font-size: 15px; font-weight: 700; letter-spacing: -.3px; color: #e6ebf2; line-height: 1; }
+  .brand-text span { color: var(--accent); }
+  .entity-switcher { display: flex; align-items: center; gap: 6px; margin-left: 8px; padding: 5px 10px; background: #1d2530; border: 1px solid #2a3340; border-radius: 6px; cursor: pointer; font-size: 13px; color: #e6ebf2; white-space: nowrap; }
+  .entity-switcher svg { color: #8b96a5; }
+  .navbar-search { flex: 1; max-width: 320px; margin-left: auto; display: flex; align-items: center; gap: 8px; background: #1d2530; border: 1px solid #2a3340; border-radius: 20px; padding: 6px 14px; }
+  .navbar-search input { background: transparent; border: none; outline: none; color: #e6ebf2; font-size: 13px; width: 100%; font-family: inherit; }
+  .navbar-search input::placeholder { color: #8b96a5; }
+  .status-badge { display: flex; align-items: center; gap: 6px; padding: 4px 10px; background: var(--accent-dim); border: 1px solid rgba(249,115,22,.3); border-radius: 20px; font-size: 12px; font-weight: 600; color: var(--accent-light); white-space: nowrap; }
+  .status-badge-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse-dot 2s ease-in-out infinite; }
+  @keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+  .navbar-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin-left: 8px; }
+  .icon-btn { position: relative; width: 34px; height: 34px; background: #1d2530; border: 1px solid #2a3340; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #8b96a5; }
+  .icon-btn:hover { color: #e6ebf2; border-color: #3a4455; }
+  .notif-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; background: var(--accent); border-radius: 50%; border: 1.5px solid #141922; }
+  .avatar { width: 32px; height: 32px; background: linear-gradient(135deg, var(--accent) 0%, #c2410c 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; cursor: pointer; flex-shrink: 0; }
+
+  /* ── SHELL + RAIL (shared) ──────────────────────────────────── */
+  .shell { display: flex; flex: 1; overflow: hidden; }
+  .rail { width: 56px; background: #0c0f14; border-right: 1px solid #2a3340; display: flex; flex-direction: column; align-items: center; padding: 12px 0; gap: 4px; flex-shrink: 0; }
+  .rail-item { position: relative; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #64748b; transition: background .15s, color .15s; }
+  .rail-item:hover { background: #141922; color: #8b96a5; }
+  .rail-item.active { background: var(--accent-dim); color: var(--accent); }
+  .rail-item.active svg path, .rail-item.active svg rect, .rail-item.active svg line { stroke: var(--accent); }
+  .rail-spacer { flex: 1; }
+
+  .main { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .page-title { font-size: 18px; font-weight: 700; color: #e6ebf2; }
+  .page-subtitle { font-size: 13px; color: #8b96a5; margin-top: 2px; }
+  .header-actions { display: flex; align-items: center; gap: 8px; }
+  .btn-ghost { padding: 7px 14px; background: transparent; border: 1px solid #2a3340; border-radius: 7px; color: #8b96a5; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; transition: border-color .15s, color .15s; }
+  .btn-ghost:hover { border-color: #3a4455; color: #e6ebf2; }
+  .btn-primary { padding: 7px 14px; background: var(--accent); border: 1px solid var(--accent); border-radius: 7px; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background .15s; }
+  .btn-primary:hover { background: var(--accent-light); }
+
+  /* ── TOOLBAR (search + filters) ─────────────────────────────── */
+  .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .toolbar-search { display: flex; align-items: center; gap: 8px; background: #141922; border: 1px solid #2a3340; border-radius: 8px; padding: 8px 12px; min-width: 260px; flex: 1; max-width: 360px; }
+  .toolbar-search input { background: transparent; border: none; outline: none; color: #e6ebf2; font-size: 13px; width: 100%; font-family: inherit; }
+  .toolbar-search input::placeholder { color: #8b96a5; }
+  .filter-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .filter-label { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: #64748b; margin-right: 2px; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; background: #141922; border: 1px solid #2a3340; border-radius: 20px; font-size: 12px; font-weight: 500; color: #8b96a5; cursor: pointer; transition: border-color .15s, color .15s; white-space: nowrap; }
+  .chip:hover { border-color: #3a4455; color: #e6ebf2; }
+  .chip.active { background: var(--accent-dim); border-color: rgba(249,115,22,.4); color: var(--accent-light); }
+  .chip .chip-count { font-size: 11px; color: #64748b; font-variant-numeric: tabular-nums; }
+  .chip.active .chip-count { color: var(--accent-light); }
+
+  /* ── RECORDS TABLE ──────────────────────────────────────────── */
+  .card { background: #141922; border: 1px solid #2a3340; border-radius: 10px; overflow: hidden; }
+  .rec-table-wrap { overflow-x: auto; }
+  .rec-table { width: 100%; border-collapse: collapse; }
+  .rec-table th { font-size: 10.5px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #64748b; text-align: left; padding: 11px 16px; background: #141922; border-bottom: 1px solid #2a3340; white-space: nowrap; position: sticky; top: 0; }
+  .rec-table th.sortable { cursor: pointer; }
+  .rec-table th .sort-ind { color: var(--accent); margin-left: 3px; }
+  .rec-table td { padding: 11px 16px; font-size: 13px; color: #c5cdd7; border-bottom: 1px solid #1d2530; vertical-align: middle; font-variant-numeric: tabular-nums; }
+  .rec-table tr:last-child td { border-bottom: none; }
+  .rec-table tbody tr { cursor: pointer; }
+  .rec-table tbody tr:hover td { background: #1d2530; }
+  .rec-id { font-weight: 700; color: #e6ebf2; font-family: "Courier New", monospace; font-size: 12px; }
+  .code-cell { display: flex; flex-direction: column; gap: 1px; }
+  .code-id { font-weight: 600; color: #e6ebf2; font-family: "Courier New", monospace; font-size: 12px; }
+  .code-name { font-size: 11px; color: #8b96a5; }
+  .line-cell { color: #e6ebf2; font-weight: 600; }
+  .qty-cell { font-weight: 600; color: #e6ebf2; }
+  .due-date { font-size: 12px; color: #8b96a5; }
+  .due-date.overdue { color: var(--state-down); font-weight: 600; }
+  .prio { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; }
+  .prio.high { color: var(--state-down); }
+  .prio.med { color: var(--state-idle); }
+  .prio.low { color: #8b96a5; }
+  .prio-bar { width: 3px; height: 12px; border-radius: 2px; background: currentColor; }
+
+  .rec-status { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 700; letter-spacing: .1px; white-space: nowrap; }
+  .rec-status-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+  .rec-status.inprogress { background: var(--accent-dim); color: var(--accent-light); border: 1px solid rgba(249,115,22,.25); }
+  .rec-status.queued { background: var(--state-queued-dim); color: #94a3b8; border: 1px solid rgba(100,116,139,.25); }
+  .rec-status.completed { background: var(--state-completed-dim); color: var(--state-completed); border: 1px solid rgba(34,197,94,.22); }
+  .rec-status.onhold { background: var(--state-hold-dim); color: var(--state-hold); border: 1px solid rgba(239,68,68,.22); }
+
+  .rec-footer { display: flex; align-items: center; justify-content: space-between; padding: 11px 16px; border-top: 1px solid #2a3340; font-size: 12px; color: #64748b; }
+  .pagination { display: flex; align-items: center; gap: 4px; }
+  .page-btn { min-width: 28px; height: 28px; padding: 0 6px; background: #1d2530; border: 1px solid #2a3340; border-radius: 5px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #8b96a5; font-size: 12px; font-family: inherit; font-variant-numeric: tabular-nums; }
+  .page-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
+  .page-btn:hover:not(.active) { border-color: #3a4455; color: #e6ebf2; }
+  .page-ellipsis { color: #64748b; padding: 0 2px; }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="#" class="navbar-brand">
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="26" height="26" rx="7" fill="#f97316"/>
+      <path d="M7 19L10 10H13L11 15H14L9.5 24L13 17H10.5L12.5 10H16L13 19H7Z" fill="white"/>
+      <rect x="15" y="7" width="4" height="12" rx="1.5" fill="rgba(255,255,255,.55)"/>
+    </svg>
+    <span class="brand-text">Forge<span>MES</span></span>
+  </a>
+  <button class="entity-switcher">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+    Ironclad — Plant 1 · Sector A
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
+  <div class="navbar-search">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b96a5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" placeholder="Search WO, product, line…">
+  </div>
+  <div class="status-badge"><span class="status-badge-dot"></span>Shift B · 06:00–14:00</div>
+  <div class="navbar-right">
+    <div class="icon-btn">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="notif-dot"></span>
+    </div>
+    <div class="avatar">MK</div>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <aside class="rail">
+    <div class="rail-item" title="Dashboard">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>
+    </div>
+    <div class="rail-item" title="Production Lines">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="4" rx="1"/><rect x="2" y="10" width="20" height="4" rx="1"/><rect x="2" y="17" width="20" height="4" rx="1"/></svg>
+    </div>
+    <div class="rail-item active" title="Work Orders">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="12" y2="15"/></svg>
+    </div>
+    <div class="rail-item" title="Reports">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    </div>
+    <div class="rail-spacer"></div>
+    <div class="rail-item" title="Settings">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <div class="page-header">
+      <div>
+        <div class="page-title">Work Orders</div>
+        <div class="page-subtitle">Plant 1 · Sector A · 34 active orders across 5 lines</div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-ghost">Export CSV</button>
+        <button class="btn-primary">+ New Work Order</button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="toolbar-search">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8b96a5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Filter by WO #, product code, description…">
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Status</span>
+        <span class="chip active">All <span class="chip-count">34</span></span>
+        <span class="chip">In Progress <span class="chip-count">12</span></span>
+        <span class="chip">Queued <span class="chip-count">15</span></span>
+        <span class="chip">On Hold <span class="chip-count">3</span></span>
+        <span class="chip">Completed <span class="chip-count">4</span></span>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Line</span>
+        <span class="chip">A-01</span>
+        <span class="chip">A-02</span>
+        <span class="chip">B-01</span>
+        <span class="chip">B-02</span>
+        <span class="chip">C-01</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="rec-table-wrap">
+        <table class="rec-table">
+          <thead>
+            <tr>
+              <th class="sortable">WO # <span class="sort-ind">▼</span></th>
+              <th>Product Code</th>
+              <th>Description</th>
+              <th>Line</th>
+              <th style="text-align:right">Qty (pcs)</th>
+              <th>Priority</th>
+              <th class="sortable">Due Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="rec-id">WO-240601</span></td>
+              <td><div class="code-cell"><span class="code-id">FRG-4412</span><span class="code-name">Bracket Assy — Rear Frame</span></div></td>
+              <td style="color:#8b96a5;font-size:12px;">Weld + stamp, Tier-1 auto</td>
+              <td class="line-cell">A-01</td>
+              <td style="text-align:right" class="qty-cell">2,400</td>
+              <td><span class="prio high"><span class="prio-bar"></span>High</span></td>
+              <td><span class="due-date">02 Jun 2025</span></td>
+              <td><span class="rec-status inprogress"><span class="rec-status-dot"></span>In Progress</span></td>
+            </tr>
+            <tr>
+              <td><span class="rec-id">WO-240602</span></td>
+              <td><div class="code-cell"><span class="code-id">FRG-5503</span><span class="code-name">Crossmember Sub-assy</span></div></td>
+              <td style="color:#8b96a5;font-size:12px;">Assembly + weld, struct.</td>
+              <td class="line-cell">B-01</td>
+              <td style="text-align:right" class="qty-cell">1,800</td>
+              <td><span class="prio med"><span class="prio-bar"></span>Medium</span></td>
+              <td><span class="due-date">03 Jun 2025</span></td>
+              <td><span class="rec-status queued"><span class="rec-status-dot"></span>Queued</span></td>
+            </tr>
+            <tr>
+              <td><span class="rec-id">WO-240598</span></td>
+              <td><div class="code-cell"><span class="code-id">FRG-2871</span><span class="code-name">Door Hinge Reinforcement</span></div></td>
+              <td style="color:#8b96a5;font-size:12px;">Paint + QA inspection</td>
+              <td class="line-cell">B-02</td>
+              <td style="text-align:right" class="qty-cell">3,600</td>
+              <td><span class="prio high"><span class="prio-bar"></span>High</span></td>
+              <td><span class="due-date">02 Jun 2025</span></td>
+              <td><span class="rec-status inprogress"><span class="rec-status-dot"></span>In Progress</span></td>
+            </tr>
+            <tr>
+              <td><span class="rec-id">WO-240595</span></td>
+              <td><div class="code-cell"><span class="code-id">FRG-1104</span><span class="code-name">Engine Mount Plate</span></div></td>
+              <td style="color:#8b96a5;font-size:12px;">Precision stamp, toleranced</td>
+              <td class="line-cell">A-01</td>
+              <td style="text-align:right" class="qty-cell">960</td>
+              <td><span class="prio low"><span class="prio-bar"></span>Low</span></td>
+              <td><span class="due-date">01 Jun 2025</span></td>
+              <td><span class="rec-status completed"><span class="rec-status-dot"></span>Completed</span></td>
+            </tr>
+            <tr>
+              <td><span class="rec-id">WO-240588</span></td>
+              <td><div class="code-cell"><span class="code-id">FRG-3390</span><span class="code-name">Fuel Tank Brace — Lower</span></div></td>
+              <td style="color:#8b96a5;font-size:12px;">Weld + e-coat, corrosion</td>
+              <td class="line-cell">A-02</td>
+              <td style="text-align:right" class="qty-cell">720</td>
+              <td><span class="prio high"><span class="prio-bar"></span>High</span></td>
+              <td><span class="due-date overdue">30 May 2025</span></td>
+              <td><span class="rec-status onhold"><span class="rec-status-dot"></span>On Hold</span></td>
+            </tr>
+            <tr>
+              <td><span class="rec-id">WO-240610</span></td>
+              <td><div class="code-cell"><span class="code-id">FRG-6620</span><span class="code-name">Roof Bow Stamping</span></div></td>
+              <td style="color:#8b96a5;font-size:12px;">Progressive die, GA steel</td>
+              <td class="line-cell">A-01</td>
+              <td style="text-align:right" class="qty-cell">4,200</td>
+              <td><span class="prio med"><span class="prio-bar"></span>Medium</span></td>
+              <td><span class="due-date">05 Jun 2025</span></td>
+              <td><span class="rec-status queued"><span class="rec-status-dot"></span>Queued</span></td>
+            </tr>
+            <tr>
+              <td><span class="rec-id">WO-240603</span></td>
+              <td><div class="code-cell"><span class="code-id">FRG-4419</span><span class="code-name">Seat Pan Support Rail</span></div></td>
+              <td style="color:#8b96a5;font-size:12px;">Weld + assembly, HRPO</td>
+              <td class="line-cell">A-02</td>
+              <td style="text-align:right" class="qty-cell">1,080</td>
+              <td><span class="prio med"><span class="prio-bar"></span>Medium</span></td>
+              <td><span class="due-date">04 Jun 2025</span></td>
+              <td><span class="rec-status inprogress"><span class="rec-status-dot"></span>In Progress</span></td>
+            </tr>
+            <tr>
+              <td><span class="rec-id">WO-240597</span></td>
+              <td><div class="code-cell"><span class="code-id">FRG-0882</span><span class="code-name">Quarter Panel Inner</span></div></td>
+              <td style="color:#8b96a5;font-size:12px;">Stamp + hem flange, Class A</td>
+              <td class="line-cell">C-01</td>
+              <td style="text-align:right" class="qty-cell">600</td>
+              <td><span class="prio low"><span class="prio-bar"></span>Low</span></td>
+              <td><span class="due-date">03 Jun 2025</span></td>
+              <td><span class="rec-status queued"><span class="rec-status-dot"></span>Queued</span></td>
+            </tr>
+            <tr>
+              <td><span class="rec-id">WO-240611</span></td>
+              <td><div class="code-cell"><span class="code-id">FRG-7210</span><span class="code-name">Battery Tray Weldment</span></div></td>
+              <td style="color:#8b96a5;font-size:12px;">Robotic weld, EV platform</td>
+              <td class="line-cell">A-02</td>
+              <td style="text-align:right" class="qty-cell">1,440</td>
+              <td><span class="prio high"><span class="prio-bar"></span>High</span></td>
+              <td><span class="due-date">06 Jun 2025</span></td>
+              <td><span class="rec-status queued"><span class="rec-status-dot"></span>Queued</span></td>
+            </tr>
+            <tr>
+              <td><span class="rec-id">WO-240590</span></td>
+              <td><div class="code-cell"><span class="code-id">FRG-2044</span><span class="code-name">Sill Reinforcement Inner</span></div></td>
+              <td style="color:#8b96a5;font-size:12px;">Hot-form stamp, boron</td>
+              <td class="line-cell">A-01</td>
+              <td style="text-align:right" class="qty-cell">2,100</td>
+              <td><span class="prio med"><span class="prio-bar"></span>Medium</span></td>
+              <td><span class="due-date">01 Jun 2025</span></td>
+              <td><span class="rec-status completed"><span class="rec-status-dot"></span>Completed</span></td>
+            </tr>
+            <tr>
+              <td><span class="rec-id">WO-240612</span></td>
+              <td><div class="code-cell"><span class="code-id">FRG-5588</span><span class="code-name">Hood Latch Bracket</span></div></td>
+              <td style="color:#8b96a5;font-size:12px;">Stamp + tap, zinc plate</td>
+              <td class="line-cell">B-02</td>
+              <td style="text-align:right" class="qty-cell">5,000</td>
+              <td><span class="prio low"><span class="prio-bar"></span>Low</span></td>
+              <td><span class="due-date">07 Jun 2025</span></td>
+              <td><span class="rec-status queued"><span class="rec-status-dot"></span>Queued</span></td>
+            </tr>
+            <tr>
+              <td><span class="rec-id">WO-240585</span></td>
+              <td><div class="code-cell"><span class="code-id">FRG-1820</span><span class="code-name">Shock Tower Reinforcement</span></div></td>
+              <td style="color:#8b96a5;font-size:12px;">Weld + MIG, dual-phase</td>
+              <td class="line-cell">B-01</td>
+              <td style="text-align:right" class="qty-cell">840</td>
+              <td><span class="prio high"><span class="prio-bar"></span>High</span></td>
+              <td><span class="due-date overdue">31 May 2025</span></td>
+              <td><span class="rec-status onhold"><span class="rec-status-dot"></span>On Hold</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="rec-footer">
+        <span>Showing 1–12 of 34 work orders</span>
+        <div class="pagination">
+          <button class="page-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <span class="page-ellipsis">…</span>
+          <button class="page-btn">3</button>
+          <button class="page-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>
