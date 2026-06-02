@@ -37,7 +37,7 @@ repo so it can be reviewed and driven from any runtime.
 - **When installed via symlink** (this `SKILL.md` lives at
   `~/.claude/skills/od-plugin-forge/SKILL.md` symlinked to
   `<repo>/forge/adapters/claude/od-plugin-forge/`), the spec is at
-  `../../pipeline/forge.md` relative to this file — i.e. resolve the symlink to the
+  `../../../pipeline/forge.md` relative to this file — i.e. resolve the symlink to the
   repo and open `forge/pipeline/forge.md`.
 
 Read that spec end to end, then execute it.

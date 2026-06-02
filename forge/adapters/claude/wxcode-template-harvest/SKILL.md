@@ -39,7 +39,7 @@ repo so it can be reviewed and driven from any runtime.
 - **When installed via symlink** (this `SKILL.md` lives at
   `~/.claude/skills/wxcode-template-harvest/SKILL.md` symlinked to
   `<repo>/forge/adapters/claude/wxcode-template-harvest/`), the spec is at
-  `../../pipeline/harvest.md` relative to this file — i.e. resolve the symlink to the
+  `../../../pipeline/harvest.md` relative to this file — i.e. resolve the symlink to the
   repo and open `forge/pipeline/harvest.md`.
 
 Read that spec end to end, then execute it.
