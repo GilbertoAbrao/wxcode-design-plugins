@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{Screen title}</title>
+<style>
+/*
+ * Voyage Admin — template seed
+ * Copy this shell; drop your region skeletons from references/layouts.md into
+ * <main class="content">. Replace every {placeholder} with real domain content.
+ */
+
+:root {
+  /* Primary accent — sky blue */
+  --sky:      #0ea5e9;
+  --sky-lt:   #38bdf8;
+  --sky-bg:   #f0f9ff;
+
+  /* Secondary accent — coral */
+  --coral:    #fb7185;
+  --coral-lt: #fda4af;
+  --coral-bg: #ffe4e6;
+
+  /* Status tokens */
+  --green:    #22c55e;
+  --green-bg: #dcfce7;
+  --amber:    #f59e0b;
+  --amber-bg: #fef9c3;
+
+  /* Surfaces */
+  --surface:  #ffffff;
+  --canvas:   #f6fafc;
+  --border:   #e2eaf0;
+}
+
+/* ─── RESET ───────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:14px;color:#1e293b;background:var(--canvas);
+  display:flex;height:100vh;overflow:hidden;
+}
+
+/* ─── SIDEBAR (240px) ─────────────────────────────────── */
+.sidebar{
+  width:240px;min-width:240px;background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow-y:auto;
+}
+.sidebar-brand{
+  display:flex;align-items:center;gap:10px;
+  padding:20px 18px 16px;border-bottom:1px solid var(--border);
+}
+.brand-icon{
+  width:36px;height:36px;background:var(--sky-bg);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.brand-icon svg{color:var(--sky);}
+.brand-name{font-size:15px;font-weight:700;color:#1e293b;line-height:1.2;}
+.brand-sub{font-size:11px;color:#94a3b8;letter-spacing:.04em;}
+
+/* Entity / region switcher pill */
+.region-pill{
+  display:flex;align-items:center;gap:6px;
+  margin:12px 18px;padding:7px 12px;
+  background:var(--sky-bg);border:1px solid #bae6fd;border-radius:20px;
+  font-size:12px;font-weight:600;color:var(--sky);cursor:pointer;
+}
+.region-pill svg{color:var(--sky);}
+
+/* Nav groups */
+.nav-section{padding:8px 0;}
+.nav-label{
+  font-size:10px;font-weight:700;letter-spacing:.08em;color:#94a3b8;
+  text-transform:uppercase;padding:8px 18px 4px;
+}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:9px 18px;
+  font-size:13px;font-weight:500;color:#64748b;cursor:pointer;
+  border-left:3px solid transparent;
+  transition:background .12s,color .12s;
+}
+.nav-item:hover{background:#f8fafc;color:#1e293b;}
+.nav-item.active{background:var(--sky-bg);color:var(--sky);border-left-color:var(--sky);font-weight:600;}
+.nav-item svg{width:16px;height:16px;flex-shrink:0;}
+.nav-badge{
+  margin-left:auto;background:var(--coral-bg);color:var(--coral);
+  font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;
+}
+
+/* Agent footer */
+.sidebar-footer{
+  margin-top:auto;border-top:1px solid var(--border);
+  padding:14px 18px;display:flex;align-items:center;gap:10px;
+}
+.avatar-sm{
+  width:32px;height:32px;border-radius:50%;
+  background:linear-gradient(135deg,var(--sky) 0%,var(--coral) 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:#fff;flex-shrink:0;
+}
+.footer-name{font-size:12px;font-weight:600;color:#1e293b;}
+.footer-role{font-size:11px;color:#94a3b8;}
+.footer-logout{margin-left:auto;color:#94a3b8;cursor:pointer;}
+.footer-logout:hover{color:var(--coral);}
+
+/* ─── MAIN ────────────────────────────────────────────── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+/* ─── TOPBAR (60px) ───────────────────────────────────── */
+.topbar{
+  height:60px;min-height:60px;background:var(--surface);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 24px;gap:16px;
+}
+.topbar-title h1{font-size:16px;font-weight:700;color:#1e293b;line-height:1;}
+.topbar-breadcrumb{font-size:11px;color:#94a3b8;margin-top:2px;}
+.topbar-breadcrumb span{color:var(--sky);}
+.topbar-search{
+  flex:1;max-width:340px;display:flex;align-items:center;gap:8px;
+  background:#f8fafc;border:1px solid var(--border);border-radius:20px;
+  padding:7px 14px;margin:0 auto;
+}
+.topbar-search input{border:none;background:transparent;outline:none;font-size:13px;color:#1e293b;width:100%;font-family:inherit;}
+.topbar-search input::placeholder{color:#94a3b8;}
+.topbar-search svg{color:#94a3b8;flex-shrink:0;}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.date-chip{
+  display:flex;align-items:center;gap:6px;border:1px solid var(--sky);
+  border-radius:20px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--sky);
+  cursor:pointer;white-space:nowrap;
+}
+.date-chip svg{color:var(--sky);}
+.bell-wrap{position:relative;cursor:pointer;display:flex;align-items:center;}
+.bell-dot{position:absolute;top:0;right:0;width:8px;height:8px;border-radius:50%;background:var(--coral);border:2px solid var(--surface);}
+.topbar-avatar{display:flex;align-items:center;gap:8px;cursor:pointer;}
+.avatar-md{
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,var(--sky) 0%,var(--coral) 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:#fff;
+}
+.avatar-label{font-size:13px;font-weight:600;color:#1e293b;}
+
+/* ─── CONTENT ─────────────────────────────────────────── */
+.content{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:20px;}
+
+/* ─── CARD ────────────────────────────────────────────── */
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;box-shadow:0 2px 12px rgba(14,165,233,.05);
+}
+.card-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px;border-bottom:1px solid var(--border);
+}
+.card-title{font-size:14px;font-weight:700;color:#1e293b;}
+
+/* ─── PILLS ───────────────────────────────────────────── */
+.pill{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 9px;border-radius:20px;}
+.pill-green{background:var(--green-bg);color:var(--green);}
+.pill-amber{background:var(--amber-bg);color:var(--amber);}
+.pill-coral{background:var(--coral-bg);color:var(--coral);}
+
+/* ─── BUTTONS ─────────────────────────────────────────── */
+.btn-ghost{
+  padding:8px 18px;border:1px solid var(--border);border-radius:20px;
+  background:var(--surface);font-size:13px;font-weight:600;color:#64748b;
+  cursor:pointer;font-family:inherit;
+}
+.btn-ghost:hover{background:#f8fafc;}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--sky);color:#fff;border:none;
+  padding:8px 16px;border-radius:20px;font-size:13px;font-weight:600;
+  cursor:pointer;font-family:inherit;
+}
+.btn-primary:hover{background:var(--sky-lt);}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed;}
+
+/* ─── TABLE ───────────────────────────────────────────── */
+table{width:100%;border-collapse:collapse;}
+thead tr{background:#f8fafc;}
+th{
+  font-size:10px;font-weight:700;letter-spacing:.07em;color:#94a3b8;
+  text-transform:uppercase;padding:11px 16px;text-align:left;
+  border-bottom:1px solid var(--border);white-space:nowrap;
+}
+td{padding:12px 16px;font-size:13px;color:#1e293b;border-bottom:1px solid var(--border);vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:var(--sky-bg);}
+.ref{font-family:"Courier New",monospace;font-size:12px;font-weight:700;color:#64748b;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR — copy and customize nav groups for the real domain -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">
+      <!-- Replace with the real brand glyph; keep stroke=currentColor, color:var(--sky) -->
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <circle cx="10" cy="10" r="8.5" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M10 5v1M10 14v1M5 10h1M14 10h1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="10" cy="10" r="1" fill="currentColor"/>
+      </svg>
+    </div>
+    <div>
+      <div class="brand-name">{Brand name}</div>
+      <div class="brand-sub">{Sub-line}</div>
+    </div>
+  </div>
+
+  <!-- Entity / region switcher -->
+  <div class="region-pill">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+      <circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.3"/>
+      <path d="M2 6h8M6 1c-1.5 1.5-2 3-2 5s.5 3.5 2 5M6 1c1.5 1.5 2 3 2 5s-.5 3.5-2 5" stroke="currentColor" stroke-width="1"/>
+    </svg>
+    {Entity / Region label}
+    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style="margin-left:auto">
+      <path d="M2.5 4l2.5 2.5L7.5 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <nav>
+    <!-- Repeat .nav-section for each group; add .active to the current page item -->
+    <div class="nav-section">
+      <div class="nav-label">{Group label}</div>
+      <div class="nav-item active">
+        <svg viewBox="0 0 16 16" fill="none"><!-- icon --></svg>
+        {Nav item}
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 16 16" fill="none"><!-- icon --></svg>
+        {Nav item}
+        <!-- optional: <span class="nav-badge">{count}</span> -->
+      </div>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="avatar-sm">{initials}</div>
+    <div>
+      <div class="footer-name">{Agent name}</div>
+      <div class="footer-role">{Role}</div>
+    </div>
+    <div class="footer-logout" title="Logout">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 14H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h3M11 11l3-3-3-3M14 8H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-title">
+      <h1>{Page title}</h1>
+      <div class="topbar-breadcrumb">{Brand} / <span>{Section}</span></div>
+    </div>
+    <div class="topbar-search">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M9.5 9.5l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <input type="text" placeholder="Search {entities}…" readonly>
+    </div>
+    <div class="topbar-right">
+      <div class="date-chip">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <rect x="1" y="3" width="11" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+          <path d="M4 1v2M9 1v2M1 6h11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        {date range}
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+          <path d="M2.5 4l2.5 2.5L7.5 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="bell-wrap">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M10 2a6 6 0 0 1 6 6v3l1.5 2H2.5L4 11V8a6 6 0 0 1 6-6z" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M8 16a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <span class="bell-dot"></span>
+      </div>
+      <div class="topbar-avatar">
+        <div class="avatar-md">{initials}</div>
+        <span class="avatar-label">{Name}</span>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M2.5 5l3.5 3.5L9.5 5" stroke="#64748b" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENT SLOT — paste region skeletons from references/layouts.md here -->
+  <div class="content">
+    <!-- e.g. KPI card row, two-column grid, records table, form, detail… -->
+  </div>
+
+</div>
+</body>
+</html>

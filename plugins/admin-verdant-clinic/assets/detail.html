@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Record Detail</title>
+<style>
+:root {
+  --accent-emerald:      #10b981;
+  --accent-teal:         #0d9488;
+  --accent-emerald-dim:  #ecfdf5;
+  --accent-teal-dim:     #ccfbf1;
+  --status-stable-bg:    #d1fae5;
+  --status-stable-text:  #065f46;
+  --status-pending-bg:   #fef3c7;
+  --status-pending-text: #92400e;
+  --status-urgent-bg:    #fce7f3;
+  --status-urgent-text:  #9d174d;
+  --status-info-bg:      #dbeafe;
+  --status-info-text:    #1e40af;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px; line-height: 1.5;
+  background: #f7faf9; color: #1e293b;
+  display: flex; height: 100vh; overflow: hidden;
+}
+a { color: var(--accent-emerald); text-decoration: none; }
+button { cursor: pointer; border: none; background: none; font: inherit; }
+
+/* Sidebar */
+.sidebar { width: 240px; min-width: 240px; background: #fff; border-right: 1px solid #e3ece9; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; }
+.sidebar-logo { display: flex; align-items: center; gap: 10px; padding: 20px 18px 16px; border-bottom: 1px solid #e3ece9; }
+.logo-icon { width: 32px; height: 32px; flex-shrink: 0; }
+.logo-text { font-size: 15px; font-weight: 700; color: #1e293b; letter-spacing: -.2px; }
+.logo-text span { color: var(--accent-emerald); }
+.entity-switcher { margin: 14px 12px 6px; padding: 8px 10px; background: #f7faf9; border: 1px solid #e3ece9; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; font-size: 13px; color: #475569; font-weight: 500; }
+.nav-group { padding: 10px 0 4px; }
+.nav-group-label { padding: 0 18px 4px; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #94a3b8; }
+.nav-item { display: flex; align-items: center; gap: 9px; padding: 7px 14px 7px 16px; margin: 1px 8px; border-radius: 7px; color: #475569; font-size: 13.5px; font-weight: 500; cursor: pointer; transition: background .13s, color .13s; position: relative; }
+.nav-item:hover { background: #f1f5f3; color: #1e293b; }
+.nav-item.active { background: var(--accent-emerald-dim); color: var(--accent-emerald); font-weight: 600; }
+.nav-item.active::before { content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 3px; background: var(--accent-emerald); border-radius: 0 3px 3px 0; }
+.sidebar-footer { margin-top: auto; padding: 14px 12px; border-top: 1px solid #e3ece9; display: flex; align-items: center; gap: 10px; }
+.sidebar-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--accent-emerald); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.sidebar-user { flex: 1; min-width: 0; }
+.sidebar-user-name { font-size: 13px; font-weight: 600; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar-user-role { font-size: 11px; color: #94a3b8; }
+
+/* Main */
+.main-area { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+.topbar { height: 60px; background: #fff; border-bottom: 1px solid #e3ece9; display: flex; align-items: center; padding: 0 24px; gap: 16px; flex-shrink: 0; }
+.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #94a3b8; }
+.breadcrumb-sep { color: #cbd5e1; }
+.breadcrumb-current { color: #1e293b; font-weight: 600; }
+.search-wrap { flex: 1; max-width: 360px; position: relative; }
+.search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #94a3b8; pointer-events: none; }
+.search-input { width: 100%; padding: 7px 12px 7px 34px; background: #f7faf9; border: 1px solid #e3ece9; border-radius: 8px; font-size: 13px; color: #1e293b; outline: none; }
+.search-input::placeholder { color: #94a3b8; }
+.topbar-right { display: flex; align-items: center; gap: 14px; margin-left: auto; }
+.date-badge { font-size: 12px; font-weight: 600; color: #475569; background: #f1f5f3; padding: 4px 10px; border-radius: 6px; }
+.top-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--accent-emerald); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; cursor: pointer; border: 2px solid var(--accent-emerald-dim); }
+
+.page-body { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+
+/* Breadcrumb trail */
+.bc-trail { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #94a3b8; }
+.bc-trail a { color: var(--accent-emerald); }
+.bc-trail span { color: #cbd5e1; }
+.bc-trail strong { color: #1e293b; }
+
+/* Detail header band */
+.detail-header {
+  background: #fff; border: 1px solid #e3ece9; border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+  padding: 20px 24px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.detail-title-block { display: flex; flex-direction: column; gap: 4px; }
+.detail-id-row { display: flex; align-items: center; gap: 10px; }
+.detail-entity-dot {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--accent-emerald);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.detail-id { font-family: "Courier New", monospace; font-size: 13px; color: #64748b; background: #f1f5f3; padding: 3px 8px; border-radius: 5px; }
+.status-pill { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.pill-stable  { background: var(--status-stable-bg);  color: var(--status-stable-text); }
+.pill-pending { background: var(--status-pending-bg); color: var(--status-pending-text); }
+.pill-urgent  { background: var(--status-urgent-bg);  color: var(--status-urgent-text); }
+.pill-info    { background: var(--status-info-bg);    color: var(--status-info-text); }
+.detail-name { font-size: 22px; font-weight: 800; color: #0f172a; letter-spacing: -.4px; }
+.detail-sub  { font-size: 13px; color: #94a3b8; }
+.detail-actions { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
+.btn-ghost { padding: 7px 14px; border: 1px solid #e3ece9; border-radius: 8px; font-size: 13px; font-weight: 500; color: #475569; background: #fff; transition: border-color .13s, color .13s; cursor: pointer; }
+.btn-ghost:hover { border-color: var(--accent-emerald); color: var(--accent-emerald); }
+.btn-primary { padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; color: #fff; background: var(--accent-emerald); transition: background .13s; cursor: pointer; }
+.btn-primary:hover { background: var(--accent-teal); }
+
+/* Meta card */
+.card { background: #fff; border: 1px solid #e3ece9; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.05); overflow: hidden; }
+.card-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid #e3ece9; }
+.card-title { font-size: 14px; font-weight: 700; color: #1e293b; }
+.card-subtitle { font-size: 12px; color: #94a3b8; margin-top: 1px; }
+.meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
+.meta-cell { padding: 16px 20px; border-right: 1px solid #e3ece9; border-bottom: 1px solid #e3ece9; }
+.meta-cell:nth-child(3n) { border-right: none; }
+.meta-cell:nth-last-child(-n+3) { border-bottom: none; }
+.meta-label { font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #94a3b8; margin-bottom: 4px; }
+.meta-value { font-size: 14px; font-weight: 600; color: #1e293b; }
+.meta-sub { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+
+/* Two-col lower section */
+.lower-grid { display: grid; grid-template-columns: 7fr 5fr; gap: 16px; align-items: start; }
+@media (max-width: 1100px) { .lower-grid { grid-template-columns: 1fr; } }
+
+/* Related sessions table */
+.rel-table { width: 100%; border-collapse: collapse; }
+.rel-table thead th { padding: 8px 16px; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #94a3b8; text-align: left; background: #fafcfb; border-bottom: 1px solid #e3ece9; }
+.rel-table tbody tr { border-bottom: 1px solid #f1f5f3; transition: background .1s; }
+.rel-table tbody tr:last-child { border-bottom: none; }
+.rel-table tbody tr:hover { background: #f7faf9; }
+.rel-table tbody td { padding: 10px 16px; font-size: 13px; color: #475569; vertical-align: middle; font-variant-numeric: tabular-nums; }
+.rel-id { font-family: "Courier New", monospace; font-size: 12px; color: #64748b; background: #f1f5f3; padding: 2px 5px; border-radius: 4px; }
+
+/* Activity feed */
+.activity-list { padding: 16px 20px; display: flex; flex-direction: column; gap: 16px; }
+.activity-item { display: flex; gap: 12px; }
+.activity-dot-wrap { display: flex; flex-direction: column; align-items: center; gap: 0; }
+.activity-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent-emerald); flex-shrink: 0; margin-top: 3px; }
+.activity-dot.muted { background: #e3ece9; }
+.activity-line { flex: 1; width: 1px; background: #e3ece9; margin: 4px 0; min-height: 24px; }
+.activity-body { flex: 1; }
+.activity-action { font-size: 13px; font-weight: 600; color: #1e293b; }
+.activity-meta { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg class="logo-icon" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <rect width="32" height="32" rx="8" fill="var(--accent-emerald-dim)"/>
+      <rect x="14" y="7" width="4" height="18" rx="2" fill="var(--accent-emerald)"/>
+      <rect x="7"  y="14" width="18" height="4" rx="2" fill="var(--accent-emerald)"/>
+    </svg>
+    <span class="logo-text"><span>Verdant</span> Admin</span>
+  </div>
+  <div class="entity-switcher" role="combobox" aria-label="Entity">
+    <span>General Practice</span>
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <nav aria-label="Main navigation">
+    <div class="nav-group">
+      <div class="nav-group-label">Overview</div>
+      <div class="nav-item" role="link" tabindex="0">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2" y="2" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="11" y="2" width="7" height="7" rx="1.5" fill="currentColor" opacity=".45"/><rect x="2" y="11" width="7" height="7" rx="1.5" fill="currentColor" opacity=".45"/><rect x="11" y="11" width="7" height="7" rx="1.5" fill="currentColor" opacity=".45"/></svg>
+        Dashboard
+      </div>
+      <div class="nav-item active" role="link" tabindex="0">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M3 18c0-3.314 3.134-6 7-6s7 2.686 7 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Records
+      </div>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-avatar">SR</div>
+    <div class="sidebar-user">
+      <div class="sidebar-user-name">Dr. S. Reyes</div>
+      <div class="sidebar-user-role">Attending</div>
+    </div>
+  </div>
+</aside>
+
+<div class="main-area">
+  <header class="topbar" role="banner">
+    <div class="breadcrumb">
+      <span>Records</span>
+      <span class="breadcrumb-sep">/</span>
+      <span class="breadcrumb-current">ID-40812</span>
+    </div>
+    <div class="search-wrap" role="search">
+      <svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.6"/><path d="M13 13l4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <input class="search-input" type="search" placeholder="Search records…" aria-label="Search" />
+    </div>
+    <div class="topbar-right">
+      <div class="date-badge">Mon, 2 Jun 2026</div>
+      <div class="top-avatar">SR</div>
+    </div>
+  </header>
+
+  <main class="page-body">
+
+    <!-- Breadcrumb trail -->
+    <nav class="bc-trail" aria-label="Breadcrumb">
+      <a href="#">Records</a>
+      <span>/</span>
+      <strong>ID-40812</strong>
+    </nav>
+
+    <!-- Detail header band -->
+    <div class="detail-header">
+      <div class="detail-title-block">
+        <div class="detail-id-row">
+          <div class="detail-entity-dot" aria-hidden="true">LM</div>
+          <div>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <span class="detail-id">ID-40812</span>
+              <span class="status-pill pill-stable">Active</span>
+              <span class="status-pill pill-info">Completed Today</span>
+            </div>
+            <div class="detail-name" style="margin-top:4px;">Lena Moura</div>
+            <div class="detail-sub">DOB 1988-04-12 · Group A · Gen. Practice</div>
+          </div>
+        </div>
+      </div>
+      <div class="detail-actions">
+        <button class="btn-ghost">Archive</button>
+        <button class="btn-ghost">Print</button>
+        <button class="btn-primary">Edit Record</button>
+      </div>
+    </div>
+
+    <!-- Meta grid card -->
+    <div class="card" aria-label="Record details">
+      <div class="meta-grid">
+        <div class="meta-cell">
+          <div class="meta-label">Category</div>
+          <div class="meta-value">Group A</div>
+          <div class="meta-sub">General Practice</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Session Type</div>
+          <div class="meta-value">Annual Review</div>
+          <div class="meta-sub">Scheduled annually</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Assigned Provider</div>
+          <div class="meta-value">Dr. S. Reyes</div>
+          <div class="meta-sub">Primary</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Location / Slot</div>
+          <div class="meta-value">Room 3</div>
+          <div class="meta-sub">08:30 — 09:00</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Priority</div>
+          <div class="meta-value">Standard</div>
+          <div class="meta-sub">No escalation</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Created</div>
+          <div class="meta-value">25 May 2026</div>
+          <div class="meta-sub">By Dr. S. Reyes</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lower two-col grid -->
+    <div class="lower-grid">
+
+      <!-- Related sessions table -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Related Sessions</div>
+            <div class="card-subtitle">All sessions for this record · most recent first</div>
+          </div>
+          <a href="#" style="font-size:12px;font-weight:600;color:var(--accent-emerald);">View all</a>
+        </div>
+        <table class="rel-table" aria-label="Related sessions">
+          <thead>
+            <tr><th>Session ID</th><th>Type</th><th>Provider</th><th>Date</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="rel-id">SES-8812</span></td>
+              <td>Annual Review</td>
+              <td>Dr. S. Reyes</td>
+              <td>Today 08:30</td>
+              <td><span class="status-pill pill-info">Completed</span></td>
+            </tr>
+            <tr>
+              <td><span class="rel-id">SES-7201</span></td>
+              <td>Follow-up</td>
+              <td>Dr. A. Moura</td>
+              <td>14 Mar 2026</td>
+              <td><span class="status-pill pill-info">Completed</span></td>
+            </tr>
+            <tr>
+              <td><span class="rel-id">SES-6548</span></td>
+              <td>Annual Review</td>
+              <td>Dr. S. Reyes</td>
+              <td>22 May 2025</td>
+              <td><span class="status-pill pill-info">Completed</span></td>
+            </tr>
+            <tr>
+              <td><span class="rel-id">SES-5330</span></td>
+              <td>Emergency</td>
+              <td>Dr. P. Costa</td>
+              <td>03 Jan 2025</td>
+              <td><span class="status-pill pill-urgent">Urgent</span></td>
+            </tr>
+            <tr>
+              <td><span class="rel-id">SES-4917</span></td>
+              <td>Follow-up</td>
+              <td>Dr. S. Reyes</td>
+              <td>08 Nov 2024</td>
+              <td><span class="status-pill pill-info">Completed</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Activity feed -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Activity</div>
+        </div>
+        <div class="activity-list" role="list" aria-label="Record activity">
+          <div class="activity-item" role="listitem">
+            <div class="activity-dot-wrap">
+              <div class="activity-dot"></div>
+              <div class="activity-line"></div>
+            </div>
+            <div class="activity-body">
+              <div class="activity-action">Session SES-8812 completed</div>
+              <div class="activity-meta">Today 09:02 · Dr. S. Reyes</div>
+            </div>
+          </div>
+          <div class="activity-item" role="listitem">
+            <div class="activity-dot-wrap">
+              <div class="activity-dot muted"></div>
+              <div class="activity-line"></div>
+            </div>
+            <div class="activity-body">
+              <div class="activity-action">Session SES-8812 started</div>
+              <div class="activity-meta">Today 08:31 · Room 3</div>
+            </div>
+          </div>
+          <div class="activity-item" role="listitem">
+            <div class="activity-dot-wrap">
+              <div class="activity-dot muted"></div>
+              <div class="activity-line"></div>
+            </div>
+            <div class="activity-body">
+              <div class="activity-action">Session SES-8812 scheduled</div>
+              <div class="activity-meta">29 May 2026 · Dr. S. Reyes</div>
+            </div>
+          </div>
+          <div class="activity-item" role="listitem">
+            <div class="activity-dot-wrap">
+              <div class="activity-dot muted"></div>
+              <div class="activity-line"></div>
+            </div>
+            <div class="activity-body">
+              <div class="activity-action">Record updated — category changed</div>
+              <div class="activity-meta">14 Mar 2026 · System</div>
+            </div>
+          </div>
+          <div class="activity-item" role="listitem">
+            <div class="activity-dot-wrap">
+              <div class="activity-dot muted"></div>
+            </div>
+            <div class="activity-body">
+              <div class="activity-action">Record created</div>
+              <div class="activity-meta">15 Apr 2022 · Admin</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /lower-grid -->
+
+  </main>
+</div>
+
+</body>
+</html>

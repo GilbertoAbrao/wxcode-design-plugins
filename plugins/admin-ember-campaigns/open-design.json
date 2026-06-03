@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-ember-campaigns",
-  "title": "Ember Campaigns Admin",
-  "version": "0.1.0",
-  "description": "Vibrant-but-clean marketing command centre \u2014 left sidebar, topbar with date-range filter, 4 KPI cards (reach / CTR / spend / ROAS) with inline SVG sparklines, a multi-series campaign performance chart, a conversion funnel, and a campaigns table with channel chips and status pills. Rose-pink accent on white/slate canvas.",
+  "title": "Ember Admin",
+  "version": "0.2.0",
+  "description": "Vibrant-but-clean light-mode admin aesthetic: white/#fafafa canvas, rose-pink accent (#e11d48) on a slate neutral ramp, secondary indigo for chart contrast, #ececf0 borders. Left sidebar with brand icon + nav sections + footer cluster, sticky topbar with search + date-range + bell + avatar, 4 KPI cards with inline SVG sparklines and delta chips, a 7/5 split middle row (multi-series SVG line chart + conversion funnel bars), and a full-width records table with typed channel chips and status pills.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -16,16 +16,16 @@
     "wxcode",
     "first-party",
     "prototype",
-    "marketing",
     "web",
     "admin",
-    "campaigns",
-    "analytics",
     "light-mode",
     "rose-accent",
     "vibrant",
-    "funnel",
-    "campaign-management"
+    "analytics",
+    "sidebar",
+    "sparkline",
+    "funnel-chart",
+    "multi-series-chart"
   ],
   "compat": {
     "agentSkills": [
@@ -38,7 +38,7 @@
     "kind": "scenario",
     "taskKind": "new-generation",
     "mode": "prototype",
-    "scenario": "marketing",
+    "scenario": "analytics",
     "surface": "web",
     "preview": {
       "type": "html",
@@ -46,13 +46,29 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a marketing campaign analytics admin \u2014 left sidebar, date-range topbar, 4 KPI cards with sparklines, multi-series performance chart, conversion funnel, and campaigns table with channel chips.",
-        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me a marketing campaign analytics admin \u2014 left sidebar, date-range topbar, 4 KPI cards with sparklines, multi-series performance chart, conversion funnel, and campaigns table with channel chips."
+        "en": "Apply this vibrant rose-accent light-mode admin aesthetic to my domain",
+        "zh-CN": "使用这个充满活力的玫瑰色调浅色模式管理界面风格来构建我的应用"
       },
       "exampleOutputs": [
         {
-          "path": "./example.html",
-          "title": "Ember Campaigns Admin"
+          "path": "./assets/dashboard.html",
+          "title": "Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Records List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "New Record Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Record Detail"
+        },
+        {
+          "path": "./assets/template.html",
+          "title": "Screen Seed Template"
         }
       ]
     },
@@ -70,7 +86,12 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {

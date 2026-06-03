@@ -4,7 +4,7 @@
   "name": "wxcode-admin-neobrutal",
   "title": "Neobrutalist Admin",
   "version": "0.1.0",
-  "description": "A neo-brutalist admin dashboard \u2014 thick black borders, hard 4px offset shadows, vibrant pastel blocks (coral / lime / cream), monospaced numerics. Use when the brief asks for an admin with personality: 'brutalist admin', 'pastel dashboard', 'bold borders', 'flat blocks'.",
+  "description": "Neo-brutalist admin aesthetic: white canvas with thick black borders (2–3px), hard 4px offset shadows (no blur), vibrant pastel accent blocks (coral #F5A86E, lime #8FD14F, cream #FFF5E6), monospace numerics and uppercase micro-labels, zero border-radius everywhere. Archetype = left sidebar (brand block + monospace nav glyphs + user footer) + top bar (cream search slab + lime CTA) + 4 stat tiles with coloured top-border accents + 2-column content grid (records table + activity feed) + footer meta strip, plus matching list, form, and detail screens.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -21,8 +21,11 @@
     "admin",
     "neobrutalism",
     "bold-borders",
+    "hard-shadow",
+    "pastel-blocks",
+    "monospace",
     "high-contrast",
-    "pastel-blocks"
+    "zero-radius"
   ],
   "compat": {
     "agentSkills": [
@@ -43,13 +46,25 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a neo-brutalist admin panel for a creative studio \u2014 bold black borders, pastel blocks, sidebar, stat tiles, project table, recent activity.",
-        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me a neo-brutalist admin panel for a creative studio \u2014 bold black borders, pastel blocks, sidebar, stat tiles, project table, recent activity."
+        "en": "Apply this neo-brutalist admin aesthetic to my domain — white canvas, thick black borders, hard offset shadows, pastel accent blocks (coral/lime/cream), monospace type, zero border-radius, left sidebar, stat tiles, records table, and activity feed, plus list, form, and detail screens.",
+        "zh-CN": "将这个野兽派管理界面风格应用到我的领域：白色底色、粗黑边框、硬阴影、珊瑚/青柠/奶油色调色块、等宽字体、零圆角，配套左侧栏、统计卡片、记录表格和动态流，以及列表、表单和详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Neobrutalist Admin"
+          "title": "Neobrutalist Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Neobrutalist Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Neobrutalist Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Neobrutalist Admin — Detail"
         }
       ]
     },
@@ -67,7 +82,13 @@
         "state-coverage"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {
@@ -84,6 +105,10 @@
     "capabilities": [
       "prompt:inject",
       "fs:write"
-    ]
+    ],
+    "provenance": {
+      "category": "admin-dashboards",
+      "note": "original archetype; no third-party template reproduced"
+    }
   }
 }

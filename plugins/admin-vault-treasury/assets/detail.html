@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vault Admin — Transaction TXN-240601</title>
+<style>
+  :root {
+    --bg-shell:   #0a0f1e;
+    --bg-panel:   #121a2e;
+    --bg-raised:  #1b2640;
+    --bg-hover:   #1e2e4a;
+    --border:     #243049;
+    --text-primary:  #e5e9f0;
+    --text-secondary:#c5cdd7;
+    --text-muted:    #8b97ad;
+    --text-faint:    #4e5e7a;
+    --accent:     #f59e0b;
+    --accent-hi:  #fbbf24;
+    --accent-dk:  #b45309;
+    --green:      #34d399;
+    --red:        #f87171;
+    --pill-green-bg: rgba(52,211,153,0.12);
+    --pill-amber-bg: rgba(245,158,11,0.14);
+    --pill-red-bg:   rgba(248,113,113,0.12);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+    background: var(--bg-shell);
+    color: var(--text-primary);
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── LEFT RAIL NAV ──────────────────────────────────────────────── */
+  .rail { width: 220px; min-width: 220px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+  .rail-brand { display: flex; align-items: center; gap: 10px; padding: 20px 18px 18px; border-bottom: 1px solid var(--border); }
+  .rail-brand-mark { width: 32px; height: 32px; flex-shrink: 0; }
+  .rail-brand-name { font-size: 15px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; line-height: 1.2; }
+  .rail-brand-sub  { font-size: 10px; color: var(--accent); letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; }
+  .rail-nav { flex: 1; overflow-y: auto; padding: 12px 0; scrollbar-width: none; }
+  .rail-nav::-webkit-scrollbar { display: none; }
+  .nav-group-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-faint); padding: 14px 18px 4px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 18px; color: var(--text-muted); cursor: pointer; border-left: 2px solid transparent; transition: background 0.14s, color 0.14s, border-color 0.14s; font-size: 13.5px; }
+  .nav-item:hover { background: var(--bg-raised); color: var(--text-primary); }
+  .nav-item.active { border-left-color: var(--accent); background: var(--bg-raised); color: var(--accent-hi); font-weight: 600; }
+  .nav-item svg { flex-shrink: 0; opacity: 0.75; }
+  .nav-item.active svg { opacity: 1; color: var(--accent-hi); }
+  .nav-badge { margin-left: auto; background: var(--accent); color: #0a0f1e; font-size: 10px; font-weight: 700; border-radius: 20px; padding: 1px 6px; line-height: 1.6; }
+  .rail-bottom { border-top: 1px solid var(--border); padding: 12px 0; }
+
+  /* ── MAIN ───────────────────────────────────────────────────────── */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+  /* ── TOPBAR ──────────────────────────────────────────────────────── */
+  .topbar { height: 60px; min-height: 60px; background: var(--bg-panel); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 16px; }
+  .entity-switcher { display: flex; align-items: center; gap: 8px; background: var(--bg-raised); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+  .entity-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+  .entity-name { font-size: 13px; font-weight: 600; color: var(--text-primary); white-space: nowrap; }
+  .entity-chevron { color: var(--text-muted); }
+  .topbar-spacer { flex: 1; }
+  .topbar-actions { display: flex; align-items: center; gap: 12px; }
+  .topbar-icon-btn { position: relative; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted); background: var(--bg-raised); border: 1px solid var(--border); }
+  .topbar-icon-btn:hover { color: var(--text-primary); }
+  .notif-dot { position: absolute; top: 7px; right: 7px; width: 6px; height: 6px; border-radius: 50%; background: var(--red); border: 1.5px solid var(--bg-panel); }
+  .avatar-group { display: flex; align-items: center; gap: 9px; cursor: pointer; }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dk) 100%); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #0a0f1e; flex-shrink: 0; }
+  .avatar-info { line-height: 1.3; }
+  .avatar-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .avatar-role  { font-size: 11px; color: var(--text-muted); }
+
+  /* ── CONTENT ─────────────────────────────────────────────────────── */
+  .content { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+  .content::-webkit-scrollbar { width: 6px; }
+  .content::-webkit-scrollbar-track { background: transparent; }
+  .content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .breadcrumb { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text-faint); }
+  .breadcrumb a { color: var(--text-muted); text-decoration: none; }
+  .breadcrumb a:hover { color: var(--accent-hi); }
+
+  /* Detail header band */
+  .detail-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .detail-id-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .detail-id { font-family: "Courier New", monospace; font-size: 16px; font-weight: 700; color: var(--text-primary); letter-spacing: 0.01em; }
+  .status-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; letter-spacing: 0.02em; }
+  .status-settled  { background: var(--pill-green-bg); color: var(--green); }
+  .status-pending  { background: var(--pill-amber-bg); color: var(--accent-hi); }
+  .status-rejected { background: var(--pill-red-bg);   color: var(--red); }
+  .detail-counterparty { font-size: 15px; font-weight: 500; color: var(--text-secondary); }
+  .detail-actions { display: flex; gap: 10px; align-items: center; }
+
+  .btn-ghost {
+    background: transparent; border: 1px solid var(--border); color: var(--text-muted);
+    font-size: 13px; font-weight: 600; padding: 7px 14px; border-radius: 8px; cursor: pointer;
+    display: flex; align-items: center; gap: 6px; font-family: inherit; transition: color 0.12s, border-color 0.12s;
+  }
+  .btn-ghost:hover { color: var(--text-primary); border-color: var(--text-muted); }
+  .btn-primary {
+    background: var(--accent); border: none; color: #0a0f1e;
+    font-size: 13px; font-weight: 700; padding: 7px 16px; border-radius: 8px; cursor: pointer;
+    display: flex; align-items: center; gap: 6px; font-family: inherit; transition: background 0.12s;
+  }
+  .btn-primary:hover { background: var(--accent-hi); }
+
+  /* ── CARDS ───────────────────────────────────────────────────────── */
+  .card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .card-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+  .card-title { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+
+  /* Meta grid: 3 columns */
+  .meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
+  .meta-cell { padding: 16px 18px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .meta-cell:nth-child(3n) { border-right: none; }
+  .meta-cell:nth-last-child(-n+3) { border-bottom: none; }
+  .meta-label { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 5px; }
+  .meta-value { font-size: 14px; font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+  .meta-value.positive { color: var(--green); }
+  .meta-value.negative { color: var(--red); }
+  .meta-sub   { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  /* Two-column layout for sub-panels */
+  .two-col { display: grid; grid-template-columns: 7fr 5fr; gap: 16px; align-items: start; }
+
+  /* Settlement details mini-table */
+  table { width: 100%; border-collapse: collapse; }
+  thead th { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint); padding: 0 16px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+  thead th.right { text-align: right; }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--bg-raised); }
+  tbody td { padding: 10px 16px; font-size: 13px; color: var(--text-primary); vertical-align: middle; }
+  .td-label { color: var(--text-muted); font-size: 12px; }
+  .td-mono  { font-family: "Courier New", monospace; font-size: 12px; color: var(--text-secondary); }
+  .td-right { text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* Activity feed */
+  .activity-list { display: flex; flex-direction: column; }
+  .activity-row { display: flex; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--border); align-items: flex-start; }
+  .activity-row:last-child { border-bottom: none; }
+  .activity-dot-col { display: flex; flex-direction: column; align-items: center; padding-top: 3px; }
+  .activity-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+  .activity-dot.green { background: var(--green); }
+  .activity-dot.muted { background: var(--border); }
+  .activity-body { flex: 1; }
+  .activity-event { font-size: 13px; color: var(--text-primary); line-height: 1.4; }
+  .activity-meta  { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ══ LEFT RAIL NAV ════════════════════════════════════════════════ -->
+<nav class="rail" aria-label="Primary navigation">
+  <div class="rail-brand">
+    <svg class="rail-brand-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <rect width="32" height="32" rx="8" fill="#1b2640"/>
+      <rect x="6" y="6" width="20" height="20" rx="5" stroke="#f59e0b" stroke-width="1.5"/>
+      <circle cx="16" cy="16" r="5" stroke="#fbbf24" stroke-width="1.5"/>
+      <circle cx="16" cy="16" r="2" fill="#f59e0b"/>
+      <path d="M16 8v2M16 22v2M8 16h2M22 16h2" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <div class="rail-brand-name">Vault</div>
+      <div class="rail-brand-sub">Admin</div>
+    </div>
+  </div>
+
+  <div class="rail-nav">
+    <div class="nav-group-label">Overview</div>
+    <div class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.6"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.6"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.6"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Cash Position
+    </div>
+
+    <div class="nav-group-label">Transactions</div>
+    <div class="nav-item active">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M1 7h14" stroke="currentColor" stroke-width="1.5"/><path d="M5 11h2M10 11h1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Payments
+    </div>
+    <div class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 5l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Transfers
+    </div>
+    <div class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M5 4l3-3 3 3M5 12l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      FX &amp; Hedging
+    </div>
+
+    <div class="nav-group-label">Management</div>
+    <div class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="2" y="5" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M5 5V4a3 3 0 116 0v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Bank Accounts
+    </div>
+    <div class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Forecasting
+    </div>
+    <div class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h10a1 1 0 001-1V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10 2l4 4-6 6H4v-4l6-6z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Reports
+    </div>
+  </div>
+
+  <div class="rail-bottom">
+    <div class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M2 14c0-3.314 2.686-5 6-5s6 1.686 6 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      M. Fernandez
+    </div>
+  </div>
+</nav>
+
+<!-- ══ MAIN COLUMN ══════════════════════════════════════════════════ -->
+<div class="main">
+
+  <header class="topbar">
+    <div class="entity-switcher" role="button" aria-label="Switch entity">
+      <div class="entity-dot"></div>
+      <span class="entity-name">Halcyon Group — HQ</span>
+      <svg class="entity-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="topbar-spacer"></div>
+    <div class="topbar-actions">
+      <div class="topbar-icon-btn" role="button" aria-label="Notifications">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1a5 5 0 015 5v2.5l1.5 2H1.5L3 8.5V6a5 5 0 015-5zM6.5 13a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="notif-dot"></span>
+      </div>
+      <div class="avatar-group" role="button" aria-label="Account menu">
+        <div class="avatar" aria-hidden="true">MF</div>
+        <div class="avatar-info">
+          <div class="avatar-name">M. Fernandez</div>
+          <div class="avatar-role">Treasury Controller</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="#">Payments</a>
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M3 2l4 3-4 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>TXN-240601</span>
+    </nav>
+
+    <!-- Detail header band -->
+    <div class="detail-header">
+      <div>
+        <div class="detail-id-row">
+          <span class="detail-id">TXN-240601</span>
+          <span class="status-pill status-settled">Settled</span>
+        </div>
+        <div class="detail-counterparty">Meridian Structured Finance · Inbound Wire</div>
+      </div>
+      <div class="detail-actions">
+        <button class="btn-ghost">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1v9M4 7l3 3 3-3M1 11h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Export PDF
+        </button>
+        <button class="btn-ghost">Dispute</button>
+        <button class="btn-primary">Edit</button>
+      </div>
+    </div>
+
+    <!-- Meta grid -->
+    <div class="card">
+      <div class="meta-grid" role="list">
+        <div class="meta-cell" role="listitem">
+          <div class="meta-label">Amount</div>
+          <div class="meta-value positive">+$4,250,000.00</div>
+          <div class="meta-sub">USD · Inbound</div>
+        </div>
+        <div class="meta-cell" role="listitem">
+          <div class="meta-label">Counterparty</div>
+          <div class="meta-value">Meridian Structured Finance</div>
+          <div class="meta-sub">Bank: MSFIUS33</div>
+        </div>
+        <div class="meta-cell" role="listitem">
+          <div class="meta-label">Value Date</div>
+          <div class="meta-value">Jun 01, 2026</div>
+          <div class="meta-sub">Settlement: same day</div>
+        </div>
+        <div class="meta-cell" role="listitem">
+          <div class="meta-label">Payment Type</div>
+          <div class="meta-value">Inbound Wire</div>
+          <div class="meta-sub">SWIFT / CHAPS</div>
+        </div>
+        <div class="meta-cell" role="listitem">
+          <div class="meta-label">Source Account</div>
+          <div class="meta-value">USD Operating</div>
+          <div class="meta-sub">Crestview Bank N.A. · …4821</div>
+        </div>
+        <div class="meta-cell" role="listitem">
+          <div class="meta-label">Initiated By</div>
+          <div class="meta-value">M. Fernandez</div>
+          <div class="meta-sub">Approved · C. Okafor CFO</div>
+        </div>
+        <div class="meta-cell" role="listitem">
+          <div class="meta-label">Reference</div>
+          <div class="meta-value" style="font-family:'Courier New',monospace;font-size:12px">MSF-2026-Q2-0047</div>
+          <div class="meta-sub">Q2 structured facility draw</div>
+        </div>
+        <div class="meta-cell" role="listitem">
+          <div class="meta-label">Created</div>
+          <div class="meta-value">Jun 01, 2026 · 09:14 UTC</div>
+          <div class="meta-sub">Settled 11:32 UTC</div>
+        </div>
+        <div class="meta-cell" role="listitem">
+          <div class="meta-label">FX Rate</div>
+          <div class="meta-value">1.0000</div>
+          <div class="meta-sub">No conversion · USD→USD</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two-column: settlement details + activity feed -->
+    <div class="two-col">
+
+      <!-- Settlement details mini-table -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Settlement Details</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-label">SWIFT / UETR</td>
+              <td class="td-mono">f7c3e1d2-8b24-4a09-be61-3f92dd10a57c</td>
+            </tr>
+            <tr>
+              <td class="td-label">Correspondent Bank</td>
+              <td>JP Morgan Chase — CHASUS33</td>
+            </tr>
+            <tr>
+              <td class="td-label">Intermediary BIC</td>
+              <td class="td-mono">MSFIUS33XXX</td>
+            </tr>
+            <tr>
+              <td class="td-label">Nostro Account</td>
+              <td class="td-mono">001-4821-USD-OPS</td>
+            </tr>
+            <tr>
+              <td class="td-label">Charge Type</td>
+              <td>SHA (shared)</td>
+            </tr>
+            <tr>
+              <td class="td-label">Processing Fee</td>
+              <td class="td-right">$0.00</td>
+            </tr>
+            <tr>
+              <td class="td-label">Net Received</td>
+              <td class="td-right" style="color:var(--green);font-weight:600;font-variant-numeric:tabular-nums">+$4,250,000.00</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Activity feed -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Activity</div>
+        </div>
+        <div class="activity-list" role="log" aria-live="polite">
+          <div class="activity-row">
+            <div class="activity-dot-col"><div class="activity-dot green"></div></div>
+            <div class="activity-body">
+              <div class="activity-event">Transaction settled — funds credited to USD Operating account</div>
+              <div class="activity-meta">Jun 01, 2026 · 11:32 UTC · Automatic</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-dot-col"><div class="activity-dot"></div></div>
+            <div class="activity-body">
+              <div class="activity-event">SWIFT confirmation received (MT910)</div>
+              <div class="activity-meta">Jun 01, 2026 · 11:28 UTC · System</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-dot-col"><div class="activity-dot"></div></div>
+            <div class="activity-body">
+              <div class="activity-event">CFO approval granted — C. Okafor</div>
+              <div class="activity-meta">Jun 01, 2026 · 10:54 UTC · Manual</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-dot-col"><div class="activity-dot"></div></div>
+            <div class="activity-body">
+              <div class="activity-event">Pending confirmation — awaiting SWIFT MT910</div>
+              <div class="activity-meta">Jun 01, 2026 · 09:46 UTC · System</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-dot-col"><div class="activity-dot muted"></div></div>
+            <div class="activity-body">
+              <div class="activity-event">Payment initiated by M. Fernandez</div>
+              <div class="activity-meta">Jun 01, 2026 · 09:14 UTC · M. Fernandez</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>

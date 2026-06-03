@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>New Record Form</title>
+<style>
+:root {
+  --accent:#ea580c;--accent-hover:#c2410c;--accent-light:#fff7ed;
+  --amber:#f59e0b;--amber-light:#fffbeb;
+  --success:#16a34a;--success-light:#f0fdf4;
+  --danger:#dc2626;--danger-light:#fef2f2;
+  --warn:#d97706;
+  --surface:#ffffff;--bg:#f8f9fb;--border:#e6e9ee;
+  --text:#1e293b;--muted:#64748b;
+  --sidebar-bg:#1a2235;--sidebar-text:#94a3b8;--sidebar-active:#ffffff;
+  --radius-sm:6px;--radius-md:10px;
+  --shadow-card:0 1px 4px rgba(0,0,0,.06);
+  --font:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);font-size:14px;color:var(--text);background:var(--bg);min-height:100vh;display:flex}
+button{font-family:var(--font);cursor:pointer;border:none;outline:none}
+input,select,textarea{font-family:var(--font)}
+
+/* Sidebar */
+.sidebar{width:240px;flex-shrink:0;background:var(--sidebar-bg);display:flex;flex-direction:column;min-height:100vh;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar-brand{display:flex;align-items:center;gap:10px;padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.06)}
+.brand-icon{width:34px;height:34px;flex-shrink:0}
+.brand-name{color:#fff;font-size:15px;font-weight:700}
+.brand-sub{color:var(--sidebar-text);font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+.entity-switcher{margin:14px 12px 8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-sm);padding:8px 10px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.switcher-label{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--sidebar-text);margin-bottom:2px}
+.switcher-value{font-size:13px;font-weight:600;color:#fff}
+.nav-group{margin-top:18px}
+.nav-group-label{font-size:10px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;color:rgba(148,163,184,.55);padding:0 18px;margin-bottom:4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 18px;font-size:13px;font-weight:500;color:var(--sidebar-text);cursor:pointer;border-left:3px solid transparent;transition:background .15s,color .15s}
+.nav-item:hover{background:rgba(255,255,255,.04);color:#fff}
+.nav-item.active{background:rgba(234,88,12,.15);border-left-color:var(--accent);color:var(--sidebar-active)}
+.ni{width:16px;height:16px;flex-shrink:0;opacity:.75}
+.sidebar-footer{margin-top:auto;padding:14px 16px;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:10px}
+.sa{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0}
+.sn{font-size:13px;font-weight:600;color:#fff}
+.sr{font-size:10px;color:var(--sidebar-text)}
+
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{height:60px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;position:sticky;top:0;z-index:20}
+.tb-title{font-size:15px;font-weight:700}
+.tb-crumb{font-size:12px;color:var(--muted);margin-top:1px}
+.tb-space{flex:1}
+.bell{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;color:var(--muted)}
+.bell-dot{position:absolute;top:7px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--amber);border:1.5px solid var(--surface)}
+.av-wrap{display:flex;align-items:center;gap:8px;cursor:pointer}
+.av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--amber));display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700}
+.av-name{font-size:13px;font-weight:600}
+
+/* Body */
+.page-body{flex:1;padding:24px;display:flex;flex-direction:column;gap:20px;max-width:800px}
+.page-header{display:flex;align-items:center;justify-content:space-between}
+.page-title{font-size:18px;font-weight:800;letter-spacing:-.02em}
+.page-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.header-actions{display:flex;gap:8px}
+.btn-ghost{height:34px;padding:0 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;color:var(--muted);background:transparent;border:1px solid var(--border);display:flex;align-items:center;gap:5px;transition:border-color .15s,color .15s}
+.btn-ghost:hover{border-color:var(--muted);color:var(--text)}
+.btn-primary{height:34px;padding:0 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;color:#fff;background:var(--accent);display:flex;align-items:center;gap:6px;transition:background .15s}
+.btn-primary:hover:not(:disabled){background:var(--accent-hover)}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed}
+
+/* Form sections */
+.form-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-card);overflow:hidden}
+.section-header{padding:16px 20px;border-bottom:1px solid var(--border)}
+.section-title{font-size:13px;font-weight:700;color:var(--text)}
+.section-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.section-body{padding:20px;display:flex;flex-direction:column;gap:16px}
+
+.field-grid{display:grid;gap:16px}
+.field-grid-2{grid-template-columns:1fr 1fr}
+.field-grid-3{grid-template-columns:1fr 1fr 1fr}
+
+.field{display:flex;flex-direction:column;gap:5px}
+.field-label{font-size:12px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:3px}
+.req{color:var(--accent);font-size:11px}
+.field-input{height:36px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 12px;font-size:13px;color:var(--text);background:var(--surface);transition:border-color .15s}
+.field-input:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px var(--accent-light)}
+.field-input.error{border-color:var(--danger)}
+.field-input.error:focus{box-shadow:0 0 0 3px var(--danger-light)}
+.field-select{height:36px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 12px;font-size:13px;color:var(--text);background:var(--surface);appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M2.5 3.5l2.5 3 2.5-3' stroke='%2364748b' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px;transition:border-color .15s;cursor:pointer}
+.field-select:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px var(--accent-light)}
+.field-select.error{border-color:var(--danger)}
+.field-helper{font-size:11px;color:var(--muted)}
+.field-error{font-size:11px;color:var(--danger);display:flex;align-items:center;gap:4px}
+.field-error svg{flex-shrink:0}
+.field-textarea{width:100%;min-height:80px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-size:13px;color:var(--text);background:var(--surface);resize:vertical;transition:border-color .15s;line-height:1.5}
+.field-textarea:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px var(--accent-light)}
+
+/* Priority radio group */
+.priority-group{display:flex;gap:8px}
+.priority-opt{display:flex;align-items:center;gap:6px;padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);transition:border-color .15s,color .15s,background .15s}
+.priority-opt.selected-standard{border-color:#475569;color:#475569;background:#f1f5f9}
+.priority-opt.selected-express{border-color:var(--amber);color:var(--warn);background:var(--amber-light)}
+.priority-opt.selected-urgent{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+
+/* Form footer */
+.form-footer{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-top:1px solid var(--border);background:var(--bg)}
+.form-footer-note{font-size:12px;color:var(--muted)}
+.form-footer-actions{display:flex;gap:8px}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <svg class="brand-icon" viewBox="0 0 34 34" fill="none">
+      <polygon points="17,2 31,9.5 31,24.5 17,32 3,24.5 3,9.5" fill="var(--accent)" opacity=".9"/>
+      <rect x="10" y="13" width="14" height="9" rx="1.5" fill="white" opacity=".95"/>
+      <path d="M10 16h14" stroke="var(--accent)" stroke-width="1.2"/>
+      <rect x="13" y="11" width="8" height="4" rx="1" fill="white" opacity=".7"/>
+    </svg>
+    <div><div class="brand-name">VexCargo</div><div class="brand-sub">Fleet Ops</div></div>
+  </div>
+  <div class="entity-switcher">
+    <div><div class="switcher-label">Active Hub</div><div class="switcher-value">North Central</div></div>
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="color:var(--sidebar-text)"><path d="M3 4.5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <nav class="nav-group">
+    <div class="nav-group-label">Dispatch</div>
+    <div class="nav-item"><svg class="ni" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor" opacity=".6"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor" opacity=".6"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor" opacity=".6"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor" opacity=".6"/></svg>Overview</div>
+    <div class="nav-item active"><svg class="ni" viewBox="0 0 16 16" fill="none"><rect x="1" y="2" width="3" height="12" rx="1" fill="currentColor"/><rect x="6" y="5" width="3" height="9" rx="1" fill="currentColor"/><rect x="11" y="1" width="3" height="13" rx="1" fill="currentColor"/></svg>Status Board</div>
+  </nav>
+  <nav class="nav-group">
+    <div class="nav-group-label">Fleet</div>
+    <div class="nav-item"><svg class="ni" viewBox="0 0 16 16" fill="none"><rect x="1" y="6" width="10" height="6" rx="1" stroke="currentColor" stroke-width="1.4"/><path d="M11 8h2l2 2v2h-4V8z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="4" cy="13" r="1.5" fill="currentColor"/><circle cx="12" cy="13" r="1.5" fill="currentColor"/></svg>Vehicles</div>
+    <div class="nav-item"><svg class="ni" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Drivers</div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sa">RK</div>
+    <div><div class="sn">Reva Koltzen</div><div class="sr">Fleet Supervisor</div></div>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div><div class="tb-title">New Shipment</div><div class="tb-crumb">Dispatch &rsaquo; Status Board &rsaquo; New Shipment</div></div>
+    <div class="tb-space"></div>
+    <div class="bell"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a5 5 0 00-5 5c0 2.5-.8 3.5-1.5 4h13c-.7-.5-1.5-1.5-1.5-4a5 5 0 00-5-5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M6.5 13a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><div class="bell-dot"></div></div>
+    <div class="av-wrap"><div class="av">RK</div><span class="av-name">Reva K.</span></div>
+  </header>
+
+  <div class="page-body">
+    <div class="page-header">
+      <div>
+        <div class="page-title">New Shipment</div>
+        <div class="page-sub">Fill in origin, destination, carrier, and schedule details</div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-ghost">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Section 1: Route -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-title">Route Details</div>
+        <div class="section-sub">Set the origin, destination, and carrier for this shipment</div>
+      </div>
+      <div class="section-body">
+        <div class="field-grid field-grid-2">
+          <div class="field">
+            <label class="field-label">Origin Hub <span class="req">*</span></label>
+            <select class="field-select">
+              <option value="">Select origin hub&hellip;</option>
+              <option selected>Veron</option>
+              <option>Kalsted</option>
+              <option>Omdra</option>
+              <option>Pelholt</option>
+              <option>Trisca</option>
+              <option>Nuvex</option>
+              <option>Brekka</option>
+              <option>Gorfen</option>
+            </select>
+            <span class="field-helper">Hub where the shipment is picked up</span>
+          </div>
+          <div class="field">
+            <label class="field-label">Destination Hub <span class="req">*</span></label>
+            <select class="field-select error">
+              <option value="">Select destination hub&hellip;</option>
+              <option>Veron</option>
+              <option>Kalsted</option>
+              <option>Omdra</option>
+              <option>Pelholt</option>
+              <option>Trisca</option>
+              <option>Nuvex</option>
+              <option>Brekka</option>
+              <option>Gorfen</option>
+            </select>
+            <span class="field-error"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M6 4v3M6 8.5v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Destination is required</span>
+          </div>
+        </div>
+        <div class="field-grid field-grid-2">
+          <div class="field">
+            <label class="field-label">Carrier <span class="req">*</span></label>
+            <select class="field-select">
+              <option value="">Select carrier&hellip;</option>
+              <option selected>Kaldex Logistics</option>
+              <option>Veron Freight</option>
+              <option>Trisca Haul Co.</option>
+              <option>Orex Trans</option>
+            </select>
+            <span class="field-helper">Carrier must be registered and available</span>
+          </div>
+          <div class="field">
+            <label class="field-label">Assigned Vehicle <span class="req">*</span></label>
+            <select class="field-select">
+              <option value="">Select vehicle&hellip;</option>
+              <option selected>VXC-1182 — Box Truck</option>
+              <option>VXC-2540 — Flatbed</option>
+              <option>VXC-3814 — Refrigerated</option>
+            </select>
+            <span class="field-helper">Only available vehicles are listed</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Schedule -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-title">Schedule</div>
+        <div class="section-sub">Set pickup date and expected delivery window</div>
+      </div>
+      <div class="section-body">
+        <div class="field-grid field-grid-3">
+          <div class="field">
+            <label class="field-label">Pickup Date <span class="req">*</span></label>
+            <input class="field-input" type="date" value="2026-06-04">
+            <span class="field-helper">Must be today or a future date</span>
+          </div>
+          <div class="field">
+            <label class="field-label">Pickup Time <span class="req">*</span></label>
+            <input class="field-input" type="time" value="14:00">
+            <span class="field-helper">Local hub time</span>
+          </div>
+          <div class="field">
+            <label class="field-label">Expected Delivery</label>
+            <input class="field-input" type="date">
+            <span class="field-helper">Leave blank to calculate automatically</span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Priority</label>
+          <div class="priority-group">
+            <div class="priority-opt selected-standard">Standard</div>
+            <div class="priority-opt">Express</div>
+            <div class="priority-opt">Urgent</div>
+          </div>
+          <span class="field-helper">Express and Urgent require supervisor approval</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Cargo -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-title">Cargo Details</div>
+        <div class="section-sub">Describe the cargo contents and handling requirements</div>
+      </div>
+      <div class="section-body">
+        <div class="field-grid field-grid-2">
+          <div class="field">
+            <label class="field-label">Cargo Type <span class="req">*</span></label>
+            <select class="field-select">
+              <option value="">Select type&hellip;</option>
+              <option selected>General Freight</option>
+              <option>Refrigerated</option>
+              <option>Hazardous</option>
+              <option>Oversized</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label">Weight (kg) <span class="req">*</span></label>
+            <input class="field-input" type="number" placeholder="e.g. 4500" min="1">
+            <span class="field-helper">Must be greater than 0 and within vehicle capacity</span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Special Instructions</label>
+          <textarea class="field-textarea" placeholder="e.g. Handle with care, keep upright, temperature-sensitive&hellip;"></textarea>
+          <span class="field-helper">Optional notes for the driver and dock staff</span>
+        </div>
+      </div>
+      <div class="form-footer">
+        <span class="form-footer-note"><span style="color:var(--accent)">*</span> Required fields must be completed before submitting</span>
+        <div class="form-footer-actions">
+          <button class="btn-ghost">Save Draft</button>
+          <button class="btn-primary" disabled>
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 2v9M2 6.5h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            Create Shipment
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

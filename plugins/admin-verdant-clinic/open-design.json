@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-verdant-clinic",
-  "title": "Verdant Clinic Admin",
-  "version": "0.1.0",
-  "description": "Calm, clinical light-mode admin dashboard for clinic and healthcare operations \u2014 left sidebar with department switcher, topbar with search and clinician avatar, 4 KPI cards (patients today, appointments, avg wait, bed occupancy), today's appointment schedule, vitals occupancy mini-chart, and a recent patients table. Emerald-to-teal accent palette with triage status colors.",
+  "title": "Verdant Admin",
+  "version": "0.2.0",
+  "description": "Calm light-mode admin aesthetic: near-white #f7faf9 canvas, white cards with emerald-to-teal accent (#10b981 / #0d9488), slate text hierarchy, and tri-tone status pills. Archetype = left sidebar (entity-switcher + sectioned nav + user chip) + 60px topbar + 4 KPI cards with sparklines + 2-column main grid (schedule board + chart panel) + full-width records table, plus matching list, form, and detail screens.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,14 +19,12 @@
     "operations",
     "web",
     "admin",
-    "healthcare",
-    "clinic",
     "light-mode",
     "emerald-teal",
-    "calm-clinical",
-    "triage",
-    "schedule",
-    "patient-management"
+    "calm",
+    "status-pills",
+    "sidebar-nav",
+    "data-table"
   ],
   "compat": {
     "agentSkills": [
@@ -47,13 +45,29 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a clinic operations admin dashboard \u2014 left sidebar with department switcher, topbar with search and clinician avatar, 4 KPI cards (patients today, appointments, avg wait, bed occupancy), a today's appointments schedule list, a mini occupancy chart, and a recent patients table.",
-        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me a clinic operations admin dashboard \u2014 left sidebar with department switcher, topbar with search and clinician avatar, 4 KPI cards, appointments schedule, occupancy chart, recent patients table."
+        "en": "Apply this calm emerald-teal light-mode admin aesthetic to my domain — left sidebar with entity-switcher and sectioned nav, 60px topbar with search and date badge, 4 KPI cards with sparklines, a 2-column main grid (schedule board + chart panel), and a full-width records table, plus list, form, and detail screens.",
+        "zh-CN": "将这个平静的祖母绿-青色浅色管理风格应用到我的领域：左侧边栏含实体切换和分组导航、60px顶栏含搜索和日期标签、4个KPI卡片含迷你图、两列主网格（时间表+图表面板）、全宽记录表，以及配套列表、表单和详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Verdant Clinic Admin"
+          "title": "Verdant Admin — Dashboard"
+        },
+        {
+          "path": "./assets/dashboard.html",
+          "title": "Verdant Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Verdant Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Verdant Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Verdant Admin — Detail"
         }
       ]
     },
@@ -71,7 +85,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {

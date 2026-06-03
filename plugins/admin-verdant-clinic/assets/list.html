@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Records List</title>
+<style>
+:root {
+  --accent-emerald:      #10b981;
+  --accent-teal:         #0d9488;
+  --accent-emerald-dim:  #ecfdf5;
+  --accent-teal-dim:     #ccfbf1;
+  --status-stable-bg:    #d1fae5;
+  --status-stable-text:  #065f46;
+  --status-pending-bg:   #fef3c7;
+  --status-pending-text: #92400e;
+  --status-urgent-bg:    #fce7f3;
+  --status-urgent-text:  #9d174d;
+  --status-info-bg:      #dbeafe;
+  --status-info-text:    #1e40af;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px; line-height: 1.5;
+  background: #f7faf9; color: #1e293b;
+  display: flex; height: 100vh; overflow: hidden;
+}
+a { color: var(--accent-emerald); text-decoration: none; }
+button { cursor: pointer; border: none; background: none; font: inherit; }
+
+/* Sidebar (collapsed icon-only for list screens) */
+.sidebar {
+  width: 240px; min-width: 240px; background: #fff;
+  border-right: 1px solid #e3ece9; display: flex; flex-direction: column;
+  height: 100vh; overflow-y: auto;
+}
+.sidebar-logo {
+  display: flex; align-items: center; gap: 10px;
+  padding: 20px 18px 16px; border-bottom: 1px solid #e3ece9;
+}
+.logo-icon { width: 32px; height: 32px; flex-shrink: 0; }
+.logo-text { font-size: 15px; font-weight: 700; color: #1e293b; letter-spacing: -.2px; }
+.logo-text span { color: var(--accent-emerald); }
+.entity-switcher {
+  margin: 14px 12px 6px; padding: 8px 10px;
+  background: #f7faf9; border: 1px solid #e3ece9; border-radius: 8px;
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer; font-size: 13px; color: #475569; font-weight: 500;
+}
+.entity-switcher:hover { border-color: var(--accent-emerald); }
+.nav-group { padding: 10px 0 4px; }
+.nav-group-label {
+  padding: 0 18px 4px; font-size: 10px; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase; color: #94a3b8;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 7px 14px 7px 16px; margin: 1px 8px; border-radius: 7px;
+  color: #475569; font-size: 13.5px; font-weight: 500; cursor: pointer;
+  transition: background .13s, color .13s; position: relative;
+}
+.nav-item:hover { background: #f1f5f3; color: #1e293b; }
+.nav-item.active { background: var(--accent-emerald-dim); color: var(--accent-emerald); font-weight: 600; }
+.nav-item.active::before {
+  content: ''; position: absolute; left: 0; top: 6px; bottom: 6px;
+  width: 3px; background: var(--accent-emerald); border-radius: 0 3px 3px 0;
+}
+.sidebar-footer {
+  margin-top: auto; padding: 14px 12px; border-top: 1px solid #e3ece9;
+  display: flex; align-items: center; gap: 10px;
+}
+.sidebar-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--accent-emerald); display: flex; align-items: center;
+  justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.sidebar-user { flex: 1; min-width: 0; }
+.sidebar-user-name { font-size: 13px; font-weight: 600; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar-user-role { font-size: 11px; color: #94a3b8; }
+
+/* Main */
+.main-area { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+.topbar {
+  height: 60px; background: #fff; border-bottom: 1px solid #e3ece9;
+  display: flex; align-items: center; padding: 0 24px; gap: 16px; flex-shrink: 0;
+}
+.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #94a3b8; white-space: nowrap; }
+.breadcrumb-sep { color: #cbd5e1; }
+.breadcrumb-current { color: #1e293b; font-weight: 600; }
+.search-wrap { flex: 1; max-width: 360px; position: relative; }
+.search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #94a3b8; pointer-events: none; }
+.search-input {
+  width: 100%; padding: 7px 12px 7px 34px; background: #f7faf9;
+  border: 1px solid #e3ece9; border-radius: 8px; font-size: 13px; color: #1e293b;
+  outline: none; transition: border-color .15s;
+}
+.search-input::placeholder { color: #94a3b8; }
+.search-input:focus { border-color: var(--accent-emerald); background: #fff; }
+.topbar-right { display: flex; align-items: center; gap: 14px; margin-left: auto; }
+.date-badge { font-size: 12px; font-weight: 600; color: #475569; background: #f1f5f3; padding: 4px 10px; border-radius: 6px; }
+.top-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--accent-emerald); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; cursor: pointer; border: 2px solid var(--accent-emerald-dim); }
+
+.page-body { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+.page-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.page-title { font-size: 20px; font-weight: 700; color: #1e293b; }
+.page-subtitle { font-size: 13px; color: #94a3b8; margin-top: 1px; }
+.page-actions { display: flex; gap: 8px; align-items: center; }
+.btn-ghost { padding: 7px 14px; border: 1px solid #e3ece9; border-radius: 8px; font-size: 13px; font-weight: 500; color: #475569; background: #fff; transition: border-color .13s, color .13s; }
+.btn-ghost:hover { border-color: var(--accent-emerald); color: var(--accent-emerald); }
+.btn-primary { padding: 7px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; color: #fff; background: var(--accent-emerald); transition: background .13s; }
+.btn-primary:hover { background: var(--accent-teal); }
+
+/* Toolbar */
+.toolbar {
+  background: #fff; border: 1px solid #e3ece9; border-radius: 12px;
+  padding: 14px 18px; display: flex; align-items: center; gap: 16px;
+  flex-wrap: wrap; box-shadow: 0 1px 4px rgba(0,0,0,.05);
+}
+.toolbar-search { position: relative; flex: 0 0 280px; }
+.toolbar-search svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #94a3b8; pointer-events: none; }
+.toolbar-search input {
+  width: 100%; padding: 7px 12px 7px 34px; background: #f7faf9;
+  border: 1px solid #e3ece9; border-radius: 8px; font-size: 13px; color: #1e293b; outline: none;
+}
+.toolbar-search input::placeholder { color: #94a3b8; }
+.toolbar-search input:focus { border-color: var(--accent-emerald); background: #fff; }
+.filter-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.filter-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #94a3b8; margin-right: 4px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 20px; border: 1px solid #e3ece9;
+  font-size: 12px; font-weight: 500; color: #475569; cursor: pointer; background: #fff;
+  transition: border-color .13s, color .13s;
+}
+.chip:hover { border-color: var(--accent-emerald); color: var(--accent-emerald); }
+.chip.active { background: var(--accent-emerald-dim); border-color: var(--accent-emerald); color: var(--accent-emerald); font-weight: 600; }
+.chip-count { font-size: 10px; font-weight: 700; opacity: .7; }
+.result-count { margin-left: auto; font-size: 12px; color: #94a3b8; font-weight: 500; }
+
+/* Table card */
+.card { background: #fff; border: 1px solid #e3ece9; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.05); overflow: hidden; }
+.rec-table-wrap { overflow-x: auto; }
+.rec-table { width: 100%; border-collapse: collapse; }
+.rec-table thead th {
+  padding: 9px 16px; font-size: 10.5px; font-weight: 700; letter-spacing: .06em;
+  text-transform: uppercase; color: #94a3b8; text-align: left;
+  background: #fafcfb; border-bottom: 1px solid #e3ece9;
+}
+.rec-table th.right { text-align: right; }
+.rec-table tbody tr { border-bottom: 1px solid #f1f5f3; transition: background .1s; }
+.rec-table tbody tr:last-child { border-bottom: none; }
+.rec-table tbody tr:hover { background: #f7faf9; }
+.rec-table tbody td { padding: 11px 16px; font-size: 13px; color: #475569; vertical-align: middle; }
+.rec-table td.right { text-align: right; font-variant-numeric: tabular-nums; }
+.entity-cell { display: flex; align-items: center; gap: 10px; }
+.entity-dot { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; color: #fff; }
+.dot-em { background: var(--accent-emerald); }
+.dot-tl { background: var(--accent-teal); }
+.dot-am { background: #f59e0b; }
+.dot-sl { background: #64748b; }
+.rec-name { font-weight: 600; color: #1e293b; }
+.rec-sub  { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+.rec-id { font-family: "Courier New", monospace; font-size: 12px; color: #64748b; background: #f1f5f3; padding: 2px 6px; border-radius: 4px; }
+.cat-tag { display: inline-block; padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; background: var(--accent-emerald-dim); color: var(--accent-emerald); }
+.cat-tag.b { background: var(--accent-teal-dim); color: var(--accent-teal); }
+.cat-tag.c { background: var(--status-urgent-bg); color: var(--status-urgent-text); }
+.cat-tag.d { background: var(--status-pending-bg); color: var(--status-pending-text); }
+.cat-tag.e { background: #ede9fe; color: #5b21b6; }
+.status-pill { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.pill-stable  { background: var(--status-stable-bg);  color: var(--status-stable-text); }
+.pill-pending { background: var(--status-pending-bg); color: var(--status-pending-text); }
+.pill-urgent  { background: var(--status-urgent-bg);  color: var(--status-urgent-text); }
+.pill-info    { background: var(--status-info-bg);    color: var(--status-info-text); }
+.row-actions { display: flex; gap: 6px; align-items: center; justify-content: flex-end; }
+.action-btn { padding: 4px 10px; border: 1px solid #e3ece9; border-radius: 6px; font-size: 12px; font-weight: 500; color: #475569; background: #fff; transition: border-color .13s, color .13s; }
+.action-btn:hover { border-color: var(--accent-emerald); color: var(--accent-emerald); }
+
+/* Pagination footer */
+.rec-footer { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-top: 1px solid #e3ece9; font-size: 12px; color: #94a3b8; }
+.pagination { display: flex; gap: 4px; align-items: center; }
+.page-btn { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #e3ece9; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; color: #475569; background: #fff; cursor: pointer; transition: border-color .13s, color .13s; }
+.page-btn:hover { border-color: var(--accent-emerald); color: var(--accent-emerald); }
+.page-btn.active { background: var(--accent-emerald); border-color: var(--accent-emerald); color: #fff; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg class="logo-icon" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <rect width="32" height="32" rx="8" fill="var(--accent-emerald-dim)"/>
+      <rect x="14" y="7" width="4" height="18" rx="2" fill="var(--accent-emerald)"/>
+      <rect x="7"  y="14" width="18" height="4" rx="2" fill="var(--accent-emerald)"/>
+    </svg>
+    <span class="logo-text"><span>Verdant</span> Admin</span>
+  </div>
+  <div class="entity-switcher" role="combobox" aria-label="Entity">
+    <span>General Practice</span>
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <nav aria-label="Main navigation">
+    <div class="nav-group">
+      <div class="nav-group-label">Overview</div>
+      <div class="nav-item" role="link" tabindex="0">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2" y="2" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="11" y="2" width="7" height="7" rx="1.5" fill="currentColor" opacity=".45"/><rect x="2" y="11" width="7" height="7" rx="1.5" fill="currentColor" opacity=".45"/><rect x="11" y="11" width="7" height="7" rx="1.5" fill="currentColor" opacity=".45"/></svg>
+        Dashboard
+      </div>
+      <div class="nav-item" role="link" tabindex="0">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2" y="5" width="16" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M6 2v4M14 2v4M2 9h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Schedule
+      </div>
+      <div class="nav-item active" role="link" tabindex="0">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M3 18c0-3.314 3.134-6 7-6s7 2.686 7 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Records
+      </div>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-avatar">SR</div>
+    <div class="sidebar-user">
+      <div class="sidebar-user-name">Dr. S. Reyes</div>
+      <div class="sidebar-user-role">Attending</div>
+    </div>
+  </div>
+</aside>
+
+<div class="main-area">
+  <header class="topbar" role="banner">
+    <div class="breadcrumb">
+      <span>Admin</span>
+      <span class="breadcrumb-sep">/</span>
+      <span class="breadcrumb-current">Records</span>
+    </div>
+    <div class="search-wrap" role="search">
+      <svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.6"/><path d="M13 13l4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <input class="search-input" type="search" placeholder="Search records…" aria-label="Search" />
+    </div>
+    <div class="topbar-right">
+      <div class="date-badge">Mon, 2 Jun 2026</div>
+      <div class="top-avatar">SR</div>
+    </div>
+  </header>
+
+  <main class="page-body">
+
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">All Records</h1>
+        <p class="page-subtitle">General Practice · 214 total</p>
+      </div>
+      <div class="page-actions">
+        <button class="btn-ghost">Export CSV</button>
+        <button class="btn-primary">+ New Record</button>
+      </div>
+    </div>
+
+    <!-- Search + filter toolbar -->
+    <div class="toolbar" role="search" aria-label="Filter records">
+      <div class="toolbar-search">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.6"/><path d="M13 13l4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <input type="search" placeholder="Filter by name, ID, category…" aria-label="Filter records" />
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Status</span>
+        <span class="chip active">All <span class="chip-count">214</span></span>
+        <span class="chip">Active <span class="chip-count">89</span></span>
+        <span class="chip">Pending <span class="chip-count">42</span></span>
+        <span class="chip">Completed <span class="chip-count">76</span></span>
+        <span class="chip">Urgent <span class="chip-count">7</span></span>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Category</span>
+        <span class="chip">A <span class="chip-count">61</span></span>
+        <span class="chip">B <span class="chip-count">48</span></span>
+        <span class="chip">C <span class="chip-count">37</span></span>
+        <span class="chip">D <span class="chip-count">68</span></span>
+      </div>
+      <span class="result-count">Showing 1–12 of 214</span>
+    </div>
+
+    <!-- Records table -->
+    <div class="card">
+      <div class="rec-table-wrap">
+        <table class="rec-table" aria-label="Records list">
+          <thead>
+            <tr>
+              <th>Record / Name</th><th>ID</th><th class="right">Metric</th><th>Category</th><th>Last Updated</th><th>Status</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="entity-cell"><div class="entity-dot dot-em">LM</div><div><div class="rec-name">Lena Moura</div><div class="rec-sub">DOB 1988-04-12</div></div></div></td>
+              <td><span class="rec-id">ID-40812</span></td>
+              <td class="right">38</td>
+              <td><span class="cat-tag">Group A</span></td>
+              <td>Today 08:30</td>
+              <td><span class="status-pill pill-info">Completed</span></td>
+              <td><div class="row-actions"><button class="action-btn">View</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="entity-cell"><div class="entity-dot dot-tl">HB</div><div><div class="rec-name">Hugo Brandão</div><div class="rec-sub">DOB 1970-09-03</div></div></div></td>
+              <td><span class="rec-id">ID-31074</span></td>
+              <td class="right">54</td>
+              <td><span class="cat-tag b">Group B</span></td>
+              <td>Today 09:00</td>
+              <td><span class="status-pill pill-info">Completed</span></td>
+              <td><div class="row-actions"><button class="action-btn">View</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="entity-cell"><div class="entity-dot dot-am">OM</div><div><div class="rec-name">Omar Mensah</div><div class="rec-sub">DOB 1979-02-17</div></div></div></td>
+              <td><span class="rec-id">ID-74458</span></td>
+              <td class="right">47</td>
+              <td><span class="cat-tag c">Group C</span></td>
+              <td>Today 11:30</td>
+              <td><span class="status-pill pill-urgent">Urgent</span></td>
+              <td><div class="row-actions"><button class="action-btn">View</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="entity-cell"><div class="entity-dot dot-sl">CF</div><div><div class="rec-name">Clara Fonseca</div><div class="rec-sub">DOB 1962-11-25</div></div></div></td>
+              <td><span class="rec-id">ID-55209</span></td>
+              <td class="right">62</td>
+              <td><span class="cat-tag">Group A</span></td>
+              <td>Today 09:45</td>
+              <td><span class="status-pill pill-stable">In Progress</span></td>
+              <td><div class="row-actions"><button class="action-btn">View</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="entity-cell"><div class="entity-dot dot-em">PS</div><div><div class="rec-name">Petra Stavros</div><div class="rec-sub">DOB 1955-07-08</div></div></div></td>
+              <td><span class="rec-id">ID-39201</span></td>
+              <td class="right">71</td>
+              <td><span class="cat-tag e">Group E</span></td>
+              <td>Yesterday 16:20</td>
+              <td><span class="status-pill pill-pending">Pending</span></td>
+              <td><div class="row-actions"><button class="action-btn">View</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="entity-cell"><div class="entity-dot dot-tl">RK</div><div><div class="rec-name">Ravi Khatri</div><div class="rec-sub">DOB 1993-05-14</div></div></div></td>
+              <td><span class="rec-id">ID-28634</span></td>
+              <td class="right">33</td>
+              <td><span class="cat-tag d">Group D</span></td>
+              <td>Today 10:15</td>
+              <td><span class="status-pill pill-pending">Waiting</span></td>
+              <td><div class="row-actions"><button class="action-btn">View</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="entity-cell"><div class="entity-dot dot-am">NA</div><div><div class="rec-name">Nina Azevedo</div><div class="rec-sub">DOB 1997-01-30</div></div></div></td>
+              <td><span class="rec-id">ID-61903</span></td>
+              <td class="right">29</td>
+              <td><span class="cat-tag">Group A</span></td>
+              <td>Today 11:00</td>
+              <td><span class="status-pill pill-pending">Waiting</span></td>
+              <td><div class="row-actions"><button class="action-btn">View</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="entity-cell"><div class="entity-dot dot-sl">JN</div><div><div class="rec-name">James Nakamura</div><div class="rec-sub">DOB 1968-03-21</div></div></div></td>
+              <td><span class="rec-id">ID-82311</span></td>
+              <td class="right">58</td>
+              <td><span class="cat-tag b">Group B</span></td>
+              <td>Yesterday 14:00</td>
+              <td><span class="status-pill pill-pending">Scheduled</span></td>
+              <td><div class="row-actions"><button class="action-btn">View</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="entity-cell"><div class="entity-dot dot-em">AM</div><div><div class="rec-name">Ana Melo</div><div class="rec-sub">DOB 2001-08-15</div></div></div></td>
+              <td><span class="rec-id">ID-93042</span></td>
+              <td class="right">25</td>
+              <td><span class="cat-tag">Group A</span></td>
+              <td>Yesterday 10:30</td>
+              <td><span class="status-pill pill-info">Completed</span></td>
+              <td><div class="row-actions"><button class="action-btn">View</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="entity-cell"><div class="entity-dot dot-tl">TP</div><div><div class="rec-name">Tomás Pereira</div><div class="rec-sub">DOB 1985-12-07</div></div></div></td>
+              <td><span class="rec-id">ID-17483</span></td>
+              <td class="right">41</td>
+              <td><span class="cat-tag d">Group D</span></td>
+              <td>2 days ago</td>
+              <td><span class="status-pill pill-info">Completed</span></td>
+              <td><div class="row-actions"><button class="action-btn">View</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="entity-cell"><div class="entity-dot dot-am">SK</div><div><div class="rec-name">Sara Kovalenko</div><div class="rec-sub">DOB 1991-06-22</div></div></div></td>
+              <td><span class="rec-id">ID-50127</span></td>
+              <td class="right">35</td>
+              <td><span class="cat-tag b">Group B</span></td>
+              <td>2 days ago</td>
+              <td><span class="status-pill pill-stable">In Progress</span></td>
+              <td><div class="row-actions"><button class="action-btn">View</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="entity-cell"><div class="entity-dot dot-sl">KO</div><div><div class="rec-name">Kenji Ota</div><div class="rec-sub">DOB 1976-10-18</div></div></div></td>
+              <td><span class="rec-id">ID-64890</span></td>
+              <td class="right">50</td>
+              <td><span class="cat-tag c">Group C</span></td>
+              <td>3 days ago</td>
+              <td><span class="status-pill pill-pending">Pending</span></td>
+              <td><div class="row-actions"><button class="action-btn">View</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="rec-footer">
+        <span>Showing 1–12 of 214 records</span>
+        <div class="pagination" aria-label="Pagination">
+          <button class="page-btn" aria-label="Previous">‹</button>
+          <button class="page-btn active" aria-current="page">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <span style="padding:0 4px;color:#94a3b8">…</span>
+          <button class="page-btn">18</button>
+          <button class="page-btn" aria-label="Next">›</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>

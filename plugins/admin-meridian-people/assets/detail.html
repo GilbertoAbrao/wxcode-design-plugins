@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Record Detail</title>
+<style>
+:root {
+  --color-accent:       #4f46e5;
+  --color-accent-mid:   #6366f1;
+  --color-accent-bg:    #eef2ff;
+  --color-success:      #16a34a;
+  --color-success-bg:   #dcfce7;
+  --color-warn:         #d97706;
+  --color-warn-bg:      #fef3c7;
+  --color-danger:       #dc2626;
+  --color-danger-bg:    #fee2e2;
+  --color-probation:    #4338ca;
+  --color-probation-bg: #e0e7ff;
+  --color-cat-a:        #6366f1;
+  --color-cat-b:        #ec4899;
+  --color-cat-c:        #f59e0b;
+  --color-cat-d:        #10b981;
+  --color-cat-e:        #8b5cf6;
+  --color-cat-f:        #0ea5e9;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:14px;color:#1e1e2d;background:#f8f8fb;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;border:none;background:none;font:inherit}
+svg{display:block}
+
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* Sidebar */
+.sidebar{width:240px;min-width:240px;background:#fff;border-right:1px solid #e8e8ef;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0}
+.sidebar-logo{display:flex;align-items:center;gap:10px;padding:20px 20px 16px;border-bottom:1px solid #e8e8ef}
+.sidebar-logo-text{font-size:15px;font-weight:700;color:#1e1e2d;letter-spacing:-0.01em}
+.sidebar-logo-text span{color:var(--color-accent)}
+.org-switcher{margin:12px 12px 8px;padding:10px 12px;background:#f8f8fb;border:1px solid #e8e8ef;border-radius:8px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.org-switcher-inner{display:flex;align-items:center;gap:8px}
+.org-avatar{width:28px;height:28px;border-radius:6px;background:var(--color-accent-bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--color-accent)}
+.org-name{font-size:12px;font-weight:600;color:#1e1e2d}
+.org-sub{font-size:11px;color:#9ca3af}
+.nav-section{padding:8px 0 4px}
+.nav-section-label{padding:6px 20px 4px;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#9ca3af}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 20px;font-size:13px;color:#6b7280;position:relative;cursor:pointer;transition:background .12s,color .12s}
+.nav-item:hover{background:#f8f8fb;color:#1e1e2d}
+.nav-item.active{background:var(--color-accent-bg);color:var(--color-accent);font-weight:600}
+.nav-item.active::before{content:"";position:absolute;left:0;top:4px;bottom:4px;width:3px;border-radius:0 3px 3px 0;background:var(--color-accent)}
+.nav-item svg{flex-shrink:0;opacity:.7}
+.nav-item.active svg{opacity:1}
+.sidebar-footer{margin-top:auto;border-top:1px solid #e8e8ef;padding:14px 16px;display:flex;align-items:center;gap:10px}
+.sidebar-footer-avatar{width:32px;height:32px;border-radius:50%;background:var(--color-accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff}
+.sidebar-footer-info{flex:1;min-width:0}
+.sidebar-footer-name{font-size:12px;font-weight:600;color:#1e1e2d}
+.sidebar-footer-role{font-size:11px;color:#9ca3af}
+
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+/* Topbar */
+.topbar{height:60px;min-height:60px;background:#fff;border-bottom:1px solid #e8e8ef;display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0}
+.topbar-title{display:flex;flex-direction:column;line-height:1.2;min-width:0;flex-shrink:0}
+.topbar-page{font-size:15px;font-weight:700;color:#1e1e2d;white-space:nowrap}
+.topbar-breadcrumb{font-size:11px;color:#9ca3af}
+.topbar-breadcrumb a{color:var(--color-accent)}
+.topbar-avatar-wrap{margin-left:auto;display:flex;align-items:center;gap:8px}
+.topbar-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--color-accent),var(--color-accent-mid));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.topbar-uname{font-size:13px;font-weight:600;color:#1e1e2d}
+
+/* Content */
+.content{flex:1;overflow-y:auto;padding:24px}
+.detail-wrap{max-width:900px}
+
+/* Breadcrumb */
+.breadcrumb{font-size:12px;color:#9ca3af;margin-bottom:16px;display:flex;align-items:center;gap:6px}
+.breadcrumb a{color:var(--color-accent)}
+.breadcrumb-sep{color:#d1d5db}
+
+/* Detail header */
+.detail-header{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.detail-avatar{width:56px;height:56px;border-radius:50%;background:var(--color-accent);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;flex-shrink:0}
+.detail-title-block{flex:1;min-width:0}
+.detail-name{font-size:20px;font-weight:700;color:#1e1e2d}
+.detail-meta{font-size:13px;color:#6b7280;margin-top:2px;display:flex;align-items:center;gap:8px}
+.detail-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.btn-ghost{padding:7px 16px;border:1px solid #e8e8ef;border-radius:8px;font-size:12px;color:#6b7280;background:#fff}
+.btn-ghost:hover{border-color:var(--color-accent);color:var(--color-accent)}
+.btn-primary{padding:7px 16px;border-radius:8px;background:var(--color-accent);color:#fff;font-size:12px;font-weight:600}
+.btn-primary:hover{background:var(--color-accent-mid)}
+.btn-danger-ghost{padding:7px 16px;border:1px solid #e8e8ef;border-radius:8px;font-size:12px;color:var(--color-danger);background:#fff}
+.btn-danger-ghost:hover{border-color:var(--color-danger);background:var(--color-danger-bg)}
+
+/* Status pills */
+.status-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600}
+.status-pill::before{content:"";width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.s-active{color:var(--color-success);background:var(--color-success-bg)}
+.s-active::before{background:var(--color-success)}
+.s-warn{color:var(--color-warn);background:var(--color-warn-bg)}
+.s-warn::before{background:var(--color-warn)}
+.s-info{color:var(--color-probation);background:var(--color-probation-bg)}
+.s-info::before{background:var(--color-probation)}
+
+/* Cards */
+.card{background:#fff;border:1px solid #e8e8ef;border-radius:12px;margin-bottom:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 14px;border-bottom:1px solid #e8e8ef}
+.card-title{font-size:13px;font-weight:700;color:#1e1e2d;display:flex;align-items:center;gap:6px}
+.card-action{font-size:12px;color:var(--color-accent);font-weight:500;cursor:pointer}
+
+/* Meta grid */
+.meta-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;padding:0}
+.meta-cell{padding:16px 20px;border-right:1px solid #e8e8ef;border-bottom:1px solid #e8e8ef}
+.meta-cell:nth-child(3n){border-right:none}
+.meta-cell:nth-last-child(-n+3){border-bottom:none}
+.meta-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af;margin-bottom:4px}
+.meta-value{font-size:13px;font-weight:600;color:#1e1e2d}
+.meta-sub{font-size:11px;color:#9ca3af;margin-top:2px}
+
+/* Two-col layout */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+
+/* Breakdown mini bars */
+.mini-bar-row{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #f1f1f5}
+.mini-bar-row:last-child{border-bottom:none}
+.mini-swatch{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.mini-label{font-size:12px;color:#1e1e2d;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mini-track{width:80px;height:5px;background:#f1f1f5;border-radius:99px;overflow:hidden;flex-shrink:0}
+.mini-fill{height:100%;border-radius:99px}
+.mini-val{font-size:12px;font-weight:600;color:#1e1e2d;width:28px;text-align:right;flex-shrink:0}
+.mini-pct{font-size:11px;color:#9ca3af;width:28px;text-align:right;flex-shrink:0}
+
+/* Activity feed */
+.activity-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #f1f1f5}
+.activity-item:last-child{border-bottom:none}
+.activity-dot{width:8px;height:8px;border-radius:50%;background:var(--color-accent-bg);border:2px solid var(--color-accent);margin-top:4px;flex-shrink:0}
+.activity-dot.success{border-color:var(--color-success);background:var(--color-success-bg)}
+.activity-dot.warn{border-color:var(--color-warn);background:var(--color-warn-bg)}
+.activity-body{flex:1;min-width:0}
+.activity-text{font-size:12px;color:#1e1e2d}
+.activity-time{font-size:11px;color:#9ca3af;margin-top:1px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <rect width="28" height="28" rx="7" fill="var(--color-accent)"/>
+        <polygon points="14,4 24,10 24,18 14,24 4,18 4,10" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="14" cy="14" r="3" fill="#fff"/>
+      </svg>
+      <span class="sidebar-logo-text">Meri<span>dian</span></span>
+    </div>
+    <div class="org-switcher">
+      <div class="org-switcher-inner">
+        <div class="org-avatar">NV</div>
+        <div><div class="org-name">NorthVault Group</div><div class="org-sub">847 members</div></div>
+      </div>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:#9ca3af"><path d="M4 5.5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <nav class="nav-section">
+      <div class="nav-section-label">People</div>
+      <div class="nav-item active">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M1 13c0-2.2 2.239-4 5-4s5 1.8 5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="12" cy="5" r="2" stroke="currentColor" stroke-width="1.3" opacity=".5"/><path d="M14 13c0-1.5-1-2.8-2.5-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity=".5"/></svg>
+        Directory
+      </div>
+      <div class="nav-item">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a6 6 0 010 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M8 2a6 6 0 000 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" opacity=".4"/><path d="M5 8h6M8 5v6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Time Off
+      </div>
+    </nav>
+    <nav class="nav-section">
+      <div class="nav-section-label">Talent</div>
+      <div class="nav-item">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 8l1.5 1.5L10.5 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Performance
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-footer-avatar">KR</div>
+      <div class="sidebar-footer-info">
+        <div class="sidebar-footer-name">Kira Reynolds</div>
+        <div class="sidebar-footer-role">Admin</div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-title">
+        <span class="topbar-page">Adriana Lopes</span>
+        <span class="topbar-breadcrumb"><a href="#">Directory</a> / Adriana Lopes</span>
+      </div>
+      <div class="topbar-avatar-wrap">
+        <div class="topbar-avatar">KR</div>
+        <span class="topbar-uname">Kira Reynolds</span>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="detail-wrap">
+
+        <div class="breadcrumb">
+          <a href="#">Directory</a>
+          <span class="breadcrumb-sep">›</span>
+          <span>Adriana Lopes</span>
+        </div>
+
+        <!-- Header band -->
+        <div class="detail-header">
+          <div class="detail-avatar">AL</div>
+          <div class="detail-title-block">
+            <div class="detail-name">Adriana Lopes</div>
+            <div class="detail-meta">
+              <span>Senior Engineer</span>
+              <span style="color:#d1d5db">·</span>
+              <span>Engineering</span>
+              <span style="color:#d1d5db">·</span>
+              <span class="status-pill s-active">Active</span>
+            </div>
+          </div>
+          <div class="detail-actions">
+            <button class="btn-ghost">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="display:inline;vertical-align:middle;margin-right:4px"><path d="M2 9.5V12h2.5l6-6L8 3.5l-6 6z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+              Edit
+            </button>
+            <button class="btn-primary">Send Message</button>
+            <button class="btn-danger-ghost">Archive</button>
+          </div>
+        </div>
+
+        <!-- Meta grid -->
+        <div class="card">
+          <div class="meta-grid">
+            <div class="meta-cell">
+              <div class="meta-label">Job Title</div>
+              <div class="meta-value">Senior Engineer</div>
+              <div class="meta-sub">Engineering · London HQ</div>
+            </div>
+            <div class="meta-cell">
+              <div class="meta-label">Direct Manager</div>
+              <div class="meta-value">Tunde Barrett</div>
+              <div class="meta-sub">VP Engineering</div>
+            </div>
+            <div class="meta-cell">
+              <div class="meta-label">Start Date</div>
+              <div class="meta-value">14 Mar 2022</div>
+              <div class="meta-sub">4 years, 2 months</div>
+            </div>
+            <div class="meta-cell">
+              <div class="meta-label">Contract</div>
+              <div class="meta-value">Full-time</div>
+              <div class="meta-sub">Permanent</div>
+            </div>
+            <div class="meta-cell">
+              <div class="meta-label">Work Email</div>
+              <div class="meta-value" style="font-size:12px">adriana.lopes@example.io</div>
+            </div>
+            <div class="meta-cell">
+              <div class="meta-label">Location</div>
+              <div class="meta-value">London — HQ</div>
+              <div class="meta-sub">GMT+1</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Two-col: breakdown + activity -->
+        <div class="two-col">
+
+          <!-- Category breakdown -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 11V5l4-3 4 3v6H2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M5 11V8h3v3" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+                Leave Balance
+              </div>
+              <span class="card-action">Request →</span>
+            </div>
+            <div style="padding:8px 20px">
+              <div class="mini-bar-row">
+                <div class="mini-swatch" style="background:var(--color-success)"></div>
+                <div class="mini-label">Annual</div>
+                <div class="mini-track"><div class="mini-fill" style="width:72%;background:var(--color-success)"></div></div>
+                <div class="mini-val">18</div>
+                <div class="mini-pct">days</div>
+              </div>
+              <div class="mini-bar-row">
+                <div class="mini-swatch" style="background:var(--color-warn)"></div>
+                <div class="mini-label">Sick</div>
+                <div class="mini-track"><div class="mini-fill" style="width:30%;background:var(--color-warn)"></div></div>
+                <div class="mini-val">3</div>
+                <div class="mini-pct">days</div>
+              </div>
+              <div class="mini-bar-row">
+                <div class="mini-swatch" style="background:var(--color-accent)"></div>
+                <div class="mini-label">Personal</div>
+                <div class="mini-track"><div class="mini-fill" style="width:50%;background:var(--color-accent)"></div></div>
+                <div class="mini-val">2</div>
+                <div class="mini-pct">days</div>
+              </div>
+              <div class="mini-bar-row">
+                <div class="mini-swatch" style="background:var(--color-cat-e)"></div>
+                <div class="mini-label">Carried Over</div>
+                <div class="mini-track"><div class="mini-fill" style="width:15%;background:var(--color-cat-e)"></div></div>
+                <div class="mini-val">1.5</div>
+                <div class="mini-pct">days</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Activity log -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4v3l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Recent Activity
+              </div>
+              <span class="card-action">All →</span>
+            </div>
+            <div style="padding:0 20px">
+              <div class="activity-item">
+                <div class="activity-dot success"></div>
+                <div class="activity-body">
+                  <div class="activity-text">Annual leave approved (3 days, Jun 14–16)</div>
+                  <div class="activity-time">Today at 09:14</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot"></div>
+                <div class="activity-body">
+                  <div class="activity-text">Profile updated — location changed to London HQ</div>
+                  <div class="activity-time">Yesterday at 14:30</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot warn"></div>
+                <div class="activity-body">
+                  <div class="activity-text">Performance review reminder sent</div>
+                  <div class="activity-time">28 May 2026</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot success"></div>
+                <div class="activity-body">
+                  <div class="activity-text">Role updated to Senior Engineer</div>
+                  <div class="activity-time">12 Jan 2026</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot"></div>
+                <div class="activity-body">
+                  <div class="activity-text">Contract renewed — permanent full-time</div>
+                  <div class="activity-time">14 Mar 2025</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

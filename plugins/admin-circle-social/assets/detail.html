@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Member Detail</title>
+<style>
+  :root {
+    --accent-blue: #3b82f6;
+    --accent-violet: #8b5cf6;
+    --accent-blue-soft: #eff6ff;
+    --accent-violet-soft: #f5f3ff;
+    --status-green: #22c55e;
+    --status-amber: #f59e0b;
+    --status-red: #ef4444;
+    --status-green-soft: #dcfce7;
+    --status-amber-soft: #fef3c7;
+    --status-red-soft: #fee2e2;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+    color: #334155;
+    background: #f8f9fc;
+    display: flex;
+    min-height: 100vh;
+  }
+
+  .sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    background: #fff;
+    border-right: 1px solid #e8eaf2;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+  }
+
+  .sidebar-brand { display: flex; align-items: center; gap: 9px; padding: 18px 16px 14px; border-bottom: 1px solid #e8eaf2; }
+  .brand-icon { width: 32px; height: 32px; flex-shrink: 0; }
+  .brand-name { font-size: 15px; font-weight: 700; color: #0f172a; letter-spacing: -0.01em; }
+
+  .context-switcher { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; margin: 12px 10px 4px; background: var(--accent-blue-soft); border: 1px solid #bfdbfe; border-radius: 8px; cursor: pointer; }
+  .context-switcher-name { font-size: 12.5px; font-weight: 600; color: var(--accent-blue); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .nav-section { padding: 14px 10px 0; }
+  .nav-section-label { font-size: 10px; font-weight: 700; letter-spacing: 0.07em; color: #94a3b8; text-transform: uppercase; padding: 0 6px; margin-bottom: 4px; }
+
+  .nav-item { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 7px; cursor: pointer; color: #64748b; font-size: 13.5px; font-weight: 500; border-left: 3px solid transparent; transition: background 0.12s, color 0.12s; text-decoration: none; }
+  .nav-item:hover { background: #f1f5f9; color: #334155; }
+  .nav-item.active { border-left-color: var(--accent-blue); background: var(--accent-blue-soft); color: var(--accent-blue); font-weight: 600; }
+  .nav-item svg { flex-shrink: 0; }
+
+  .nav-badge { margin-left: auto; background: var(--status-red); color: #fff; font-size: 10px; font-weight: 700; border-radius: 999px; padding: 1px 6px; min-width: 18px; text-align: center; }
+
+  .sidebar-footer { margin-top: auto; border-top: 1px solid #e8eaf2; padding: 14px 16px; display: flex; align-items: center; gap: 10px; }
+
+  .avatar-circle { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .av-blue   { background: var(--accent-blue-soft);  color: var(--accent-blue); }
+  .av-violet { background: var(--accent-violet-soft); color: var(--accent-violet); }
+  .av-green  { background: var(--status-green-soft);  color: #16a34a; }
+  .av-amber  { background: var(--status-amber-soft);  color: #d97706; }
+  .av-slate  { background: #f1f5f9;                   color: #475569; }
+
+  .sidebar-user-info { flex: 1; min-width: 0; }
+  .sidebar-user-name { font-size: 13px; font-weight: 600; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sidebar-user-role { font-size: 11px; color: #94a3b8; }
+
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+
+  .topbar { height: 56px; background: #fff; border-bottom: 1px solid #e8eaf2; display: flex; align-items: center; gap: 12px; padding: 0 24px; position: sticky; top: 0; z-index: 10; }
+
+  .breadcrumb { font-size: 13px; color: #94a3b8; white-space: nowrap; }
+  .breadcrumb strong { color: #0f172a; font-weight: 600; }
+  .breadcrumb a { color: #94a3b8; text-decoration: none; }
+  .breadcrumb a:hover { color: var(--accent-blue); }
+
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+  .icon-btn { position: relative; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #64748b; border: 1px solid #e8eaf2; background: #fff; }
+  .icon-btn:hover { background: #f8f9fc; }
+  .notif-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--status-red); border-radius: 50%; border: 1.5px solid #fff; }
+
+  .page-body { padding: 24px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; line-height: 1; white-space: nowrap; }
+  .btn-primary { background: var(--accent-blue); color: #fff; }
+  .btn-primary:hover { background: #2563eb; }
+  .btn-ghost { background: transparent; border: 1px solid #e8eaf2; color: #475569; }
+  .btn-ghost:hover { background: #f1f5f9; }
+  .btn-danger { background: transparent; border: 1px solid var(--status-red); color: #dc2626; }
+  .btn-danger:hover { background: var(--status-red-soft); }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+  .pill { display: inline-flex; align-items: center; font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+
+  .card { background: #fff; border: 1px solid #e8eaf2; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); overflow: hidden; }
+  .card-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid #e8eaf2; }
+  .card-title { font-size: 15px; font-weight: 700; color: #0f172a; }
+
+  /* ── Detail header ── */
+  .detail-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #fff;
+    border: 1px solid #e8eaf2;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+
+  .detail-avatar { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; flex-shrink: 0; }
+
+  .detail-title-block { flex: 1; min-width: 0; }
+
+  .detail-name-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .detail-name { font-size: 20px; font-weight: 700; color: #0f172a; }
+  .detail-handle { font-size: 14px; color: #94a3b8; }
+
+  .detail-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+  /* ── Meta grid ── */
+  .meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
+
+  .meta-cell {
+    padding: 16px 20px;
+    border-right: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .meta-cell:nth-child(3n) { border-right: none; }
+  .meta-cell:nth-last-child(-n+3) { border-bottom: none; }
+
+  .meta-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #94a3b8; margin-bottom: 4px; }
+  .meta-value { font-size: 14px; font-weight: 600; color: #0f172a; }
+  .meta-sub { font-size: 11.5px; color: #94a3b8; margin-top: 2px; }
+
+  /* ── Two-col bottom ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+
+  /* ── Activity timeline ── */
+  .activity-list { padding: 4px 20px 16px; display: flex; flex-direction: column; }
+
+  .activity-row {
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .activity-row:last-child { border-bottom: none; }
+
+  .activity-dot-col { display: flex; flex-direction: column; align-items: center; gap: 0; padding-top: 3px; }
+  .activity-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .activity-dot-blue   { background: var(--accent-blue); }
+  .activity-dot-violet { background: var(--accent-violet); }
+  .activity-dot-green  { background: var(--status-green); }
+  .activity-dot-red    { background: var(--status-red); }
+  .activity-dot-slate  { background: #94a3b8; }
+
+  .activity-body { flex: 1; min-width: 0; }
+  .activity-text { font-size: 13px; color: #334155; line-height: 1.4; }
+  .activity-time { font-size: 11.5px; color: #94a3b8; margin-top: 2px; }
+
+  /* ── Stat table ── */
+  .stat-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .stat-table thead th { text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #94a3b8; padding: 10px 20px; border-bottom: 1px solid #e8eaf2; background: #fafbfc; }
+  .stat-table tbody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.1s; }
+  .stat-table tbody tr:last-child { border-bottom: none; }
+  .stat-table tbody tr:hover { background: #f8f9fc; }
+  .stat-table td { padding: 11px 20px; color: #334155; vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <svg class="brand-icon" viewBox="0 0 32 32" fill="none">
+      <circle cx="16" cy="16" r="15" fill="var(--accent-blue-soft)" stroke="var(--accent-blue)" stroke-width="1.5"/>
+      <circle cx="16" cy="7"  r="2.5" fill="var(--accent-blue)"/>
+      <circle cx="23.5" cy="10.5" r="2.5" fill="var(--accent-violet)"/>
+      <circle cx="23.5" cy="21.5" r="2.5" fill="var(--accent-blue)"/>
+      <circle cx="16" cy="25" r="2.5" fill="var(--accent-violet)"/>
+      <circle cx="8.5" cy="21.5" r="2.5" fill="var(--accent-blue)"/>
+      <circle cx="8.5" cy="10.5" r="2.5" fill="var(--accent-violet)"/>
+      <circle cx="16" cy="16" r="3"   fill="var(--accent-blue)"/>
+    </svg>
+    <span class="brand-name">CircleSpace</span>
+  </div>
+
+  <div class="context-switcher">
+    <span class="context-switcher-name">Design Creators Hub</span>
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:var(--accent-blue);flex-shrink:0">
+      <path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <nav class="nav-section">
+    <div class="nav-section-label">Overview</div>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="5.5" height="5.5" rx="1.5" fill="currentColor" opacity=".9"/><rect x="9.5" y="1" width="5.5" height="5.5" rx="1.5" fill="currentColor" opacity=".5"/><rect x="1" y="9.5" width="5.5" height="5.5" rx="1.5" fill="currentColor" opacity=".5"/><rect x="9.5" y="9.5" width="5.5" height="5.5" rx="1.5" fill="currentColor" opacity=".9"/></svg>Dashboard</a>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><polyline points="1,11 5,7 9,9 15,3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Analytics</a>
+  </nav>
+
+  <nav class="nav-section">
+    <div class="nav-section-label">Community</div>
+    <a class="nav-item active" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.5" stroke="currentColor" stroke-width="1.5"/><circle cx="11.5" cy="5" r="2" stroke="currentColor" stroke-width="1.5"/><path d="M1 13c0-2.5 2-4 5-4s5 1.5 5 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M11.5 9c1.5 0 3 .8 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Members</a>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="14" height="10" rx="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M4 13h8M8 11v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Posts</a>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M1 7h14M5 1v4M11 1v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Events</a>
+  </nav>
+
+  <nav class="nav-section">
+    <div class="nav-section-label">Moderation</div>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1L2 4v5c0 3 2.5 5.5 6 6 3.5-.5 6-3 6-6V4L8 1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 6v3M8 11v.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Reports<span class="nav-badge">4</span></a>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M3 8h7M3 12h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Queue</a>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 3l8 5-8 5V3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Flagged</a>
+  </nav>
+
+  <nav class="nav-section">
+    <div class="nav-section-label">Settings</div>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.1 3.1l1.4 1.4M11.5 11.5l1.4 1.4M3.1 12.9l1.4-1.4M11.5 4.5l1.4-1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Roles</a>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="5.5" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="9.5" y="3" width="5.5" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 8h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Integrations</a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="avatar-circle av-blue">MR</div>
+    <div class="sidebar-user-info">
+      <div class="sidebar-user-name">Maya Reyes</div>
+      <div class="sidebar-user-role">Community Lead</div>
+    </div>
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:#94a3b8;flex-shrink:0;cursor:pointer">
+      <path d="M5 2H3a1 1 0 00-1 1v8a1 1 0 001 1h2M9 10l3-3-3-3M12 7H5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <span class="breadcrumb">
+      <a href="#">CircleSpace</a>&ensp;/&ensp;<a href="#">Members</a>&ensp;/&ensp;<strong>Dev Krishnan</strong>
+    </span>
+    <div class="topbar-right">
+      <div class="icon-btn">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M8 2a5 5 0 00-5 5c0 3-1.5 4-1.5 4h13S13 10 13 7a5 5 0 00-5-5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M9.7 13.5a2 2 0 01-3.4 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span class="notif-dot"></span>
+      </div>
+      <div class="avatar-circle av-blue" style="width:34px;height:34px;font-size:13px;cursor:pointer">MR</div>
+    </div>
+  </header>
+
+  <div class="page-body">
+
+    <!-- Detail header -->
+    <div class="detail-header">
+      <div class="detail-avatar av-violet" style="width:56px;height:56px;font-size:20px">DK</div>
+      <div class="detail-title-block">
+        <div class="detail-name-row">
+          <span class="detail-name">Dev Krishnan</span>
+          <span class="detail-handle">@dev.k</span>
+          <span class="pill" style="background:var(--accent-violet-soft);color:var(--accent-violet)">Moderator</span>
+          <span class="pill" style="background:var(--status-green-soft);color:#16a34a">Active</span>
+        </div>
+        <div style="font-size:13px;color:#64748b;margin-top:4px">Member since Mar 04, 2024 · Design Creators Hub</div>
+      </div>
+      <div class="detail-actions">
+        <button class="btn btn-ghost">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 10.5l3.5-1 6-6-2.5-2.5-6 6L1 10.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+          Edit
+        </button>
+        <button class="btn btn-danger">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 2l9 9M11 2L2 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Suspend
+        </button>
+      </div>
+    </div>
+
+    <!-- Meta grid -->
+    <div class="card">
+      <div class="meta-grid">
+        <div class="meta-cell">
+          <div class="meta-label">Email</div>
+          <div class="meta-value">dev.krishnan@gmail.com</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Role</div>
+          <div class="meta-value"><span class="pill" style="background:var(--accent-violet-soft);color:var(--accent-violet)">Moderator</span></div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Status</div>
+          <div class="meta-value"><span class="pill" style="background:var(--status-green-soft);color:#16a34a">Active</span></div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Joined</div>
+          <div class="meta-value" style="font-variant-numeric:tabular-nums">Mar 04, 2024</div>
+          <div class="meta-sub">14 months ago</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Last Active</div>
+          <div class="meta-value">Yesterday, 11:42 PM</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Timezone</div>
+          <div class="meta-value">IST (UTC+5:30)</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Total Posts</div>
+          <div class="meta-value" style="font-variant-numeric:tabular-nums">432</div>
+          <div class="meta-sub">Last post 2 days ago</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Reactions Given</div>
+          <div class="meta-value" style="font-variant-numeric:tabular-nums">1,847</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Flag Count</div>
+          <div class="meta-value" style="font-variant-numeric:tabular-nums">0</div>
+          <div class="meta-sub">No violations recorded</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two-col bottom -->
+    <div class="two-col">
+
+      <!-- Top posts stat table -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Top Posts</span>
+          <span style="font-size:12px;color:#94a3b8">Last 30 days</span>
+        </div>
+        <table class="stat-table">
+          <thead>
+            <tr><th>Post excerpt</th><th>Channel</th><th style="text-align:right">Reactions</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="color:#0f172a;font-weight:500;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">"Here's how I tokenize spacing in Figma…"</td>
+              <td><span class="pill" style="background:var(--accent-blue-soft);color:var(--accent-blue);font-size:11px">#design-systems</span></td>
+              <td style="text-align:right;font-variant-numeric:tabular-nums;color:#334155">94</td>
+            </tr>
+            <tr>
+              <td style="color:#0f172a;font-weight:500;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">"My 2025 typography stack for web apps"</td>
+              <td><span class="pill" style="background:var(--accent-violet-soft);color:var(--accent-violet);font-size:11px">#typography</span></td>
+              <td style="text-align:right;font-variant-numeric:tabular-nums;color:#334155">71</td>
+            </tr>
+            <tr>
+              <td style="color:#0f172a;font-weight:500;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">"Tool showcase: Radix UI + Tailwind deep dive"</td>
+              <td><span class="pill" style="background:#f1f5f9;color:#64748b;font-size:11px">#tooling</span></td>
+              <td style="text-align:right;font-variant-numeric:tabular-nums;color:#334155">58</td>
+            </tr>
+            <tr>
+              <td style="color:#0f172a;font-weight:500;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">"Critique thread: AI-generated assets — worth it?"</td>
+              <td><span class="pill" style="background:#f1f5f9;color:#64748b;font-size:11px">#general</span></td>
+              <td style="text-align:right;font-variant-numeric:tabular-nums;color:#334155">47</td>
+            </tr>
+            <tr>
+              <td style="color:#0f172a;font-weight:500;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">"Event recap: #PortfolioDay 2025 highlights"</td>
+              <td><span class="pill" style="background:var(--status-green-soft);color:#16a34a;font-size:11px">#events</span></td>
+              <td style="text-align:right;font-variant-numeric:tabular-nums;color:#334155">39</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Activity timeline -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Recent Activity</span>
+        </div>
+        <div class="activity-list">
+          <div class="activity-row">
+            <div class="activity-dot-col"><div class="activity-dot activity-dot-blue"></div></div>
+            <div class="activity-body">
+              <div class="activity-text">Posted in <strong>#design-systems</strong> — "Here's how I tokenize spacing in Figma…"</div>
+              <div class="activity-time">2 days ago · 2:14 PM</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-dot-col"><div class="activity-dot activity-dot-violet"></div></div>
+            <div class="activity-body">
+              <div class="activity-text">Moderation action — removed a spam post from @brandLord99</div>
+              <div class="activity-time">3 days ago · 10:07 AM</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-dot-col"><div class="activity-dot activity-dot-green"></div></div>
+            <div class="activity-body">
+              <div class="activity-text">Reacted to 14 posts in <strong>#typography</strong></div>
+              <div class="activity-time">4 days ago · 6:50 PM</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-dot-col"><div class="activity-dot activity-dot-blue"></div></div>
+            <div class="activity-body">
+              <div class="activity-text">Posted "My 2025 typography stack for web apps"</div>
+              <div class="activity-time">5 days ago · 9:30 AM</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-dot-col"><div class="activity-dot activity-dot-slate"></div></div>
+            <div class="activity-body">
+              <div class="activity-text">Profile updated — added bio and timezone</div>
+              <div class="activity-time">8 days ago · 3:15 PM</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,1409 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kinetic Fitness Admin</title>
+<style>
+  :root {
+    --color-accent:          #84cc16;
+    --color-accent-bright:   #a3e635;
+    --color-accent-dim:      rgba(132,204,22,0.18);
+    --color-accent-muted:    rgba(132,204,22,0.08);
+    --color-text-primary:    #e6efe6;
+    --color-text-muted:      #93a392;
+    --color-text-lime:       #84cc16;
+    --color-status-active:   #84cc16;
+    --color-status-frozen:   #60a5fa;
+    --color-status-overdue:  #f87171;
+    --color-status-active-bg:  rgba(132,204,22,0.13);
+    --color-status-frozen-bg:  rgba(96,165,250,0.13);
+    --color-status-overdue-bg: rgba(248,113,113,0.13);
+    --color-star:            #84cc16;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #0f1410;
+    color: var(--color-text-primary);
+    font-size: 13px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── TOPBAR ─── */
+  .topbar {
+    height: 48px;
+    background: #19211a;
+    border-bottom: 1px solid #2c3a2f;
+    display: flex;
+    align-items: center;
+    padding: 0 16px 0 12px;
+    gap: 14px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-shrink: 0;
+  }
+
+  .topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .topbar-brand-icon {
+    width: 28px;
+    height: 28px;
+    background: var(--color-accent-dim);
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-accent);
+  }
+
+  .topbar-brand-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+
+  .topbar-search {
+    flex: 1;
+    max-width: 320px;
+    position: relative;
+  }
+
+  .topbar-search input {
+    width: 100%;
+    height: 32px;
+    background: #232e25;
+    border: 1px solid #2c3a2f;
+    border-radius: 7px;
+    color: var(--color-text-primary);
+    font-size: 12px;
+    font-family: inherit;
+    padding: 0 10px 0 30px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .topbar-search input::placeholder { color: var(--color-text-muted); }
+  .topbar-search input:focus { border-color: var(--color-accent); }
+
+  .topbar-search-icon {
+    position: absolute;
+    left: 9px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-muted);
+    pointer-events: none;
+  }
+
+  .topbar-spacer { flex: 1; }
+
+  .topbar-location {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #232e25;
+    border: 1px solid #2c3a2f;
+    border-radius: 7px;
+    padding: 4px 10px;
+    font-size: 12px;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .topbar-location svg { color: var(--color-accent); }
+
+  .topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .topbar-bell {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+    cursor: pointer;
+  }
+
+  .topbar-bell-dot {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 7px;
+    height: 7px;
+    background: var(--color-accent);
+    border-radius: 50%;
+    border: 1.5px solid #19211a;
+  }
+
+  .topbar-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--color-accent-dim);
+    border: 1.5px solid var(--color-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-accent);
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+  }
+
+  .topbar-avatar-name {
+    font-size: 12px;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .topbar-chevron { color: var(--color-text-muted); }
+
+  /* ─── BODY LAYOUT ─── */
+  .app-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ─── ICON RAIL ─── */
+  .rail {
+    width: 52px;
+    background: #19211a;
+    border-right: 1px solid #2c3a2f;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 0;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .rail-item {
+    width: 40px;
+    height: 40px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    position: relative;
+    transition: background 0.12s, color 0.12s;
+  }
+
+  .rail-item:hover { background: #232e25; color: var(--color-text-primary); }
+
+  .rail-item.active {
+    background: #232e25;
+    color: var(--color-accent);
+  }
+
+  .rail-item.active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 3px;
+    background: var(--color-accent);
+    border-radius: 0 2px 2px 0;
+  }
+
+  .rail-divider {
+    width: 24px;
+    height: 1px;
+    background: #2c3a2f;
+    margin: 4px 0;
+  }
+
+  /* ─── MAIN ─── */
+  .main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 24px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  .page-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    letter-spacing: -0.02em;
+  }
+
+  .page-subtitle {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+  }
+
+  .page-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-ghost {
+    height: 32px;
+    padding: 0 12px;
+    border: 1px solid #2c3a2f;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: border-color 0.12s, color 0.12s;
+  }
+
+  .btn-ghost:hover { border-color: var(--color-accent); color: var(--color-accent); }
+
+  .btn-primary {
+    height: 32px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 7px;
+    background: var(--color-accent);
+    color: #0f1410;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background 0.12s;
+  }
+
+  .btn-primary:hover { background: var(--color-accent-bright); }
+
+  /* ─── CARD ─── */
+  .card {
+    background: #19211a;
+    border: 1px solid #2c3a2f;
+    border-radius: 10px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid #2c3a2f;
+  }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .card-link {
+    font-size: 11px;
+    color: var(--color-accent);
+    text-decoration: none;
+    opacity: 0.85;
+    transition: opacity 0.12s;
+  }
+
+  .card-link:hover { opacity: 1; }
+
+  /* ─── KPI TILES ─── */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .kpi-tile {
+    background: #19211a;
+    border: 1px solid #2c3a2f;
+    border-radius: 10px;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+  }
+
+  .kpi-icon {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    width: 36px;
+    height: 36px;
+    background: var(--color-accent-muted);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-accent);
+  }
+
+  .kpi-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .kpi-value {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--color-text-primary);
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  .kpi-meta {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+
+  .kpi-delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 20px;
+  }
+
+  .kpi-delta.up {
+    background: var(--color-accent-dim);
+    color: var(--color-accent);
+  }
+
+  .kpi-delta.down {
+    background: rgba(248,113,113,0.13);
+    color: var(--color-status-overdue);
+  }
+
+  /* ─── MIDDLE ROW ─── */
+  .mid-row {
+    display: grid;
+    grid-template-columns: 7fr 5fr;
+    gap: 16px;
+  }
+
+  /* ─── SCHEDULE LIST ─── */
+  .schedule-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .schedule-item {
+    display: grid;
+    grid-template-columns: 44px 1fr 120px 140px;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 18px;
+    border-bottom: 1px solid #232e25;
+    transition: background 0.1s;
+  }
+
+  .schedule-item:last-child { border-bottom: none; }
+  .schedule-item:hover { background: #232e25; }
+
+  .sched-time {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-accent);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sched-class {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  .sched-coach {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+
+  .sched-cap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .cap-bar-wrap {
+    width: 100%;
+    height: 5px;
+    background: #232e25;
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .cap-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--color-accent);
+    transition: width 0.3s;
+  }
+
+  .cap-bar-fill.full { background: var(--color-accent); }
+
+  .cap-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .cap-fraction {
+    font-size: 10px;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cap-full-pill {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    background: var(--color-accent-dim);
+    color: var(--color-accent);
+    padding: 1px 5px;
+    border-radius: 10px;
+  }
+
+  /* ─── CHART CARD ─── */
+  .chart-card { height: 100%; }
+
+  .chart-meta {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    padding: 6px 18px 14px;
+  }
+
+  .chart-legend {
+    display: flex;
+    gap: 14px;
+    padding: 0 18px 10px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+
+  .legend-swatch {
+    width: 16px;
+    height: 3px;
+    border-radius: 2px;
+  }
+
+  .legend-swatch.this-week { background: var(--color-accent); }
+  .legend-swatch.last-week { background: #93a392; opacity: 0.6; }
+
+  .chart-svg-wrap {
+    padding: 0 18px 16px;
+  }
+
+  /* ─── MEMBERS TABLE ─── */
+  .members-card {}
+
+  .members-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tbl {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .tbl th {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    text-align: left;
+    padding: 10px 18px;
+    border-bottom: 1px solid #232e25;
+    background: transparent;
+  }
+
+  .tbl td {
+    padding: 10px 18px;
+    font-size: 12px;
+    color: var(--color-text-primary);
+    border-bottom: 1px solid #232e25;
+    vertical-align: middle;
+  }
+
+  .tbl tr:last-child td { border-bottom: none; }
+
+  .tbl tbody tr:hover td { background: #232e25; }
+
+  .member-cell {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+
+  .member-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--color-accent-muted);
+    border: 1px solid var(--color-accent-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--color-accent);
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+  }
+
+  .member-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  .plan-text {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 20px;
+  }
+
+  .status-pill.active {
+    background: var(--color-status-active-bg);
+    color: var(--color-status-active);
+  }
+
+  .status-pill.frozen {
+    background: var(--color-status-frozen-bg);
+    color: var(--color-status-frozen);
+  }
+
+  .status-pill.overdue {
+    background: var(--color-status-overdue-bg);
+    color: var(--color-status-overdue);
+  }
+
+  .status-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .last-visit {
+    color: var(--color-text-muted);
+    font-size: 11px;
+  }
+
+  .tbl-action {
+    color: var(--color-text-muted);
+    cursor: pointer;
+    font-size: 14px;
+    letter-spacing: 1px;
+    transition: color 0.12s;
+  }
+
+  .tbl-action:hover { color: var(--color-accent); }
+
+  /* ─── COACH PANEL ─── */
+  .coach-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .coach-card {
+    background: #232e25;
+    border: 1px solid #2c3a2f;
+    border-radius: 10px;
+    padding: 18px 18px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .coach-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .coach-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+    color: #0f1410;
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+  }
+
+  .coach-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .coach-specialty {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin-top: 1px;
+  }
+
+  .coach-stats {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+  }
+
+  .coach-classes {
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .coach-classes span { color: var(--color-text-primary); font-weight: 600; }
+
+  .coach-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--color-text-muted);
+    font-size: 11px;
+  }
+
+  .stars {
+    display: inline-flex;
+    gap: 1px;
+    color: var(--color-star);
+  }
+
+  .star-empty { opacity: 0.3; }
+
+  /* ─── SCROLLBAR ─── */
+  .main::-webkit-scrollbar { width: 4px; }
+  .main::-webkit-scrollbar-track { background: transparent; }
+  .main::-webkit-scrollbar-thumb { background: #2c3a2f; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="topbar-brand" href="#">
+    <div class="topbar-brand-icon">
+
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="2" y="10" width="4" height="4" rx="1"/>
+        <rect x="18" y="10" width="4" height="4" rx="1"/>
+        <rect x="6" y="8" width="2" height="8" rx="1"/>
+        <rect x="16" y="8" width="2" height="8" rx="1"/>
+        <line x1="8" y1="12" x2="16" y2="12"/>
+      </svg>
+    </div>
+    <span class="topbar-brand-name">KINETIC</span>
+  </a>
+
+  <div class="topbar-search">
+    <svg class="topbar-search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input type="text" placeholder="Search members, classes…" aria-label="Search">
+  </div>
+
+  <div class="topbar-spacer"></div>
+
+  <div class="topbar-location">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+      <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/>
+      <circle cx="12" cy="10" r="3"/>
+    </svg>
+    Downtown Studio
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polyline points="6 9 12 15 18 9"/>
+    </svg>
+  </div>
+
+  <div class="topbar-actions">
+    <div class="topbar-bell" aria-label="Notifications">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span class="topbar-bell-dot"></span>
+    </div>
+    <div class="topbar-avatar" aria-label="Account">AK</div>
+    <span class="topbar-avatar-name">Alex Kowalski</span>
+    <svg class="topbar-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polyline points="6 9 12 15 18 9"/>
+    </svg>
+  </div>
+</header>
+
+<div class="app-body">
+
+
+  <nav class="rail" aria-label="Primary navigation">
+
+    <div class="rail-item active" aria-label="Dashboard">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+      </svg>
+    </div>
+
+
+    <div class="rail-item" aria-label="Members">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+    </div>
+
+
+    <div class="rail-item" aria-label="Schedule">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+        <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+        <line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+    </div>
+
+
+    <div class="rail-item" aria-label="Classes">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="2" y="9" width="3" height="6" rx="1"/>
+        <rect x="19" y="9" width="3" height="6" rx="1"/>
+        <rect x="5" y="7" width="2" height="10" rx="1"/>
+        <rect x="17" y="7" width="2" height="10" rx="1"/>
+        <line x1="7" y1="12" x2="17" y2="12"/>
+      </svg>
+    </div>
+
+    <div class="rail-divider"></div>
+
+
+    <div class="rail-item" aria-label="Analytics">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="18" y1="20" x2="18" y2="10"/>
+        <line x1="12" y1="20" x2="12" y2="4"/>
+        <line x1="6" y1="20" x2="6" y2="14"/>
+      </svg>
+    </div>
+
+
+    <div class="rail-item" aria-label="Settings">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </div>
+  </nav>
+
+
+  <main class="main">
+
+
+    <div class="page-header">
+      <div>
+        <div class="page-title">Operations Dashboard</div>
+        <div class="page-subtitle">Sunday, 1 June 2026 · Downtown Studio</div>
+      </div>
+      <div class="page-actions">
+        <button class="btn-ghost">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Export
+        </button>
+        <button class="btn-primary">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Add Member
+        </button>
+      </div>
+    </div>
+
+
+    <div class="kpi-row">
+
+
+      <div class="kpi-tile">
+        <div class="kpi-icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+          </svg>
+        </div>
+        <div class="kpi-label">Active Members</div>
+        <div class="kpi-value">1,847</div>
+        <div><span class="kpi-delta up">▲ +34 this month</span></div>
+      </div>
+
+
+      <div class="kpi-tile">
+        <div class="kpi-icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 11 12 14 22 4"/>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+          </svg>
+        </div>
+        <div class="kpi-label">Check-ins Today</div>
+        <div class="kpi-value">312</div>
+        <div><span class="kpi-delta up">▲ +18 vs yesterday</span></div>
+      </div>
+
+
+      <div class="kpi-tile">
+        <div class="kpi-icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+            <polyline points="9 16 11 18 15 14"/>
+          </svg>
+        </div>
+        <div class="kpi-label">Classes Today</div>
+        <div class="kpi-value">18</div>
+        <div class="kpi-meta">8 completed · 10 upcoming</div>
+      </div>
+
+
+      <div class="kpi-tile">
+        <div class="kpi-icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <polyline points="9 12 11 14 15 10"/>
+          </svg>
+        </div>
+        <div class="kpi-label">30-Day Retention</div>
+        <div class="kpi-value">91.4%</div>
+        <div><span class="kpi-delta up">▲ +1.2 pp vs last month</span></div>
+      </div>
+
+    </div>
+
+
+
+    <div class="mid-row">
+
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Today's Classes</span>
+          <a class="card-link" href="#">View full schedule →</a>
+        </div>
+        <div class="schedule-list" role="list">
+
+
+          <div class="schedule-item" role="listitem">
+            <div class="sched-time">06:00</div>
+            <div>
+              <div class="sched-class">HIIT Ignite</div>
+            </div>
+            <div class="sched-coach">Coach Priya Mehra</div>
+            <div class="sched-cap">
+              <div class="cap-label-row">
+                <span class="cap-fraction">24 / 30</span>
+              </div>
+              <div class="cap-bar-wrap">
+                <div class="cap-bar-fill" style="width:80%"></div>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="schedule-item" role="listitem">
+            <div class="sched-time">07:30</div>
+            <div>
+              <div class="sched-class">Power Lift</div>
+            </div>
+            <div class="sched-coach">Coach Dom Vasquez</div>
+            <div class="sched-cap">
+              <div class="cap-label-row">
+                <span class="cap-fraction">16 / 30</span>
+              </div>
+              <div class="cap-bar-wrap">
+                <div class="cap-bar-fill" style="width:53%"></div>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="schedule-item" role="listitem">
+            <div class="sched-time">09:00</div>
+            <div>
+              <div class="sched-class">Yoga Flow</div>
+            </div>
+            <div class="sched-coach">Coach Anika Torres</div>
+            <div class="sched-cap">
+              <div class="cap-label-row">
+                <span class="cap-fraction">20 / 20</span>
+                <span class="cap-full-pill">Full</span>
+              </div>
+              <div class="cap-bar-wrap">
+                <div class="cap-bar-fill full" style="width:100%"></div>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="schedule-item" role="listitem">
+            <div class="sched-time">10:30</div>
+            <div>
+              <div class="sched-class">Spin Burn</div>
+            </div>
+            <div class="sched-coach">Coach Dev Okafor</div>
+            <div class="sched-cap">
+              <div class="cap-label-row">
+                <span class="cap-fraction">18 / 28</span>
+              </div>
+              <div class="cap-bar-wrap">
+                <div class="cap-bar-fill" style="width:64%"></div>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="schedule-item" role="listitem">
+            <div class="sched-time">12:00</div>
+            <div>
+              <div class="sched-class">Core &amp; Stretch</div>
+            </div>
+            <div class="sched-coach">Coach Priya Mehra</div>
+            <div class="sched-cap">
+              <div class="cap-label-row">
+                <span class="cap-fraction">8 / 25</span>
+              </div>
+              <div class="cap-bar-wrap">
+                <div class="cap-bar-fill" style="width:32%"></div>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="schedule-item" role="listitem">
+            <div class="sched-time">17:00</div>
+            <div>
+              <div class="sched-class">Boxing Basics</div>
+            </div>
+            <div class="sched-coach">Coach Marcus Reid</div>
+            <div class="sched-cap">
+              <div class="cap-label-row">
+                <span class="cap-fraction">12 / 20</span>
+              </div>
+              <div class="cap-bar-wrap">
+                <div class="cap-bar-fill" style="width:60%"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+
+      <div class="card chart-card">
+        <div class="card-header">
+          <span class="card-title">Weekly Attendance</span>
+          <span class="card-link" style="cursor:default;color:var(--color-text-muted);">This vs Last Week</span>
+        </div>
+        <div class="chart-legend">
+          <div class="legend-item">
+            <div class="legend-swatch this-week"></div>
+            This week
+          </div>
+          <div class="legend-item">
+            <div class="legend-swatch last-week"></div>
+            Last week
+          </div>
+        </div>
+        <div class="chart-svg-wrap">
+
+          <svg width="100%" viewBox="0 0 360 148" aria-label="Weekly attendance area chart" role="img" style="display:block;overflow:visible">
+            <defs>
+              <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--color-accent)" stop-opacity="0.32"/>
+                <stop offset="100%" stop-color="var(--color-accent)" stop-opacity="0.02"/>
+              </linearGradient>
+            </defs>
+
+
+            <line x1="20" y1="18" x2="340" y2="18" stroke="#2c3a2f" stroke-width="1"/>
+            <line x1="20" y1="47" x2="340" y2="47" stroke="#2c3a2f" stroke-width="1"/>
+            <line x1="20" y1="76" x2="340" y2="76" stroke="#2c3a2f" stroke-width="1"/>
+            <line x1="20" y1="105" x2="340" y2="105" stroke="#2c3a2f" stroke-width="1"/>
+
+
+            <text x="16" y="21" text-anchor="end" font-size="9" fill="#93a392" font-family="system-ui">420</text>
+            <text x="16" y="50" text-anchor="end" font-size="9" fill="#93a392" font-family="system-ui">315</text>
+            <text x="16" y="79" text-anchor="end" font-size="9" fill="#93a392" font-family="system-ui">210</text>
+            <text x="16" y="108" text-anchor="end" font-size="9" fill="#93a392" font-family="system-ui">105</text>
+
+
+
+
+            <polyline
+              points="
+                20,65.6
+                73.3,51.8
+                126.7,54.8
+                180,46.0
+                233.3,49.1
+                286.7,23.3
+                340,30.4
+              "
+              fill="none"
+              stroke="#93a392"
+              stroke-width="1.5"
+              stroke-dasharray="4 3"
+              opacity="0.55"
+            />
+
+
+            <polygon
+              points="
+                20,105
+                20,61.5
+                73.3,47.0
+                126.7,50.1
+                180,41.8
+                233.3,44.9
+                286.7,18.0
+                340,26.3
+                340,105
+              "
+              fill="url(#areaGrad)"
+            />
+
+
+            <polyline
+              points="
+                20,61.5
+                73.3,47.0
+                126.7,50.1
+                180,41.8
+                233.3,44.9
+                286.7,18.0
+                340,26.3
+              "
+              fill="none"
+              stroke="var(--color-accent)"
+              stroke-width="2"
+              stroke-linejoin="round"
+              stroke-linecap="round"
+            />
+
+
+            <circle cx="20"    cy="61.5" r="3" fill="var(--color-accent)"/>
+            <circle cx="73.3"  cy="47.0" r="3" fill="var(--color-accent)"/>
+            <circle cx="126.7" cy="50.1" r="3" fill="var(--color-accent)"/>
+            <circle cx="180"   cy="41.8" r="3" fill="var(--color-accent)"/>
+            <circle cx="233.3" cy="44.9" r="3" fill="var(--color-accent)"/>
+            <circle cx="286.7" cy="18.0" r="3" fill="var(--color-accent)"/>
+            <circle cx="340"   cy="26.3" r="3" fill="var(--color-accent)"/>
+
+
+            <text x="20"    y="124" text-anchor="middle" font-size="9" fill="#93a392" font-family="system-ui">Mon</text>
+            <text x="73.3"  y="124" text-anchor="middle" font-size="9" fill="#93a392" font-family="system-ui">Tue</text>
+            <text x="126.7" y="124" text-anchor="middle" font-size="9" fill="#93a392" font-family="system-ui">Wed</text>
+            <text x="180"   y="124" text-anchor="middle" font-size="9" fill="#93a392" font-family="system-ui">Thu</text>
+            <text x="233.3" y="124" text-anchor="middle" font-size="9" fill="#93a392" font-family="system-ui">Fri</text>
+            <text x="286.7" y="124" text-anchor="middle" font-size="9" fill="#93a392" font-family="system-ui">Sat</text>
+            <text x="340"   y="124" text-anchor="middle" font-size="9" fill="#93a392" font-family="system-ui">Sun</text>
+          </svg>
+        </div>
+        <div class="chart-meta">Peak day: Saturday · 420 check-ins &nbsp;·&nbsp; Week total: 2,155</div>
+      </div>
+
+
+    </div>
+
+
+
+    <div class="card members-card">
+      <div class="card-header">
+        <span class="card-title">Members</span>
+        <div class="members-header-actions">
+          <button class="btn-ghost" style="border-color:var(--color-accent);color:var(--color-accent);">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Export CSV
+          </button>
+        </div>
+      </div>
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Plan</th>
+            <th>Status</th>
+            <th>Last Visit</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="member-cell">
+                <div class="member-avatar">JK</div>
+                <div class="member-name">Jess Kamara</div>
+              </div>
+            </td>
+            <td><span class="plan-text">Elite Annual</span></td>
+            <td><span class="status-pill active"><span class="status-dot"></span>Active</span></td>
+            <td><span class="last-visit">2 hrs ago</span></td>
+            <td><span class="tbl-action">···</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="member-cell">
+                <div class="member-avatar">TW</div>
+                <div class="member-name">Tobias Wren</div>
+              </div>
+            </td>
+            <td><span class="plan-text">Monthly Flex</span></td>
+            <td><span class="status-pill active"><span class="status-dot"></span>Active</span></td>
+            <td><span class="last-visit">Yesterday</span></td>
+            <td><span class="tbl-action">···</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="member-cell">
+                <div class="member-avatar">CN</div>
+                <div class="member-name">Chloe Nakamura</div>
+              </div>
+            </td>
+            <td><span class="plan-text">Elite Annual</span></td>
+            <td><span class="status-pill active"><span class="status-dot"></span>Active</span></td>
+            <td><span class="last-visit">3 days ago</span></td>
+            <td><span class="tbl-action">···</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="member-cell">
+                <div class="member-avatar">RO</div>
+                <div class="member-name">Rafael Osei</div>
+              </div>
+            </td>
+            <td><span class="plan-text">Day Pass</span></td>
+            <td><span class="status-pill active"><span class="status-dot"></span>Active</span></td>
+            <td><span class="last-visit">Today</span></td>
+            <td><span class="tbl-action">···</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="member-cell">
+                <div class="member-avatar">NC</div>
+                <div class="member-name">Nina Castillo</div>
+              </div>
+            </td>
+            <td><span class="plan-text">Monthly Flex</span></td>
+            <td><span class="status-pill frozen"><span class="status-dot"></span>Frozen</span></td>
+            <td><span class="last-visit">12 days ago</span></td>
+            <td><span class="tbl-action">···</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="member-cell">
+                <div class="member-avatar">KD</div>
+                <div class="member-name">Kwame Diallo</div>
+              </div>
+            </td>
+            <td><span class="plan-text">Elite Annual</span></td>
+            <td><span class="status-pill active"><span class="status-dot"></span>Active</span></td>
+            <td><span class="last-visit">4 hrs ago</span></td>
+            <td><span class="tbl-action">···</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="member-cell">
+                <div class="member-avatar">SP</div>
+                <div class="member-name">Sasha Petrova</div>
+              </div>
+            </td>
+            <td><span class="plan-text">Monthly Flex</span></td>
+            <td><span class="status-pill overdue"><span class="status-dot"></span>Overdue</span></td>
+            <td><span class="last-visit">18 days ago</span></td>
+            <td><span class="tbl-action">···</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="member-cell">
+                <div class="member-avatar">LA</div>
+                <div class="member-name">Leo Andrade</div>
+              </div>
+            </td>
+            <td><span class="plan-text">Student Plan</span></td>
+            <td><span class="status-pill active"><span class="status-dot"></span>Active</span></td>
+            <td><span class="last-visit">1 day ago</span></td>
+            <td><span class="tbl-action">···</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+
+    <div class="coach-row">
+
+
+      <div class="coach-card">
+        <div class="coach-header">
+          <div class="coach-avatar">PM</div>
+          <div>
+            <div class="coach-name">Priya Mehra</div>
+            <div class="coach-specialty">HIIT &amp; Yoga</div>
+          </div>
+        </div>
+        <div class="coach-stats">
+          <div class="coach-classes">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <span>8</span> classes this week
+          </div>
+          <div class="coach-rating">
+            <span class="stars" aria-label="4.9 out of 5 stars">
+              <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+            </span>
+            4.9
+          </div>
+        </div>
+      </div>
+
+
+      <div class="coach-card">
+        <div class="coach-header">
+          <div class="coach-avatar">DV</div>
+          <div>
+            <div class="coach-name">Dom Vasquez</div>
+            <div class="coach-specialty">Strength &amp; Conditioning</div>
+          </div>
+        </div>
+        <div class="coach-stats">
+          <div class="coach-classes">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <span>6</span> classes this week
+          </div>
+          <div class="coach-rating">
+            <span class="stars" aria-label="4.7 out of 5 stars">
+              <span>★</span><span>★</span><span>★</span><span>★</span><span class="star-empty">★</span>
+            </span>
+            4.7
+          </div>
+        </div>
+      </div>
+
+
+      <div class="coach-card">
+        <div class="coach-header">
+          <div class="coach-avatar">MR</div>
+          <div>
+            <div class="coach-name">Marcus Reid</div>
+            <div class="coach-specialty">Boxing &amp; HIIT</div>
+          </div>
+        </div>
+        <div class="coach-stats">
+          <div class="coach-classes">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <span>5</span> classes this week
+          </div>
+          <div class="coach-rating">
+            <span class="stars" aria-label="4.8 out of 5 stars">
+              <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+            </span>
+            4.8
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+
+  </main>
+
+
+</div>
+
+</body>
+</html>

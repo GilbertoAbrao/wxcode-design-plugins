@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-vault-treasury",
-  "title": "Vault Treasury Admin",
-  "version": "0.1.0",
-  "description": "Premium dark-mode corporate treasury dashboard \u2014 amber/gold accent on deep navy, left rail nav, entity/period switcher, 4 KPI cards (balance \u00b7 inflows \u00b7 outflows \u00b7 runway), cashflow SVG area chart, allocation donut, recent transactions table with status pills.",
+  "title": "Vault Admin",
+  "version": "0.2.0",
+  "description": "Deep-navy / amber-gold admin aesthetic: #0a0f1e canvas, raised navy panels (#121a2e / #1b2640), amber-gold accent (#f59e0b), cool-navy neutral ramp, Inter tabular figures, signed-amount rows (green / red), 8–10px radii. Archetype = labeled 220px rail nav with grouped sections + 60px topbar (entity switcher + period tabs + avatar) + 4 KPI cards with inline sparklines + 2-column (7fr area chart / 5fr allocation donut) + full-width records table with status pills, plus matching list, form, and detail screens. Built for calm, high-clarity operational consoles that communicate magnitude at a glance.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,14 +19,14 @@
     "operations",
     "web",
     "admin",
-    "finance",
-    "treasury",
     "dark-mode",
+    "deep-navy",
     "amber-gold",
-    "corporate",
-    "premium",
-    "cashflow",
-    "deep-navy"
+    "labeled-rail",
+    "data-dense",
+    "area-chart",
+    "donut-chart",
+    "enterprise"
   ],
   "compat": {
     "agentSkills": [
@@ -47,13 +47,25 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a premium dark-mode corporate treasury admin dashboard \u2014 left rail nav, entity/period switcher, 4 KPI cards for cash position, inflows, outflows, runway, cashflow area chart, allocation donut, recent transactions table.",
-        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me a premium dark-mode corporate treasury admin dashboard \u2014 left rail nav, entity/period switcher, 4 KPI cards for cash position, inflows, outflows, runway, cashflow area chart, allocation donut, recent transactions table."
+        "en": "Apply this deep navy amber-gold admin aesthetic to my domain — labeled rail nav, entity/period switcher, 4 KPI cards with sparklines, area chart + allocation donut, and a dense records table with signed amounts and status pills, plus list / form / detail screens.",
+        "zh-CN": "将这个深海军蓝琥珀金管理界面风格应用到我的领域：带标签的侧边导航栏、实体/周期切换器、4 个带迷你图的 KPI 卡片、面积图 + 分配圆环图，以及带有正负金额和状态标签的密集记录表格，并配套列表 / 表单 / 详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Vault Treasury Admin"
+          "title": "Vault Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Vault Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Vault Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Vault Admin — Detail"
         }
       ]
     },
@@ -71,7 +83,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {
@@ -90,8 +108,8 @@
       "fs:write"
     ],
     "provenance": {
-      "category": "themeforest-admin-templates",
-      "note": "category design-language reference only; original implementation"
+      "category": "admin-dashboards",
+      "note": "original archetype; no third-party template reproduced"
     }
   }
 }

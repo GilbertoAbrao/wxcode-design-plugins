@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bloom Admin — Detail</title>
+<style>
+:root {
+  --accent:         #10b981;
+  --accent-light:   #d1fae5;
+  --accent-dark:    #059669;
+  --accent-mid:     #34d399;
+  --coral:          #fb7185;
+  --coral-light:    #ffe4e8;
+  --coral-dark:     #e11d48;
+  --amber:          #f59e0b;
+  --amber-light:    #fef3c7;
+  --amber-dark:     #92400e;
+  --surface:        #f7fbf9;
+  --card:           #ffffff;
+  --border:         #e4ede9;
+  --text-primary:   #1e293b;
+  --text-secondary: #64748b;
+  --text-muted:     #94a3b8;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px; color: var(--text-primary);
+  background: var(--surface); display: flex; min-height: 100vh; line-height: 1.5;
+}
+
+/* ── SIDEBAR ─────────────────────────────────────── */
+.sidebar { width: 260px; flex-shrink: 0; background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; height: 100vh; position: sticky; top: 0; overflow-y: auto; }
+.org-switcher { padding: 20px 16px 14px; border-bottom: 1px solid var(--border); }
+.org-row { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 6px 8px; border-radius: 8px; }
+.org-avatar { width: 34px; height: 34px; border-radius: 9px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.org-name { font-size: 13px; font-weight: 600; flex: 1; }
+.org-caret { color: var(--text-muted); }
+.program-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; padding: 0 8px; }
+.program-chip { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px; background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); cursor: pointer; }
+.program-chip.active { background: var(--accent-light); color: var(--accent-dark); border-color: var(--accent-light); }
+.nav { flex: 1; padding: 12px 10px; overflow-y: auto; }
+.nav-section-label { font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); padding: 10px 8px 4px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 7px; cursor: pointer; color: var(--text-secondary); font-size: 13px; font-weight: 500; position: relative; transition: all .15s; text-decoration: none; }
+.nav-item:hover { background: var(--surface); color: var(--text-primary); }
+.nav-item.active { background: var(--accent-light); color: var(--accent-dark); font-weight: 600; }
+.nav-item.active::before { content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 3px; border-radius: 0 3px 3px 0; background: var(--accent); }
+.nav-item svg { flex-shrink: 0; }
+.nav-item.active svg { color: var(--accent); }
+.nav-badge { margin-left: auto; font-size: 10px; font-weight: 700; background: var(--coral-light); color: var(--coral-dark); border-radius: 10px; padding: 1px 6px; }
+.sidebar-footer { padding: 14px 16px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+.user-avatar-sm { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-light); color: var(--accent-dark); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.user-info { flex: 1; }
+.user-name { font-size: 13px; font-weight: 600; }
+.user-role { font-size: 11px; color: var(--text-muted); }
+
+/* ── MAIN ────────────────────────────────────────── */
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+/* ── TOPBAR ──────────────────────────────────────── */
+.topbar { height: 60px; background: var(--card); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 16px; padding: 0 24px; position: sticky; top: 0; z-index: 10; }
+.topbar-left { flex: 1; }
+.breadcrumb { font-size: 12px; color: var(--text-muted); }
+.breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+.breadcrumb a:hover { color: var(--accent-dark); }
+.page-title-row { display: flex; align-items: center; gap: 10px; margin-top: 2px; }
+.page-title { font-size: 16px; font-weight: 700; }
+.topbar-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.btn-ghost { padding: 7px 14px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; transition: all .15s; }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent-dark); }
+.btn-primary { padding: 7px 14px; background: var(--accent); border: 1px solid var(--accent); border-radius: 8px; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background .15s; }
+.btn-primary:hover { background: var(--accent-dark); }
+
+/* ── CONTENT ─────────────────────────────────────── */
+.content { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+
+.status-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; border-radius: 20px; padding: 2px 8px; }
+.status-badge.active { background: var(--accent-light); color: var(--accent-dark); }
+.status-badge.ending { background: var(--amber-light);  color: var(--amber-dark);  }
+.status-badge.paused { background: #f1f5f9;              color: #64748b;            }
+
+/* ── DETAIL HEADER CARD ──────────────────────────── */
+.detail-header-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+.detail-id-row { display: flex; align-items: center; gap: 10px; }
+.detail-id { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.detail-name { font-size: 20px; font-weight: 700; margin-top: 4px; }
+.detail-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+.detail-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+/* progress header strip -->*/
+.progress-strip { margin-top: 16px; display: flex; flex-direction: column; gap: 6px; }
+.progress-nums { display: flex; align-items: baseline; gap: 6px; }
+.raised-fig { font-size: 22px; font-weight: 700; color: var(--accent-dark); font-variant-numeric: tabular-nums; }
+.goal-fig { font-size: 13px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.progress-bar-wide { height: 8px; border-radius: 4px; background: var(--border); overflow: hidden; }
+.progress-fill-wide { height: 100%; border-radius: 4px; background: var(--accent); transition: width .4s; }
+.progress-meta { display: flex; align-items: center; gap: 12px; font-size: 11px; color: var(--text-muted); }
+.progress-meta strong { color: var(--text-primary); }
+
+/* ── META GRID ───────────────────────────────────── */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.card-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 12px; border-bottom: 1px solid var(--border); }
+.card-title { font-size: 14px; font-weight: 700; }
+.meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
+.meta-cell { padding: 16px 20px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.meta-cell:nth-child(3n) { border-right: none; }
+.meta-cell:nth-last-child(-n+3) { border-bottom: none; }
+.meta-label { font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+.meta-value { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.meta-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+/* ── TWO-COL PANELS ──────────────────────────────── */
+.two-col { display: grid; grid-template-columns: 1fr 320px; gap: 16px; align-items: start; }
+
+/* contributions sub-table */
+.sub-table { width: 100%; border-collapse: collapse; }
+.sub-table th { font-size: 10px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--text-muted); padding: 9px 20px; text-align: left; background: var(--surface); border-bottom: 1px solid var(--border); white-space: nowrap; }
+.sub-table td { padding: 10px 20px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+.sub-table tr:last-child td { border-bottom: none; }
+.sub-table tr:hover td { background: #f9fdfb; }
+.sub-footer { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-top: 1px solid var(--border); background: var(--surface); }
+.sub-footer-count { font-size: 12px; color: var(--text-muted); }
+.sub-footer-link { font-size: 12px; font-weight: 600; color: var(--accent-dark); cursor: pointer; background: none; border: none; text-decoration: none; }
+.sub-footer-link:hover { text-decoration: underline; }
+
+.entity-cell { display: flex; align-items: center; gap: 8px; }
+.entity-initials { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; color: #fff; }
+.entity-name { font-weight: 600; }
+.amount-cell { font-weight: 700; font-variant-numeric: tabular-nums; }
+.type-pill { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+.type-pill.primary   { background: var(--accent-light); color: var(--accent-dark); }
+.type-pill.recurring { background: var(--coral-light);  color: var(--coral-dark);  }
+.date-cell { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+
+/* activity feed */
+.activity-feed { display: flex; flex-direction: column; }
+.activity-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px 20px; border-bottom: 1px solid var(--border); }
+.activity-item:last-child { border-bottom: none; }
+.activity-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.activity-dot.green { background: var(--accent); }
+.activity-dot.coral { background: var(--coral); }
+.activity-dot.amber { background: var(--amber); }
+.activity-dot.slate { background: var(--text-muted); }
+.activity-body { display: flex; flex-direction: column; gap: 1px; }
+.activity-text { font-size: 13px; }
+.activity-text strong { font-weight: 600; }
+.activity-time { font-size: 11px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="org-switcher">
+    <div class="org-row">
+      <div class="org-avatar">G</div>
+      <span class="org-name">GreenPath Alliance</span>
+      <span class="org-caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+    </div>
+    <div class="program-chips">
+      <span class="program-chip active">All Programs</span>
+      <span class="program-chip">Environment</span>
+      <span class="program-chip">Education</span>
+    </div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section-label">Overview</div>
+    <a class="nav-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a class="nav-item active"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Initiatives<span class="nav-badge">9</span></a>
+    <div class="nav-section-label">Members</div>
+    <a class="nav-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Member List</a>
+    <a class="nav-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Segments</a>
+    <div class="nav-section-label">Finance</div>
+    <a class="nav-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Reports</a>
+    <div class="nav-section-label">Settings</div>
+    <a class="nav-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Team</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-avatar-sm">CL</div>
+    <div class="user-info"><div class="user-name">Carmen López</div><div class="user-role">Programs Director</div></div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="breadcrumb"><a href="#">Initiatives</a> › INI-2026-07</div>
+      <div class="page-title-row">
+        <div class="page-title">Reforestation Drive</div>
+        <span class="status-badge active"><svg width="7" height="7" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg> Active</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn-ghost">Pause</button>
+      <button class="btn-ghost">Share</button>
+      <button class="btn-primary">Edit Initiative</button>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- DETAIL HEADER CARD -->
+    <div class="detail-header-card">
+      <div style="flex:1;">
+        <div class="detail-id-row">
+          <span class="detail-id">INI-2026-07</span>
+        </div>
+        <div class="detail-name">Reforestation Drive 2026</div>
+        <div class="detail-sub">Environment · Lead: Carmen López · Created Apr 5, 2026</div>
+        <div class="progress-strip">
+          <div class="progress-nums">
+            <span class="raised-fig">$74,200</span>
+            <span class="goal-fig">of $100,000 goal</span>
+          </div>
+          <div class="progress-bar-wide"><div class="progress-fill-wide" style="width:74.2%"></div></div>
+          <div class="progress-meta">
+            <span><strong>74%</strong> funded</span>
+            <span>·</span>
+            <span><strong>22 days</strong> remaining</span>
+            <span>·</span>
+            <span><strong>148</strong> contributors</span>
+            <span>·</span>
+            <span>Closes <strong>Jun 24, 2026</strong></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- META GRID -->
+    <div class="card">
+      <div class="card-header"><span class="card-title">Details</span></div>
+      <div class="meta-grid">
+        <div class="meta-cell"><div class="meta-label">Program</div><div class="meta-value">Environment</div><div class="meta-sub">GreenPath Alliance</div></div>
+        <div class="meta-cell"><div class="meta-label">Priority</div><div class="meta-value">Medium</div></div>
+        <div class="meta-cell"><div class="meta-label">Recurring Pledges</div><div class="meta-value">Allowed</div><div class="meta-sub">Monthly cycle</div></div>
+        <div class="meta-cell"><div class="meta-label">Total Raised</div><div class="meta-value">$74,200</div><div class="meta-sub">148 contributions</div></div>
+        <div class="meta-cell"><div class="meta-label">Avg. Contribution</div><div class="meta-value">$501</div></div>
+        <div class="meta-cell"><div class="meta-label">Largest Single</div><div class="meta-value">$5,000</div><div class="meta-sub">Amara Osei · Jun 1</div></div>
+      </div>
+    </div>
+
+    <!-- TWO-COL: contributions table + activity feed -->
+    <div class="two-col">
+
+      <!-- Contributions sub-table -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Recent Contributions</span>
+          <button class="btn-ghost" style="font-size:12px;padding:5px 10px;">Export CSV</button>
+        </div>
+        <table class="sub-table">
+          <thead>
+            <tr>
+              <th>Member</th>
+              <th>Amount</th>
+              <th>Type</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="entity-cell"><div class="entity-initials" style="background:var(--accent)">AO</div><span class="entity-name">Amara Osei</span></div></td>
+              <td class="amount-cell">$5,000</td>
+              <td><span class="type-pill primary">One-time</span></td>
+              <td class="date-cell">Jun 1, 2026</td>
+            </tr>
+            <tr>
+              <td><div class="entity-cell"><div class="entity-initials" style="background:var(--amber)">TW</div><span class="entity-name">Thomas Weber</span></div></td>
+              <td class="amount-cell">$800</td>
+              <td><span class="type-pill recurring">Recurring</span></td>
+              <td class="date-cell">May 30, 2026</td>
+            </tr>
+            <tr>
+              <td><div class="entity-cell"><div class="entity-initials" style="background:var(--coral)">SJ</div><span class="entity-name">Soo-Jin Park</span></div></td>
+              <td class="amount-cell">$200</td>
+              <td><span class="type-pill primary">One-time</span></td>
+              <td class="date-cell">May 29, 2026</td>
+            </tr>
+            <tr>
+              <td><div class="entity-cell"><div class="entity-initials" style="background:var(--accent-mid)">RN</div><span class="entity-name">Rafael Nunes</span></div></td>
+              <td class="amount-cell">$120</td>
+              <td><span class="type-pill recurring">Recurring</span></td>
+              <td class="date-cell">May 28, 2026</td>
+            </tr>
+            <tr>
+              <td><div class="entity-cell"><div class="entity-initials" style="background:#64748b">BK</div><span class="entity-name">Boris Kuznetsov</span></div></td>
+              <td class="amount-cell">$50</td>
+              <td><span class="type-pill recurring">Recurring</span></td>
+              <td class="date-cell">May 27, 2026</td>
+            </tr>
+            <tr>
+              <td><div class="entity-cell"><div class="entity-initials" style="background:var(--accent-dark)">LM</div><span class="entity-name">Linh Mai</span></div></td>
+              <td class="amount-cell">$350</td>
+              <td><span class="type-pill primary">One-time</span></td>
+              <td class="date-cell">May 26, 2026</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="sub-footer">
+          <span class="sub-footer-count">Showing 6 of 148 contributions</span>
+          <a class="sub-footer-link">View all →</a>
+        </div>
+      </div>
+
+      <!-- Activity feed -->
+      <div class="card">
+        <div class="card-header"><span class="card-title">Activity</span></div>
+        <div class="activity-feed">
+          <div class="activity-item">
+            <span class="activity-dot green"></span>
+            <div class="activity-body">
+              <div class="activity-text"><strong>Amara Osei</strong> contributed $5,000.</div>
+              <div class="activity-time">Jun 1, 2026 · 14:22</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <span class="activity-dot slate"></span>
+            <div class="activity-body">
+              <div class="activity-text"><strong>Carmen López</strong> updated the close date to Jun 24.</div>
+              <div class="activity-time">May 31, 2026 · 09:05</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <span class="activity-dot amber"></span>
+            <div class="activity-body">
+              <div class="activity-text">75% milestone notification sent to coordinator.</div>
+              <div class="activity-time">May 30, 2026 · 18:47</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <span class="activity-dot green"></span>
+            <div class="activity-body">
+              <div class="activity-text"><strong>Thomas Weber</strong> set up a recurring pledge of $800/mo.</div>
+              <div class="activity-time">May 30, 2026 · 11:30</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <span class="activity-dot coral"></span>
+            <div class="activity-body">
+              <div class="activity-text"><strong>Jorge Vargas</strong> cancelled their pledge.</div>
+              <div class="activity-time">May 28, 2026 · 08:14</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <span class="activity-dot slate"></span>
+            <div class="activity-body">
+              <div class="activity-text">Initiative launched and set to <strong>Active</strong>.</div>
+              <div class="activity-time">Apr 5, 2026 · 10:00</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+</body>
+</html>

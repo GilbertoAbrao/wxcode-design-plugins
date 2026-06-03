@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Member Detail</title>
+<style>
+  :root {
+    --bg-base: #0d1117;
+    --bg-mid: #1c1f2a;
+    --cyan: #4dd0e1;
+    --cyan-dim: rgba(77,208,225,0.15);
+    --white-95: rgba(255,255,255,0.95);
+    --white-60: rgba(255,255,255,0.60);
+    --white-30: rgba(255,255,255,0.30);
+    --white-10: rgba(255,255,255,0.10);
+    --white-06: rgba(255,255,255,0.06);
+    --white-04: rgba(255,255,255,0.04);
+    --white-02: rgba(255,255,255,0.02);
+    --green-glass: rgba(52,211,153,0.18);
+    --green-text: #34d399;
+    --glass-bg: rgba(255,255,255,0.04);
+    --glass-border: 1px solid rgba(255,255,255,0.10);
+    --glass-shadow: 0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
+    --glass-blur: blur(18px) saturate(120%);
+    --radius: 16px;
+    --sidebar-w: 240px;
+    --topbar-h: 72px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-base); color: var(--white-95); min-height: 100vh; overflow-x: hidden; position: relative; }
+  .aurora { position: fixed; inset: 0; z-index: 0; background: radial-gradient(ellipse 80% 60% at 10% 20%, rgba(77,208,225,0.18) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 85% 15%, rgba(167,139,250,0.14) 0%, transparent 55%), radial-gradient(ellipse 70% 60% at 70% 80%, rgba(244,114,182,0.12) 0%, transparent 55%), radial-gradient(ellipse 50% 40% at 20% 85%, rgba(59,130,246,0.10) 0%, transparent 50%), linear-gradient(160deg, #0f1520 0%, #0d1117 40%, #111828 100%); }
+  .grain { position: fixed; inset: 0; z-index: 1; opacity: 0.035; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E"); pointer-events: none; }
+  .shell { position: relative; z-index: 2; display: flex; min-height: 100vh; }
+  .sidebar { width: var(--sidebar-w); min-height: 100vh; flex-shrink: 0; background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border-right: var(--glass-border); box-shadow: var(--glass-shadow); display: flex; flex-direction: column; padding: 28px 16px; gap: 8px; }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 0 8px 24px; border-bottom: 1px solid var(--white-06); margin-bottom: 8px; }
+  .brand-icon { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, var(--cyan) 0%, #818cf8 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .brand-name { font-size: 15px; font-weight: 700; letter-spacing: 0.08em; color: var(--white-95); }
+  .brand-sub { font-size: 9px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--white-60); margin-top: 1px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: pointer; color: var(--white-60); font-size: 13.5px; font-weight: 500; transition: background 0.15s, color 0.15s; text-decoration: none; }
+  .nav-item:hover { background: var(--white-04); color: var(--white-95); }
+  .nav-item.active { background: var(--cyan-dim); color: var(--cyan); border: 1px solid rgba(77,208,225,0.20); box-shadow: inset 0 1px 0 rgba(77,208,225,0.12), 0 0 16px rgba(77,208,225,0.06); }
+  .sidebar-spacer { flex: 1; }
+  .sidebar-footer { padding: 12px 8px 0; border-top: 1px solid var(--white-06); display: flex; align-items: center; gap: 10px; }
+  .avatar-sm { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #818cf8, var(--cyan)); flex-shrink: 0; }
+  .footer-info { flex: 1; overflow: hidden; }
+  .footer-name { font-size: 12.5px; font-weight: 600; color: var(--white-95); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .footer-role { font-size: 11px; color: var(--white-60); }
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .topbar { height: var(--topbar-h); background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border-bottom: var(--glass-border); box-shadow: var(--glass-shadow); display: flex; align-items: center; padding: 0 28px; gap: 16px; flex-shrink: 0; }
+  .topbar-title { font-size: 17px; font-weight: 700; color: var(--white-95); flex: 1; }
+  .topbar-actions { display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 38px; height: 38px; border-radius: 10px; background: var(--white-06); border: 1px solid var(--white-10); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--white-60); }
+  .avatar-md { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #818cf8, var(--cyan)); border: 2px solid rgba(77,208,225,0.35); cursor: pointer; flex-shrink: 0; }
+  .content { padding: 28px; display: flex; flex-direction: column; gap: 20px; flex: 1; }
+  .breadcrumb { font-size: 12px; color: var(--white-60); display: flex; align-items: center; gap: 6px; }
+  .breadcrumb a { color: var(--cyan); text-decoration: none; }
+  .glass { background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border: var(--glass-border); border-radius: var(--radius); box-shadow: var(--glass-shadow); }
+  .detail-header { display: flex; align-items: center; gap: 20px; padding: 24px; }
+  .member-avatar-lg { width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; color: #fff; background: linear-gradient(135deg, #f472b6, #818cf8); border: 2px solid rgba(77,208,225,0.30); }
+  .detail-title-block { flex: 1; }
+  .detail-name { font-size: 22px; font-weight: 800; color: var(--white-95); }
+  .detail-handle { font-size: 14px; color: var(--cyan); margin-top: 3px; }
+  .detail-meta-line { font-size: 12px; color: var(--white-60); margin-top: 5px; display: flex; align-items: center; gap: 12px; }
+  .detail-actions { display: flex; gap: 10px; flex-shrink: 0; }
+  .btn-ghost { font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 10px; border: 1px solid var(--white-10); background: var(--white-04); color: var(--white-95); cursor: pointer; }
+  .btn-primary { font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 10px; border: none; background: var(--cyan); color: #0d1117; cursor: pointer; }
+  .status-pill { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 20px; letter-spacing: 0.04em; }
+  .status-active { background: var(--green-glass); color: var(--green-text); border: 1px solid rgba(52,211,153,0.25); }
+  .tier-pill { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 20px; letter-spacing: 0.04em; }
+  .tier-elite { background: rgba(77,208,225,0.15); color: var(--cyan); border: 1px solid rgba(77,208,225,0.25); }
+  .meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
+  .meta-cell { padding: 18px 24px; border-right: 1px solid var(--white-06); }
+  .meta-cell:last-child, .meta-cell:nth-child(3) { border-right: none; }
+  .meta-cell:nth-child(n+4) { border-top: 1px solid var(--white-06); }
+  .meta-label { font-size: 10px; font-weight: 600; letter-spacing: 0.10em; text-transform: uppercase; color: var(--white-60); margin-bottom: 5px; }
+  .meta-value { font-size: 16px; font-weight: 700; color: var(--white-95); }
+  .meta-sub { font-size: 11px; color: var(--white-60); margin-top: 3px; }
+  .meta-value.accent { color: var(--cyan); }
+  .two-col { display: grid; grid-template-columns: 1fr 340px; gap: 20px; align-items: start; }
+  .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px 14px; border-bottom: 1px solid var(--white-06); }
+  .panel-title { font-size: 14px; font-weight: 700; color: var(--white-95); }
+  .see-all { font-size: 11.5px; color: var(--cyan); cursor: pointer; text-decoration: none; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { padding: 10px 20px; text-align: left; font-size: 10px; font-weight: 600; letter-spacing: 0.10em; text-transform: uppercase; color: var(--white-60); border-bottom: 1px solid var(--white-06); }
+  tbody tr { border-bottom: 1px solid var(--white-06); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--white-02); }
+  td { padding: 11px 20px; color: var(--white-95); vertical-align: middle; }
+  .td-muted { color: var(--white-60) !important; }
+  .activity-list { padding: 0 24px; }
+  .activity-row { display: flex; align-items: flex-start; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--white-06); }
+  .activity-row:last-child { border-bottom: none; }
+  .activity-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .activity-body { flex: 1; }
+  .activity-event { font-size: 13px; color: var(--white-95); }
+  .activity-time { font-size: 11px; color: var(--white-60); margin-top: 2px; }
+</style>
+</head>
+<body>
+<div class="aurora"></div>
+<div class="grain"></div>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <polygon points="9,2 16,6 16,12 9,16 2,12 2,6" fill="none" stroke="#fff" stroke-width="1.5"/>
+          <polygon points="9,5 13,7.5 13,12 9,14 5,12 5,7.5" fill="rgba(255,255,255,0.35)"/>
+        </svg>
+      </div>
+      <div><div class="brand-name">NEXUS</div><div class="brand-sub">Admin</div></div>
+    </div>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/>
+        <rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/>
+      </svg>Overview
+    </a>
+    <a class="nav-item active" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.31 2.69-6 6-6s6 2.69 6 6"/>
+      </svg>Members
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="2" y="4" width="12" height="9" rx="1.5"/><path d="M5 4V3a1 1 0 011-1h4a1 1 0 011 1v1"/>
+      </svg>Subscriptions
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11l4-4 3 3 5-6"/></svg>Analytics
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h10M3 8h7M3 12h9"/></svg>Campaigns
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="8" cy="8" r="2.5"/><path d="M13.2 10a5.5 5.5 0 01-.5.9l1.1 1.1-1.4 1.4-1.1-1.1a5.5 5.5 0 01-.9.5V14h-2v-1.2a5.5 5.5 0 01-.9-.5l-1.1 1.1L4.9 12l1.1-1.1a5.5 5.5 0 01-.5-.9H4V8h1.2a5.5 5.5 0 01.5-.9L4.6 6l1.4-1.4 1.1 1.1a5.5 5.5 0 01.9-.5V4h2v1.2a5.5 5.5 0 01.9.5l1.1-1.1L13.4 6l-1.1 1.1a5.5 5.5 0 01.5.9H14v2h-1.2z"/>
+      </svg>Settings
+    </a>
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-footer">
+      <div class="avatar-sm"></div>
+      <div class="footer-info">
+        <div class="footer-name">Jordan Ellis</div>
+        <div class="footer-role">Platform Admin</div>
+      </div>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-title">Member Detail</div>
+      <div class="topbar-actions">
+        <div class="icon-btn">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M8 2a4.5 4.5 0 014.5 4.5c0 2.5.5 3.5 1.5 4H2c1-0.5 1.5-1.5 1.5-4A4.5 4.5 0 018 2z"/>
+            <path d="M6.5 13.5a1.5 1.5 0 003 0"/>
+          </svg>
+        </div>
+        <div class="avatar-md"></div>
+      </div>
+    </header>
+    <main class="content">
+      <div class="breadcrumb">
+        <a href="#">Members</a> <span>›</span> <span>Marcus Kim</span>
+      </div>
+      <div class="glass">
+        <div class="detail-header">
+          <div class="member-avatar-lg">MK</div>
+          <div class="detail-title-block">
+            <div class="detail-name">Marcus Kim</div>
+            <div class="detail-handle">@mkdesigns</div>
+            <div class="detail-meta-line">
+              <span class="tier-pill tier-elite">Elite</span>
+              <span class="status-pill status-active">Active</span>
+              <span>Visual Art · 892K audience</span>
+            </div>
+          </div>
+          <div class="detail-actions">
+            <button class="btn-ghost">Suspend</button>
+            <button class="btn-primary">Edit</button>
+          </div>
+        </div>
+      </div>
+      <div class="glass">
+        <div class="meta-grid">
+          <div class="meta-cell">
+            <div class="meta-label">Plan</div>
+            <div class="meta-value">Elite</div>
+            <div class="meta-sub">15% revenue share</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Monthly Value</div>
+            <div class="meta-value accent">$41,700</div>
+            <div class="meta-sub">↑ $2,400 vs last month</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Email</div>
+            <div class="meta-value" style="font-size:13px">marcus@mkdesigns.io</div>
+            <div class="meta-sub">Verified</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Member Since</div>
+            <div class="meta-value" style="font-size:14px">Mar 12, 2024</div>
+            <div class="meta-sub">847 days</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Audience</div>
+            <div class="meta-value">892K</div>
+            <div class="meta-sub">Across all channels</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Last Active</div>
+            <div class="meta-value" style="font-size:14px">Jun 2, 2026</div>
+            <div class="meta-sub">2 hours ago</div>
+          </div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="glass">
+          <div class="panel-header">
+            <div class="panel-title">Top Content</div>
+            <a href="#" class="see-all">See all</a>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Title</th><th>Type</th><th>Published</th><th style="text-align:right">Engagement</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:600">Generative Art in 2026</td>
+                <td class="td-muted">Video</td>
+                <td class="td-muted">May 28</td>
+                <td class="td-muted" style="text-align:right;color:var(--cyan) !important;font-weight:700">124K</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">Color Grading Workflow</td>
+                <td class="td-muted">Tutorial</td>
+                <td class="td-muted">May 20</td>
+                <td class="td-muted" style="text-align:right;color:var(--cyan) !important;font-weight:700">98K</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">NFT Drop — Series IV</td>
+                <td class="td-muted">Collection</td>
+                <td class="td-muted">May 14</td>
+                <td class="td-muted" style="text-align:right;color:var(--cyan) !important;font-weight:700">87K</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">Portfolio Masterclass</td>
+                <td class="td-muted">Live</td>
+                <td class="td-muted">May 6</td>
+                <td class="td-muted" style="text-align:right;color:var(--cyan) !important;font-weight:700">71K</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">Motion Design Toolkit</td>
+                <td class="td-muted">Download</td>
+                <td class="td-muted">Apr 29</td>
+                <td class="td-muted" style="text-align:right;color:var(--cyan) !important;font-weight:700">54K</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="glass">
+          <div class="panel-header">
+            <div class="panel-title">Recent Activity</div>
+          </div>
+          <div class="activity-list">
+            <div class="activity-row">
+              <div class="activity-dot" style="background:#4dd0e1"></div>
+              <div class="activity-body">
+                <div class="activity-event">Revenue payout processed — $41,700</div>
+                <div class="activity-time">Jun 2, 2026 · 08:12</div>
+              </div>
+            </div>
+            <div class="activity-row">
+              <div class="activity-dot" style="background:#818cf8"></div>
+              <div class="activity-body">
+                <div class="activity-event">New content published: Generative Art in 2026</div>
+                <div class="activity-time">May 28, 2026 · 14:05</div>
+              </div>
+            </div>
+            <div class="activity-row">
+              <div class="activity-dot" style="background:#34d399"></div>
+              <div class="activity-body">
+                <div class="activity-event">Plan upgraded from Pro to Elite</div>
+                <div class="activity-time">May 15, 2026 · 09:30</div>
+              </div>
+            </div>
+            <div class="activity-row">
+              <div class="activity-dot" style="background:#818cf8"></div>
+              <div class="activity-body">
+                <div class="activity-event">New content published: NFT Drop — Series IV</div>
+                <div class="activity-time">May 14, 2026 · 16:44</div>
+              </div>
+            </div>
+            <div class="activity-row">
+              <div class="activity-dot" style="background:#fbbf24"></div>
+              <div class="activity-body">
+                <div class="activity-event">Profile verification renewed</div>
+                <div class="activity-time">May 10, 2026 · 11:00</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

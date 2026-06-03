@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{App Name}</title>
+<style>
+  /* ── TOKENS ─────────────────────────────────────────────────────────────────
+     Neo-brutalist skin: white canvas, thick black borders, hard offset shadows,
+     pastel accent blocks, monospace type, zero border-radius everywhere.
+  ── */
+  :root {
+    --ink:    #000000;
+    --coral:  #F5A86E;   /* accent-1: nav brand block, avatar, footer link */
+    --lime:   #8FD14F;   /* accent-2: active nav, CTA button, active chip    */
+    --cream:  #FFF5E6;   /* surface:  tile bg, odd rows, search slab, cards  */
+    --paper:  #ffffff;   /* canvas */
+    --lav:    #B8A4FF;   /* accent-3: draft/queued pills, tile accent         */
+    --yell:   #FDE74C;   /* accent-4: hold/idle pills, tile accent            */
+    --cyan:   #90E0EF;   /* accent-5: activity icons                         */
+    --border: 2px solid #000000;
+    --shadow: 4px 4px 0 #000000;
+    --font-mono: ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --font-ui:   system-ui,-apple-system,sans-serif;
+  }
+
+  /* ── RESET ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ── BODY ── */
+  body {
+    font-family: var(--font-ui);
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── SHELL (sidebar + main-col) ── */
+  .shell { display: flex; flex: 1; min-height: 0; }
+
+  /* ── SIDEBAR (220px) ── */
+  .sidebar {
+    width: 220px; min-width: 220px;
+    border-right: 3px solid var(--ink);
+    display: flex; flex-direction: column;
+    background: var(--paper);
+  }
+  /* Brand block: coral fill */
+  .sidebar-brand {
+    background: var(--coral);
+    border-bottom: 3px solid var(--ink);
+    padding: 18px 16px;
+  }
+  .brand-eyebrow {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7;
+  }
+  .brand-name {
+    font-family: var(--font-mono); font-size: 18px; font-weight: 700;
+    letter-spacing: -0.02em; margin-top: 2px;
+  }
+  /* Nav list */
+  .sidebar-nav { list-style: none; padding: 12px 0; flex: 1; }
+  .sidebar-nav li a {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px;
+    font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    text-decoration: none; color: var(--ink);
+    border-left: 3px solid transparent;
+  }
+  .sidebar-nav li a .glyph { font-size: 14px; width: 16px; text-align: center; flex-shrink: 0; }
+  /* Active item: lime fill */
+  .sidebar-nav li.active a { background: var(--lime); border-left-color: var(--ink); }
+  .sidebar-nav li a:hover  { background: var(--cream); }
+  /* User footer */
+  .sidebar-footer { border-top: 2px solid var(--ink); padding: 12px 16px; }
+  .user-block { display: flex; align-items: center; gap: 10px; }
+  .avatar-sm {
+    width: 32px; height: 32px;
+    background: var(--coral); border: 2px solid var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .user-name { font-family: var(--font-mono); font-size: 12px; font-weight: 700; }
+  .user-role { font-family: var(--font-mono); font-size: 10px; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* ── MAIN COLUMN ── */
+  .main-col { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    border-bottom: 3px solid var(--ink);
+    padding: 12px 24px;
+    display: flex; align-items: center; gap: 12px;
+    background: var(--paper);
+  }
+  .topbar-title {
+    font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase; flex-shrink: 0;
+  }
+  /* Search slab: cream fill, thick border */
+  .search-slab {
+    flex: 1; max-width: 360px;
+    display: flex; align-items: center; gap: 8px;
+    background: var(--cream); border: 3px solid var(--ink);
+    padding: 6px 12px;
+  }
+  .search-slab input {
+    border: none; background: transparent;
+    font-family: var(--font-mono); font-size: 12px; color: var(--ink);
+    outline: none; width: 100%;
+  }
+  .search-slab input::placeholder { opacity: 0.5; }
+  .topbar-actions { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+  /* CTA: lime block + hard shadow */
+  .btn-new {
+    background: var(--lime); border: 2px solid var(--ink);
+    box-shadow: var(--shadow);
+    font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 7px 14px; cursor: pointer; color: var(--ink);
+  }
+  .btn-new:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 var(--ink); }
+  /* Avatar square: coral */
+  .topbar-avatar {
+    width: 36px; height: 36px;
+    background: var(--coral); border: 2px solid var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* ── CONTENT AREA ── */
+  .content { flex: 1; overflow-y: auto; padding: 24px; background: var(--paper); }
+
+  /* ── STAT TILES (4-up grid) ── */
+  .stat-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-tile {
+    background: var(--cream);
+    border: 3px solid var(--ink);
+    box-shadow: var(--shadow);
+    padding: 18px 16px 14px;
+  }
+  /* Coloured top accent — rotate through coral/lime/lav/yell */
+  .stat-tile:nth-child(1) { border-top: 6px solid var(--coral); }
+  .stat-tile:nth-child(2) { border-top: 6px solid var(--lime); }
+  .stat-tile:nth-child(3) { border-top: 6px solid var(--lav); }
+  .stat-tile:nth-child(4) { border-top: 6px solid var(--yell); }
+  .stat-label {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.6;
+    margin-bottom: 8px;
+  }
+  .stat-value {
+    font-family: var(--font-mono); font-size: 36px; font-weight: 700;
+    line-height: 1; letter-spacing: -0.03em; margin-bottom: 8px;
+  }
+  .stat-delta { display: flex; align-items: center; gap: 4px; font-family: var(--font-mono); font-size: 11px; font-weight: 700; }
+  .stat-delta.up   { color: #2a7a00; }
+  .stat-delta.down { color: #c00; }
+
+  /* ── PANEL (panel-header = black bar with white text) ── */
+  .panel { border: 3px solid var(--ink); box-shadow: var(--shadow); }
+  .panel-header {
+    background: var(--ink); color: var(--paper);
+    padding: 10px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .panel-title {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .panel-meta { font-family: var(--font-mono); font-size: 10px; opacity: 0.6; }
+  .section-label {
+    font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.5;
+    margin-bottom: 10px;
+  }
+
+  /* ── RECORDS TABLE ── */
+  .rec-table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 12px; }
+  .rec-table thead tr { background: var(--cream); border-bottom: 2px solid var(--ink); }
+  .rec-table thead th {
+    padding: 9px 14px; text-align: left;
+    font-weight: 700; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .rec-table tbody tr:nth-child(odd)  { background: var(--cream); }
+  .rec-table tbody tr:nth-child(even) { background: var(--paper); }
+  .rec-table tbody tr:hover { background: #FFE5CC; cursor: pointer; }
+  .rec-table tbody td { padding: 10px 14px; border-bottom: 1px solid var(--ink); vertical-align: middle; }
+  .rec-table tbody tr:last-child td { border-bottom: none; }
+
+  /* ── STATUS PILLS (flat pastel blocks) ── */
+  .status-pill {
+    display: inline-block; padding: 2px 8px;
+    border: 2px solid var(--ink);
+    font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
+  }
+  .pill-lime   { background: var(--lime); }   /* active / running */
+  .pill-coral  { background: var(--coral); }  /* review / warning */
+  .pill-yell   { background: var(--yell); }   /* hold / idle       */
+  .pill-lav    { background: var(--lav); }    /* draft / queued   */
+  .pill-grey   { background: #D0D0D0; }       /* done / completed */
+
+  /* ── ACTIVITY CARDS ── */
+  .activity-feed { display: flex; flex-direction: column; }
+  .activity-card {
+    background: var(--cream); border: 2px solid var(--ink); border-top: none;
+    padding: 12px 14px; display: flex; flex-direction: column; gap: 4px;
+  }
+  .activity-card:first-child { border-top: 2px solid var(--ink); }
+  .activity-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .activity-icon {
+    width: 24px; height: 24px; flex-shrink: 0;
+    border: 2px solid var(--ink);
+    display: flex; align-items: center; justify-content: center;
+  }
+  /* Rotate accent fills for icons */
+  .activity-icon.c1 { background: var(--lime); }
+  .activity-icon.c2 { background: var(--coral); }
+  .activity-icon.c3 { background: var(--yell); }
+  .activity-icon.c4 { background: var(--lav); }
+  .activity-icon.c5 { background: var(--cyan); }
+  .activity-body { flex: 1; }
+  .activity-event { font-family: var(--font-mono); font-size: 11px; font-weight: 700; line-height: 1.4; }
+  .activity-sub   { font-family: var(--font-ui); font-size: 11px; opacity: 0.65; margin-top: 2px; line-height: 1.4; }
+  .activity-time  { font-family: var(--font-mono); font-size: 10px; opacity: 0.55; white-space: nowrap; flex-shrink: 0; padding-top: 2px; }
+
+  /* ── FOOTER STRIP (ink bg) ── */
+  .footer {
+    border-top: 3px solid var(--ink);
+    background: var(--ink); color: var(--paper);
+    padding: 10px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer-meta {
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: 0.06em; opacity: 0.7; display: flex; gap: 20px;
+  }
+  .footer-link {
+    background: var(--coral); color: var(--ink);
+    border: 2px solid var(--paper);
+    font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 4px 10px; text-decoration: none;
+  }
+
+  /* ── FORM UTILITIES ── */
+  .form-card { border: 3px solid var(--ink); box-shadow: var(--shadow); margin-bottom: 16px; }
+  .form-card-header { background: var(--ink); color: var(--paper); padding: 10px 16px; }
+  .form-section-title { font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+  .form-card-body { padding: 20px 16px; }
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 20px; }
+  .field.full { grid-column: 1 / -1; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field-label { font-family: var(--font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 4px; }
+  .req { color: #c00; }
+  .control {
+    font-family: var(--font-mono); font-size: 13px; color: var(--ink);
+    background: var(--cream); border: 2px solid var(--ink);
+    padding: 8px 10px; outline: none; width: 100%;
+  }
+  .control:focus { background: var(--paper); box-shadow: 2px 2px 0 var(--ink); }
+  .helper     { font-family: var(--font-mono); font-size: 10px; opacity: 0.55; line-height: 1.5; }
+  .field.invalid .control { border-color: #c00; background: #fff0f0; }
+  .error-msg  { font-family: var(--font-mono); font-size: 10px; color: #c00; font-weight: 700; display: flex; align-items: center; gap: 4px; }
+  .btn-cancel  { background: var(--paper); border: 2px solid var(--ink); font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 8px 16px; cursor: pointer; color: var(--ink); }
+  .btn-submit  { background: var(--lime); border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 8px 20px; cursor: pointer; color: var(--ink); }
+  .btn-submit:disabled { background: #D0D0D0; box-shadow: none; cursor: not-allowed; opacity: 0.6; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- SIDEBAR — replace {Brand} and nav labels with real domain entities -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-eyebrow">{Organization}</div>
+      <div class="brand-name">{App Name}</div>
+    </div>
+    <ul class="sidebar-nav">
+      <li class="active"><a href="#"><span class="glyph">&gt;</span>{Section 1}</a></li>
+      <li><a href="#"><span class="glyph">#</span>{Section 2}</a></li>
+      <li><a href="#"><span class="glyph">*</span>{Section 3}</a></li>
+      <li><a href="#"><span class="glyph">+</span>{Section 4}</a></li>
+      <li><a href="#"><span class="glyph">%</span>{Section 5}</a></li>
+      <li><a href="#"><span class="glyph">@</span>Settings</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <div class="user-block">
+        <div class="avatar-sm">{XX}</div>
+        <div>
+          <div class="user-name">{User Name}</div>
+          <div class="user-role">{Role}</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN COLUMN — drop the appropriate region skeleton from references/layouts.md -->
+  <div class="main-col">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <span class="topbar-title">{Screen Title}</span>
+      <div class="search-slab">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4.5" stroke="#000" stroke-width="1.5"/><line x1="10" y1="10" x2="14" y2="14" stroke="#000" stroke-width="1.5" stroke-linecap="square"/></svg>
+        <input type="text" placeholder="Search {entities}…">
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-new">+ {New Entity}</button>
+        <div class="topbar-avatar">{XX}</div>
+      </div>
+    </header>
+
+    <!-- CONTENT: place region skeletons here -->
+    <main class="content">
+      <!-- dashboard: stat-row + main-grid (see references/layouts.md) -->
+      <!-- list:      toolbar + panel with rec-table + panel-footer     -->
+      <!-- form:      form-card sections + form-footer                   -->
+      <!-- detail:    breadcrumb + detail-header + meta-panel + two-col  -->
+    </main>
+
+    <!-- FOOTER STRIP -->
+    <footer class="footer">
+      <div class="footer-meta">
+        <span>{App Name} v{version}</span>
+        <span>ENV: {env}</span>
+      </div>
+      <a href="#" class="footer-link">Support</a>
+    </footer>
+
+  </div>
+</div>
+</body>
+</html>

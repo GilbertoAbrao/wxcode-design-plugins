@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Account Detail</title>
+<style>
+:root {
+  --accent: #5369f8;
+  --accent-dark: #3d52d5;
+  --accent-light: #eef0fe;
+  --surface: #f5f7fa;
+  --white: #ffffff;
+  --border: #e8eaed;
+  --text-1: #111827;
+  --text-2: #6b7280;
+  --text-3: #9ca3af;
+  --green: #10b981;
+  --green-light: #d1fae5;
+  --red: #ef4444;
+  --red-light: #fee2e2;
+  --orange: #f59e0b;
+  --orange-light: #fef3c7;
+  --sidebar-w: 256px;
+  --topbar-h: 64px;
+  --shadow: 0 1px 2px rgba(15,23,42,.04), 0 2px 8px rgba(15,23,42,.04);
+  --radius-card: 12px;
+  --radius-btn: 8px;
+  --radius-pill: 20px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: var(--surface); font-family: var(--font); color: var(--text-1); font-size: 14px; line-height: 1.5; }
+.shell { display: flex; height: 100vh; overflow: hidden; }
+
+/* Sidebar */
+.sidebar { width: var(--sidebar-w); min-width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; }
+.brand-row { height: var(--topbar-h); display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.brand-mark { width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.brand-mark svg { color: #fff; }
+.brand-name { font-size: 15px; font-weight: 700; color: var(--text-1); letter-spacing: -0.3px; }
+.brand-name em { font-style: normal; color: var(--accent); }
+.nav-section { padding: 20px 12px 4px; }
+.nav-label { font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); padding: 0 8px; margin-bottom: 4px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--radius-btn); color: var(--text-2); text-decoration: none; font-size: 13.5px; font-weight: 500; position: relative; cursor: pointer; transition: background .15s, color .15s; }
+.nav-item:hover { background: var(--surface); color: var(--text-1); }
+.nav-item.active { background: var(--accent-light); color: var(--accent); }
+.nav-item.active::before { content: ''; position: absolute; left: -12px; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: var(--accent); border-radius: 0 3px 3px 0; }
+.nav-item svg { flex-shrink: 0; opacity: .7; }
+.nav-item.active svg { opacity: 1; }
+.sidebar-footer { margin-top: auto; padding: 16px 12px; border-top: 1px solid var(--border); }
+.user-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--radius-btn); cursor: pointer; transition: background .15s; }
+.user-row:hover { background: var(--surface); }
+.avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+.avatar-sm { width: 24px; height: 24px; font-size: 10px; }
+.avatar-lg { width: 44px; height: 44px; font-size: 16px; }
+.user-info { flex: 1; min-width: 0; }
+.user-name { font-size: 13px; font-weight: 600; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-role { font-size: 11px; color: var(--text-3); }
+
+/* Main */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.topbar { height: var(--topbar-h); background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 16px; flex-shrink: 0; }
+.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-3); }
+.breadcrumb a { color: var(--text-3); text-decoration: none; }
+.breadcrumb a:hover { color: var(--accent); }
+.bc-sep { color: var(--border); }
+.bc-cur { color: var(--text-1); font-weight: 500; }
+.search-wrap { flex: 1; max-width: 320px; margin: 0 auto; position: relative; }
+.search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-3); pointer-events: none; }
+.search-input { width: 100%; height: 36px; border: 1px solid var(--border); border-radius: 6px; padding: 0 12px 0 34px; font-size: 13px; color: var(--text-1); background: var(--surface); outline: none; transition: border-color .15s; }
+.search-input:focus { border-color: var(--accent); background: var(--white); }
+.search-input::placeholder { color: var(--text-3); }
+.tb-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.icon-btn { width: 36px; height: 36px; border: none; background: transparent; border-radius: var(--radius-btn); display: flex; align-items: center; justify-content: center; color: var(--text-2); cursor: pointer; position: relative; transition: background .15s; }
+.icon-btn:hover { background: var(--surface); }
+.notif-dot { position: absolute; top: 7px; right: 7px; width: 7px; height: 7px; background: var(--red); border-radius: 50%; border: 1.5px solid #fff; }
+.tb-divider { width: 1px; height: 24px; background: var(--border); }
+.tb-user { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px 8px; border-radius: var(--radius-btn); transition: background .15s; }
+.tb-user:hover { background: var(--surface); }
+.tb-username { font-size: 13px; font-weight: 600; color: var(--text-1); }
+
+/* Content */
+.content { flex: 1; overflow-y: auto; padding: 24px; }
+.btn { height: 36px; padding: 0 16px; border-radius: var(--radius-btn); font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background .15s, border-color .15s; }
+.btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text-2); }
+.btn-ghost:hover { background: var(--surface); }
+.btn-primary { background: var(--accent); border: 1px solid var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
+.btn-danger { background: transparent; border: 1px solid var(--red); color: var(--red); }
+.btn-danger:hover { background: var(--red-light); }
+
+/* Card */
+.card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-card); box-shadow: var(--shadow); }
+.card-head { padding: 18px 20px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+.card-title { font-size: 14px; font-weight: 700; color: var(--text-1); }
+.card-count { font-size: 11px; font-weight: 600; color: var(--text-3); background: var(--surface); border-radius: 10px; padding: 1px 7px; margin-left: 6px; }
+.view-all { font-size: 13px; color: var(--accent); text-decoration: none; font-weight: 500; }
+.view-all:hover { text-decoration: underline; }
+
+/* Status pills */
+.status-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 600; }
+.st-active { background: var(--green-light); color: #065f46; }
+.st-pending { background: var(--orange-light); color: #92400e; }
+.st-inactive { background: var(--red-light); color: #991b1b; }
+.st-dot { width: 5px; height: 5px; border-radius: 50%; }
+.st-active .st-dot { background: var(--green); }
+.st-pending .st-dot { background: var(--orange); }
+.st-inactive .st-dot { background: var(--red); }
+
+/* Category pills */
+.cat-pill { display: inline-block; padding: 2px 8px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 600; }
+.cat-c { background: var(--accent-light); color: var(--accent); }
+.cat-d { background: #ede9fe; color: #7c3aed; }
+
+/* Detail header */
+.detail-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
+.detail-ident { display: flex; align-items: center; gap: 14px; }
+.detail-text-block { display: flex; flex-direction: column; gap: 4px; }
+.detail-name { font-size: 22px; font-weight: 800; color: var(--text-1); letter-spacing: -.3px; }
+.detail-sub { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-2); }
+.detail-actions { display: flex; gap: 8px; }
+
+/* Meta grid */
+.meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
+.meta-cell { padding: 16px 20px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.meta-cell:nth-child(3n) { border-right: none; }
+.meta-cell:nth-last-child(-n+3) { border-bottom: none; }
+.meta-lbl { font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--text-3); margin-bottom: 4px; }
+.meta-val { font-size: 14px; font-weight: 600; color: var(--text-1); }
+.meta-val.mono { font-family: "Courier New", monospace; font-size: 13px; }
+.meta-val.num { font-variant-numeric: tabular-nums; }
+.meta-hint { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+
+/* Two-column related panels */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* Subscription list */
+.sub-list { }
+.sub-row { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid var(--border); }
+.sub-row:last-child { border-bottom: none; }
+.sub-name { font-size: 13px; font-weight: 600; color: var(--text-1); }
+.sub-period { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+.sub-amount { font-size: 14px; font-weight: 700; color: var(--text-1); font-variant-numeric: tabular-nums; text-align: right; }
+
+/* Activity timeline */
+.activity-list { }
+.activity-row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 20px; border-bottom: 1px solid var(--border); }
+.activity-row:last-child { border-bottom: none; }
+.act-dot-col { flex-shrink: 0; padding-top: 3px; }
+.act-dot { width: 8px; height: 8px; border-radius: 50%; }
+.act-body { flex: 1; min-width: 0; }
+.act-text { font-size: 13px; color: var(--text-1); line-height: 1.4; }
+.act-text strong { font-weight: 600; }
+.act-time { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand-row">
+      <div class="brand-mark">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9h5M9 3v5M9 9l4 4"/><circle cx="9" cy="9" r="7"/>
+        </svg>
+      </div>
+      <span class="brand-name">Flow<em>base</em></span>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Main</div>
+      <a class="nav-item" href="#">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/>
+          <rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/>
+        </svg>
+        Dashboard
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 8h2l2-5 3 10 2-7 2 4 1-2h2"/>
+        </svg>
+        Activity
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Manage</div>
+      <a class="nav-item active" href="#">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="8" cy="5" r="3"/><path d="M1 14c0-3.3 3.1-6 7-6s7 2.7 7 6"/>
+        </svg>
+        Accounts
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="1" y="3" width="14" height="10" rx="2"/><path d="M1 7h14"/>
+        </svg>
+        Billing
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="5" cy="5" r="3"/><circle cx="11" cy="5" r="3"/>
+          <path d="M1 14c0-2.8 1.8-5 4-5 .7 0 1.3.2 2 .5"/><path d="M9 14c0-2.8 1.8-5 4-5"/>
+        </svg>
+        Team
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Settings</div>
+      <a class="nav-item" href="#">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="8" cy="8" r="2.5"/>
+          <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.1 3.1l1.4 1.4M11.5 11.5l1.4 1.4M3.1 12.9l1.4-1.4M11.5 4.5l1.4-1.4"/>
+        </svg>
+        Preferences
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-row">
+        <div class="avatar" style="background:#dbeafe;color:#1d4ed8;">JS</div>
+        <div class="user-info">
+          <div class="user-name">Jamie Sullivan</div>
+          <div class="user-role">Administrator</div>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#9ca3af" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l4 4-4 4"/></svg>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <header class="topbar">
+      <nav class="breadcrumb">
+        <a href="#">Home</a><span class="bc-sep">/</span>
+        <a href="#">Accounts</a><span class="bc-sep">/</span>
+        <span class="bc-cur">Acme Corp</span>
+      </nav>
+      <div class="search-wrap">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="6" cy="6" r="4"/><path d="M9.5 9.5l3 3"/>
+        </svg>
+        <input class="search-input" type="text" placeholder="Search…">
+      </div>
+      <div class="tb-actions">
+        <button class="icon-btn" title="Notifications">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 1a5 5 0 0 1 5 5v2l1.5 2.5H1.5L3 8V6a5 5 0 0 1 5-5z"/>
+            <path d="M6.5 13.5a1.5 1.5 0 0 0 3 0"/>
+          </svg>
+          <span class="notif-dot"></span>
+        </button>
+        <div class="tb-divider"></div>
+        <div class="tb-user">
+          <div class="avatar avatar-sm" style="background:#dbeafe;color:#1d4ed8;">JS</div>
+          <span class="tb-username">Jamie S.</span>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#9ca3af" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5l3 3 3-3"/></svg>
+        </div>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- Detail header -->
+      <div class="detail-header">
+        <div class="detail-ident">
+          <div class="avatar avatar-lg" style="background:#dbeafe;color:#1d4ed8;">AC</div>
+          <div class="detail-text-block">
+            <div class="detail-name">Acme Corp</div>
+            <div class="detail-sub">
+              <span class="cat-pill cat-d">Enterprise</span>
+              <span class="status-pill st-active"><span class="st-dot"></span>Active</span>
+              <span style="color:var(--text-3);">enterprise@acmecorp.com</span>
+            </div>
+          </div>
+        </div>
+        <div class="detail-actions">
+          <button class="btn btn-ghost">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 9v3H2V9M7 1v8M4 5l3 3 3-3"/>
+            </svg>
+            Export
+          </button>
+          <button class="btn btn-primary">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 2l2 2-7 7H3v-2l7-7z"/>
+            </svg>
+            Edit
+          </button>
+        </div>
+      </div>
+
+      <!-- Meta grid -->
+      <div class="card" style="margin-bottom:16px;">
+        <div class="meta-grid">
+          <div class="meta-cell">
+            <div class="meta-lbl">Plan</div>
+            <div class="meta-val"><span class="cat-pill cat-d">Enterprise</span></div>
+            <div class="meta-hint">Annual billing</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-lbl">MRR</div>
+            <div class="meta-val num">$4,200</div>
+            <div class="meta-hint">USD · monthly</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-lbl">Status</div>
+            <div class="meta-val"><span class="status-pill st-active"><span class="st-dot"></span>Active</span></div>
+            <div class="meta-hint">Since Jan 14, 2025</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-lbl">Contact</div>
+            <div class="meta-val">Jordan Mills</div>
+            <div class="meta-hint">CEO</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-lbl">Billing Email</div>
+            <div class="meta-val">enterprise@acmecorp.com</div>
+            <div class="meta-hint">Primary invoice recipient</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-lbl">Account ID</div>
+            <div class="meta-val mono">ACC-00142</div>
+            <div class="meta-hint">Created Jan 14, 2025</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Two-column related panels -->
+      <div class="two-col">
+
+        <!-- Active subscriptions -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">
+              Active Subscriptions
+              <span class="card-count">3</span>
+            </div>
+            <a href="#" class="view-all">Manage →</a>
+          </div>
+          <div class="sub-list">
+            <div class="sub-row">
+              <div>
+                <div class="sub-name">Enterprise Seats</div>
+                <div class="sub-period">25 seats · annual</div>
+              </div>
+              <span class="status-pill st-active"><span class="st-dot"></span>Active</span>
+              <div class="sub-amount">$3,500</div>
+            </div>
+            <div class="sub-row">
+              <div>
+                <div class="sub-name">Advanced Analytics Add-on</div>
+                <div class="sub-period">Monthly</div>
+              </div>
+              <span class="status-pill st-active"><span class="st-dot"></span>Active</span>
+              <div class="sub-amount">$500</div>
+            </div>
+            <div class="sub-row">
+              <div>
+                <div class="sub-name">Priority Support</div>
+                <div class="sub-period">Annual</div>
+              </div>
+              <span class="status-pill st-active"><span class="st-dot"></span>Active</span>
+              <div class="sub-amount">$200</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent activity -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">Recent Activity</div>
+            <a href="#" class="view-all">View all →</a>
+          </div>
+          <div class="activity-list">
+            <div class="activity-row">
+              <div class="act-dot-col"><div class="act-dot" style="background:var(--accent);"></div></div>
+              <div class="act-body">
+                <div class="act-text"><strong>Jordan Mills</strong> added 5 team members</div>
+                <div class="act-time">Today, 09:14</div>
+              </div>
+            </div>
+            <div class="activity-row">
+              <div class="act-dot-col"><div class="act-dot" style="background:var(--green);"></div></div>
+              <div class="act-body">
+                <div class="act-text">Invoice #INV-1042 paid successfully</div>
+                <div class="act-time">Yesterday, 14:30</div>
+              </div>
+            </div>
+            <div class="activity-row">
+              <div class="act-dot-col"><div class="act-dot" style="background:var(--orange);"></div></div>
+              <div class="act-body">
+                <div class="act-text">Seat limit reached — upgrade recommended</div>
+                <div class="act-time">2 days ago</div>
+              </div>
+            </div>
+            <div class="activity-row">
+              <div class="act-dot-col"><div class="act-dot" style="background:var(--accent);"></div></div>
+              <div class="act-body">
+                <div class="act-text">Advanced Analytics add-on activated</div>
+                <div class="act-time">May 28, 2026</div>
+              </div>
+            </div>
+            <div class="activity-row">
+              <div class="act-dot-col"><div class="act-dot" style="background:var(--green);"></div></div>
+              <div class="act-body">
+                <div class="act-text">Annual renewal processed — $4,200</div>
+                <div class="act-time">Jan 14, 2026</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pulse Admin — Detail</title>
+<style>
+:root {
+  --accent:         #0ea5e9;
+  --accent-dark:    #2563eb;
+  --accent-bg:      #e0f2fe;
+  --won:            #10b981;
+  --won-bg:         #d1fae5;
+  --stage3:         #7c3aed;
+  --stage3-bg:      #ede9fe;
+  --stage2:         #f59e0b;
+  --stage2-bg:      #fef3c7;
+  --lost:           #ef4444;
+  --lost-bg:        #fee2e2;
+}
+*,::before,::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:14px;color:#334155;background:#f8fafc;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:inherit;font-size:inherit;border:none;background:none}
+
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* Sidebar */
+.sidebar{width:240px;flex-shrink:0;background:#fff;border-right:1px solid #e2e8f0;display:flex;flex-direction:column;overflow-y:auto}
+.ws-switcher{display:flex;align-items:center;gap:10px;padding:18px 16px 14px;border-bottom:1px solid #e2e8f0;cursor:pointer}
+.ws-mark{width:32px;height:32px;border-radius:8px;background:var(--accent-dark);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0}
+.ws-name{font-weight:600;font-size:13px;color:#0f172a;flex:1}
+.nav-section{padding:18px 12px 4px}
+.nav-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94a3b8;padding:0 4px 6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 8px;border-radius:7px;font-size:13px;color:#475569;transition:background .12s,color .12s;position:relative}
+.nav-item:hover{background:#f1f5f9;color:#0f172a}
+.nav-item.active{background:var(--accent-bg);color:var(--accent-dark);font-weight:600}
+.nav-item.active::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:18px;border-radius:2px;background:var(--accent-dark)}
+.nav-item svg{flex-shrink:0;color:currentColor}
+.sidebar-footer{margin-top:auto;padding:14px 16px;border-top:1px solid #e2e8f0}
+.avatar-sm{width:26px;height:26px;border-radius:50%;border:2px solid #fff;margin-right:-8px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;color:#fff}
+.invite-link{font-size:12px;color:var(--accent);font-weight:500;margin-left:18px}
+
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:56px;flex-shrink:0;background:#fff;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:12px;padding:0 20px}
+.topbar-title{font-size:15px;font-weight:700;color:#0f172a;white-space:nowrap}
+.breadcrumb{display:flex;align-items:center;gap:4px;font-size:12px;color:#94a3b8;margin-left:6px}
+.breadcrumb span+span::before{content:"›";margin-right:4px}
+.breadcrumb .bc-active{color:#475569}
+.topbar-avatar{display:flex;align-items:center;gap:8px;margin-left:auto}
+.avatar-lg{width:32px;height:32px;border-radius:50%;background:var(--accent-dark);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.avatar-name{font-size:13px;font-weight:600;color:#0f172a;white-space:nowrap}
+
+.content{flex:1;overflow-y:auto;padding:20px}
+
+.breadcrumb-trail{display:flex;align-items:center;gap:6px;font-size:12px;color:#94a3b8;margin-bottom:14px}
+.breadcrumb-trail a{color:var(--accent)}
+.breadcrumb-trail a:hover{color:var(--accent-dark)}
+.sep{color:#cbd5e1}
+
+/* Detail header */
+.detail-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:16px}
+.detail-title-block{}
+.detail-id-row{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.detail-id{font-size:12px;font-weight:700;color:#94a3b8;font-family:"Courier New",monospace;background:#f1f5f9;padding:2px 8px;border-radius:4px;font-variant-numeric:tabular-nums}
+.status-pill{display:inline-block;padding:3px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.pill-s3{background:var(--stage3-bg);color:var(--stage3)}
+.pill-s2{background:var(--stage2-bg);color:var(--stage2)}
+.pill-won{background:var(--won-bg);color:var(--won)}
+.pill-s1{background:var(--accent-bg);color:var(--accent)}
+.detail-name{font-size:20px;font-weight:800;color:#0f172a;letter-spacing:-.3px}
+.detail-sub{font-size:13px;color:#64748b;margin-top:3px}
+.detail-actions{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.btn-ghost{padding:7px 14px;background:transparent;border:1px solid #e2e8f0;border-radius:7px;color:#475569;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:border-color .15s,color .15s}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent-dark)}
+.btn-primary{padding:7px 16px;background:var(--accent);border:1px solid var(--accent);border-radius:7px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s}
+.btn-primary:hover{background:var(--accent-dark)}
+
+/* Cards */
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.04);margin-bottom:14px}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #e2e8f0}
+.card-title{font-size:13px;font-weight:700;color:#0f172a}
+.view-all{font-size:12px;color:var(--accent)}
+
+/* Meta grid */
+.meta-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+.meta-cell{padding:16px 20px;border-right:1px solid #f1f5f9}
+.meta-cell:nth-child(3n){border-right:none}
+.meta-cell+.meta-cell{border-top:none}
+.meta-label{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#94a3b8;margin-bottom:4px}
+.meta-value{font-size:14px;font-weight:600;color:#0f172a;font-variant-numeric:tabular-nums}
+.meta-sub{font-size:11px;color:#64748b;margin-top:2px}
+
+/* Two-col */
+.two-col{display:grid;grid-template-columns:1fr 340px;gap:14px}
+
+/* Related table */
+.rel-table{width:100%;border-collapse:collapse}
+.rel-table thead th{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#94a3b8;padding:10px 16px;text-align:left;background:#f8fafc;border-bottom:1px solid #e2e8f0}
+.rel-table tbody tr{border-bottom:1px solid #f1f5f9;transition:background .1s}
+.rel-table tbody tr:hover{background:#f8fafc}
+.rel-table tbody tr:last-child{border-bottom:none}
+.rel-table td{padding:11px 16px;font-size:13px;color:#334155;vertical-align:middle}
+.rel-name{font-weight:600;color:#0f172a}
+.rel-sub{font-size:12px;color:#64748b}
+.rel-pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
+.rel-done{background:var(--won-bg);color:var(--won)}
+.rel-pend{background:var(--stage2-bg);color:var(--stage2)}
+.rel-block{background:var(--lost-bg);color:var(--lost)}
+
+/* Activity feed */
+.feed-list{padding:8px 16px 12px}
+.feed-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5f9}
+.feed-item:last-child{border-bottom:none}
+.feed-dot{width:28px;height:28px;border-radius:50%;flex-shrink:0;font-size:11px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.feed-body{flex:1}
+.feed-action{font-size:12px;color:#334155}
+.feed-action strong{color:#0f172a}
+.feed-time{font-size:11px;color:#94a3b8;margin-top:1px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<aside class="sidebar">
+  <div class="ws-switcher">
+    <div class="ws-mark">N</div>
+    <span class="ws-name">Norbridge Co.</span>
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 5.5l3 3 3-3" stroke="#94a3b8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Overview</div>
+    <a href="#" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".9"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".4"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".4"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".4"/></svg>
+      Dashboard
+    </a>
+    <a href="#" class="nav-item active">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      Records
+      <span style="margin-left:auto;background:var(--accent-dark);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px">42</span>
+    </a>
+    <a href="#" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="3.5" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 14c0-2.485 2.462-4.5 5.5-4.5s5.5 2.015 5.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Contacts
+    </a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Analytics</div>
+    <a href="#" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.5 12.5L5 8.5l3 2 4-5 2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Reports
+    </a>
+  </div>
+  <div class="sidebar-footer">
+    <div style="display:flex;align-items:center;margin-bottom:8px">
+      <div style="display:flex">
+        <div class="avatar-sm" style="background:#2563eb">TK</div>
+        <div class="avatar-sm" style="background:#7c3aed">RL</div>
+        <div class="avatar-sm" style="background:#0ea5e9">SC</div>
+        <div class="avatar-sm" style="background:#f59e0b">DM</div>
+      </div>
+      <a href="#" class="invite-link">+ Invite</a>
+    </div>
+    <div style="font-size:11px;color:#94a3b8">4 team members</div>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div>
+      <div class="topbar-title">Record Detail</div>
+      <div class="breadcrumb">
+        <span>Records</span><span class="bc-active">#0041</span>
+      </div>
+    </div>
+    <div class="topbar-avatar">
+      <div class="avatar-lg">TK</div>
+      <span class="avatar-name">Tara Kim</span>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <div class="breadcrumb-trail">
+      <a href="#">Records</a>
+      <span class="sep">›</span>
+      <span>Orion Platform Upgrade</span>
+    </div>
+
+    <div class="detail-header">
+      <div class="detail-title-block">
+        <div class="detail-id-row">
+          <span class="detail-id">#0041</span>
+          <span class="status-pill pill-s3">Negotiation</span>
+        </div>
+        <div class="detail-name">Orion Platform Upgrade</div>
+        <div class="detail-sub">Orion Systems · Enterprise · Opened May 12, 2026</div>
+      </div>
+      <div class="detail-actions">
+        <button class="btn-ghost">Change Stage</button>
+        <button class="btn-ghost">Archive</button>
+        <button class="btn-primary">Edit</button>
+      </div>
+    </div>
+
+    <!-- Meta grid -->
+    <div class="card">
+      <div class="meta-grid">
+        <div class="meta-cell">
+          <div class="meta-label">Account</div>
+          <div class="meta-value">Orion Systems</div>
+          <div class="meta-sub">Enterprise · 3 contacts</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Value</div>
+          <div class="meta-value">$78,000</div>
+          <div class="meta-sub">High priority</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Stage</div>
+          <div class="meta-value">Negotiation</div>
+          <div class="meta-sub">Stage 3 of 4</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Due Date</div>
+          <div class="meta-value">Jun 20, 2026</div>
+          <div class="meta-sub">17 days remaining</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Owner</div>
+          <div class="meta-value">Tara Kim</div>
+          <div class="meta-sub">Assigned May 12, 2026</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Source</div>
+          <div class="meta-value">Referral</div>
+          <div class="meta-sub">Via Sam Chen</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two-col: related items + activity feed -->
+    <div class="two-col">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Related Items</span>
+          <a href="#" class="view-all">Add item →</a>
+        </div>
+        <table class="rel-table">
+          <thead>
+            <tr><th>Item</th><th>Type</th><th>Date</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="rel-name">Proposal Document</div><div class="rel-sub">v2 — Revised scope</div></td>
+              <td style="font-size:12px;color:#64748b">Document</td>
+              <td style="font-size:12px;color:#64748b">Jun 3, 2026</td>
+              <td><span class="rel-pill rel-done">Sent</span></td>
+            </tr>
+            <tr>
+              <td><div class="rel-name">Discovery Call</div><div class="rel-sub">45 min · Recorded</div></td>
+              <td style="font-size:12px;color:#64748b">Meeting</td>
+              <td style="font-size:12px;color:#64748b">May 28, 2026</td>
+              <td><span class="rel-pill rel-done">Done</span></td>
+            </tr>
+            <tr>
+              <td><div class="rel-name">Legal Review</div><div class="rel-sub">Contract terms</div></td>
+              <td style="font-size:12px;color:#64748b">Task</td>
+              <td style="font-size:12px;color:#64748b">Jun 20, 2026</td>
+              <td><span class="rel-pill rel-pend">Pending</span></td>
+            </tr>
+            <tr>
+              <td><div class="rel-name">Procurement Sign-off</div><div class="rel-sub">Awaiting VP approval</div></td>
+              <td style="font-size:12px;color:#64748b">Approval</td>
+              <td style="font-size:12px;color:#64748b">Jun 18, 2026</td>
+              <td><span class="rel-pill rel-block">Blocked</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="card-title">Activity</span></div>
+        <div class="feed-list">
+          <div class="feed-item">
+            <div class="feed-dot" style="background:#2563eb">TK</div>
+            <div class="feed-body">
+              <div class="feed-action"><strong>Tara Kim</strong> moved to <strong>Negotiation</strong></div>
+              <div class="feed-time">Jun 3, 2026 · 14 min ago</div>
+            </div>
+          </div>
+          <div class="feed-item">
+            <div class="feed-dot" style="background:#2563eb">TK</div>
+            <div class="feed-body">
+              <div class="feed-action"><strong>Tara Kim</strong> sent revised proposal</div>
+              <div class="feed-time">Jun 3, 2026 · 2 hr ago</div>
+            </div>
+          </div>
+          <div class="feed-item">
+            <div class="feed-dot" style="background:#7c3aed">RL</div>
+            <div class="feed-body">
+              <div class="feed-action"><strong>Rosa Lee</strong> added procurement task</div>
+              <div class="feed-time">Jun 1, 2026</div>
+            </div>
+          </div>
+          <div class="feed-item">
+            <div class="feed-dot" style="background:#0ea5e9">SC</div>
+            <div class="feed-body">
+              <div class="feed-action"><strong>Sam Chen</strong> completed discovery call</div>
+              <div class="feed-time">May 28, 2026</div>
+            </div>
+          </div>
+          <div class="feed-item">
+            <div class="feed-dot" style="background:#2563eb">TK</div>
+            <div class="feed-body">
+              <div class="feed-action"><strong>Tara Kim</strong> created this record</div>
+              <div class="feed-time">May 12, 2026</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NORTHWIND — Add Host</title>
+<style>
+  :root {
+    --bg-deep: #0f1419;
+    --bg-card: #1a2332;
+    --bg-card-hover: #1f2b3e;
+    --bg-rail: #111922;
+    --border: rgba(255,255,255,0.06);
+    --border-strong: rgba(255,255,255,0.1);
+    --indigo: #6366f1;
+    --indigo-dim: rgba(99,102,241,0.15);
+    --pink: #ec4899;
+    --green: #22c55e;
+    --red: #ef4444;
+    --yellow: #f59e0b;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-xs: 6px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg-deep); color: var(--text-primary);
+    font-size: 13px; line-height: 1.5;
+    display: flex; flex-direction: column;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    height: 56px; background: var(--bg-rail); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 20px; gap: 16px;
+    flex-shrink: 0; z-index: 10;
+  }
+  .topbar-brand { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; letter-spacing: -0.01em; white-space: nowrap; }
+  .brand-icon { width: 28px; height: 28px; background: linear-gradient(135deg, var(--indigo), var(--pink)); border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .breadcrumb { display: flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 12px; }
+  .breadcrumb span { color: var(--text-secondary); }
+  .breadcrumb-sep { opacity: 0.3; }
+  .cmd-pill { flex: 1; max-width: 480px; margin: 0 auto; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 24px; height: 34px; display: flex; align-items: center; padding: 0 14px; gap: 8px; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+  .cmd-pill:hover { border-color: var(--indigo); background: var(--indigo-dim); }
+  .cmd-pill-text { color: var(--text-muted); font-size: 12px; flex: 1; }
+  .cmd-kbd { background: rgba(255,255,255,0.07); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-size: 11px; color: var(--text-muted); font-family: monospace; white-space: nowrap; }
+  .topbar-actions { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+  .notif-btn { position: relative; width: 32px; height: 32px; background: transparent; border: 1px solid var(--border); border-radius: var(--radius-xs); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); }
+  .notif-dot { position: absolute; top: 5px; right: 5px; width: 7px; height: 7px; background: var(--pink); border-radius: 50%; border: 2px solid var(--bg-rail); }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--indigo), var(--pink)); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
+
+  /* ── BODY ── */
+  .body-layout { display: flex; flex: 1; overflow: hidden; }
+
+  /* ── NAV RAIL ── */
+  .nav-rail { width: 64px; background: var(--bg-rail); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 16px 0; gap: 4px; flex-shrink: 0; }
+  .nav-item { width: 44px; height: 44px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted); transition: all 0.15s; }
+  .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text-secondary); }
+  .nav-item.active { background: var(--indigo-dim); color: var(--indigo); box-shadow: inset 0 0 0 1px rgba(99,102,241,0.3); }
+  .nav-spacer { flex: 1; }
+
+  /* ── MAIN ── */
+  .main { flex: 1; overflow-y: auto; padding: 24px; }
+  .main::-webkit-scrollbar { width: 4px; }
+  .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .form-wrap { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+
+  /* Breadcrumb */
+  .bc { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+  .bc a { color: var(--text-secondary); text-decoration: none; }
+  .bc a:hover { color: var(--indigo); }
+
+  /* Page header */
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
+  .page-title { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+  .page-subtitle { color: var(--text-secondary); font-size: 13px; margin-top: 2px; }
+
+  /* Cards */
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .card-section-title {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+    color: var(--text-muted); padding: 13px 18px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 7px;
+  }
+  .card-section-title svg { color: var(--indigo); }
+  .card-body { padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+
+  /* Fields */
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field.full { grid-column: 1 / -1; }
+
+  .field-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
+  .req { color: var(--indigo); font-weight: 700; }
+
+  .control {
+    background: var(--bg-deep); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 8px 12px; color: var(--text-primary); font-size: 13px; font-family: inherit;
+    outline: none; transition: border-color 0.15s, box-shadow 0.15s; width: 100%;
+    font-variant-numeric: tabular-nums;
+  }
+  .control::placeholder { color: var(--text-muted); }
+  .control:focus { border-color: var(--indigo); box-shadow: 0 0 0 3px var(--indigo-dim); }
+  textarea.control { resize: vertical; min-height: 72px; line-height: 1.5; }
+  select.control {
+    appearance: none; cursor: pointer;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px;
+  }
+
+  /* Validation states */
+  .field.invalid .control { border-color: var(--red); }
+  .field.invalid .control:focus { box-shadow: 0 0 0 3px rgba(239,68,68,0.14); }
+
+  .helper { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+  .error-msg { font-size: 11px; color: var(--red); display: flex; align-items: center; gap: 5px; line-height: 1.4; }
+
+  /* Tag input */
+  .tag-input-wrap {
+    background: var(--bg-deep); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 6px 10px; display: flex; flex-wrap: wrap; gap: 5px; align-items: center;
+    transition: border-color 0.15s, box-shadow 0.15s; min-height: 38px;
+  }
+  .tag-input-wrap:focus-within { border-color: var(--indigo); box-shadow: 0 0 0 3px var(--indigo-dim); }
+  .tag-chip { background: var(--indigo-dim); border: 1px solid rgba(99,102,241,0.3); border-radius: 20px; padding: 2px 8px; font-size: 11px; color: #a5b4fc; display: flex; align-items: center; gap: 5px; }
+  .tag-chip button { background: none; border: none; color: #a5b4fc; cursor: pointer; padding: 0; line-height: 1; font-size: 13px; }
+  .tag-input-wrap input { background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 12px; font-family: inherit; flex: 1; min-width: 80px; }
+  .tag-input-wrap input::placeholder { color: var(--text-muted); }
+
+  /* Form footer */
+  .form-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 0; border-top: 1px solid var(--border); margin-top: 4px;
+  }
+  .form-hint { font-size: 11px; color: var(--text-muted); }
+  .footer-actions { display: flex; gap: 8px; }
+  .btn-ghost { background: transparent; border: 1px solid var(--border); border-radius: var(--radius-xs); padding: 8px 16px; color: var(--text-secondary); font-size: 12px; cursor: pointer; transition: all 0.15s; }
+  .btn-ghost:hover { border-color: var(--border-strong); color: var(--text-primary); }
+  .btn-primary { background: var(--indigo); border: none; border-radius: var(--radius-xs); padding: 8px 16px; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+  .btn-primary:hover:not(:disabled) { opacity: 0.88; }
+  .btn-primary:disabled { opacity: 0.38; cursor: not-allowed; }
+
+  /* ── STATUS BAR ── */
+  .statusbar { height: 32px; background: var(--bg-rail); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 16px; gap: 20px; flex-shrink: 0; font-size: 11px; color: var(--text-muted); }
+  .statusbar-agent { display: flex; align-items: center; gap: 6px; }
+  .status-led { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+  .statusbar-sep { width: 1px; height: 14px; background: var(--border); }
+  .statusbar-spacer { flex: 1; }
+  .model-chip { background: var(--indigo-dim); border: 1px solid rgba(99,102,241,0.25); border-radius: 20px; padding: 1px 7px; font-size: 10px; color: #a5b4fc; font-weight: 600; }
+  svg { display: block; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="brand-icon">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M3 4l5-2 5 2v4l-5 4-5-4V4z" stroke="#fff" stroke-width="1.2" stroke-linejoin="round" fill="none"/>
+        <circle cx="8" cy="8" r="1.5" fill="#fff"/>
+      </svg>
+    </div>
+    NORTHWIND
+  </div>
+  <div class="breadcrumb">
+    <span>Hosts</span>
+    <span class="breadcrumb-sep">/</span>
+    <span style="color:var(--text-muted)">Add Host</span>
+  </div>
+  <div class="cmd-pill">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    <span class="cmd-pill-text">Ask Pilot or jump to a deploy, host, or incident</span>
+    <span class="cmd-kbd">⌘K</span>
+  </div>
+  <div class="topbar-actions">
+    <button class="notif-btn" title="Notifications">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 014 4v3l1 1H3l1-1V6a4 4 0 014-4z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" fill="none"/><path d="M6.5 13a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3"/></svg>
+      <span class="notif-dot"></span>
+    </button>
+    <div class="avatar">JR</div>
+  </div>
+</header>
+
+<div class="body-layout">
+  <!-- NAV RAIL -->
+  <nav class="nav-rail">
+    <div class="nav-item" title="Overview">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="2" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="10" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="10" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+    </div>
+    <div class="nav-item" title="Deploys">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2l4 4H5l4-4z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" fill="none"/><path d="M9 6v7M5 14l4-1 4 1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    </div>
+    <div class="nav-item active" title="Hosts">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="14" height="4" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="10" width="14" height="4" rx="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="5" cy="6" r="1" fill="currentColor"/><circle cx="5" cy="12" r="1" fill="currentColor"/></svg>
+    </div>
+    <div class="nav-item" title="Incidents">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2l7 13H2L9 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" fill="none"/><path d="M9 8v3M9 13.5v.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </div>
+    <div class="nav-item" title="Costs">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.3"/><path d="M9 5v1.5M9 11.5V13M6.5 10a2.5 2.5 0 005 0c0-1.5-1-2-2.5-2.5S6.5 7 6.5 6a2 2 0 014 0" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+    </div>
+    <div class="nav-item" title="Audit">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 3h10a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1z" stroke="currentColor" stroke-width="1.3"/><path d="M6 7h6M6 10h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="nav-item" title="Settings">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M9 2v1.5M9 14.5V16M2 9h1.5M14.5 9H16M3.9 3.9l1.1 1.1M13 13l1.1 1.1M3.9 14.1l1.1-1.1M13 5l1.1-1.1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+    <form class="form-wrap" novalidate>
+
+      <div class="bc">
+        <a href="#">Hosts</a>
+        <span style="opacity:0.3">›</span>
+        <span>Add Host</span>
+      </div>
+
+      <div class="page-header">
+        <div>
+          <div class="page-title">Add Host</div>
+          <div class="page-subtitle">Register a new host in the fleet management system</div>
+        </div>
+      </div>
+
+      <!-- Section: Identity -->
+      <div class="card">
+        <div class="card-section-title">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="4" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="10" width="12" height="4" rx="1" stroke="currentColor" stroke-width="1.3"/><circle cx="4.5" cy="6" r="0.8" fill="currentColor"/><circle cx="4.5" cy="12" r="0.8" fill="currentColor"/></svg>
+          Identity
+        </div>
+        <div class="card-body">
+          <div class="field-grid">
+
+            <!-- Host ID: invalid (already taken) -->
+            <div class="field invalid">
+              <label class="field-label" for="host-id">Host ID <span class="req">*</span></label>
+              <input id="host-id" class="control" type="text" value="nw-eu-001" aria-invalid="true" placeholder="e.g. nw-eu-042">
+              <span class="error-msg">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v4M8 11v.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Host ID already exists in this region
+              </span>
+            </div>
+
+            <!-- Region: valid -->
+            <div class="field">
+              <label class="field-label" for="region">Region <span class="req">*</span></label>
+              <select id="region" class="control">
+                <option value="">Select region…</option>
+                <option selected>eu-west-1</option>
+                <option>us-east-1</option>
+                <option>ap-southeast-1</option>
+                <option>us-west-2</option>
+                <option>eu-central-1</option>
+                <option>ap-northeast-1</option>
+              </select>
+              <span class="helper">Region determines which availability zone the host is placed in</span>
+            </div>
+
+            <!-- Fleet: valid -->
+            <div class="field">
+              <label class="field-label" for="fleet">Fleet <span class="req">*</span></label>
+              <select id="fleet" class="control">
+                <option value="">Select fleet…</option>
+                <option selected>checkout-api-eu</option>
+                <option>api-gateway</option>
+                <option>search-indexer</option>
+                <option>worker-jobs</option>
+                <option>data-pipeline</option>
+                <option>media-cdn</option>
+                <option>auth-service</option>
+              </select>
+              <span class="helper">The fleet this host belongs to — affects deployment targets and autoscaling groups</span>
+            </div>
+
+            <!-- Instance type -->
+            <div class="field">
+              <label class="field-label" for="instance-type">Instance Type <span class="req">*</span></label>
+              <select id="instance-type" class="control">
+                <option value="">Select type…</option>
+                <option>m5.large</option>
+                <option selected>c5.2xlarge</option>
+                <option>r5.large</option>
+                <option>m5.xlarge</option>
+                <option>r5.2xlarge</option>
+                <option>c5.xlarge</option>
+              </select>
+              <span class="helper">CPU-optimized (c5) for compute workloads; memory-optimized (r5) for caches</span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Configuration -->
+      <div class="card">
+        <div class="card-section-title">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/><path d="M8 2v1.5M8 12.5V14M2 8h1.5M12.5 8H14M3.5 3.5l1 1M11.5 11.5l1 1M3.5 12.5l1-1M11.5 4.5l1-1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Configuration
+        </div>
+        <div class="card-body">
+          <div class="field-grid">
+
+            <!-- SSH Key Pair: valid -->
+            <div class="field">
+              <label class="field-label" for="ssh-key">SSH Key Pair <span class="req">*</span></label>
+              <select id="ssh-key" class="control">
+                <option value="">Select key pair…</option>
+                <option selected>northwind-eu-2024</option>
+                <option>northwind-us-2024</option>
+                <option>northwind-ap-2024</option>
+              </select>
+              <span class="helper">Must be a key pair already uploaded to this region</span>
+            </div>
+
+            <!-- Monitoring: optional -->
+            <div class="field">
+              <label class="field-label" for="monitoring">Monitoring Level</label>
+              <select id="monitoring" class="control">
+                <option>Standard (1-min intervals)</option>
+                <option selected>Detailed (10-sec intervals)</option>
+              </select>
+              <span class="helper">Detailed monitoring incurs additional cost (~$3.50/host/month)</span>
+            </div>
+
+            <!-- AMI ID: invalid (bad format) -->
+            <div class="field invalid">
+              <label class="field-label" for="ami-id">AMI ID <span class="req">*</span></label>
+              <input id="ami-id" class="control" type="text" value="ami-abc" aria-invalid="true" placeholder="ami-0123456789abcdef0">
+              <span class="error-msg">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v4M8 11v.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Must be a valid AMI ID (ami- followed by 17 hex characters)
+              </span>
+            </div>
+
+            <!-- Subnet -->
+            <div class="field">
+              <label class="field-label" for="subnet">Subnet <span class="req">*</span></label>
+              <select id="subnet" class="control">
+                <option value="">Select subnet…</option>
+                <option selected>subnet-0a1b2c3d (eu-west-1a, private)</option>
+                <option>subnet-4e5f6g7h (eu-west-1b, private)</option>
+              </select>
+              <span class="helper">Private subnets are required for fleet hosts; public subnets are for load balancers only</span>
+            </div>
+
+            <!-- Tags: optional, full-width -->
+            <div class="field full">
+              <label class="field-label" for="tags-input">Tags</label>
+              <div class="tag-input-wrap">
+                <span class="tag-chip">env:prod <button type="button">×</button></span>
+                <span class="tag-chip">team:platform <button type="button">×</button></span>
+                <input id="tags-input" type="text" placeholder="Add key:value tag…">
+              </div>
+              <span class="helper">Use key:value format. Tags apply to all AWS resources created for this host.</span>
+            </div>
+
+            <!-- Notes: optional, full-width -->
+            <div class="field full">
+              <label class="field-label" for="notes">Notes</label>
+              <textarea id="notes" class="control" placeholder="Reason for provisioning, ticket reference, etc."></textarea>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="form-footer">
+        <span class="form-hint">Fields marked <span class="req">*</span> are required.</span>
+        <div class="footer-actions">
+          <button type="button" class="btn-ghost">Cancel</button>
+          <button type="submit" class="btn-primary" disabled>Add Host</button>
+        </div>
+      </div>
+
+    </form>
+  </main>
+</div>
+
+<!-- STATUS BAR -->
+<footer class="statusbar">
+  <div class="statusbar-agent">
+    <div class="status-led"></div>
+    <span><strong style="color:var(--text-secondary)">Pilot</strong> · idle</span>
+  </div>
+  <div class="statusbar-sep"></div>
+  <span>$0.043 today</span>
+  <div class="statusbar-sep"></div>
+  <span>p50 1.2s</span>
+  <div class="statusbar-spacer"></div>
+  <span>2 validation errors</span>
+  <div class="statusbar-sep"></div>
+  <span class="model-chip">sonnet-4-6</span>
+</footer>
+
+</body>
+</html>

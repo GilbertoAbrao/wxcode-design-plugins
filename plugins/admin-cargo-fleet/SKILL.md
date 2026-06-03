@@ -1,150 +1,195 @@
 ---
 name: admin-cargo-fleet
 description: |
-  Industrial-clean logistics and fleet operations admin: light mode with
-  orange-amber accent (#ea580c / #f59e0b), white/slate surfaces, status
-  greens/reds. Left sidebar with hub/region switcher and grouped nav;
-  topbar with search, region filter dropdown, and avatar; 4 KPI cards
-  (in-transit count, on-time rate, active fleet, warehouse utilization);
-  a Kanban-style shipment status board (Pending / Loading / In Transit /
-  Delivered columns with draggable-looking cards); an original abstract
-  route/region SVG visualization (nodes + arcs, no real map copy); and
-  an active shipments data table with status pills. Use when the brief
-  involves logistics, freight, cargo, fleet management, trucking,
-  warehouse ops, or supply-chain dashboards.
+  Industrial-clean light-mode admin aesthetic: white/slate canvas (#f8f9fb / #ffffff),
+  dark-navy sidebar (#1a2235), orange-amber accent family (#ea580c / #f59e0b), crisp
+  status pills on slate borders, system sans-serif at 13–14px, compact cards with
+  1px borders and shallow shadows. Archetype = branded sidebar (entity switcher +
+  grouped nav) + topbar (search pill + context filter + avatar) + 4 KPI cards +
+  2-column middle (Kanban-column status board + abstract network visualization) +
+  full-width records table with status pills, plus list / form / detail screens.
 triggers:
-  - "cargo fleet"
-  - "logistics dashboard"
-  - "fleet management"
-  - "shipment tracker"
-  - "freight admin"
-  - "trucking dashboard"
-  - "warehouse operations"
-  - "supply chain admin"
-  - "painel logístico"
-  - "物流管理后台"
+  - "industrial-clean light admin"
+  - "orange-amber accent dashboard"
+  - "white-slate admin panel"
+  - "dark-navy sidebar admin"
+  - "kanban-board status admin"
+  - "network-visualization dashboard"
+  - "painel clean laranja"
+example_prompt: "Apply this industrial-clean light admin aesthetic to my domain"
 od:
   mode: prototype
   surface: web
   scenario: operations
   preview:
     type: html
-    entry: index.html
+    entry: example.html
   design_system:
     requires: true
     sections: [color, typography, layout, components]
   craft:
     requires: [pixel-discipline, laws-of-ux]
-  example_prompt: "Build me an industrial-clean cargo fleet admin dashboard — left sidebar with hub/region switcher, topbar with search and region filter, 4 KPI cards (in transit, on-time rate, active fleet, warehouse utilization), a shipment status board (Pending / Loading / In Transit / Delivered), a route/region visualization, and an active shipments table."
 ---
 
-# Cargo Fleet Admin Skill
+# Cargo Fleet Admin — Visual Archetype
 
-Produce an industrial-clean logistics and fleet operations admin layout
-anchored to the orange-amber accent family with white/slate surfaces.
+This plugin contributes a **look** (industrial-clean light mode, orange-amber
+accent, dark-navy sidebar) and a **structure** (sidebar with entity switcher +
+grouped nav, topbar with search, 4 KPI cards, Kanban status board, network
+visualization, records table, plus list / form / detail screens). It does **not**
+contribute a domain — the subject matter comes from the Knowledge Base and the
+user's prompt. Treat the example below as illustration only.
 
-## Design tokens
+## Visual language        (AUTHORITATIVE)
 
-| Token | Value | Usage |
-|---|---|---|
-| `--accent` | `#ea580c` | primary CTAs, active nav bar, focus rings |
-| `--accent-light` | `#fff7ed` | active nav bg, card tints |
-| `--amber` | `#f59e0b` | secondary highlights, ETA warnings |
-| `--success` | `#16a34a` | on-time status, delivered pill |
-| `--danger` | `#dc2626` | delayed status, critical alerts |
-| `--warn` | `#d97706` | in-transit warning, loading pill |
-| `--surface` | `#ffffff` | card bg |
-| `--bg` | `#f8f9fb` | page canvas |
-| `--border` | `#e6e9ee` | dividers, card outlines |
-| `--text` | `#1e293b` | primary body text |
-| `--muted` | `#64748b` | secondary labels, timestamps |
-| `--sidebar-bg` | `#1a2235` | sidebar dark navy |
-| `--sidebar-text` | `#94a3b8` | inactive sidebar labels |
-| `--sidebar-active` | `#ffffff` | active sidebar label |
+The non-negotiable look. Declare every chromatic value as a `:root` CSS custom
+property.
 
-All chromatic colors must be CSS custom properties on `:root`; no hex
-literals in CSS rules or inline SVG chromatic fills — use `var(--token)`
-or `currentColor`.
+- **Canvas / surfaces:** page `#f8f9fb`; card/surface `#ffffff`; border
+  `#e6e9ee`; sidebar `#1a2235`; sidebar text (inactive) `#94a3b8`; sidebar
+  text (active) `#ffffff`.
+- **Text ramp:** primary `#1e293b`, muted `#64748b`.
+- **Accent family:** `--accent: #ea580c` (deep orange), `--accent-hover: #c2410c`,
+  `--accent-light: #fff7ed`; `--amber: #f59e0b`, `--amber-light: #fffbeb`.
+  CTAs, active nav bar, key figures, sparkline strokes, progress fills.
+- **Status ramp (as tokens):** `--success: #16a34a` / `--success-light: #f0fdf4`;
+  `--danger: #dc2626` / `--danger-light: #fef2f2`; `--warn: #d97706`. State pill
+  backgrounds use the corresponding `*-light` tint; pill text uses the base color.
+- **Typography:** `"Inter", system-ui, -apple-system, "Segoe UI", Roboto,
+  sans-serif`. Base 14px body. KPI values 26px / weight 800 / `letter-spacing:
+  -.02em`. KPI labels, table headers, nav group labels: 10px / uppercase /
+  `letter-spacing: .07–.10em`. Record IDs in monospace (`"SF Mono", "Consolas",
+  monospace`). `font-variant-numeric: tabular-nums` on every numeric cell.
+- **Density & radius:** topbar 60px, sidebar 240px. Card padding 18–20px.
+  Panel radius 10px (`--radius-md`), control radius 6px (`--radius-sm`), pill
+  radius 20px. Compact table rows: 10px vertical padding.
+- **Borders & shadows:** 1px `var(--border)` for all card outlines and dividers.
+  Shallow card shadow `0 1px 4px rgba(0,0,0,.06)`; hover lift
+  `0 4px 12px rgba(0,0,0,.10)`. Active sidebar item: `rgba(234,88,12,.15)` bg +
+  3px left border in `var(--accent)`.
+- **Motion:** `.15s` background/border hover transitions, subtle hover lift
+  `translateY(-1px)` on Kanban cards, node pulse animation 2s ease-in-out
+  infinite. No bouncy easing.
+
+## Layout archetype       (AUTHORITATIVE, domain-neutral)
+
+Regions and component patterns, described by shape and behavior — not meaning.
+
+- **Left sidebar** (240px, dark-navy, sticky full-height): brand mark (inline
+  SVG glyph + wordmark + sub-label) → **entity switcher** (a selector block
+  showing current entity + caret) → **grouped nav** (2–4 groups; each group
+  has an uppercase micro-label + 2–4 items). Active item: 3px left orange bar
+  + accent-dim bg overlay. Footer: avatar chip + user name + role label.
+- **Top bar** (60px, white, 1px bottom border, sticky): page title + breadcrumb
+  → **search pill** (magnifier icon + text input, rounded) → spacer →
+  **context filter** (pill-select with caret) → notification bell with dot →
+  avatar circle + name.
+- **KPI card row** (4 equal cards, 1fr grid): each card = 1px bordered white
+  surface with a top row of uppercase micro-label + icon chip, a big tabular
+  figure, a delta chip (green▲ / red▼ / amber▲) + sparkline SVG, and
+  optionally a thin progress bar across the card bottom.
+- **2-column middle grid (7fr / 5fr):**
+  - **Left — Kanban status board:** white panel with a header (title + action
+    link) and 3–4 columns; each column has an uppercase colored label + count
+    badge + 2–3 item cards. Each item card: ID (monospace) + route/description
+    line + sub-detail + time label; colored left-border stripe for the column
+    state.
+  - **Right — network visualization:** white panel with a header + an abstract
+    SVG graph (nodes as circles + curved arc paths, colored by state; animated
+    traveler dot along one arc). Legend row: active / busy / idle dots.
+- **Full-width records table:** white panel with header (title + count badge +
+  ghost + primary buttons), sticky uppercase thead, dense rows with **status
+  pills**, monospace ID column, route/description cell, carrier/detail columns,
+  and alternating row tints. Footer with result count + pager links.
+- **Records list screen:** the table archetype as its own page — search input +
+  filter chips + record count, same dense table, pager.
+- **Record form screen:** sectioned white cards with labeled fields; **rules
+  appear as inline validation** — required marks (`*`), helper text below the
+  field, inline error messages on invalid fields, primary submit
+  disabled-until-valid. No rules/checklist/validation-status panel.
+- **Record detail screen:** a header band (title + status pill + primary / ghost
+  actions), a meta grid of label/value pairs, one or more related sub-panels
+  (status-board row pattern or a mini-table) below.
+
+## Applying to a domain   (the contract)
+
+The domain comes from the Knowledge Base + the user's prompt. Extract THIS
+domain's equivalent of the archetype slots — its primary entities, key metrics,
+status states, record list/columns, form fields and their rules, and detail
+fields — and map them onto the archetype above. If no KB/domain is supplied
+(standalone), use the Example instantiation below.
+
+Do NOT invent a "rules" / "checklist" / "validation-status" panel; domain rules
+become inline field validation. Do NOT render build/implementation notes or
+designer controls — every screen is a finished product screen.
+
+## Example instantiation (illustrative only — NOT the domain)
+
+> One concrete example so standalone Open Design has a complete brief. In WXCode
+> this is IGNORED — replace every label with the real domain's equivalent
+> (entities, metrics, states, columns, fields) drawn from the KB + prompt.
+
+```
+Domain (illustrative): a logistics and fleet operations platform.
+
+Entity switcher    → active hub: "North Central".
+Sidebar groups     → DISPATCH (Overview, Live Map, Status Board),
+                     FLEET (Vehicles, Drivers, Maintenance),
+                     WAREHOUSE (Inventory, Dock Schedule),
+                     SETTINGS (Integrations, Users, Alerts).
+Context filter     → region selector: All Regions / North / South / East / West.
+
+KPI cards (4):
+  • In Transit: 847 (▲+12% vs yesterday), sparkline in orange.
+  • On-Time Rate: 94.2% (▲+1.4pp this week), sparkline in green.
+  • Active Fleet: 312 vehicles (▼−3 offline), sparkline in slate.
+  • Warehouse Util.: 78% (▲+6% capacity), progress bar at 78%.
+
+Status board (left, Kanban)  → "Shipment Status Board" — 4 columns:
+  Pending (24), Loading (11), In Transit (847), Delivered (1,204).
+  Each card: shipment ID / origin→dest / carrier / ETA or completion.
+  Column colors: Pending=slate, Loading=amber, In Transit=orange,
+  Delivered=green (left border stripe per column).
+
+Network visualization (right) → "Route Network" — abstract SVG graph
+  of 8 invented hub nodes (Veron, Kalsted, Omdra, Pelholt, Trisca,
+  Nuvex, Brekka, Gorfen) connected by bezier arcs. Active=orange,
+  Busy=amber, Idle=slate. Animated traveler dot on the primary arc.
+  Legend: Active Route / Busy / Idle.
+
+Records table        → "Active Shipments" (847): Shipment ID / Origin→Dest /
+  Carrier / Vehicle ID / ETA / Status pill
+  (Pending / Loading / In Transit / Delayed / Delivered).
+
+List screen          → all records, search + filter chips (status, region),
+  paginated, same dense table.
+
+Form screen          → "New Record": ID field (auto), origin (required select),
+  destination (required select), carrier (required), vehicle (required select),
+  scheduled date (required, not in the past), priority. Required marks + helper
+  text + inline errors; submit disabled until valid.
+
+Detail screen        → one record: header (ID + status pill + Edit / Archive
+  actions), meta grid (origin, dest, carrier, vehicle, ETA, created), and a
+  "Route Log" related sub-table + timeline of events.
+```
 
 ## Workflow
 
-1. Read the active DESIGN.md if present; otherwise apply the token table
-   above directly.
-2. Extract from the brief: company/hub name, region list (default:
-   North, South, East, West, Central), primary fleet type (trucks,
-   vans, containers — default trucks).
-3. Layout (single HTML file, all CSS inline):
-
-   **Left sidebar (240px, dark navy `#1a2235`)**
-   - Brand mark at top: a small inline SVG truck/hexagon icon + company
-     name in white.
-   - Hub/region switcher: a dropdown-style selector showing current hub
-     with a small caret; visually distinct section above the nav.
-   - Nav groups: DISPATCH (Overview, Live Map, Status Board), FLEET
-     (Vehicles, Drivers, Maintenance), WAREHOUSE (Inventory, Dock
-     Schedule), SETTINGS (Integrations, Users, Alerts).
-   - Active item: 3px left orange bar + `--accent-light` tinted bg
-     (use semi-transparent overlay since sidebar is dark — render as
-     `rgba(234,88,12,0.15)` bg + white text).
-   - Footer: avatar + user name + role label in small text.
-
-   **Top bar (60px, white, `--border` bottom)**
-   - Left: page title "Status Board" + breadcrumb "Fleet Ops / Status Board".
-   - Center: search input with magnifier SVG icon, placeholder
-     "Search shipments, carriers, routes…".
-   - Right: region filter pill-select (All Regions / North / South /
-     East / West), notification bell with amber dot, avatar circle.
-
-   **KPI cards row (4 cards)**
-   - White cards, 10px radius, subtle shadow `0 1px 4px rgba(0,0,0,0.06)`.
-   - Card 1 "In Transit": count ~847, delta +12% vs yesterday, inline
-     SVG truck icon in orange.
-   - Card 2 "On-Time Rate": 94.2%, delta +1.4pp, inline SVG
-     checkmark-circle in green.
-   - Card 3 "Active Fleet": 312 vehicles, delta −3 offline, inline SVG
-     fleet icon in slate.
-   - Card 4 "Warehouse Util.": 78%, progress bar across card bottom
-     (orange fill), inline SVG warehouse icon in amber.
-   - Each card: small uppercase muted label, big bold number, delta
-     chip (green ▲ / red ▼), tiny inline sparkline SVG (5–7 points).
-
-   **Two-column middle section (7/5 grid)**
-   - LEFT (7 cols): **Shipment Status Board** — 4 Kanban columns
-     (Pending / Loading / In Transit / Delivered). Column header has
-     label + count badge. Each column holds 2–3 shipment cards showing:
-     shipment ID, origin→dest abbreviation, carrier name, ETA or
-     completion time, status color-dot. Cards have white bg, subtle
-     border, hover lift. Pending = slate, Loading = amber, In Transit
-     = orange, Delivered = green column accent dots.
-   - RIGHT (5 cols): **Route Network Visualization** — an original
-     abstract SVG (450×320 or similar) showing stylized nodes (city
-     hub circles) connected by curved arc paths. Nodes are colored by
-     status (active = orange, idle = slate, busy = amber). Animate
-     a small circle traveling along one arc with a CSS animation.
-     Label 6–8 node cities with short invented names (Veron, Kalsted,
-     Omdra, Pelholt, Trisca, Nuvex, Brekka, Gorfen). Add legend:
-     Active Route / Idle / Busy. No real map geography — purely
-     abstract topological graph.
-
-   **Active Shipments table (full width)**
-   - Header: "Active Shipments" title + count badge + "Export CSV"
-     ghost button + "New Shipment" orange primary button.
-   - 8 rows, columns: Shipment ID, Origin → Destination, Carrier,
-     Vehicle ID, ETA, Status pill.
-   - Status pills: Pending (slate bg), Loading (amber bg), In Transit
-     (orange bg), Delayed (red bg), Delivered (green bg) — white text.
-   - Alternating row tint (`#f8f9fb` on odd rows), hover highlight.
-   - Invented data: realistic shipment IDs (SHP-20481, etc.), city
-     pairs, carrier names (Veron Freight, Kaldex Logistics, etc.).
-
-4. Typography: system font stack only — `"Inter", system-ui,
-   -apple-system, "Segoe UI", Roboto, sans-serif`. No external font
-   loads. Uppercase tracking for KPI labels. Orange for active
-   links and primary actions only.
-
-5. One inline `<style>` block, semantic HTML5, zero external CDNs,
-   zero external fonts, no lorem ipsum, all copy invented, target
-   10–30 KB total.
+1. Read the active DESIGN.md (if present); otherwise use this plugin's Visual
+   language tokens.
+2. Extract THIS domain's equivalent of the archetype slots — primary entities,
+   key metrics, status states, record columns, form fields + rules, detail
+   fields — from the KB + prompt. Standalone: use the Example instantiation above.
+3. Build each screen in the Visual language + Layout archetype above, imitating
+   the example set in `assets/` (dashboard, list, form, detail) and the
+   `assets/template.html` seed — with fresh content for the real domain, NOT
+   the example labels.
+4. Express domain rules as INLINE field validation (required marks, helper text,
+   inline errors, disabled-until-valid submit). Never render
+   rules/checklist/validation-status/build-note panels or designer/demo controls.
+5. One inline `<style>`, semantic HTML5, `tabular-nums` on figures, no external
+   assets, no CDNs — self-contained.
 
 ## Output contract
 

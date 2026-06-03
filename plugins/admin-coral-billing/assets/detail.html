@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coral Admin — Record Detail</title>
+<style>
+:root {
+  --coral:        #f43f5e;
+  --coral-light:  #fb7185;
+  --coral-muted:  #fff1f2;
+  --slate:        #475569;
+  --slate-light:  #64748b;
+  --green:        #16a34a;
+  --green-muted:  #f0fdf4;
+  --amber:        #d97706;
+  --amber-muted:  #fffbeb;
+  --red:          #dc2626;
+  --red-muted:    #fef2f2;
+  --surface:      #f8f9fb;
+  --card:         #ffffff;
+  --border:       #e6e9ef;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:14px;color:#111827;background:var(--surface)}
+button{font:inherit;cursor:pointer;border:none;background:none}
+a{text-decoration:none;color:inherit}
+
+.shell{display:flex;height:100vh;overflow:hidden}
+aside.sidebar{width:240px;min-width:240px;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;padding:20px 12px}
+.sidebar-logo{display:flex;align-items:center;gap:9px;padding:0 8px 16px}
+.sidebar-logo-name{font-size:15px;font-weight:600;color:var(--slate)}
+.workspace-pill{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);border-radius:8px;padding:6px 10px;margin-bottom:20px;color:var(--slate);font-size:12px;font-weight:500;cursor:pointer}
+.workspace-pill:hover{background:var(--surface)}
+.nav-section-label{font-size:10px;font-weight:600;letter-spacing:.08em;color:#9ca3af;text-transform:uppercase;padding:0 8px;margin-bottom:4px;margin-top:12px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:0 8px;height:36px;border-radius:8px;color:var(--slate);font-size:13px;font-weight:500;cursor:pointer;position:relative;transition:background .12s}
+.nav-item:hover{background:var(--surface)}
+.nav-item.active{background:var(--coral-muted);color:var(--coral)}
+.nav-item.active::before{content:'';position:absolute;left:-12px;top:50%;transform:translateY(-50%);width:3px;height:20px;border-radius:0 2px 2px 0;background:var(--coral)}
+.nav-item svg{flex-shrink:0;opacity:.7}
+.nav-item.active svg{opacity:1;color:var(--coral)}
+.nav-badge{margin-left:auto;background:var(--coral);color:#fff;font-size:10px;font-weight:700;border-radius:9px;padding:1px 6px;line-height:16px}
+.sidebar-bottom{margin-top:auto;padding-top:16px;border-top:1px solid var(--border)}
+.sidebar-user{display:flex;align-items:center;gap:10px;padding:8px}
+.avatar-sm{width:30px;height:30px;border-radius:50%;background:var(--coral);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.sidebar-user-info{flex:1;min-width:0}
+.sidebar-user-name{font-size:12px;font-weight:600;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sidebar-user-role{font-size:11px;color:#9ca3af}
+
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+header.topbar{height:56px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;padding:0 24px;flex-shrink:0;position:sticky;top:0;z-index:10}
+.search-wrap{position:relative;width:260px}
+.search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#9ca3af;pointer-events:none}
+.search-input{width:100%;height:34px;border:1px solid var(--border);border-radius:8px;padding:0 10px 0 34px;font-size:13px;color:#374151;background:#fff;outline:none}
+.search-input::placeholder{color:#9ca3af}
+.topbar-right{display:flex;align-items:center;gap:12px;margin-left:auto}
+.bell-wrap{position:relative;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:8px;cursor:pointer}
+.bell-wrap:hover{background:var(--surface)}
+.bell-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--coral);border:2px solid #fff}
+.avatar-topbar{width:34px;height:34px;border-radius:50%;background:var(--slate);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;cursor:pointer}
+
+.page-content{flex:1;overflow-y:auto;padding:24px}
+
+.breadcrumb{display:flex;align-items:center;gap:7px;font-size:12px;color:#9ca3af;margin-bottom:16px}
+.breadcrumb a{color:var(--slate-light);text-decoration:none}
+.breadcrumb a:hover{color:var(--coral)}
+.breadcrumb-sep{color:#d1d5db}
+
+.detail-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:16px;flex-wrap:wrap}
+.detail-title-block{display:flex;flex-direction:column;gap:5px}
+.detail-id-row{display:flex;align-items:center;gap:10px}
+.detail-id{font-size:20px;font-weight:700;color:#111827;font-family:monospace}
+.pill{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+.pill-paid{background:var(--green-muted);color:var(--green)}
+.pill-pending{background:var(--amber-muted);color:var(--amber)}
+.pill-failed{background:var(--red-muted);color:var(--red)}
+.detail-account{font-size:14px;color:#6b7280}
+.detail-actions{display:flex;gap:10px;align-items:center}
+.btn-ghost{height:34px;padding:0 14px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:500;color:var(--slate);background:#fff;transition:border-color .12s,color .12s}
+.btn-ghost:hover{border-color:var(--slate);color:#111827}
+.btn-primary{height:34px;padding:0 16px;border-radius:8px;font-size:13px;font-weight:600;color:#fff;background:var(--coral);transition:background .12s}
+.btn-primary:hover{background:var(--coral-light)}
+.btn-danger{height:34px;padding:0 14px;border:1px solid var(--red-muted);border-radius:8px;font-size:13px;font-weight:500;color:var(--red);background:var(--red-muted);transition:background .12s,border-color .12s}
+.btn-danger:hover{background:#fecdd3;border-color:var(--red)}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+.card-title{font-size:15px;font-weight:600;color:#111827}
+.card-action{font-size:13px;font-weight:500;color:var(--coral);cursor:pointer}
+.card-action:hover{color:var(--coral-light)}
+
+.meta-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;padding:0}
+.meta-cell{padding:18px 20px;border-right:1px solid var(--border);border-bottom:1px solid var(--border)}
+.meta-cell:nth-child(3n){border-right:none}
+.meta-cell:nth-last-child(-n+3){border-bottom:none}
+.meta-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af;margin-bottom:5px}
+.meta-value{font-size:14px;font-weight:600;color:#111827;font-variant-numeric:tabular-nums}
+.meta-sub{font-size:11px;color:#9ca3af;margin-top:2px}
+
+.two-col{display:grid;grid-template-columns:3fr 2fr;gap:16px}
+
+table{width:100%;border-collapse:collapse}
+thead th{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af;padding:10px 20px;text-align:left;background:var(--surface);border-bottom:1px solid var(--border)}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#f8f9fb}
+tbody td{padding:12px 20px;font-size:13px;color:#374151;font-variant-numeric:tabular-nums}
+.line-id{font-weight:600;font-family:monospace;font-size:12px;color:#111827}
+
+.activity-list{padding:0}
+.activity-item{display:flex;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border)}
+.activity-item:last-child{border-bottom:none}
+.activity-dot-wrap{display:flex;flex-direction:column;align-items:center;gap:0;padding-top:2px}
+.activity-dot{width:8px;height:8px;border-radius:50%;background:var(--coral);flex-shrink:0}
+.activity-dot.muted{background:#d1d5db}
+.activity-body{flex:1;min-width:0}
+.activity-title{font-size:13px;font-weight:500;color:#111827}
+.activity-meta{font-size:11px;color:#9ca3af;margin-top:2px}
+.activity-actor{font-weight:600;color:#374151}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <rect width="28" height="28" rx="7" fill="var(--coral)"/>
+        <path d="M14 5L21 12L14 23L7 12Z" fill="white" opacity="0.9"/>
+        <path d="M14 5L21 12L14 16L7 12Z" fill="white"/>
+      </svg>
+      <span class="sidebar-logo-name">Meridian</span>
+    </div>
+    <div class="workspace-pill">
+      <span>Orion Technologies</span>
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+        <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <nav>
+      <div class="nav-section-label">Overview</div>
+      <div class="nav-item">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor"/>
+          <rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/>
+          <rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/>
+          <rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/>
+        </svg>
+        Dashboard
+      </div>
+      <div class="nav-item active">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/>
+          <path d="M1 6h14" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M5 10h2M9 10h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Records
+        <span class="nav-badge">12</span>
+      </div>
+      <div class="nav-item">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5" fill="none"/>
+          <path d="M8 4v4l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Accounts
+      </div>
+      <div class="nav-section-label">Management</div>
+      <div class="nav-item">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M2 4a1 1 0 011-1h10a1 1 0 011 1v2H2V4z" fill="currentColor" opacity=".4"/>
+          <rect x="2" y="6" width="12" height="7" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        </svg>
+        Tiers
+      </div>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="sidebar-user">
+        <div class="avatar-sm">AM</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name">Anika Müller</div>
+          <div class="sidebar-user-role">Operations Admin</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="search-wrap">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <input class="search-input" type="search" placeholder="Search records, accounts…" aria-label="Search">
+      </div>
+      <div class="topbar-right">
+        <div class="bell-wrap" role="button" aria-label="Notifications">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+            <path d="M9 1.5A5.5 5.5 0 003.5 7v4l-1.5 2h14l-1.5-2V7A5.5 5.5 0 009 1.5z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+            <path d="M7 15a2 2 0 004 0" stroke="currentColor" stroke-width="1.5" fill="none"/>
+          </svg>
+          <span class="bell-dot"></span>
+        </div>
+        <div class="avatar-topbar" aria-label="Profile">AM</div>
+      </div>
+    </header>
+
+    <main class="page-content">
+
+      <div class="breadcrumb">
+        <a href="#">Records</a>
+        <span class="breadcrumb-sep">›</span>
+        <a href="#">All Records</a>
+        <span class="breadcrumb-sep">›</span>
+        <span>REC-20409</span>
+      </div>
+
+      <div class="detail-header">
+        <div class="detail-title-block">
+          <div class="detail-id-row">
+            <span class="detail-id">REC-20409</span>
+            <span class="pill pill-paid">Active</span>
+          </div>
+          <span class="detail-account">Syncify — Enterprise · Monthly</span>
+        </div>
+        <div class="detail-actions">
+          <button class="btn-danger">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="display:inline;vertical-align:middle;margin-right:4px" aria-hidden="true">
+              <circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.3"/>
+              <path d="M4.5 4.5l4 4M8.5 4.5l-4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+            Void
+          </button>
+          <button class="btn-ghost">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="display:inline;vertical-align:middle;margin-right:4px" aria-hidden="true">
+              <path d="M6.5 1v8M3 6l3.5 3.5L10 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Download
+          </button>
+          <button class="btn-primary">Edit</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Details</span>
+          <span class="card-action">Edit</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-cell">
+            <div class="meta-label">Account</div>
+            <div class="meta-value">Syncify</div>
+            <div class="meta-sub">Enterprise plan</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Amount</div>
+            <div class="meta-value">$4,800.00</div>
+            <div class="meta-sub">USD · Monthly</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Due Date</div>
+            <div class="meta-value">May 28, 2025</div>
+            <div class="meta-sub">Issued May 1, 2025</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Billing Cycle</div>
+            <div class="meta-value">Monthly</div>
+            <div class="meta-sub">Renews Jun 1, 2025</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Account Owner</div>
+            <div class="meta-value">Anika Müller</div>
+            <div class="meta-sub">Operations Admin</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Created</div>
+            <div class="meta-value">May 1, 2025</div>
+            <div class="meta-sub">Auto-generated</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-col">
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Line Items</span>
+            <button class="btn-ghost" style="font-size:12px;height:28px">+ Add Item</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Item #</th>
+                <th>Description</th>
+                <th>Qty</th>
+                <th style="text-align:right">Unit Price</th>
+                <th style="text-align:right">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="line-id">LI-001</td>
+                <td>Enterprise License</td>
+                <td>1</td>
+                <td style="text-align:right">$4,000.00</td>
+                <td style="text-align:right">$4,000.00</td>
+              </tr>
+              <tr>
+                <td class="line-id">LI-002</td>
+                <td>Premium Support Add-on</td>
+                <td>1</td>
+                <td style="text-align:right">$600.00</td>
+                <td style="text-align:right">$600.00</td>
+              </tr>
+              <tr>
+                <td class="line-id">LI-003</td>
+                <td>SSO Integration</td>
+                <td>1</td>
+                <td style="text-align:right">$200.00</td>
+                <td style="text-align:right">$200.00</td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="display:flex;justify-content:flex-end;padding:14px 20px;border-top:1px solid var(--border);gap:24px">
+            <span style="font-size:12px;color:#9ca3af">Total</span>
+            <span style="font-size:14px;font-weight:700;color:#111827;font-variant-numeric:tabular-nums">$4,800.00</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Activity</span>
+          </div>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-dot-wrap"><span class="activity-dot"></span></div>
+              <div class="activity-body">
+                <div class="activity-title">Payment received</div>
+                <div class="activity-meta"><span class="activity-actor">Syncify</span> · May 28, 2025 at 09:14</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot-wrap"><span class="activity-dot muted"></span></div>
+              <div class="activity-body">
+                <div class="activity-title">Reminder sent</div>
+                <div class="activity-meta"><span class="activity-actor">System</span> · May 25, 2025 at 08:00</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot-wrap"><span class="activity-dot muted"></span></div>
+              <div class="activity-body">
+                <div class="activity-title">Record issued</div>
+                <div class="activity-meta"><span class="activity-actor">Anika Müller</span> · May 1, 2025 at 10:02</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot-wrap"><span class="activity-dot muted"></span></div>
+              <div class="activity-body">
+                <div class="activity-title">Account renewed</div>
+                <div class="activity-meta"><span class="activity-actor">System</span> · May 1, 2025 at 00:00</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+</div>
+
+</body>
+</html>

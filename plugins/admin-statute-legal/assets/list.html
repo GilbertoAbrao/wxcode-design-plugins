@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Statute Admin — List</title>
+<style>
+:root {
+  --clr-accent:        #9f1239;
+  --clr-accent-hi:     #be123c;
+  --clr-accent-subtle: #fdf2f4;
+  --clr-accent-muted:  #fce7eb;
+  --clr-gold:          #b45309;
+  --clr-gold-hi:       #d97706;
+  --clr-surface:       #faf8f6;
+  --clr-surface-raised:#ffffff;
+  --clr-border:        #e8e2dc;
+  --clr-row:           #f4f0ec;
+  --clr-sidebar-bg:    #1e1714;
+  --clr-sidebar-hover: #2d2420;
+  --clr-sidebar-active:#3a2820;
+  --clr-sidebar-text:  #d6cfc8;
+  --clr-sidebar-muted: #8b7f78;
+  --clr-sidebar-sep:   #2d2420;
+  --status-active-bg:  #dcfce7;  --status-active-fg:  #15803d;
+  --status-pending-bg: #fef3c7;  --status-pending-fg: #b45309;
+  --status-closed-bg:  #f1f5f9;  --status-closed-fg:  #64748b;
+  --status-urgent-bg:  #ffe4e6;  --status-urgent-fg:  #be123c;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:14px;color:#334155;background:var(--clr-surface);display:flex;min-height:100vh;line-height:1.5}
+
+/* sidebar (collapsed for list page — just icons for space) */
+.sidebar{width:240px;min-width:240px;background:var(--clr-sidebar-bg);display:flex;flex-direction:column;height:100vh;position:sticky;top:0;overflow-y:auto}
+.sidebar-brand{display:flex;align-items:center;gap:10px;padding:20px 18px 16px;border-bottom:1px solid var(--clr-sidebar-sep)}
+.sidebar-mono{width:36px;height:36px;background:var(--clr-accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+.sidebar-org{font-size:13px;font-weight:600;color:#f5f0ec;line-height:1.25}
+.sidebar-org span{display:block;font-size:11px;font-weight:400;color:var(--clr-sidebar-muted)}
+.nav-section{padding:10px 12px 4px}
+.nav-section-label{font-size:10px;font-weight:500;color:var(--clr-sidebar-muted);letter-spacing:0.1em;text-transform:uppercase;padding:0 6px;margin-bottom:4px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:6px;color:var(--clr-sidebar-text);font-size:13px;cursor:pointer;text-decoration:none;transition:background 0.15s;position:relative;margin-bottom:1px}
+.nav-item:hover{background:var(--clr-sidebar-hover);color:#f5f0ec}
+.nav-item.active{background:var(--clr-sidebar-active);color:#fff}
+.nav-item.active::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;background:var(--clr-accent-hi);border-radius:0 3px 3px 0}
+.nav-item svg{flex-shrink:0;opacity:0.75}
+.nav-item.active svg{opacity:1}
+.nav-badge{margin-left:auto;background:var(--clr-accent);color:#fff;font-size:10px;font-weight:600;padding:1px 6px;border-radius:10px;min-width:18px;text-align:center}
+.sidebar-footer{margin-top:auto;padding:14px 12px;border-top:1px solid var(--clr-sidebar-sep)}
+.user-chip{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#2d2420;border-radius:8px}
+.user-avatar{width:28px;height:28px;background:var(--clr-accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.user-info{font-size:12px;font-weight:500;color:#e8e2dc;line-height:1.2}
+.user-info span{display:block;font-size:11px;color:var(--clr-sidebar-muted)}
+
+/* main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:60px;background:var(--clr-surface-raised);border-bottom:1px solid var(--clr-border);display:flex;align-items:center;gap:14px;padding:0 24px;position:sticky;top:0;z-index:10}
+.topbar-title{font-size:16px;font-weight:600;color:#1e293b;white-space:nowrap}
+.topbar-actions{margin-left:auto;display:flex;gap:8px}
+.btn-ghost{padding:7px 14px;font-size:13px;font-weight:500;border:1px solid var(--clr-border);border-radius:8px;background:transparent;color:#334155;cursor:pointer}
+.btn-ghost:hover{border-color:var(--clr-accent);color:var(--clr-accent)}
+.btn-primary{padding:7px 16px;font-size:13px;font-weight:600;border:none;border-radius:8px;background:var(--clr-accent);color:#fff;cursor:pointer}
+.btn-primary:hover{background:var(--clr-accent-hi)}
+.topbar-avatar{width:36px;height:36px;background:var(--clr-accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;cursor:pointer;margin-left:4px}
+.page-body{padding:24px;overflow-y:auto;flex:1}
+
+/* toolbar */
+.toolbar{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.toolbar-search{display:flex;align-items:center;gap:8px;background:var(--clr-surface-raised);border:1px solid var(--clr-border);border-radius:8px;padding:8px 14px;flex:1;max-width:360px}
+.toolbar-search svg{color:#94a3b8;flex-shrink:0}
+.toolbar-search input{background:transparent;border:none;outline:none;color:#334155;font-size:13px;width:100%;font-family:inherit}
+.filter-group{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.filter-label{font-size:12px;color:#64748b;font-weight:500}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;color:#64748b;background:var(--clr-surface-raised);border:1px solid var(--clr-border);cursor:pointer;transition:border-color 0.12s,color 0.12s}
+.chip:hover{border-color:var(--clr-accent);color:var(--clr-accent)}
+.chip.active{background:var(--clr-accent-subtle);border-color:var(--clr-accent-muted);color:var(--clr-accent);font-weight:600}
+.chip-count{font-size:11px;font-weight:600;background:var(--clr-accent-muted);color:var(--clr-accent);padding:0 5px;border-radius:8px}
+.chip.active .chip-count{background:var(--clr-accent);color:#fff}
+.result-count{font-size:13px;color:#64748b;margin-left:auto}
+
+/* table card */
+.card{background:var(--clr-surface-raised);border:1px solid var(--clr-border);border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.04);overflow:hidden}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--clr-border)}
+.card-title{font-size:14px;font-weight:600;color:#1e293b}
+table{width:100%;border-collapse:collapse}
+thead th{font-size:11px;font-weight:500;color:#64748b;letter-spacing:0.05em;text-transform:uppercase;padding:10px 16px;text-align:left;background:#faf8f6;border-bottom:1px solid var(--clr-border)}
+thead th.right{text-align:right}
+tbody tr{border-bottom:1px solid var(--clr-row);transition:background 0.12s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#fdf7f5}
+tbody td{padding:11px 16px;font-size:13px;color:#334155;vertical-align:middle;font-variant-numeric:tabular-nums}
+tbody td.right{text-align:right}
+.rec-id{font-family:ui-monospace,"Cascadia Code","Fira Code",monospace;font-size:12px;color:var(--clr-accent);font-weight:600}
+.rec-name{font-weight:500;color:#1e293b}
+.rec-sub{font-size:11px;color:#64748b;margin-top:2px}
+.person-cell{display:flex;align-items:center;gap:7px}
+.person-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.pill-active{background:var(--status-active-bg);color:var(--status-active-fg)}
+.pill-pending{background:var(--status-pending-bg);color:var(--status-pending-fg)}
+.pill-closed{background:var(--status-closed-bg);color:var(--status-closed-fg)}
+.pill-urgent{background:var(--status-urgent-bg);color:var(--status-urgent-fg)}
+.pill-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+.action-link{font-size:12px;color:var(--clr-accent);text-decoration:none;font-weight:500}
+.table-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--clr-border);font-size:13px;color:#64748b}
+.pagination{display:flex;gap:4px}
+.page-btn{width:32px;height:32px;border-radius:7px;border:1px solid var(--clr-border);background:var(--clr-surface-raised);font-size:13px;color:#64748b;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color 0.12s,color 0.12s}
+.page-btn:hover{border-color:var(--clr-accent);color:var(--clr-accent)}
+.page-btn.active{background:var(--clr-accent);border-color:var(--clr-accent);color:#fff;font-weight:600}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-mono">VK</div>
+    <div class="sidebar-org">Varela &amp; Kossuth
+      <span>Professional Practice Suite</span>
+    </div>
+  </div>
+  <nav>
+    <div class="nav-section">
+      <div class="nav-section-label">Overview</div>
+      <a class="nav-item" href="#">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item active" href="#">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Matters
+        <span class="nav-badge">42</span>
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        Clients
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Calendar
+        <span class="nav-badge">7</span>
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Billing</div>
+      <a class="nav-item" href="#">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        Timesheets
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+        Invoices
+      </a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-chip">
+      <div class="user-avatar">PV</div>
+      <div class="user-info">Patricia Varela
+        <span>Managing Partner</span>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-title">All Records</div>
+    <div class="topbar-actions">
+      <button class="btn-ghost">Export CSV</button>
+      <button class="btn-primary">+ New Record</button>
+      <div class="topbar-avatar">PV</div>
+    </div>
+  </header>
+
+  <div class="page-body">
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="toolbar-search">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" placeholder="Filter by reference, client, category…">
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Status:</span>
+        <span class="chip active">All <span class="chip-count">42</span></span>
+        <span class="chip">Active <span class="chip-count">24</span></span>
+        <span class="chip">Urgent <span class="chip-count">4</span></span>
+        <span class="chip">Pending <span class="chip-count">9</span></span>
+        <span class="chip">Closed <span class="chip-count">5</span></span>
+      </div>
+      <div class="result-count">42 records</div>
+    </div>
+
+    <!-- TABLE CARD -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Records</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Ref #</th>
+            <th>Client / Entity</th>
+            <th>Category</th>
+            <th>Assigned To</th>
+            <th class="right">Amount</th>
+            <th>Due Date</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="rec-id">R-2026-0455</span></td>
+            <td><div><div class="rec-name">Talcott Renewables Ltd.</div><div class="rec-sub">Environmental review</div></div></td>
+            <td>Real Estate</td>
+            <td><div class="person-cell"><div class="person-dot" style="background:#0369a1">SK</div>S. Kim</div></td>
+            <td class="right">48,000</td>
+            <td>10 Jun 2026</td>
+            <td><span class="pill pill-pending"><span class="pill-dot"></span>Pending</span></td>
+            <td><a class="action-link" href="#">Open</a></td>
+          </tr>
+          <tr>
+            <td><span class="rec-id">R-2026-0441</span></td>
+            <td><div><div class="rec-name">Vantara Holdings LLC</div><div class="rec-sub">Share purchase agreement</div></div></td>
+            <td>Corporate &amp; M&amp;A</td>
+            <td><div class="person-cell"><div class="person-dot" style="background:#9f1239">PV</div>P. Varela</div></td>
+            <td class="right">120,000</td>
+            <td>5 Jun 2026</td>
+            <td><span class="pill pill-active"><span class="pill-dot"></span>Active</span></td>
+            <td><a class="action-link" href="#">Open</a></td>
+          </tr>
+          <tr>
+            <td><span class="rec-id">R-2026-0437</span></td>
+            <td><div><div class="rec-name">Desai Pharma Group</div><div class="rec-sub">Response to motion</div></div></td>
+            <td>Litigation</td>
+            <td><div class="person-cell"><div class="person-dot" style="background:#b45309">BK</div>B. Kossuth</div></td>
+            <td class="right">95,000</td>
+            <td>3 Jun 2026</td>
+            <td><span class="pill pill-urgent"><span class="pill-dot"></span>Urgent</span></td>
+            <td><a class="action-link" href="#">Open</a></td>
+          </tr>
+          <tr>
+            <td><span class="rec-id">R-2026-0429</span></td>
+            <td><div><div class="rec-name">Norden Real Estates</div><div class="rec-sub">Title report Lot 7B</div></div></td>
+            <td>Real Estate</td>
+            <td><div class="person-cell"><div class="person-dot" style="background:#0369a1">SK</div>S. Kim</div></td>
+            <td class="right">36,500</td>
+            <td>15 Jun 2026</td>
+            <td><span class="pill pill-active"><span class="pill-dot"></span>Active</span></td>
+            <td><a class="action-link" href="#">Open</a></td>
+          </tr>
+          <tr>
+            <td><span class="rec-id">R-2026-0418</span></td>
+            <td><div><div class="rec-name">Brightline Tech Inc.</div><div class="rec-sub">Patent opposition</div></div></td>
+            <td>Intellectual Property</td>
+            <td><div class="person-cell"><div class="person-dot" style="background:#7c3aed">AW</div>A. Winters</div></td>
+            <td class="right">72,000</td>
+            <td>6 Jun 2026</td>
+            <td><span class="pill pill-pending"><span class="pill-dot"></span>Pending</span></td>
+            <td><a class="action-link" href="#">Open</a></td>
+          </tr>
+          <tr>
+            <td><span class="rec-id">R-2026-0412</span></td>
+            <td><div><div class="rec-name">Olmstead &amp; Pryce Co.</div><div class="rec-sub">Settlement conference</div></div></td>
+            <td>Employment Law</td>
+            <td><div class="person-cell"><div class="person-dot" style="background:#0d9488">JN</div>J. Nakamura</div></td>
+            <td class="right">54,200</td>
+            <td>9 Jun 2026</td>
+            <td><span class="pill pill-active"><span class="pill-dot"></span>Active</span></td>
+            <td><a class="action-link" href="#">Open</a></td>
+          </tr>
+          <tr>
+            <td><span class="rec-id">R-2026-0398</span></td>
+            <td><div><div class="rec-name">Castellan Infrastructure</div><div class="rec-sub">Expert witness disclosure</div></div></td>
+            <td>Litigation</td>
+            <td><div class="person-cell"><div class="person-dot" style="background:#b45309">BK</div>B. Kossuth</div></td>
+            <td class="right">88,000</td>
+            <td>4 Jun 2026</td>
+            <td><span class="pill pill-urgent"><span class="pill-dot"></span>Urgent</span></td>
+            <td><a class="action-link" href="#">Open</a></td>
+          </tr>
+          <tr>
+            <td><span class="rec-id">R-2025-0381</span></td>
+            <td><div><div class="rec-name">Mercer Logistics SA</div><div class="rec-sub">Acquisition — closed</div></div></td>
+            <td>Corporate &amp; M&amp;A</td>
+            <td><div class="person-cell"><div class="person-dot" style="background:#9f1239">PV</div>P. Varela</div></td>
+            <td class="right">210,000</td>
+            <td>15 Apr 2026</td>
+            <td><span class="pill pill-closed"><span class="pill-dot"></span>Closed</span></td>
+            <td><a class="action-link" href="#">Open</a></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="table-footer">
+        <span>Showing 1–8 of 42</span>
+        <div class="pagination">
+          <button class="page-btn">‹</button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">…</button>
+          <button class="page-btn">6</button>
+          <button class="page-btn">›</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

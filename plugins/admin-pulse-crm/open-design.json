@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-pulse-crm",
-  "title": "Pulse CRM Admin",
-  "version": "0.1.0",
-  "description": "Airy light-mode sales CRM admin \u2014 left sidebar with workspace switcher, topbar with search and filters, 4 pipeline KPI tiles with sparklines, horizontal pipeline-by-stage strip, recent deals table with stage pills, and a right-side activity and tasks panel. Sky-blue accent on a white/slate canvas.",
+  "title": "Pulse Admin",
+  "version": "0.2.0",
+  "description": "Airy light-mode admin aesthetic: white/slate canvas (#f8fafc), sky-blue accent (#0ea5e9 / #2563eb), subtle 1px borders, 10px-radius white cards with a faint drop shadow, Inter type with tabular figures. Archetype = workspace-switcher sidebar (240px) + topbar with search and filter chips + 4 KPI tiles with inline SVG sparklines and delta chips + a stage-progress strip (N columns, proportional fill bars) + a 2-column split (records table + activity/tasks side panel), plus matching list, form, and detail screens.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -16,16 +16,16 @@
     "wxcode",
     "first-party",
     "prototype",
-    "sales",
+    "operations",
     "web",
     "admin",
-    "crm",
-    "pipeline",
-    "deals",
     "light-mode",
     "airy",
     "sky-blue",
-    "slate"
+    "slate",
+    "sparklines",
+    "sidebar",
+    "stage-progress"
   ],
   "compat": {
     "agentSkills": [
@@ -38,7 +38,7 @@
     "kind": "scenario",
     "taskKind": "new-generation",
     "mode": "prototype",
-    "scenario": "sales",
+    "scenario": "operations",
     "surface": "web",
     "preview": {
       "type": "html",
@@ -46,13 +46,25 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a CRM admin dashboard for a sales team \u2014 left sidebar with workspace switcher, topbar with search and filters, 4 pipeline KPI tiles, pipeline-by-stage strip, recent deals table, and an activity/tasks side panel.",
-        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me a CRM admin dashboard for a sales team \u2014 left sidebar with workspace switcher, topbar with search and filters, 4 pipeline KPI tiles, pipeline-by-stage strip, recent deals table, and an activity/tasks side panel."
+        "en": "Apply this airy light-mode admin aesthetic to my domain — sky-blue accent, workspace-switcher sidebar, topbar with search and filter chips, 4 KPI tiles with sparklines, a stage-progress strip, a records table with status pills, and an activity/tasks side panel, plus list / form / detail screens.",
+        "zh-CN": "将这个清爽亮色管理界面风格应用到我的领域：天蓝强调色、工作区切换侧栏、带搜索和筛选的顶栏、4 个带迷你图的 KPI 卡片、阶段进度条、带状态标签的记录表格，以及活动 / 任务侧栏，并配套列表 / 表单 / 详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Pulse CRM Admin"
+          "title": "Pulse Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Pulse Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Pulse Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Pulse Admin — Detail"
         }
       ]
     },
@@ -70,7 +82,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {
@@ -89,8 +107,8 @@
       "fs:write"
     ],
     "provenance": {
-      "category": "themeforest-admin-templates",
-      "note": "category design-language reference only; original implementation"
+      "category": "admin-dashboards",
+      "note": "original archetype; no third-party template reproduced"
     }
   }
 }

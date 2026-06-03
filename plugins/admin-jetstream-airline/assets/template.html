@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jetstream Admin — {Screen Title}</title>
+<style>
+/* ── TOKEN BLOCK (copy this to every screen) ───────────────────── */
+:root {
+  --accent-indigo:     #6366f1;
+  --accent-indigo-dim: rgba(99,102,241,.15);
+  --accent-sky:        #38bdf8;
+  --accent-sky-dim:    rgba(56,189,248,.15);
+  --state-active:      #22c55e;
+  --state-active-dim:  rgba(34,197,94,.10);
+  --state-warn:        #f59e0b;
+  --state-warn-dim:    rgba(245,158,11,.10);
+  --state-sky:         #38bdf8;
+  --state-sky-dim:     rgba(56,189,248,.10);
+  --state-muted:       #8a98ad;
+  --state-muted-dim:   rgba(138,152,173,.08);
+  --error:             #ef4444;
+  --error-dim:         rgba(239,68,68,.10);
+  --text-primary:      #e4ecf6;
+  --text-muted:        #8a98ad;
+}
+/* ── BASE RESET ────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#0a0f1a;color:#e4ecf6;font-size:14px;line-height:1.5}
+button,input,select,textarea{font-family:inherit;cursor:pointer}
+/* ── SHELL ─────────────────────────────────────────────────────── */
+.shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+/* ── NAVBAR (48px, sticky) ─────────────────────────────────────── */
+.navbar{height:48px;background:#111a2b;border-bottom:1px solid #24314a;display:flex;align-items:center;padding:0 12px;gap:12px;flex-shrink:0;z-index:100}
+/* Entity-switcher pill: live-dot + code + chevron */
+.entity-switcher{display:flex;align-items:center;gap:6px;padding:5px 10px;background:#18243a;border:1px solid #24314a;border-radius:7px;font-size:12px;font-weight:600;color:#e4ecf6;letter-spacing:.04em;cursor:pointer}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--state-active);flex-shrink:0;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+/* Search input (grows with flex) */
+.search-wrap{flex:1;max-width:340px;position:relative}
+.search-wrap svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:#8a98ad}
+.search-wrap input{width:100%;background:#18243a;border:1px solid #24314a;border-radius:7px;color:#e4ecf6;font-size:13px;padding:6px 10px 6px 32px;outline:none}
+.search-wrap input::placeholder{color:#8a98ad}
+.search-wrap input:focus{border-color:var(--accent-indigo)}
+/* Right cluster */
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.bell-btn{position:relative;background:none;border:none;padding:6px;color:#8a98ad;display:flex;align-items:center}
+.bell-btn:hover{color:#e4ecf6}
+.bell-badge{position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:var(--state-warn);border:2px solid #111a2b}
+.avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent-indigo),var(--accent-sky));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;cursor:pointer}
+/* ── BODY ROW ──────────────────────────────────────────────────── */
+.body-row{display:flex;flex:1;overflow:hidden}
+/* ── ICON RAIL (48px) ──────────────────────────────────────────── */
+.icon-rail{width:48px;background:#111a2b;border-right:1px solid #24314a;display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:4px;flex-shrink:0;overflow-y:auto}
+.rail-btn{width:36px;height:36px;background:none;border:none;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#8a98ad;transition:background .15s,color .15s}
+.rail-btn:hover{background:#18243a;color:#e4ecf6}
+.rail-btn.active{background:var(--accent-indigo-dim);color:var(--accent-sky)}
+.rail-divider{width:24px;height:1px;background:#24314a;margin:4px 0}
+.rail-spacer{flex:1}
+/* ── MAIN CONTENT ──────────────────────────────────────────────── */
+.main{flex:1;overflow-y:auto;padding:20px 24px 32px}
+/* ── PAGE HEADER (every screen) ────────────────────────────────── */
+.page-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.page-title{font-size:18px;font-weight:700;color:#e4ecf6;letter-spacing:-.01em}
+.page-sub{font-size:12px;color:#8a98ad;margin-top:2px}
+.hdr-spacer{flex:1}
+/* ── BUTTON VARIANTS ────────────────────────────────────────────── */
+.btn-ghost{background:none;border:1px solid #24314a;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:500;color:#8a98ad;transition:border-color .15s,color .15s}
+.btn-ghost:hover{border-color:var(--accent-sky);color:var(--accent-sky)}
+.btn-primary{background:var(--accent-indigo);border:none;border-radius:7px;padding:6px 14px;font-size:12px;font-weight:600;color:#fff;transition:opacity .15s}
+.btn-primary:hover:not(:disabled){opacity:.85}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed}
+/* ── CARD ───────────────────────────────────────────────────────── */
+.card{background:#18243a;border:1px solid #24314a;border-radius:10px;margin-bottom:18px}
+.card-hdr{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid #24314a}
+.card-title{font-size:13px;font-weight:700;color:#e4ecf6;letter-spacing:-.01em}
+.card-hdr-space{flex:1}
+/* ── KPI TILE ROW (4 tiles, collapses to 2×2) ──────────────────── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+.kpi-card{background:#18243a;border:1px solid #24314a;border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.kpi-top{display:flex;align-items:center;justify-content:space-between}
+.kpi-label{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#8a98ad}
+.kpi-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.kpi-icon.indigo{background:var(--accent-indigo-dim);color:var(--accent-indigo)}
+.kpi-icon.sky{background:var(--accent-sky-dim);color:var(--accent-sky)}
+.kpi-icon.green{background:var(--state-active-dim);color:var(--state-active)}
+.kpi-icon.amber{background:var(--state-warn-dim);color:var(--state-warn)}
+.kpi-num{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums;color:#e4ecf6;letter-spacing:-.02em;line-height:1.1}
+.kpi-footer{display:flex;align-items:center;gap:6px}
+.delta{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:2px 7px;border-radius:5px;font-variant-numeric:tabular-nums}
+.delta.up{background:var(--state-active-dim);color:var(--state-active)}
+.delta.warn{background:var(--state-warn-dim);color:var(--state-warn)}
+.delta.neutral{background:var(--state-muted-dim);color:#8a98ad}
+.kpi-since{font-size:11px;color:#8a98ad}
+/* ── STATE PILLS ────────────────────────────────────────────────── */
+.state-pill{display:inline-flex;align-items:center;gap:5px;border-radius:6px;padding:3px 9px;font-size:11px;font-weight:600;white-space:nowrap}
+.state-pill.active{background:var(--state-active-dim);color:var(--state-active);border:1px solid rgba(34,197,94,.2)}
+.state-pill.sky{background:var(--state-sky-dim);color:var(--state-sky);border:1px solid rgba(56,189,248,.2)}
+.state-pill.warn{background:var(--state-warn-dim);color:var(--state-warn);border:1px solid rgba(245,158,11,.2)}
+.state-pill.muted{background:var(--state-muted-dim);color:var(--state-muted);border:1px solid rgba(138,152,173,.18)}
+.state-pill.queued{background:var(--accent-indigo-dim);color:var(--accent-indigo);border:1px solid rgba(99,102,241,.2)}
+.state-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.state-dot.active{background:var(--state-active)}
+.state-dot.sky{background:var(--state-sky)}
+.state-dot.warn{background:var(--state-warn)}
+.state-dot.muted{background:var(--state-muted)}
+.state-dot.queued{background:var(--accent-indigo)}
+/* ── LIVE BADGE ─────────────────────────────────────────────────── */
+.badge-live{display:inline-flex;align-items:center;gap:5px;background:var(--state-active-dim);border:1px solid rgba(34,197,94,.25);border-radius:5px;padding:2px 8px;font-size:10px;font-weight:600;color:var(--state-active);letter-spacing:.05em}
+.badge-live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--state-active);animation:pulse 2s ease-in-out infinite}
+/* ── TABLES ─────────────────────────────────────────────────────── */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#8a98ad;padding:10px 18px;text-align:left;border-bottom:1px solid #24314a}
+.tbl th.num{text-align:right}
+.tbl td{padding:11px 18px;font-size:13px;color:#e4ecf6;border-bottom:1px solid rgba(36,49,74,.6);vertical-align:middle;font-variant-numeric:tabular-nums}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tbody tr:hover td{background:rgba(99,102,241,.04)}
+.rec-id{font-weight:700;color:var(--accent-sky)}
+.loc-pill{display:inline-block;background:#0a0f1a;border:1px solid #24314a;border-radius:5px;padding:2px 8px;font-size:11px;font-weight:600;font-variant-numeric:tabular-nums}
+/* ── FILTER / CHIP ──────────────────────────────────────────────── */
+.chip{display:inline-flex;align-items:center;gap:4px;background:none;border:1px solid #24314a;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:500;color:#8a98ad;cursor:pointer;transition:all .15s}
+.chip.active{background:var(--accent-indigo-dim);border-color:var(--accent-indigo);color:var(--accent-indigo)}
+.chip:hover:not(.active){border-color:var(--accent-sky);color:var(--accent-sky)}
+/* ── FORM FIELDS (inline validation — rules on fields, not panels) */
+.field{display:flex;flex-direction:column;gap:4px}
+.field-label{font-size:12px;font-weight:600;color:#8a98ad}
+.req{color:var(--accent-sky);font-weight:700}
+.control{background:#0a0f1a;border:1px solid #24314a;border-radius:6px;color:#e4ecf6;font-size:13px;padding:8px 10px;outline:none;transition:border-color .15s;width:100%}
+.control::placeholder{color:#8a98ad}
+.control:focus{border-color:var(--accent-indigo)}
+.helper{font-size:11px;color:#8a98ad;line-height:1.4}
+.field.invalid .control{border-color:var(--error);background:var(--error-dim)}
+.error-msg{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--error)}
+/* ── PAGER ──────────────────────────────────────────────────────── */
+.pagination{display:flex;gap:4px}
+.page-btn{width:28px;height:28px;background:none;border:1px solid #24314a;border-radius:5px;font-size:12px;color:#8a98ad;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s}
+.page-btn:hover{border-color:var(--accent-sky);color:var(--accent-sky)}
+.page-btn.active{background:var(--accent-indigo-dim);border-color:var(--accent-indigo);color:var(--accent-indigo);font-weight:600}
+/* ── TWO-COLUMN GRID (60/40 or 7fr/5fr) ────────────────────────── */
+.mid-grid{display:grid;grid-template-columns:1fr 340px;gap:18px;margin-bottom:18px}
+@media(max-width:900px){.mid-grid{grid-template-columns:1fr}}
+.two-col{display:grid;grid-template-columns:7fr 5fr;gap:18px;align-items:start}
+@media(max-width:900px){.two-col{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ── NAVBAR ── -->
+  <nav class="navbar">
+    <div class="entity-switcher">
+      <span class="live-dot"></span>
+      <span>{HUB CODE}</span>
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>
+    </div>
+    <div class="search-wrap">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>
+      <input type="text" placeholder="Search {entities}…">
+    </div>
+    <div class="nav-right">
+      <button class="bell-btn" aria-label="Alerts">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="bell-badge"></span>
+      </button>
+      <div class="avatar" title="{User}">{IN}</div>
+    </div>
+  </nav>
+
+  <!-- ── BODY ROW ── -->
+  <div class="body-row">
+
+    <!-- ── ICON RAIL ── -->
+    <aside class="icon-rail" aria-label="Navigation">
+      <!-- Repeat .rail-btn for each nav item; add .active on the current screen -->
+      <button class="rail-btn active" title="{Screen}">
+        <!-- 18×18 inline SVG icon, stroke=currentColor, stroke-width=1.6 -->
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      </button>
+      <!-- more .rail-btn items -->
+      <div class="rail-divider"></div>
+      <!-- utility items -->
+      <div class="rail-spacer"></div>
+      <!-- settings pinned at bottom -->
+      <button class="rail-btn" title="Settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </aside>
+
+    <!-- ── MAIN CONTENT SLOT ── -->
+    <main class="main">
+
+      <!-- Page header -->
+      <div class="page-header">
+        <div>
+          <div class="page-title">{Screen Title}</div>
+          <div class="page-sub">{Hub · Context · Timestamp}</div>
+        </div>
+        <div class="hdr-spacer"></div>
+        <button class="btn-ghost">{Secondary Action}</button>
+        <button class="btn-primary">+ {Primary Action}</button>
+      </div>
+
+      <!-- ↓ Drop region skeletons from references/layouts.md here ↓ -->
+
+    </main>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin — Shell Seed</title>
+<!--
+  SEED SKELETON — copy this file as the starting point for a new screen in the
+  Estate Realty refined-light/teal skin. It carries the :root token block and
+  the app shell (deep-teal sidebar + sticky topbar + main content slot).
+  Replace the brand text, the entity-switcher label, the nav section labels,
+  nav items, and the <main> content with the real domain's equivalents.
+  Mark the active nav item with .active. Keep the token block intact.
+-->
+<style>
+:root {
+  /* Primary accent (teal) */
+  --color-accent:        #0d9488;
+  --color-accent-mid:    #14b8a6;
+  --color-accent-active: #5eead4;
+  --color-accent-hover:  #0b7a70;
+  --color-accent-light:  #ccfbf1;
+  --color-accent-faint:  #f0fdfa;
+  /* Status ramp — add/remove to match the domain */
+  --color-success:       #16a34a;  --color-success-bg:  #dcfce7;  --color-success-border: #bbf7d0; --color-success-faint: #f0fdf4;
+  --color-warning:       #d97706;  --color-warning-bg:  #fef3c7;
+  --color-danger:        #dc2626;  --color-danger-bg:   #fee2e2;
+  /* Type-distinction pills */
+  --color-pill-blue:     #1d4ed8;  --color-pill-blue-bg:   #dbeafe;
+  --color-pill-violet:   #6d28d9;  --color-pill-violet-bg: #ede9fe;
+  --color-pill-amber:    #854d0e;  --color-pill-amber-bg:  #fef9c3;
+  /* Leaderboard rank tokens */
+  --color-rank-gold:     #b45309;
+  --color-rank-silver:   #64748b;
+  --color-rank-bronze:   #92400e;
+  /* Neutrals */
+  --color-text:          #1e2d2b;
+  --color-muted:         #64748b;
+  --color-border:        #e3e9e9;
+  --color-surface:       #ffffff;
+  --color-bg:            #f7f9f9;
+  --color-bg-subtle:     #fafcfc;
+  /* Sidebar */
+  --color-sidebar:       #0f2623;
+  --color-sidebar-item:  rgba(255,255,255,0.07);
+  --color-sidebar-text:  #a8c5c2;
+  --color-sidebar-active:#e2f0ef;
+  --color-sidebar-head:  rgba(255,255,255,0.30);
+  /* Geometry */
+  --radius-card:         12px;
+  --shadow-card:         0 2px 10px rgba(13,148,136,0.07);
+  --font-sans:           "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font-sans); font-size: 14px; line-height: 1.5;
+  background: var(--color-bg); color: var(--color-text);
+  min-height: 100vh; display: flex;
+}
+
+/* ── SIDEBAR ──────────────────────────────────────────────────── */
+.sidebar {
+  width: 240px; min-height: 100vh; background: var(--color-sidebar);
+  display: flex; flex-direction: column; flex-shrink: 0;
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+}
+.sidebar-brand {
+  display: flex; align-items: center; gap: 10px;
+  padding: 22px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.brand-mark {
+  width: 36px; height: 36px; background: var(--color-accent); border-radius: 9px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.brand-name { color: #fff; font-size: 15px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.2; }
+.brand-name span { display: block; font-size: 10px; font-weight: 400; color: var(--color-sidebar-text); letter-spacing: 0.03em; }
+/* Entity switcher — relabel to the domain's primary scope */
+.entity-switcher {
+  margin: 14px 14px 8px; background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.09); border-radius: 8px; padding: 8px 12px;
+  display: flex; align-items: center; justify-content: space-between; cursor: pointer; gap: 6px;
+}
+.entity-switcher-label { font-size: 12px; color: var(--color-sidebar-text); flex: 1; min-width: 0; }
+.entity-switcher-name { color: #e2f0ef; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Nav sections */
+.nav-section { padding: 10px 14px 2px; }
+.nav-section-label {
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--color-sidebar-head); padding: 0 6px; margin-bottom: 4px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 7px;
+  color: var(--color-sidebar-text); font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: background 0.15s, color 0.15s; margin-bottom: 1px;
+  position: relative; text-decoration: none;
+}
+.nav-item:hover { background: var(--color-sidebar-item); color: #e2f0ef; }
+.nav-item.active { background: rgba(20,184,166,0.18); color: var(--color-accent-active); }
+.nav-item.active::before {
+  content: ''; position: absolute; left: 0; top: 6px; bottom: 6px;
+  width: 3px; background: var(--color-accent-mid); border-radius: 0 3px 3px 0;
+}
+.nav-badge { margin-left: auto; background: var(--color-accent); color: #fff; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 20px; line-height: 1.6; }
+.sidebar-footer {
+  margin-top: auto; border-top: 1px solid rgba(255,255,255,0.07);
+  padding: 14px 16px; display: flex; align-items: center; gap: 10px;
+}
+.sidebar-footer-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--color-accent); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+.sidebar-footer-info { flex: 1; min-width: 0; }
+.sidebar-footer-name { color: #e2f0ef; font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar-footer-role { color: var(--color-sidebar-text); font-size: 10.5px; }
+
+/* ── TOPBAR ──────────────────────────────────────────────────── */
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.topbar {
+  height: 60px; background: var(--color-surface); border-bottom: 1px solid var(--color-border);
+  display: flex; align-items: center; padding: 0 24px; gap: 16px;
+  position: sticky; top: 0; z-index: 10;
+}
+.topbar-title { font-size: 16px; font-weight: 700; color: var(--color-text); white-space: nowrap; letter-spacing: -0.01em; }
+/* Search — relabel placeholder to domain's search subjects */
+.topbar-search { flex: 1; max-width: 380px; margin: 0 auto; position: relative; }
+.topbar-search input { width: 100%; padding: 7px 14px 7px 34px; border: 1px solid var(--color-border); border-radius: 8px; font-family: var(--font-sans); font-size: 13px; color: var(--color-text); background: var(--color-bg); outline: none; transition: border-color 0.15s; }
+.topbar-search input::placeholder { color: var(--color-muted); }
+.topbar-search input:focus { border-color: var(--color-accent-mid); }
+.topbar-search-icon { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); color: var(--color-muted); pointer-events: none; }
+/* Dimension filter — relabel options to domain's dimensions */
+.filter-select { padding: 6px 12px; border: 1px solid var(--color-border); border-radius: 8px; font-family: var(--font-sans); font-size: 12.5px; color: var(--color-text); background: var(--color-surface); cursor: pointer; outline: none; }
+.topbar-bell { width: 36px; height: 36px; border-radius: 50%; background: var(--color-bg); border: 1px solid var(--color-border); display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; color: var(--color-muted); flex-shrink: 0; }
+.bell-dot { position: absolute; top: 5px; right: 5px; width: 8px; height: 8px; border-radius: 50%; background: var(--color-danger); border: 1.5px solid var(--color-surface); }
+.topbar-avatar { display: flex; align-items: center; gap: 8px; cursor: pointer; flex-shrink: 0; }
+.topbar-avatar-circle { width: 34px; height: 34px; border-radius: 50%; background: var(--color-accent); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 700; }
+.topbar-avatar-name { font-size: 13px; font-weight: 600; color: var(--color-text); }
+
+/* ── MAIN CONTENT SLOT ───────────────────────────────────────── */
+.page-body { padding: 24px; display: flex; flex-direction: column; gap: 22px; }
+
+/* Reusable primitives */
+.card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-card); box-shadow: var(--shadow-card); overflow: hidden; }
+.btn-primary { padding: 8px 16px; background: var(--color-accent); color: #fff; font-family: var(--font-sans); font-size: 13px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; transition: background 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+.btn-primary:hover { background: var(--color-accent-hover); }
+.btn-ghost { padding: 8px 14px; background: transparent; color: var(--color-muted); font-family: var(--font-sans); font-size: 13px; font-weight: 500; border: 1px solid var(--color-border); border-radius: 8px; cursor: pointer; transition: border-color 0.15s, color 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+.btn-ghost:hover { border-color: var(--color-accent-mid); color: var(--color-accent); }
+.pill { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: 0.02em; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR: brand → entity-switcher → grouped nav → footer avatar -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-mark">
+      <!-- Replace with the domain's brand icon (inline SVG, stroke #fff) -->
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <rect x="3" y="3" width="14" height="14" rx="3" stroke="#fff" stroke-width="1.5" fill="none"/>
+        <path d="M7 10h6M10 7v6" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="brand-name">Brand Name
+      <span>Sub-label</span>
+    </div>
+  </div>
+
+  <!-- ENTITY SWITCHER — relabel to the domain's primary scope (org/site/account…) -->
+  <div class="entity-switcher">
+    <div>
+      <div class="entity-switcher-label">Scope</div>
+      <div class="entity-switcher-name">Active Entity</div>
+    </div>
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:var(--color-sidebar-text);flex-shrink:0">
+      <path d="M3.5 5.5L7 9l3.5-3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <!-- NAV SECTIONS — replace section labels and items with domain equivalents -->
+  <div class="nav-section">
+    <div class="nav-section-label">Section A</div>
+    <a class="nav-item active" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" fill="currentColor"/><rect x="9" y="2" width="5" height="5" rx="1" fill="currentColor" fill-opacity=".5"/><rect x="2" y="9" width="5" height="5" rx="1" fill="currentColor" fill-opacity=".5"/><rect x="9" y="9" width="5" height="5" rx="1" fill="currentColor"/></svg>
+      Overview
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 5.5C2 4.12 3.12 3 4.5 3h7C12.88 3 14 4.12 14 5.5v5c0 1.38-1.12 2.5-2.5 2.5h-7C3.12 13 2 11.88 2 10.5v-5z" stroke="currentColor" stroke-width="1.3"/></svg>
+      Reports
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Section B</div>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8.5L8 2l6 6.5V14a.5.5 0 01-.5.5h-11A.5.5 0 012 14V8.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+      Primary Records
+      <span class="nav-badge">0</span>
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 5.5v2.75l1.75 1.75" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Pending
+    </a>
+  </div>
+
+  <div class="sidebar-footer">
+    <!-- Replace initials and name/role with the signed-in user -->
+    <div class="sidebar-footer-avatar">··</div>
+    <div class="sidebar-footer-info">
+      <div class="sidebar-footer-name">User Name</div>
+      <div class="sidebar-footer-role">Role</div>
+    </div>
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="color:var(--color-sidebar-text);flex-shrink:0;cursor:pointer">
+      <circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.3"/>
+      <path d="M8 2v1.5M8 12.5V14M14 8h-1.5M3.5 8H2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+    </svg>
+  </div>
+</aside>
+
+<div class="main">
+  <!-- TOPBAR: title → search → filter → bell → avatar -->
+  <header class="topbar">
+    <div class="topbar-title">Screen Title</div>
+    <div class="topbar-search">
+      <svg class="topbar-search-icon" width="15" height="15" viewBox="0 0 15 15" fill="none">
+        <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M10.5 10.5L13 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <!-- Replace placeholder with domain's search subjects -->
+      <input type="text" placeholder="Search…">
+    </div>
+    <!-- Replace options with domain dimensions -->
+    <select class="filter-select">
+      <option>All Dimensions</option>
+    </select>
+    <div class="topbar-bell">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M8 2a4.5 4.5 0 00-4.5 4.5v2.25L2 11h12l-1.5-2.25V6.5A4.5 4.5 0 008 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+        <path d="M6.5 11.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3"/>
+      </svg>
+      <span class="bell-dot"></span>
+    </div>
+    <div class="topbar-avatar">
+      <div class="topbar-avatar-circle">··</div>
+      <span class="topbar-avatar-name">User</span>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT SLOT — drop the screen body here.
+       See assets/dashboard.html, assets/list.html, assets/form.html,
+       assets/detail.html, and references/layouts.md for region skeletons. -->
+  <div class="page-body">
+    <!-- content goes here -->
+  </div>
+</div>
+
+</body>
+</html>

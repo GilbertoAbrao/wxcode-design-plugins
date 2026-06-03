@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dense Grid Admin — Detail</title>
+<style>
+:root {
+  --up:          #22c55e;
+  --dn:          #ef4444;
+  --accent-blue: #3b82f6;
+  --text-primary:#d7dde4;
+  --text-muted:  #7b8694;
+  --mono: ui-monospace, Menlo, 'Courier New', monospace;
+  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: #0c0f12;
+  color: var(--text-primary);
+  font-family: var(--sans);
+  font-size: 12px;
+  line-height: 1.4;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; }
+button { cursor: pointer; font-family: inherit; font-size: 11px; }
+
+.mono  { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.up    { color: var(--up); }
+.dn    { color: var(--dn); }
+.muted { color: var(--text-muted); }
+
+/* ── Toolbar ──────────────────────────────────────────────────── */
+.toolbar {
+  height: 36px; background: #12161b; border-bottom: 1px solid #232a31;
+  display: flex; align-items: center; padding: 0 12px; gap: 12px; flex-shrink: 0;
+}
+.brand { display: flex; align-items: center; gap: 6px; }
+.brand-mark {
+  width: 20px; height: 20px; background: var(--accent-blue); border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: #fff;
+}
+.brand-name { font-size: 13px; font-weight: 600; }
+.tb-sep { width: 1px; height: 20px; background: #232a31; }
+.breadcrumb { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+.breadcrumb a { color: var(--accent-blue); text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.toolbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.avatar {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--accent-blue); color: #fff;
+  font-size: 10px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── Page layout ──────────────────────────────────────────────── */
+.page { flex: 1; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; overflow: auto; }
+
+/* ── Detail header band ───────────────────────────────────────── */
+.detail-header {
+  background: #12161b;
+  border: 1px solid #232a31;
+  border-radius: 4px;
+  padding: 12px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px;
+}
+.detail-id-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.detail-sym { font-size: 20px; font-weight: 800; font-family: var(--mono); letter-spacing: -.5px; }
+.status-tag {
+  font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 3px;
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.status-active { background: rgba(34,197,94,.15); color: var(--up); }
+.detail-name { font-size: 13px; color: var(--text-muted); }
+.detail-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.btn-ghost {
+  height: 28px; padding: 0 12px; border-radius: 4px;
+  border: 1px solid #232a31; background: transparent;
+  color: var(--text-primary); font-size: 12px;
+  transition: border-color .15s;
+}
+.btn-ghost:hover { border-color: var(--accent-blue); }
+.btn-primary {
+  height: 28px; padding: 0 12px; border-radius: 4px;
+  border: none; background: var(--accent-blue);
+  color: #fff; font-size: 12px; font-weight: 600;
+}
+.btn-primary:hover { filter: brightness(1.1); }
+
+/* ── Card ─────────────────────────────────────────────────────── */
+.card { background: #12161b; border: 1px solid #232a31; border-radius: 4px; overflow: hidden; }
+.card-hdr {
+  height: 28px; display: flex; align-items: center; padding: 0 12px;
+  border-bottom: 1px solid #232a31;
+}
+.card-title { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.card-count { font-size: 10px; color: var(--text-muted); font-family: var(--mono); margin-left: 8px; }
+
+/* ── Meta grid ────────────────────────────────────────────────── */
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+}
+.meta-cell {
+  padding: 10px 14px;
+  border-right: 1px solid #232a31;
+  border-bottom: 1px solid #232a31;
+}
+.meta-cell:nth-child(3n) { border-right: none; }
+.meta-cell:nth-last-child(-n+3) { border-bottom: none; }
+.meta-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px; }
+.meta-value { font-size: 13px; font-weight: 600; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.meta-sub   { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+/* ── Two-column grid ──────────────────────────────────────────── */
+.two-col { display: grid; grid-template-columns: 7fr 5fr; gap: 12px; align-items: start; }
+
+/* ── Related sub-table ────────────────────────────────────────── */
+.sub-tbl th {
+  background: #0c0f12; font-size: 10px; font-weight: 600; color: var(--text-muted);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 4px 10px; border-bottom: 1px solid #232a31; white-space: nowrap;
+}
+.sub-tbl td { padding: 4px 10px; border-bottom: 1px solid rgba(35,42,49,.6); font-size: 12px; white-space: nowrap; }
+.sub-tbl tr:last-child td { border-bottom: none; }
+.sub-tbl tr:hover td { background: #191e25; }
+
+/* ── Activity log ─────────────────────────────────────────────── */
+.activity-list { display: flex; flex-direction: column; }
+.activity-row {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 8px 12px; border-bottom: 1px solid rgba(35,42,49,.6);
+}
+.activity-row:last-child { border-bottom: none; }
+.activity-dot {
+  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 3px;
+}
+.dot-blue { background: var(--accent-blue); }
+.dot-up   { background: var(--up); }
+.dot-dn   { background: var(--dn); }
+.dot-muted{ background: var(--text-muted); }
+.activity-body { flex: 1; min-width: 0; }
+.activity-desc { font-size: 11px; color: var(--text-primary); }
+.activity-time { font-size: 10px; color: var(--text-muted); margin-top: 2px; font-family: var(--mono); }
+</style>
+</head>
+<body>
+
+<!-- TOOLBAR -->
+<header class="toolbar">
+  <div class="brand">
+    <div class="brand-mark">NO</div>
+    <span class="brand-name">NovexOps</span>
+  </div>
+  <div class="tb-sep"></div>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="#">Instruments</a>
+    <span>›</span>
+    <span>NOVQ</span>
+  </nav>
+  <div class="toolbar-right">
+    <div class="avatar">RM</div>
+  </div>
+</header>
+
+<!-- PAGE -->
+<main class="page">
+
+  <!-- Detail header band -->
+  <div class="detail-header">
+    <div>
+      <div class="detail-id-row">
+        <span class="detail-sym">NOVQ</span>
+        <span class="status-tag status-active">Active</span>
+      </div>
+      <div class="detail-name">Novex Corp · Equity · NQVX</div>
+    </div>
+    <div class="detail-actions">
+      <button class="btn-ghost">Remove Alert</button>
+      <button class="btn-ghost">Export</button>
+      <button class="btn-primary">Edit</button>
+    </div>
+  </div>
+
+  <!-- Meta grid -->
+  <div class="card">
+    <div class="meta-grid">
+      <div class="meta-cell">
+        <div class="meta-label">Last Price</div>
+        <div class="meta-value up">284.40</div>
+        <div class="meta-sub">▲ 3.72 today (+1.33%)</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-label">Target Price</div>
+        <div class="meta-value">320.00</div>
+        <div class="meta-sub">12.5% upside</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-label">Alert Threshold</div>
+        <div class="meta-value">5.0%</div>
+        <div class="meta-sub">Triggers at ±5% move</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-label">52W Range</div>
+        <div class="meta-value">198.80 – 312.50</div>
+        <div class="meta-sub">Current at 87.6% of range</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-label">Volume (Today)</div>
+        <div class="meta-value mono">4,102,400</div>
+        <div class="meta-sub">Avg 3.8M / session</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-label">Added</div>
+        <div class="meta-value mono">2026-01-14</div>
+        <div class="meta-sub">by R. Muto</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Two-column: price history + activity -->
+  <div class="two-col">
+
+    <!-- Price history sub-table -->
+    <div class="card">
+      <div class="card-hdr">
+        <span class="card-title">Recent Sessions</span>
+        <span class="card-count">5 sessions</span>
+      </div>
+      <table class="sub-tbl">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th class="mono">Open</th>
+            <th class="mono">High</th>
+            <th class="mono">Low</th>
+            <th class="mono">Close</th>
+            <th class="mono">Change</th>
+            <th class="mono">Volume</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="muted">2026-06-03</td>
+            <td class="mono">280.68</td>
+            <td class="mono">286.15</td>
+            <td class="mono">279.90</td>
+            <td class="mono">284.40</td>
+            <td class="mono up">+1.33%</td>
+            <td class="mono muted">4.1M</td>
+          </tr>
+          <tr>
+            <td class="muted">2026-06-02</td>
+            <td class="mono">276.10</td>
+            <td class="mono">281.50</td>
+            <td class="mono">275.20</td>
+            <td class="mono">280.68</td>
+            <td class="mono up">+1.66%</td>
+            <td class="mono muted">3.9M</td>
+          </tr>
+          <tr>
+            <td class="muted">2026-05-30</td>
+            <td class="mono">281.40</td>
+            <td class="mono">283.00</td>
+            <td class="mono">274.80</td>
+            <td class="mono">276.10</td>
+            <td class="mono dn">-1.89%</td>
+            <td class="mono muted">5.2M</td>
+          </tr>
+          <tr>
+            <td class="muted">2026-05-29</td>
+            <td class="mono">278.00</td>
+            <td class="mono">283.50</td>
+            <td class="mono">277.40</td>
+            <td class="mono">281.40</td>
+            <td class="mono up">+1.22%</td>
+            <td class="mono muted">3.4M</td>
+          </tr>
+          <tr>
+            <td class="muted">2026-05-28</td>
+            <td class="mono">274.50</td>
+            <td class="mono">279.10</td>
+            <td class="mono">273.60</td>
+            <td class="mono">278.00</td>
+            <td class="mono up">+1.28%</td>
+            <td class="mono muted">4.0M</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Activity log -->
+    <div class="card">
+      <div class="card-hdr">
+        <span class="card-title">Activity</span>
+        <span class="card-count">recent</span>
+      </div>
+      <div class="activity-list">
+        <div class="activity-row">
+          <div class="activity-dot dot-up"></div>
+          <div class="activity-body">
+            <div class="activity-desc">Alert triggered — +1.33% above open</div>
+            <div class="activity-time">14:22 UTC · today</div>
+          </div>
+        </div>
+        <div class="activity-row">
+          <div class="activity-dot dot-blue"></div>
+          <div class="activity-body">
+            <div class="activity-desc">Target price updated to 320.00</div>
+            <div class="activity-time">09:04 UTC · 2026-06-02</div>
+          </div>
+        </div>
+        <div class="activity-row">
+          <div class="activity-dot dot-muted"></div>
+          <div class="activity-body">
+            <div class="activity-desc">Added to watchlist by R. Muto</div>
+            <div class="activity-time">11:38 UTC · 2026-01-14</div>
+          </div>
+        </div>
+        <div class="activity-row">
+          <div class="activity-dot dot-dn"></div>
+          <div class="activity-body">
+            <div class="activity-desc">Alert triggered — -1.89% below open</div>
+            <div class="activity-time">15:47 UTC · 2026-05-30</div>
+          </div>
+        </div>
+        <div class="activity-row">
+          <div class="activity-dot dot-blue"></div>
+          <div class="activity-body">
+            <div class="activity-desc">Category set to Equity · exchange NQVX</div>
+            <div class="activity-time">11:38 UTC · 2026-01-14</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+</body>
+</html>

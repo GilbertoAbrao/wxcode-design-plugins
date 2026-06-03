@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-circle-social",
-  "title": "Circle Community Admin",
-  "version": "0.1.0",
-  "description": "Friendly light-mode admin dashboard for online community and social platform operators — left sidebar with community switcher, topbar with search and date-range, 4 KPI cards, moderation queue with approve/remove actions, engagement chart, members table, and trending/flagged side panel. Original archetype for the community-ops use case.",
+  "title": "Circle Admin",
+  "version": "0.2.0",
+  "description": "Friendly light-mode admin aesthetic: white card surfaces on a soft grey canvas (#f8f9fc), blue (#3b82f6) and violet (#8b5cf6) dual-accent, system font, 12px rounded cards, hairline borders, subtle shadows, and crisp role/status pills. Archetype = left sidebar (brand mark + context switcher + grouped nav) + sticky topbar + 4 KPI cards + action-queue panel + side panel + area chart + records table, plus matching list, form, and detail screens.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,13 +19,13 @@
     "operations",
     "web",
     "admin",
-    "social",
-    "community",
     "light-mode",
-    "moderation",
     "friendly",
     "blue-violet",
-    "dashboard"
+    "dual-accent",
+    "sidebar",
+    "dashboard",
+    "data-dense"
   ],
   "compat": {
     "agentSkills": [
@@ -46,13 +46,29 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me an admin dashboard for a community / social platform — sidebar with community switcher, moderation queue, member management, engagement metrics, and flagged content panel.",
-        "zh-CN": "使用这个插件完成以下任务：Build me an admin dashboard for a community / social platform — sidebar with community switcher, moderation queue, member management, engagement metrics, and flagged content panel."
+        "en": "Apply this friendly light-mode admin aesthetic to my domain — white cards on a grey canvas, blue/violet dual-accent, left sidebar with context switcher, 4 KPI cards, action-queue panel, side panel, area chart, and a records table, plus list / form / detail screens.",
+        "zh-CN": "将这个友好浅色调管理界面风格应用到我的领域：白色卡片搭配灰色画布，蓝色/紫色双强调色，左侧边栏含上下文切换器，4 个 KPI 卡片，操作队列面板，侧边面板，面积图，以及记录表格，并配套列表 / 表单 / 详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Circle Community Admin"
+          "title": "Circle Admin — Dashboard"
+        },
+        {
+          "path": "./assets/dashboard.html",
+          "title": "Circle Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Circle Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Circle Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Circle Admin — Detail"
         }
       ]
     },
@@ -70,7 +86,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {

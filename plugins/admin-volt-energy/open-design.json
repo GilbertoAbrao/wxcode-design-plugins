@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-volt-energy",
-  "title": "Volt Energy Admin",
-  "version": "0.1.0",
-  "description": "Dark-mode utility grid operations control-room dashboard — KPI tiles, regions/sites status board, dual-series load/generation chart, alerts table, and sites side panel. Amber + cyan accent on deep navy. Original archetype for energy and infrastructure operations.",
+  "title": "Volt Admin",
+  "version": "0.2.0",
+  "description": "Deep-navy control-room admin aesthetic: near-black canvas (#0a0e14), raised panels, amber (#fbbf24) + cyan (#22d3ee) dual-accent on a steel-blue neutral ramp, Inter type with tabular figures, and dense hairline-bordered tables. Archetype = region-switcher navbar + icon rail + 4 KPI tiles + full-width status board (entity rows with state pills) + dual-series SVG trend chart + alerts panel + entity side panel, plus matching list, form, and detail screens. Built for real-time operational consoles that must read at a glance.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,14 +19,15 @@
     "operations",
     "web",
     "admin",
-    "energy",
-    "utilities",
     "dark-mode",
-    "control-room",
-    "grid-operations",
+    "dual-accent",
     "amber-accent",
     "cyan-accent",
-    "infrastructure"
+    "navy-canvas",
+    "status-board",
+    "data-dense",
+    "control-room",
+    "enterprise"
   ],
   "compat": {
     "agentSkills": [
@@ -47,13 +48,25 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a dark-mode energy grid operations dashboard — control-room style, KPI tiles for load/generation/outages/efficiency, regional sites status board, dual-series load chart, alerts table.",
-        "zh-CN": "使用这个插件完成以下任务：Build me a dark-mode energy grid operations dashboard — control-room style, KPI tiles for load/generation/outages/efficiency, regional sites status board, dual-series load chart, alerts table."
+        "en": "Apply this deep-navy control-room admin aesthetic to my domain — near-black canvas, amber + cyan dual accent, region-switcher navbar, icon rail, 4 KPI tiles, a full-width status board with state pills, a dual-series trend chart with an alerts panel and an entity side panel, plus list / form / detail screens.",
+        "zh-CN": "将这个深海军蓝控制室风格应用到我的领域：近黑底色、琥珀+青色双重强调色、区域切换导航栏、图标侧栏、4 个 KPI 卡片、带状态标签的全宽状态看板、双系列趋势图和告警面板及实体侧边栏，并配套列表 / 表单 / 详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Volt Energy Admin"
+          "title": "Volt Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Volt Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Volt Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Volt Admin — Detail"
         }
       ]
     },
@@ -71,7 +84,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {

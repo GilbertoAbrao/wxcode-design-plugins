@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-aurora-analytics",
-  "title": "Aurora Analytics Admin",
-  "version": "0.1.0",
-  "description": "Aurora Analytics Admin is a polished light-mode dashboard for product and growth teams who need at-a-glance visibility into sessions, conversion, and retention. It pairs a fixed left sidebar with a top search bar, four live KPI tiles, an area chart of weekly sessions, a recent-sessions table, and a right-rail insights panel \u2014 all rendered in a single self-contained HTML file. Designed for clarity over decoration: indigo-violet accents on a crisp slate-and-white canvas.",
+  "title": "Aurora Admin",
+  "version": "0.2.0",
+  "description": "Light-mode admin aesthetic: crisp white-and-slate canvas, indigo-violet accent ramp, clean Inter type, subtle card shadows, and soft 12px radius panels. Archetype = fixed 240px sidebar with grouped nav + sticky topbar (search + actions + avatar) + 4 KPI cards with inline sparklines + primary area chart + records table + right-rail side panel (donut + insight bullets + activity feed), plus matching list, form, and detail screens.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,10 +19,12 @@
     "operations",
     "web",
     "admin",
-    "analytics",
     "light-mode",
     "indigo",
-    "clean-cards"
+    "violet",
+    "clean-cards",
+    "sidebar",
+    "sparklines"
   ],
   "compat": {
     "agentSkills": [
@@ -42,18 +44,30 @@
       "entry": "./example.html"
     },
     "provenance": {
-      "category": "themeforest-admin-templates",
-      "note": "category design-language reference only; original implementation"
+      "category": "admin-dashboards",
+      "note": "original archetype; no third-party template reproduced"
     },
     "useCase": {
       "query": {
-        "en": "Build me a polished light-mode analytics admin dashboard \u2014 left sidebar, topbar with search, 4 KPI cards with sparklines, a sessions area chart, a recent sessions table, and an insights side panel.",
-        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me a polished light-mode analytics admin dashboard \u2014 left sidebar, topbar with search, 4 KPI cards with sparklines, a sessions area chart, a recent sessions table, and an insights side panel."
+        "en": "Apply this light indigo admin aesthetic to my domain — white canvas, indigo-violet accent, fixed sidebar with grouped nav, sticky topbar, 4 KPI cards with sparklines, an area chart, a records table, and a right-rail side panel, plus list / form / detail screens.",
+        "zh-CN": "将这个浅色靛蓝风格应用到我的领域：白色画布、靛蓝紫罗兰强调色、带分组导航的固定侧边栏、吸顶顶栏、4 个带迷你折线图的 KPI 卡片、面积图、记录表格和右侧边栏，以及配套的列表 / 表单 / 详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Aurora Analytics Admin"
+          "title": "Aurora Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Aurora Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Aurora Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Aurora Admin — Detail"
         }
       ]
     },
@@ -71,7 +85,13 @@
         "typographic-rhythm"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {

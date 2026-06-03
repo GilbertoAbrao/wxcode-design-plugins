@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-onyx-crypto",
-  "title": "Onyx Crypto Admin",
-  "version": "0.1.0",
-  "description": "Dark-mode digital-asset portfolio console \u2014 left rail nav, topbar with network/wallet switcher, 4 KPI cards, area price chart, holdings table, and market movers side list. Sleek neon aesthetic with emerald and violet accents.",
+  "title": "Onyx Admin",
+  "version": "0.2.0",
+  "description": "Deep-obsidian admin aesthetic: near-black canvas (#0a0a0f), elevated dark panels (#14141c / #1c1c28), emerald primary accent (#10b981) with neon glow hover, violet secondary accent (#8b5cf6), Inter type with tabular-nums, neon-tinted delta chips, 10px radii, hairline borders. Archetype = wide labeled left rail (220px) + sticky topbar (context-switcher pill + entity address pill + search + icon actions) + 4 KPI sparkline cards + main grid (area chart with timeframe tabs / ranked-rows side panel) + full-width records table with delta-colored column. Matching list, form, and detail screens included.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,14 +19,14 @@
     "operations",
     "web",
     "admin",
-    "crypto",
-    "web3",
     "dark-mode",
     "neon",
-    "digital-assets",
-    "portfolio",
-    "defi",
-    "sleek"
+    "obsidian",
+    "emerald-accent",
+    "violet-accent",
+    "data-dense",
+    "sleek",
+    "enterprise"
   ],
   "compat": {
     "agentSkills": [
@@ -47,13 +47,29 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a dark-mode crypto portfolio admin console \u2014 left rail nav, topbar with network and wallet switcher, 4 KPI cards, area price chart with timeframe tabs, holdings table with colored deltas, and a market movers side panel.",
-        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me a dark-mode crypto portfolio admin console \u2014 left rail nav, topbar with network and wallet switcher, 4 KPI cards, area price chart with timeframe tabs, holdings table with colored deltas, and a market movers side panel."
+        "en": "Apply this deep-obsidian neon admin aesthetic to my domain — wide labeled left rail, sticky topbar with context-switcher and entity address pills, 4 KPI sparkline cards with neon glow, area chart with timeframe tabs, ranked-rows side panel, and a dense records table with delta-colored columns. Include matching list, form, and detail screens.",
+        "zh-CN": "将这个深黑曜石霓虹风格管理后台应用到我的领域：宽标签左侧导航栏、带上下文切换和实体地址的置顶栏、4 个带霓虹光晕的 KPI 卡片、带时间范围选项卡的面积图、排名行侧面板和带颜色差异列的密集记录表格。包含配套的列表、表单和详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Onyx Crypto Admin"
+          "title": "Onyx Admin — Dashboard"
+        },
+        {
+          "path": "./assets/dashboard.html",
+          "title": "Onyx Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Onyx Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Onyx Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Onyx Admin — Detail"
         }
       ]
     },
@@ -71,7 +87,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {
@@ -90,8 +112,8 @@
       "fs:write"
     ],
     "provenance": {
-      "category": "themeforest-admin-templates",
-      "note": "category design-language reference only; original implementation"
+      "category": "admin-dashboards",
+      "note": "original archetype; no third-party template reproduced"
     }
   }
 }

@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Records — Record Detail</title>
+<style>
+:root {
+  --sky:      #0ea5e9;
+  --sky-lt:   #38bdf8;
+  --sky-bg:   #f0f9ff;
+  --coral:    #fb7185;
+  --coral-bg: #ffe4e6;
+  --green:    #22c55e;
+  --green-bg: #dcfce7;
+  --amber:    #f59e0b;
+  --amber-bg: #fef9c3;
+  --surface:  #ffffff;
+  --canvas:   #f6fafc;
+  --border:   #e2eaf0;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:14px;color:#1e293b;background:var(--canvas);
+  display:flex;height:100vh;overflow:hidden;
+}
+
+/* ─── SIDEBAR ─────────────────────────────────────────── */
+.sidebar{
+  width:240px;min-width:240px;background:var(--surface);
+  border-right:1px solid var(--border);display:flex;flex-direction:column;
+}
+.sidebar-brand{
+  display:flex;align-items:center;gap:10px;
+  padding:20px 18px 16px;border-bottom:1px solid var(--border);
+}
+.brand-icon{
+  width:36px;height:36px;background:var(--sky-bg);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.brand-icon svg{color:var(--sky);}
+.brand-name{font-size:15px;font-weight:700;color:#1e293b;line-height:1.2;}
+.brand-sub{font-size:11px;color:#94a3b8;letter-spacing:.04em;}
+.region-pill{
+  display:flex;align-items:center;gap:6px;margin:12px 18px;padding:7px 12px;
+  background:var(--sky-bg);border:1px solid #bae6fd;border-radius:20px;
+  font-size:12px;font-weight:600;color:var(--sky);cursor:pointer;
+}
+.nav-section{padding:8px 0;}
+.nav-label{font-size:10px;font-weight:700;letter-spacing:.08em;color:#94a3b8;text-transform:uppercase;padding:8px 18px 4px;}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:9px 18px;
+  font-size:13px;font-weight:500;color:#64748b;cursor:pointer;
+  border-left:3px solid transparent;transition:background .12s,color .12s;
+}
+.nav-item:hover{background:#f8fafc;color:#1e293b;}
+.nav-item.active{background:var(--sky-bg);color:var(--sky);border-left-color:var(--sky);font-weight:600;}
+.nav-item svg{width:16px;height:16px;flex-shrink:0;}
+.nav-badge{margin-left:auto;background:var(--coral-bg);color:var(--coral);font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;}
+.sidebar-footer{
+  margin-top:auto;border-top:1px solid var(--border);
+  padding:14px 18px;display:flex;align-items:center;gap:10px;
+}
+.avatar-sm{
+  width:32px;height:32px;border-radius:50%;
+  background:linear-gradient(135deg,var(--sky) 0%,var(--coral) 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:#fff;flex-shrink:0;
+}
+.footer-name{font-size:12px;font-weight:600;color:#1e293b;}
+.footer-role{font-size:11px;color:#94a3b8;}
+.footer-logout{margin-left:auto;color:#94a3b8;cursor:pointer;}
+
+/* ─── MAIN ────────────────────────────────────────────── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{
+  height:60px;min-height:60px;background:var(--surface);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 24px;gap:16px;
+}
+.topbar-title h1{font-size:16px;font-weight:700;color:#1e293b;line-height:1;}
+.topbar-breadcrumb{font-size:11px;color:#94a3b8;margin-top:2px;}
+.topbar-breadcrumb span{color:var(--sky);}
+.topbar-right{display:flex;align-items:center;gap:10px;margin-left:auto;}
+.btn-ghost{
+  padding:7px 16px;border:1px solid var(--border);border-radius:20px;
+  background:var(--surface);font-size:12px;font-weight:600;color:#64748b;
+  cursor:pointer;font-family:inherit;
+}
+.btn-ghost:hover{background:#f8fafc;}
+.btn-primary{
+  padding:7px 16px;border:none;border-radius:20px;
+  background:var(--sky);font-size:12px;font-weight:600;color:#fff;
+  cursor:pointer;font-family:inherit;
+}
+.btn-primary:hover{background:var(--sky-lt);}
+.avatar-md{
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,var(--sky) 0%,var(--coral) 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:#fff;cursor:pointer;
+}
+
+/* ─── CONTENT ─────────────────────────────────────────── */
+.content{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px;}
+.breadcrumb{font-size:12px;color:#94a3b8;}
+.breadcrumb a{color:var(--sky);text-decoration:none;}
+
+/* ─── DETAIL HEADER ───────────────────────────────────── */
+.detail-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0;
+}
+.detail-id-row{display:flex;align-items:center;gap:10px;}
+.detail-id{font-family:"Courier New",monospace;font-size:13px;font-weight:700;color:#64748b;}
+.detail-name{font-size:22px;font-weight:800;color:#1e293b;margin-top:4px;}
+.detail-meta-line{font-size:12px;color:#94a3b8;margin-top:4px;}
+.pill{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:4px 10px;border-radius:20px;}
+.pill-green{background:var(--green-bg);color:var(--green);}
+.pill-amber{background:var(--amber-bg);color:var(--amber);}
+.pill-coral{background:var(--coral-bg);color:var(--coral);}
+.header-actions{display:flex;gap:8px;}
+
+/* ─── CARD ────────────────────────────────────────────── */
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;box-shadow:0 2px 12px rgba(14,165,233,.05);
+}
+.card-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;border-bottom:1px solid var(--border);
+}
+.card-title{font-size:13px;font-weight:700;color:#1e293b;}
+
+/* ─── META GRID ───────────────────────────────────────── */
+.meta-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:0;padding:0;
+}
+.meta-cell{
+  padding:16px 20px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);
+}
+.meta-cell:nth-child(3n){border-right:none;}
+.meta-cell:nth-last-child(-n+3){border-bottom:none;}
+.meta-label{font-size:10px;font-weight:700;letter-spacing:.06em;color:#94a3b8;text-transform:uppercase;margin-bottom:6px;}
+.meta-value{font-size:14px;font-weight:600;color:#1e293b;}
+.meta-sub{font-size:11px;color:#94a3b8;margin-top:3px;}
+
+/* ─── TWO-COL ─────────────────────────────────────────── */
+.two-col{display:grid;grid-template-columns:7fr 5fr;gap:16px;}
+
+/* ─── ENTITY SUB-TABLE ────────────────────────────────── */
+table{width:100%;border-collapse:collapse;}
+thead tr{background:#f8fafc;}
+th{
+  font-size:10px;font-weight:700;letter-spacing:.07em;color:#94a3b8;
+  text-transform:uppercase;padding:10px 16px;text-align:left;
+  border-bottom:1px solid var(--border);
+}
+td{padding:11px 16px;font-size:13px;color:#1e293b;border-bottom:1px solid var(--border);vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:var(--sky-bg);}
+.ref{font-family:"Courier New",monospace;font-size:12px;color:#64748b;}
+
+/* ─── ACTIVITY FEED ───────────────────────────────────── */
+.activity-list{display:flex;flex-direction:column;}
+.activity-item{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:12px 20px;border-bottom:1px solid var(--border);
+}
+.activity-item:last-child{border-bottom:none;}
+.act-dot{
+  width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;
+}
+.act-dot.sky{background:var(--sky);}
+.act-dot.green{background:var(--green);}
+.act-dot.amber{background:var(--amber);}
+.act-dot.coral{background:var(--coral);}
+.act-body{flex:1;}
+.act-text{font-size:12px;color:#1e293b;line-height:1.4;}
+.act-time{font-size:11px;color:#94a3b8;margin-top:3px;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <circle cx="10" cy="10" r="8.5" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M10 5v1M10 14v1M5 10h1M14 10h1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M12.5 7.5L9 11l-1.5-1.5L12 7l.5.5z" fill="currentColor"/>
+        <circle cx="10" cy="10" r="1" fill="currentColor"/>
+      </svg>
+    </div>
+    <div>
+      <div class="brand-name">Meridian</div>
+      <div class="brand-sub">Operations Platform</div>
+    </div>
+  </div>
+  <div class="region-pill">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+      <circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.3"/>
+      <path d="M2 6h8M6 1c-1.5 1.5-2 3-2 5s.5 3.5 2 5M6 1c1.5 1.5 2 3 2 5s-.5 3.5-2 5" stroke="currentColor" stroke-width="1"/>
+    </svg>
+    EMEA Region
+    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style="margin-left:auto">
+      <path d="M2.5 4l2.5 2.5L7.5 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <nav>
+    <div class="nav-section">
+      <div class="nav-label">Operations</div>
+      <div class="nav-item active">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 2v2M11 2v2M2 7h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Records
+        <span class="nav-badge">12</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M3 4h10M3 8h7M3 12h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Schedules
+      </div>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="avatar-sm">AL</div>
+    <div>
+      <div class="footer-name">Amara Levin</div>
+      <div class="footer-role">Ops Manager</div>
+    </div>
+    <div class="footer-logout" title="Logout">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 14H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h3M11 11l3-3-3-3M14 8H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <header class="topbar">
+    <div>
+      <h1>Record Detail</h1>
+      <div class="topbar-breadcrumb">Meridian / Records / <span>MRD-48201</span></div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn-ghost">Cancel Record</button>
+      <button class="btn-primary">Edit</button>
+      <div class="avatar-md" title="Amara Levin">AL</div>
+    </div>
+  </header>
+
+  <div class="content">
+    <div class="breadcrumb">
+      <a href="#">Records</a> › <span>MRD-48201</span>
+    </div>
+
+    <!-- Detail header -->
+    <div class="detail-header">
+      <div>
+        <div class="detail-id-row">
+          <span class="detail-id">MRD-48201</span>
+          <span class="pill pill-green">Confirmed</span>
+        </div>
+        <div class="detail-name">Mediterranean Circuit</div>
+        <div class="detail-meta-line">Created Jun 1, 2026 · Managed by Amara Levin</div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-ghost">Download PDF</button>
+        <button class="btn-primary">Send Confirmation</button>
+      </div>
+    </div>
+
+    <!-- Meta grid -->
+    <div class="card">
+      <div class="meta-grid">
+        <div class="meta-cell">
+          <div class="meta-label">Contact</div>
+          <div class="meta-value">Marco Reyes</div>
+          <div class="meta-sub">m.reyes@email.com</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Category</div>
+          <div class="meta-value">Europe</div>
+          <div class="meta-sub">Mediterranean region</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Dates</div>
+          <div class="meta-value">Jun 4 – Jun 14, 2026</div>
+          <div class="meta-sub">10 days</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Quantity</div>
+          <div class="meta-value">2</div>
+          <div class="meta-sub">Participants</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Total Value</div>
+          <div class="meta-value">$3,840</div>
+          <div class="meta-sub">Deposit: $960 paid</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Account Type</div>
+          <div class="meta-value">Individual</div>
+          <div class="meta-sub">Standard pricing</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two-col: sub-table + activity -->
+    <div class="two-col">
+
+      <!-- Schedule / itinerary sub-table -->
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">Schedule Details</span>
+          <a href="#" style="font-size:12px;font-weight:600;color:var(--sky);text-decoration:none;">Expand →</a>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Leg</th>
+              <th>Location</th>
+              <th>Duration</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="ref">LEG-01</span></td>
+              <td>Rome</td>
+              <td>3 days</td>
+              <td><span class="pill pill-green">Confirmed</span></td>
+            </tr>
+            <tr>
+              <td><span class="ref">LEG-02</span></td>
+              <td>Naples</td>
+              <td>2 days</td>
+              <td><span class="pill pill-green">Confirmed</span></td>
+            </tr>
+            <tr>
+              <td><span class="ref">LEG-03</span></td>
+              <td>Amalfi Coast</td>
+              <td>3 days</td>
+              <td><span class="pill pill-amber">Pending</span></td>
+            </tr>
+            <tr>
+              <td><span class="ref">LEG-04</span></td>
+              <td>Capri</td>
+              <td>2 days</td>
+              <td><span class="pill pill-amber">Pending</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Activity feed -->
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">Activity</span>
+        </div>
+        <div class="activity-list">
+          <div class="activity-item">
+            <div class="act-dot green"></div>
+            <div class="act-body">
+              <div class="act-text">Record confirmed by Amara Levin</div>
+              <div class="act-time">Jun 1, 2026 at 14:32</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-dot sky"></div>
+            <div class="act-body">
+              <div class="act-text">Confirmation email sent to m.reyes@email.com</div>
+              <div class="act-time">Jun 1, 2026 at 14:33</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-dot amber"></div>
+            <div class="act-body">
+              <div class="act-text">Legs 3 &amp; 4 moved to Pending — supplier confirmation pending</div>
+              <div class="act-time">Jun 2, 2026 at 09:15</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-dot sky"></div>
+            <div class="act-body">
+              <div class="act-text">Deposit of $960 received and applied</div>
+              <div class="act-time">Jun 2, 2026 at 11:40</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-dot sky"></div>
+            <div class="act-body">
+              <div class="act-text">Contact updated phone number</div>
+              <div class="act-time">Jun 3, 2026 at 08:02</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>

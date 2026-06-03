@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{Screen Title}</title>
+<style>
+  /* ── Glassmorphism Admin — template seed ────────────────────────────────────
+     Copy this file; fill in {placeholders}; drop a region skeleton from
+     references/layouts.md into <main class="content">.
+     Do NOT reference CDNs or external fonts. Aurora + grain are inline.
+  ──────────────────────────────────────────────────────────────────────────── */
+
+  :root {
+    /* Canvas */
+    --bg-base: #0d1117;
+    --bg-mid:  #1c1f2a;
+
+    /* Accent */
+    --cyan:     #4dd0e1;
+    --cyan-dim: rgba(77,208,225,0.15);
+    --cyan-glow:rgba(77,208,225,0.08);
+
+    /* Text ramp */
+    --white-95: rgba(255,255,255,0.95);
+    --white-60: rgba(255,255,255,0.60);
+    --white-30: rgba(255,255,255,0.30);
+    --white-10: rgba(255,255,255,0.10);
+    --white-06: rgba(255,255,255,0.06);
+    --white-04: rgba(255,255,255,0.04);
+    --white-02: rgba(255,255,255,0.02);
+
+    /* State tokens */
+    --green-glass: rgba(52,211,153,0.18);  --green-text: #34d399;
+    --pink-glass:  rgba(244,114,182,0.18); --pink-text:  #f472b6;
+    --amber-glass: rgba(251,191,36,0.15);  --amber-text: #fbbf24;
+    --violet-glass:rgba(99,102,241,0.20);  --violet-text:#818cf8;
+
+    /* Glass recipe */
+    --glass-bg:    rgba(255,255,255,0.04);
+    --glass-border:1px solid rgba(255,255,255,0.10);
+    --glass-shadow:0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
+    --glass-blur:  blur(18px) saturate(120%);
+
+    /* Shape */
+    --radius:    16px;
+    --sidebar-w: 240px;
+    --topbar-h:  72px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background-color: var(--bg-base);
+    color: var(--white-95);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Aurora gradient background — fixed, always behind everything */
+  .aurora {
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 10% 20%, rgba(77,208,225,0.18) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 85% 15%, rgba(167,139,250,0.14) 0%, transparent 55%),
+      radial-gradient(ellipse 70% 60% at 70% 80%, rgba(244,114,182,0.12) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 20% 85%, rgba(59,130,246,0.10) 0%, transparent 50%),
+      linear-gradient(160deg, #0f1520 0%, #0d1117 40%, #111828 100%);
+  }
+
+  /* Grain noise — inline SVG data URI, pointer-events: none */
+  .grain {
+    position: fixed; inset: 0; z-index: 1; opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  /* App shell — above aurora/grain */
+  .shell { position: relative; z-index: 2; display: flex; min-height: 100vh; }
+
+  /* ── Glass utility class — apply to any panel ── */
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: var(--glass-border);
+    border-radius: var(--radius);
+    box-shadow: var(--glass-shadow);
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: var(--sidebar-w); min-height: 100vh; flex-shrink: 0;
+    background: var(--glass-bg); backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-right: var(--glass-border); box-shadow: var(--glass-shadow);
+    display: flex; flex-direction: column; padding: 28px 16px; gap: 8px;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 8px 24px; border-bottom: 1px solid var(--white-06); margin-bottom: 8px;
+  }
+  .brand-icon {
+    width: 34px; height: 34px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--cyan) 0%, #818cf8 100%);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .brand-name { font-size: 15px; font-weight: 700; letter-spacing: 0.08em; color: var(--white-95); }
+  .brand-sub { font-size: 9px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--white-60); margin-top: 1px; }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+    border-radius: 10px; cursor: pointer; color: var(--white-60);
+    font-size: 13.5px; font-weight: 500;
+    transition: background 0.15s, color 0.15s; text-decoration: none;
+  }
+  .nav-item:hover { background: var(--white-04); color: var(--white-95); }
+  .nav-item.active {
+    background: var(--cyan-dim); color: var(--cyan);
+    border: 1px solid rgba(77,208,225,0.20);
+    box-shadow: inset 0 1px 0 rgba(77,208,225,0.12), 0 0 16px rgba(77,208,225,0.06);
+  }
+  .nav-item svg { flex-shrink: 0; opacity: 0.85; }
+  .nav-item.active svg { opacity: 1; }
+  .sidebar-spacer { flex: 1; }
+  .sidebar-footer { padding: 12px 8px 0; border-top: 1px solid var(--white-06); display: flex; align-items: center; gap: 10px; }
+  .avatar-sm { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #818cf8, var(--cyan)); flex-shrink: 0; }
+  .footer-info { flex: 1; overflow: hidden; }
+  .footer-name { font-size: 12.5px; font-weight: 600; color: var(--white-95); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .footer-role { font-size: 11px; color: var(--white-60); }
+
+  /* ── Main area ── */
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+  /* ── Topbar ── */
+  .topbar {
+    height: var(--topbar-h); background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+    border-bottom: var(--glass-border); box-shadow: var(--glass-shadow);
+    display: flex; align-items: center; padding: 0 28px; gap: 16px; flex-shrink: 0;
+  }
+  .topbar-title { font-size: 17px; font-weight: 700; color: var(--white-95); flex: 1; }
+  .search-pill {
+    display: flex; align-items: center; gap: 8px; background: var(--white-06);
+    border: 1px solid var(--white-10); border-radius: 24px;
+    padding: 7px 14px; font-size: 13px; color: var(--white-60); cursor: pointer; width: 200px;
+  }
+  .topbar-actions { display: flex; align-items: center; gap: 12px; }
+  .icon-btn {
+    width: 38px; height: 38px; border-radius: 10px; background: var(--white-06);
+    border: 1px solid var(--white-10); display: flex; align-items: center;
+    justify-content: center; cursor: pointer; color: var(--white-60);
+  }
+  .avatar-md {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(135deg, #818cf8, var(--cyan));
+    border: 2px solid rgba(77,208,225,0.35); cursor: pointer; flex-shrink: 0;
+  }
+
+  /* ── Content slot ── drop region skeletons here ── */
+  .content { padding: 28px; display: flex; flex-direction: column; gap: 24px; flex: 1; }
+
+  /* ── Common controls ── */
+  .btn-ghost { font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 10px; border: 1px solid var(--white-10); background: var(--white-04); color: var(--white-95); cursor: pointer; }
+  .btn-primary { font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 10px; border: none; background: var(--cyan); color: #0d1117; cursor: pointer; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .chip { font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--white-10); background: var(--white-04); color: var(--white-60); cursor: pointer; }
+  .chip.active { background: var(--cyan-dim); border-color: rgba(77,208,225,0.25); color: var(--cyan); }
+  .status-pill { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 20px; letter-spacing: 0.04em; }
+  .status-active  { background: var(--green-glass);  color: var(--green-text);  border: 1px solid rgba(52,211,153,0.25); }
+  .status-hold    { background: var(--pink-glass);   color: var(--pink-text);   border: 1px solid rgba(244,114,182,0.25); }
+  .status-pending { background: var(--amber-glass);  color: var(--amber-text);  border: 1px solid rgba(251,191,36,0.25); }
+  .status-info    { background: var(--violet-glass); color: var(--violet-text); border: 1px solid rgba(99,102,241,0.30); }
+</style>
+</head>
+<body>
+
+<div class="aurora"></div>
+<div class="grain"></div>
+
+<div class="shell">
+
+  <!-- Sidebar: copy nav-items from assets/dashboard.html; mark one .active -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">
+        <!-- replace with domain brand icon SVG -->
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <polygon points="9,2 16,6 16,12 9,16 2,12 2,6" fill="none" stroke="#fff" stroke-width="1.5"/>
+          <polygon points="9,5 13,7.5 13,12 9,14 5,12 5,7.5" fill="rgba(255,255,255,0.35)"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">{BRAND}</div>
+        <div class="brand-sub">{Sub-label}</div>
+      </div>
+    </div>
+
+    <!-- Repeat for each nav section; add .active to current screen -->
+    <a class="nav-item active" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/>
+        <rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/>
+      </svg>
+      {Nav item}
+    </a>
+    <!-- more nav items -->
+
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-footer">
+      <div class="avatar-sm"></div>
+      <div class="footer-info">
+        <div class="footer-name">{User name}</div>
+        <div class="footer-role">{Role}</div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-title">{Screen title}</div>
+      <div class="search-pill">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="6" cy="6" r="4"/><path d="M9.5 9.5l2.5 2.5"/>
+        </svg>
+        {Search placeholder…}
+      </div>
+      <div class="topbar-actions">
+        <div class="icon-btn">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M8 2a4.5 4.5 0 014.5 4.5c0 2.5.5 3.5 1.5 4H2c1-0.5 1.5-1.5 1.5-4A4.5 4.5 0 018 2z"/>
+            <path d="M6.5 13.5a1.5 1.5 0 003 0"/>
+          </svg>
+        </div>
+        <div class="avatar-md"></div>
+      </div>
+    </header>
+
+    <!-- Content — paste a region skeleton from references/layouts.md here -->
+    <main class="content">
+
+      <!-- {region skeleton} -->
+
+    </main>
+  </div>
+
+</div>
+
+</body>
+</html>

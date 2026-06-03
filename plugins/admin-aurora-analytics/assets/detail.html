@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aurora Admin — Detail</title>
+<style>
+:root {
+  --c-bg:          #f8fafc;
+  --c-surface:     #ffffff;
+  --c-border:      #e2e8f0;
+  --c-border-soft: #f1f5f9;
+  --c-text:        #0f172a;
+  --c-muted:       #475569;
+  --c-faint:       #94a3b8;
+  --c-indigo:      #6366f1;
+  --c-indigo-lt:   #eef2ff;
+  --c-indigo-mid:  #818cf8;
+  --c-violet:      #7c3aed;
+  --c-violet-lt2:  #faf5ff;
+  --c-green:       #10b981;
+  --c-green-lt:    #ecfdf5;
+  --c-red:         #ef4444;
+  --c-red-lt:      #fef2f2;
+  --c-amber:       #f59e0b;
+  --c-amber-lt:    #fffbeb;
+  --c-sky:         #0ea5e9;
+  --c-blue:        #3b82f6;
+  --c-blue-lt:     #eff6ff;
+  --sidebar-w:     240px;
+  --topbar-h:      60px;
+  --radius-sm:     8px;
+  --radius-md:     12px;
+  --shadow-sm:     0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); font-size: 14px; line-height: 1.5; color: var(--c-text); background: var(--c-bg); min-height: 100vh; display: flex; }
+
+/* Sidebar */
+.sidebar { width: var(--sidebar-w); flex-shrink: 0; background: var(--c-surface); border-right: 1px solid var(--c-border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 20; overflow-y: auto; }
+.sidebar-logo { display: flex; align-items: center; gap: 10px; padding: 20px 20px 16px; border-bottom: 1px solid var(--c-border-soft); }
+.sidebar-logo-text { font-size: 15px; font-weight: 700; letter-spacing: -.3px; color: var(--c-text); }
+.sidebar-logo-text span { color: var(--c-indigo); }
+.sidebar-section { padding: 20px 12px 4px; }
+.sidebar-section-label { font-size: 10px; font-weight: 600; letter-spacing: .8px; text-transform: uppercase; color: var(--c-faint); padding: 0 8px; margin-bottom: 6px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--radius-sm); color: var(--c-muted); font-size: 13.5px; font-weight: 500; cursor: pointer; text-decoration: none; transition: background .12s, color .12s; margin-bottom: 1px; }
+.nav-item:hover { background: var(--c-bg); color: var(--c-text); }
+.nav-item.active { background: var(--c-indigo-lt); color: var(--c-indigo); font-weight: 600; }
+.nav-item svg { flex-shrink: 0; opacity: .7; }
+.nav-item.active svg { opacity: 1; }
+.nav-badge { margin-left: auto; background: var(--c-indigo); color: #fff; font-size: 10px; font-weight: 700; border-radius: 100px; padding: 1px 6px; }
+.sidebar-bottom { margin-top: auto; padding: 12px; border-top: 1px solid var(--c-border-soft); }
+.sidebar-user { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--radius-sm); cursor: pointer; }
+.sidebar-user:hover { background: var(--c-bg); }
+.avatar-sm { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--c-indigo), var(--c-violet)); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+.sidebar-user-info { flex: 1; min-width: 0; }
+.sidebar-user-name { font-size: 13px; font-weight: 600; color: var(--c-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar-user-role { font-size: 11px; color: var(--c-faint); }
+
+/* Main */
+.main-wrap { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+.topbar { height: var(--topbar-h); background: var(--c-surface); border-bottom: 1px solid var(--c-border); display: flex; align-items: center; padding: 0 24px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+.breadcrumb-nav { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--c-muted); }
+.breadcrumb-sep { color: var(--c-faint); }
+.breadcrumb-current { color: var(--c-text); font-weight: 600; }
+.topbar-search { margin-left: auto; display: flex; align-items: center; gap: 8px; background: var(--c-bg); border: 1px solid var(--c-border); border-radius: var(--radius-sm); padding: 6px 12px; width: 220px; }
+.topbar-search input { border: none; background: transparent; font-family: var(--font); font-size: 13px; color: var(--c-text); outline: none; width: 100%; }
+.topbar-search input::placeholder { color: var(--c-faint); }
+.topbar-actions { display: flex; align-items: center; gap: 8px; }
+.icon-btn { width: 36px; height: 36px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; background: none; border: none; cursor: pointer; color: var(--c-muted); }
+.notif-wrap { position: relative; }
+.notif-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; background: var(--c-red); border-radius: 50%; border: 1.5px solid var(--c-surface); }
+.topbar-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--c-indigo), var(--c-violet)); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
+
+/* Page */
+.page-body { padding: 28px 24px; display: flex; flex-direction: column; gap: 20px; }
+.breadcrumb { font-size: 12px; color: var(--c-faint); }
+.breadcrumb a { color: var(--c-muted); text-decoration: none; }
+.breadcrumb a:hover { color: var(--c-indigo); }
+
+/* Detail header */
+.detail-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.detail-title-block { display: flex; flex-direction: column; gap: 6px; }
+.detail-id-row { display: flex; align-items: center; gap: 10px; }
+.detail-id { font-size: 12px; font-weight: 700; font-family: "Courier New", monospace; background: var(--c-border-soft); border: 1px solid var(--c-border); border-radius: 6px; padding: 2px 8px; color: var(--c-muted); letter-spacing: .3px; }
+.status-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; border-radius: 100px; padding: 3px 9px; }
+.status-pill-dot { width: 6px; height: 6px; border-radius: 50%; }
+.status-active   { background: var(--c-green-lt);  color: var(--c-green); }
+.status-active   .status-pill-dot { background: var(--c-green); }
+.status-pending  { background: var(--c-amber-lt);  color: var(--c-amber); }
+.status-pending  .status-pill-dot { background: var(--c-amber); }
+.detail-name { font-size: 24px; font-weight: 800; letter-spacing: -.5px; color: var(--c-text); }
+.detail-sub { font-size: 13px; color: var(--c-muted); margin-top: 2px; }
+.detail-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.btn-ghost { padding: 8px 14px; background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-sm); color: var(--c-muted); font-family: var(--font); font-size: 13px; font-weight: 500; cursor: pointer; transition: background .12s, color .12s; }
+.btn-ghost:hover { background: var(--c-bg); color: var(--c-text); }
+.btn-primary { padding: 8px 16px; background: var(--c-indigo); border: none; border-radius: var(--radius-sm); color: #fff; font-family: var(--font); font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background .12s; }
+.btn-primary:hover { background: var(--c-indigo-mid); }
+
+/* Meta card */
+.meta-card { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-md); padding: 24px; box-shadow: var(--shadow-sm); }
+.card-title { font-size: 14px; font-weight: 700; color: var(--c-text); margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--c-border-soft); }
+.meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.meta-cell { display: flex; flex-direction: column; gap: 3px; }
+.meta-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--c-faint); }
+.meta-value { font-size: 14px; font-weight: 600; color: var(--c-text); font-variant-numeric: tabular-nums; }
+.meta-sub { font-size: 11.5px; color: var(--c-faint); }
+
+/* Two-col panels */
+.two-col { display: grid; grid-template-columns: 7fr 5fr; gap: 20px; align-items: start; }
+
+/* Sub-table */
+.sub-table-card { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden; }
+.sub-table-card .card-title { padding: 20px 24px 0; margin-bottom: 0; border-bottom: none; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th { text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--c-faint); padding: 10px 16px 8px; border-bottom: 1px solid var(--c-border); white-space: nowrap; }
+thead th:first-child { padding-left: 24px; }
+thead th:last-child  { padding-right: 24px; }
+tbody tr { border-bottom: 1px solid var(--c-border-soft); }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--c-bg); }
+tbody td { padding: 11px 16px; color: var(--c-text); vertical-align: middle; font-variant-numeric: tabular-nums; }
+tbody td:first-child { padding-left: 24px; }
+tbody td:last-child  { padding-right: 24px; }
+.sub-card-footer { padding: 12px 24px; border-top: 1px solid var(--c-border-soft); display: flex; align-items: center; justify-content: space-between; }
+.result-count { font-size: 12px; color: var(--c-faint); }
+
+/* Activity feed card */
+.activity-card { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm); }
+.activity-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--c-border-soft); }
+.activity-item:last-child { border-bottom: none; padding-bottom: 0; }
+.activity-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.activity-content { flex: 1; }
+.activity-title { font-size: 13px; color: var(--c-text); font-weight: 500; }
+.activity-time { font-size: 11px; color: var(--c-faint); margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="8" fill="var(--c-indigo)"/><path d="M7 20 Q14 6 21 20" stroke="white" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M10 20 Q14 11 18 20" stroke="#a5b4fc" stroke-width="1.6" fill="none" stroke-linecap="round"/><circle cx="14" cy="9.5" r="2" fill="#e0e7ff"/></svg>
+    <span class="sidebar-logo-text">Brand<span>.</span></span>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Overview</div>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h5v5H2V2zm0 7h5v5H2V9zm7-7h5v5H9V2zm0 7h5v5H9V9z"/></svg>Dashboard</a>
+    <a class="nav-item active" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="1" y="3" width="14" height="10" rx="2"/><path d="M1 6h14"/></svg>
+      Records
+      <span class="nav-badge">4.2k</span>
+    </a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">System</div>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>Settings</a>
+  </div>
+  <div class="sidebar-bottom">
+    <div class="sidebar-user">
+      <div class="avatar-sm">MA</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">Marta Alves</div>
+        <div class="sidebar-user-role">Growth Lead</div>
+      </div>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--c-faint)" stroke-width="1.5" stroke-linecap="round"><path d="M3 5l4 4 4-4"/></svg>
+    </div>
+  </div>
+</aside>
+
+<div class="main-wrap">
+  <header class="topbar">
+    <nav class="breadcrumb-nav">
+      <span>Platform</span>
+      <span class="breadcrumb-sep">›</span>
+      <a href="#" style="color:var(--c-muted);text-decoration:none">Records</a>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-current">REC-20415</span>
+    </nav>
+    <div class="topbar-search">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--c-faint)" stroke-width="1.5" stroke-linecap="round"><circle cx="6" cy="6" r="4"/><path d="M10 10l2.5 2.5"/></svg>
+      <input type="text" placeholder="Search…">
+    </div>
+    <div class="topbar-actions">
+      <div class="notif-wrap">
+        <button class="icon-btn"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M9 2a5 5 0 0 1 5 5c0 3 1 4 2 5H2c1-1 2-2 2-5a5 5 0 0 1 5-5z"/><path d="M7 14a2 2 0 0 0 4 0"/></svg></button>
+        <span class="notif-dot"></span>
+      </div>
+      <div class="topbar-avatar">MA</div>
+    </div>
+  </header>
+
+  <main class="page-body">
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <a href="#">Records</a> › <span style="color:var(--c-text);font-weight:500">REC-20415</span>
+    </div>
+
+    <!-- Detail header -->
+    <div class="detail-header">
+      <div class="detail-title-block">
+        <div class="detail-id-row">
+          <span class="detail-id">REC-20415</span>
+          <span class="status-pill status-active"><span class="status-pill-dot"></span>Active</span>
+        </div>
+        <div class="detail-name">Riya Kapoor</div>
+        <div class="detail-sub">riya.k@example.io · Growth · Organic · India</div>
+      </div>
+      <div class="detail-actions">
+        <button class="btn-ghost">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1 9v3h3L11 4 8 1 1 9z"/></svg>
+          Export
+        </button>
+        <button class="btn-primary">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1 9v3h3L11 4 8 1 1 9z"/></svg>
+          Edit
+        </button>
+      </div>
+    </div>
+
+    <!-- Meta grid -->
+    <div class="meta-card">
+      <div class="card-title">Record Details</div>
+      <div class="meta-grid">
+        <div class="meta-cell">
+          <div class="meta-label">Entity</div>
+          <div class="meta-value">Riya Kapoor</div>
+          <div class="meta-sub">riya.k@example.io</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Category</div>
+          <div class="meta-value">Growth</div>
+          <div class="meta-sub">Funnel stage: Activation</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Source</div>
+          <div class="meta-value">Organic Search</div>
+          <div class="meta-sub">Direct attribution</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Region</div>
+          <div class="meta-value">India</div>
+          <div class="meta-sub">Asia–Pacific</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Target Count</div>
+          <div class="meta-value">9</div>
+          <div class="meta-sub">Goal: 12 by Jun 30</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Conversion Goal</div>
+          <div class="meta-value">4.5%</div>
+          <div class="meta-sub">Current: 3.8%</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Start Date</div>
+          <div class="meta-value">Jun 1, 2025</div>
+          <div class="meta-sub">30-day window</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">End Date</div>
+          <div class="meta-value">Jun 30, 2025</div>
+          <div class="meta-sub">19 days remaining</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Assigned To</div>
+          <div class="meta-value">Marta Alves</div>
+          <div class="meta-sub">Growth Lead</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related panels -->
+    <div class="two-col">
+
+      <!-- Period breakdown sub-table -->
+      <div class="sub-table-card">
+        <div class="card-title" style="padding:20px 24px 14px;border-bottom:1px solid var(--c-border-soft)">Period Breakdown</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Period</th>
+              <th>Count</th>
+              <th>Rate</th>
+              <th>Delta</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="color:var(--c-muted);font-size:12px">Week 1 · Jun 1–7</td>
+              <td>2</td>
+              <td>3.2%</td>
+              <td style="color:var(--c-green);font-size:12px;font-weight:600">▲0.4 pp</td>
+              <td><span class="status-pill status-active" style="font-size:10px;padding:2px 7px"><span class="status-pill-dot"></span>Active</span></td>
+            </tr>
+            <tr>
+              <td style="color:var(--c-muted);font-size:12px">Week 2 · Jun 8–14</td>
+              <td>3</td>
+              <td>4.1%</td>
+              <td style="color:var(--c-green);font-size:12px;font-weight:600">▲0.9 pp</td>
+              <td><span class="status-pill status-active" style="font-size:10px;padding:2px 7px"><span class="status-pill-dot"></span>Active</span></td>
+            </tr>
+            <tr>
+              <td style="color:var(--c-muted);font-size:12px">Week 3 · Jun 15–21</td>
+              <td>4</td>
+              <td>4.8%</td>
+              <td style="color:var(--c-green);font-size:12px;font-weight:600">▲0.7 pp</td>
+              <td><span class="status-pill status-active" style="font-size:10px;padding:2px 7px"><span class="status-pill-dot"></span>Active</span></td>
+            </tr>
+            <tr>
+              <td style="color:var(--c-muted);font-size:12px">Week 4 · Jun 22–28</td>
+              <td>0</td>
+              <td>—</td>
+              <td style="color:var(--c-faint);font-size:12px">—</td>
+              <td><span class="status-pill status-pending" style="font-size:10px;padding:2px 7px"><span class="status-pill-dot"></span>Pending</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="sub-card-footer">
+          <span class="result-count">4 periods · 19 days remaining</span>
+          <button class="btn-ghost" style="font-size:12px;padding:5px 10px">Full report</button>
+        </div>
+      </div>
+
+      <!-- Activity feed -->
+      <div class="activity-card">
+        <div class="card-title" style="margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--c-border-soft)">Activity</div>
+        <div class="activity-item">
+          <div class="activity-icon" style="background:var(--c-indigo-lt)">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="var(--c-indigo)" stroke-width="1.7" stroke-linecap="round"><path d="M1 9v3h3L11 4 8 1 1 9z"/></svg>
+          </div>
+          <div class="activity-content">
+            <div class="activity-title">Record updated — target raised to 12</div>
+            <div class="activity-time">Marta Alves · 42 min ago</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon" style="background:var(--c-green-lt)">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="var(--c-green)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M1 7l4 4 7-7"/></svg>
+          </div>
+          <div class="activity-content">
+            <div class="activity-title">Week 3 target met — 4.8% conversion</div>
+            <div class="activity-time">Auto · Jun 20, 2025</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon" style="background:var(--c-amber-lt)">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="var(--c-amber)" stroke-width="1.7" stroke-linecap="round"><path d="M6.5 2v4.5M6.5 9v.5"/><circle cx="6.5" cy="6.5" r="5.5"/></svg>
+          </div>
+          <div class="activity-content">
+            <div class="activity-title">Alert: week 2 conversion below goal</div>
+            <div class="activity-time">System · Jun 14, 2025</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon" style="background:var(--c-blue-lt)">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="var(--c-blue)" stroke-width="1.7" stroke-linecap="round"><circle cx="6.5" cy="4" r="2.5"/><path d="M1.5 11.5c0-2.5 2.2-4.5 5-4.5s5 2 5 4.5"/></svg>
+          </div>
+          <div class="activity-content">
+            <div class="activity-title">Record assigned to Marta Alves</div>
+            <div class="activity-time">Diego Ferraz · Jun 1, 2025</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon" style="background:var(--c-indigo-lt)">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="var(--c-indigo)" stroke-width="1.7" stroke-linecap="round"><rect x="1" y="1" width="11" height="11" rx="2"/><path d="M4 6.5h5M6.5 4v5"/></svg>
+          </div>
+          <div class="activity-content">
+            <div class="activity-title">Record created</div>
+            <div class="activity-time">Marta Alves · Jun 1, 2025</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /two-col -->
+
+  </main>
+</div>
+
+</body>
+</html>

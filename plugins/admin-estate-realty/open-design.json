@@ -3,8 +3,8 @@
   "specVersion": "1.0.0",
   "name": "wxcode-admin-estate-realty",
   "title": "Estate Realty Admin",
-  "version": "0.1.0",
-  "description": "Real-estate brokerage back-office admin — light mode, teal accent, left sidebar with brokerage switcher, 4 KPI cards (active listings, deals in progress, avg days on market, commission MTD), listings table, deals pipeline, and agent leaderboard.",
+  "version": "0.2.0",
+  "description": "Refined light-mode admin aesthetic: near-white canvas (#f7f9f9), deep teal sidebar (#0f2623), teal accent (#0d9488 / #14b8a6), 12px-radius white cards with teal shadow, and tabular Inter type. Archetype = 240px teal sidebar (entity switcher + grouped nav) + sticky 60px topbar (search + filter + avatar) + 4 KPI cards with sparklines + 60/40 grid (records table + ranked leaderboard) + full-width 5-stage horizontal pipeline, plus list, form, and detail screens.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,12 +19,13 @@
     "operations",
     "web",
     "admin",
-    "real-estate",
-    "brokerage",
     "light-mode",
     "teal-accent",
     "refined",
-    "property-management"
+    "sidebar-nav",
+    "sparkline-kpi",
+    "horizontal-pipeline",
+    "leaderboard"
   ],
   "compat": {
     "agentSkills": [
@@ -45,13 +46,25 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a real-estate brokerage back-office admin dashboard — left sidebar with office switcher, topbar with region filter, 4 KPI cards (active listings, deals in progress, avg days on market, commission MTD), a listings table, a deals pipeline, and an agent leaderboard.",
-        "zh-CN": "使用这个插件完成以下任务：Build me a real-estate brokerage back-office admin dashboard — left sidebar with office switcher, topbar with region filter, 4 KPI cards (active listings, deals in progress, avg days on market, commission MTD), a listings table, a deals pipeline, and an agent leaderboard."
+        "en": "Apply this refined light teal admin aesthetic to my domain — near-white canvas, teal sidebar with entity switcher, sticky topbar with search and filter, 4 KPI cards with sparklines, a 60/40 grid of records table and ranked leaderboard, a full-width horizontal pipeline, plus list, form, and detail screens.",
+        "zh-CN": "将这个精致浅色 teal 风格应用到我的领域：近白底色、带实体切换器的 teal 侧边栏、带搜索和过滤器的顶栏、4 个带迷你折线图的 KPI 卡片、60/40 的记录表 + 排行榜网格、全宽水平管道，以及列表、表单和详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Estate Realty Admin"
+          "title": "Estate Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Estate Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Estate Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Estate Admin — Detail"
         }
       ]
     },
@@ -69,7 +82,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {

@@ -3,8 +3,8 @@
   "specVersion": "1.0.0",
   "name": "wxcode-admin-frost-glass",
   "title": "Frost Glass Admin",
-  "version": "0.1.0",
-  "description": "Glassmorphism operations dashboard — frosted translucent cards layered over a deep indigo-violet-teal gradient canvas. Signature style: backdrop-filter blur, 1px translucent borders, soft ambient shadows, cyan and violet accents on near-black. Use when the brief calls for a dark, premium, or futuristic analytics look.",
+  "version": "0.2.0",
+  "description": "Glassmorphism admin aesthetic: deep indigo-violet-teal radial gradient canvas, frosted translucent panels (backdrop-filter blur, 1px rgba-white borders, soft ambient shadow), cyan (#22d3ee) and violet (#a78bfa) dual-accent system, near-white text on dark surfaces. Archetype = glass sidebar + topbar + 4 KPI tiles with sparklines + area chart with period tabs + alerts side panel + full-width records table with status pills, plus list, form, and detail screens.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,14 +19,14 @@
     "operations",
     "web",
     "admin",
-    "analytics",
     "glassmorphism",
     "dark-mode",
     "frosted-glass",
     "gradient-canvas",
-    "futuristic",
     "cyan-violet",
-    "dashboard"
+    "blur-panel",
+    "dark-premium",
+    "status-board"
   ],
   "compat": {
     "agentSkills": [
@@ -47,13 +47,29 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a dark glassmorphism analytics dashboard — frosted glass cards over a deep gradient, KPI tiles, inline chart, data table, and side panel. Cyan and violet accents.",
-        "zh-CN": "使用这个插件完成以下任务：Build me a dark glassmorphism analytics dashboard — frosted glass cards over a deep gradient, KPI tiles, inline chart, data table, and side panel. Cyan and violet accents."
+        "en": "Apply this glassmorphism admin aesthetic to my domain — deep gradient canvas, frosted glass panels, cyan and violet accents, 4 KPI tiles with sparklines, area chart with period tabs, live alerts side panel, dense records table with status pills, plus list, form, and detail screens.",
+        "zh-CN": "将这个玻璃拟态管理风格应用到我的领域：深色渐变背景、磨砂玻璃面板、青色与紫色双强调色、4 个带迷你折线的 KPI 卡片、带时段选项卡的面积图、实时告警侧栏、密集的带状态标签的记录表，以及列表、表单和详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Frost Glass Admin"
+          "title": "Frost Glass Admin — Dashboard"
+        },
+        {
+          "path": "./assets/dashboard.html",
+          "title": "Frost Glass Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Frost Glass Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Frost Glass Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Frost Glass Admin — Detail"
         }
       ]
     },
@@ -71,7 +87,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {

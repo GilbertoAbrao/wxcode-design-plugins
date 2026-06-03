@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NORTHWIND — Host nw-eu-001</title>
+<style>
+  :root {
+    --bg-deep: #0f1419;
+    --bg-card: #1a2332;
+    --bg-card-hover: #1f2b3e;
+    --bg-rail: #111922;
+    --border: rgba(255,255,255,0.06);
+    --border-strong: rgba(255,255,255,0.1);
+    --indigo: #6366f1;
+    --indigo-dim: rgba(99,102,241,0.15);
+    --pink: #ec4899;
+    --green: #22c55e;
+    --red: #ef4444;
+    --yellow: #f59e0b;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-xs: 6px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg-deep); color: var(--text-primary); font-size: 13px; line-height: 1.5; display: flex; flex-direction: column; }
+
+  /* ── TOP BAR ── */
+  .topbar { height: 56px; background: var(--bg-rail); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; gap: 16px; flex-shrink: 0; z-index: 10; }
+  .topbar-brand { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; letter-spacing: -0.01em; white-space: nowrap; }
+  .brand-icon { width: 28px; height: 28px; background: linear-gradient(135deg, var(--indigo), var(--pink)); border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .breadcrumb { display: flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 12px; }
+  .breadcrumb span { color: var(--text-secondary); }
+  .breadcrumb-sep { opacity: 0.3; }
+  .cmd-pill { flex: 1; max-width: 480px; margin: 0 auto; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 24px; height: 34px; display: flex; align-items: center; padding: 0 14px; gap: 8px; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+  .cmd-pill:hover { border-color: var(--indigo); background: var(--indigo-dim); }
+  .cmd-pill-text { color: var(--text-muted); font-size: 12px; flex: 1; }
+  .cmd-kbd { background: rgba(255,255,255,0.07); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-size: 11px; color: var(--text-muted); font-family: monospace; white-space: nowrap; }
+  .topbar-actions { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+  .notif-btn { position: relative; width: 32px; height: 32px; background: transparent; border: 1px solid var(--border); border-radius: var(--radius-xs); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); }
+  .notif-dot { position: absolute; top: 5px; right: 5px; width: 7px; height: 7px; background: var(--pink); border-radius: 50%; border: 2px solid var(--bg-rail); }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--indigo), var(--pink)); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
+
+  /* ── BODY ── */
+  .body-layout { display: flex; flex: 1; overflow: hidden; }
+
+  /* ── NAV RAIL ── */
+  .nav-rail { width: 64px; background: var(--bg-rail); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 16px 0; gap: 4px; flex-shrink: 0; }
+  .nav-item { width: 44px; height: 44px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted); transition: all 0.15s; }
+  .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text-secondary); }
+  .nav-item.active { background: var(--indigo-dim); color: var(--indigo); box-shadow: inset 0 0 0 1px rgba(99,102,241,0.3); }
+  .nav-spacer { flex: 1; }
+
+  /* ── MAIN ── */
+  .main { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 18px; }
+  .main::-webkit-scrollbar { width: 4px; }
+  .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* Breadcrumb */
+  .bc { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); }
+  .bc a { color: var(--text-secondary); text-decoration: none; }
+  .bc a:hover { color: var(--indigo); }
+
+  /* Detail header */
+  .detail-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .detail-id-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .detail-id { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; font-family: monospace; }
+  .detail-sub { font-size: 13px; color: var(--text-secondary); }
+  .header-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+  .btn-ghost { background: transparent; border: 1px solid var(--border); border-radius: var(--radius-xs); padding: 7px 14px; color: var(--text-secondary); font-size: 12px; cursor: pointer; transition: all 0.15s; }
+  .btn-ghost:hover { border-color: var(--border-strong); color: var(--text-primary); }
+  .btn-danger { background: rgba(239,68,68,0.14); border: 1px solid rgba(239,68,68,0.3); border-radius: var(--radius-xs); padding: 7px 14px; color: var(--red); font-size: 12px; cursor: pointer; transition: all 0.15s; }
+  .btn-danger:hover { background: rgba(239,68,68,0.22); }
+  .btn-primary { background: var(--indigo); border: none; border-radius: var(--radius-xs); padding: 7px 14px; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+  .btn-primary:hover { opacity: 0.88; }
+
+  /* Status pill */
+  .status-pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+  .status-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+  .status-pill.degraded { background: rgba(245,158,11,0.12); color: var(--yellow); }
+  .status-pill.healthy { background: rgba(34,197,94,0.12); color: var(--green); }
+  .status-pill.down { background: rgba(239,68,68,0.12); color: var(--red); }
+
+  /* Cards */
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .card-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 7px; }
+  .card-title svg { color: var(--indigo); }
+  .card-meta { font-size: 11px; color: var(--text-muted); }
+
+  /* Meta grid */
+  .meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); padding: 18px; gap: 20px 16px; }
+  .meta-cell { display: flex; flex-direction: column; gap: 3px; }
+  .meta-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); }
+  .meta-value { font-size: 14px; font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+  .meta-sub { font-size: 11px; color: var(--text-muted); }
+  .meta-value.mono { font-family: monospace; font-size: 13px; }
+  .meta-value.warn { color: var(--yellow); }
+
+  /* Two-column layout */
+  .two-col { display: grid; grid-template-columns: 7fr 5fr; gap: 16px; align-items: start; }
+
+  /* Deploy history table */
+  table { width: 100%; border-collapse: collapse; }
+  thead th { text-align: left; padding: 8px 18px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); border-bottom: 1px solid var(--border); }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  tbody td { padding: 9px 18px; font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+  tbody td.mono { font-family: monospace; font-size: 11px; color: var(--text-primary); }
+
+  .deploy-pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 20px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  .deploy-pill.success { background: rgba(34,197,94,0.12); color: var(--green); }
+  .deploy-pill.failed { background: rgba(239,68,68,0.12); color: var(--red); }
+  .deploy-pill.rollback { background: rgba(245,158,11,0.12); color: var(--yellow); }
+
+  /* Activity feed */
+  .activity-list { display: flex; flex-direction: column; }
+  .activity-row { display: flex; gap: 10px; padding: 10px 18px; border-bottom: 1px solid var(--border); align-items: flex-start; }
+  .activity-row:last-child { border-bottom: none; }
+  .activity-dot-wrap { display: flex; flex-direction: column; align-items: center; gap: 0; flex-shrink: 0; padding-top: 2px; }
+  .activity-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .activity-dot.info { background: var(--indigo); }
+  .activity-dot.warn { background: var(--yellow); }
+  .activity-dot.error { background: var(--red); }
+  .activity-dot.ok { background: var(--green); }
+  .activity-body { flex: 1; }
+  .activity-text { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+  .activity-text strong { color: var(--text-primary); }
+  .activity-time { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ── STATUS BAR ── */
+  .statusbar { height: 32px; background: var(--bg-rail); border-top: 1px solid var(--border); display: flex; align-items: center; padding: 0 16px; gap: 20px; flex-shrink: 0; font-size: 11px; color: var(--text-muted); }
+  .statusbar-agent { display: flex; align-items: center; gap: 6px; }
+  .status-led { width: 7px; height: 7px; border-radius: 50%; background: var(--yellow); flex-shrink: 0; }
+  .statusbar-sep { width: 1px; height: 14px; background: var(--border); }
+  .statusbar-spacer { flex: 1; }
+  .model-chip { background: var(--indigo-dim); border: 1px solid rgba(99,102,241,0.25); border-radius: 20px; padding: 1px 7px; font-size: 10px; color: #a5b4fc; font-weight: 600; }
+  svg { display: block; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="brand-icon">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M3 4l5-2 5 2v4l-5 4-5-4V4z" stroke="#fff" stroke-width="1.2" stroke-linejoin="round" fill="none"/>
+        <circle cx="8" cy="8" r="1.5" fill="#fff"/>
+      </svg>
+    </div>
+    NORTHWIND
+  </div>
+  <div class="breadcrumb">
+    <span>Hosts</span>
+    <span class="breadcrumb-sep">/</span>
+    <span style="color:var(--text-muted)">nw-eu-001</span>
+  </div>
+  <div class="cmd-pill">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    <span class="cmd-pill-text">Ask Pilot or jump to a deploy, host, or incident</span>
+    <span class="cmd-kbd">⌘K</span>
+  </div>
+  <div class="topbar-actions">
+    <button class="notif-btn" title="Notifications">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 014 4v3l1 1H3l1-1V6a4 4 0 014-4z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" fill="none"/><path d="M6.5 13a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3"/></svg>
+      <span class="notif-dot"></span>
+    </button>
+    <div class="avatar">JR</div>
+  </div>
+</header>
+
+<div class="body-layout">
+  <!-- NAV RAIL -->
+  <nav class="nav-rail">
+    <div class="nav-item" title="Overview">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="2" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="10" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="10" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+    </div>
+    <div class="nav-item" title="Deploys">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2l4 4H5l4-4z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" fill="none"/><path d="M9 6v7M5 14l4-1 4 1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    </div>
+    <div class="nav-item active" title="Hosts">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="14" height="4" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="10" width="14" height="4" rx="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="5" cy="6" r="1" fill="currentColor"/><circle cx="5" cy="12" r="1" fill="currentColor"/></svg>
+    </div>
+    <div class="nav-item" title="Incidents">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2l7 13H2L9 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" fill="none"/><path d="M9 8v3M9 13.5v.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </div>
+    <div class="nav-item" title="Costs">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.3"/><path d="M9 5v1.5M9 11.5V13M6.5 10a2.5 2.5 0 005 0c0-1.5-1-2-2.5-2.5S6.5 7 6.5 6a2 2 0 014 0" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+    </div>
+    <div class="nav-item" title="Audit">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 3h10a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1z" stroke="currentColor" stroke-width="1.3"/><path d="M6 7h6M6 10h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="nav-item" title="Settings">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M9 2v1.5M9 14.5V16M2 9h1.5M14.5 9H16M3.9 3.9l1.1 1.1M13 13l1.1 1.1M3.9 14.1l1.1-1.1M13 5l1.1-1.1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- Breadcrumb -->
+    <div class="bc">
+      <a href="#">Hosts</a>
+      <span style="opacity:0.3">›</span>
+      <span>nw-eu-001</span>
+    </div>
+
+    <!-- Detail header -->
+    <div class="detail-header">
+      <div>
+        <div class="detail-id-row">
+          <span class="detail-id">nw-eu-001</span>
+          <span class="status-pill degraded">Degraded</span>
+        </div>
+        <div class="detail-sub">checkout-api-eu · eu-west-1 · c5.2xlarge</div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-ghost">Reboot</button>
+        <button class="btn-danger">Terminate</button>
+        <button class="btn-primary">Edit</button>
+      </div>
+    </div>
+
+    <!-- Meta grid -->
+    <div class="card">
+      <div class="meta-grid">
+        <div class="meta-cell">
+          <div class="meta-label">Region</div>
+          <div class="meta-value">eu-west-1a</div>
+          <div class="meta-sub">Availability zone</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Fleet</div>
+          <div class="meta-value">checkout-api-eu</div>
+          <div class="meta-sub">Primary fleet</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Instance Type</div>
+          <div class="meta-value">c5.2xlarge</div>
+          <div class="meta-sub">8 vCPU · 16 GB RAM</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">CPU</div>
+          <div class="meta-value warn">91%</div>
+          <div class="meta-sub">Threshold 85%</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Memory</div>
+          <div class="meta-value">74%</div>
+          <div class="meta-sub">11.8 of 16 GB used</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Last Deploy</div>
+          <div class="meta-value mono">v4.2.1</div>
+          <div class="meta-sub">Today at 09:12 UTC</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">AMI</div>
+          <div class="meta-value mono" style="font-size:11px">ami-0abc123def456789</div>
+          <div class="meta-sub">Ubuntu 22.04 LTS</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Created</div>
+          <div class="meta-value">Mar 12, 2024</div>
+          <div class="meta-sub">460 days uptime</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">SSH Key</div>
+          <div class="meta-value mono">northwind-eu-2024</div>
+          <div class="meta-sub">eu-west-1 region key</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two-column: deploy history + activity feed -->
+    <div class="two-col">
+
+      <!-- Deploy history -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2l4 4H4l4-4z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" fill="none"/><path d="M8 6v6M4 13l4-1 4 1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            Deploy History
+          </div>
+          <span class="card-meta">Last 5 deployments</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Version</th>
+              <th>Deployed by</th>
+              <th>Duration</th>
+              <th>When</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="mono">v4.2.1</td>
+              <td>CI/CD pipeline</td>
+              <td style="font-variant-numeric:tabular-nums">2m 14s</td>
+              <td>09:12 UTC today</td>
+              <td><span class="deploy-pill success">Success</span></td>
+            </tr>
+            <tr>
+              <td class="mono">v4.2.0</td>
+              <td>CI/CD pipeline</td>
+              <td style="font-variant-numeric:tabular-nums">2m 08s</td>
+              <td>Yesterday 14:40</td>
+              <td><span class="deploy-pill success">Success</span></td>
+            </tr>
+            <tr>
+              <td class="mono">v4.1.9</td>
+              <td>j.reynolds</td>
+              <td style="font-variant-numeric:tabular-nums">3m 55s</td>
+              <td>2 days ago</td>
+              <td><span class="deploy-pill rollback">Rollback</span></td>
+            </tr>
+            <tr>
+              <td class="mono">v4.1.9-rc2</td>
+              <td>CI/CD pipeline</td>
+              <td style="font-variant-numeric:tabular-nums">1m 42s</td>
+              <td>2 days ago</td>
+              <td><span class="deploy-pill failed">Failed</span></td>
+            </tr>
+            <tr>
+              <td class="mono">v4.1.8</td>
+              <td>CI/CD pipeline</td>
+              <td style="font-variant-numeric:tabular-nums">2m 02s</td>
+              <td>5 days ago</td>
+              <td><span class="deploy-pill success">Success</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Activity feed -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2v4l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/></svg>
+            Recent Activity
+          </div>
+          <span class="card-meta">Last 6 hours</span>
+        </div>
+        <div class="activity-list">
+          <div class="activity-row">
+            <div class="activity-dot-wrap"><div class="activity-dot warn"></div></div>
+            <div class="activity-body">
+              <div class="activity-text"><strong>CPU threshold breached</strong> — peaked at 91% (threshold 85%)</div>
+              <div class="activity-time">09:23 UTC · 18 min ago</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-dot-wrap"><div class="activity-dot info"></div></div>
+            <div class="activity-body">
+              <div class="activity-text"><strong>Deploy v4.2.1</strong> completed successfully in 2m 14s</div>
+              <div class="activity-time">09:12 UTC · 29 min ago</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-dot-wrap"><div class="activity-dot ok"></div></div>
+            <div class="activity-body">
+              <div class="activity-text"><strong>Health check</strong> passed — all endpoints responding</div>
+              <div class="activity-time">09:00 UTC · 41 min ago</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-dot-wrap"><div class="activity-dot info"></div></div>
+            <div class="activity-body">
+              <div class="activity-text"><strong>Pilot queried</strong> latency by fleet — returned 6 rows</div>
+              <div class="activity-time">08:52 UTC · 49 min ago</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-dot-wrap"><div class="activity-dot ok"></div></div>
+            <div class="activity-body">
+              <div class="activity-text"><strong>Auto-scaling triggered</strong> — +2 instances provisioned</div>
+              <div class="activity-time">08:40 UTC · 1h 1m ago</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-dot-wrap"><div class="activity-dot error"></div></div>
+            <div class="activity-body">
+              <div class="activity-text"><strong>Memory pressure alert</strong> — GC pause 420ms detected</div>
+              <div class="activity-time">07:30 UTC · 2h 11m ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- STATUS BAR -->
+<footer class="statusbar">
+  <div class="statusbar-agent">
+    <div class="status-led"></div>
+    <span><strong style="color:var(--text-secondary)">Pilot</strong> · Working: analyzing nw-eu-001…</span>
+  </div>
+  <div class="statusbar-sep"></div>
+  <span>$0.043 today</span>
+  <div class="statusbar-sep"></div>
+  <span>p50 1.2s</span>
+  <div class="statusbar-spacer"></div>
+  <span>1 open incident</span>
+  <div class="statusbar-sep"></div>
+  <span class="model-chip">sonnet-4-6</span>
+</footer>
+
+</body>
+</html>

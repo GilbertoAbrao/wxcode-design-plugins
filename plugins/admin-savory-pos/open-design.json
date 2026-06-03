@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-savory-pos",
-  "title": "Savory POS Admin",
-  "version": "0.1.0",
-  "description": "Restaurant point-of-sale back-office admin: warm light mode, amber + tomato accent, left sidebar with venue switcher, live orders kanban (New / Cooking / Served), KPI tiles, top-selling items, sales sparkline, and recent orders table.",
+  "title": "Service Admin",
+  "version": "0.2.0",
+  "description": "Warm light-mode service back-office aesthetic: near-white canvas (#faf8f5), amber accent (#f59e0b) with tomato alert tones (#ef4444) on white cards, dark sidebar (#1c1917) with grouped nav sections, 4 KPI tiles with inline sparklines, 3-column live state board, ranked items list with inline bars, area-fill SVG trend chart, and dense records table with status pills. Archetype = 240px grouped-nav sidebar + 60px sticky topbar + KPI tile row + state board + bottom 2-column grid + records table.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,14 +19,13 @@
     "operations",
     "web",
     "admin",
-    "restaurant",
-    "pos",
     "light-mode",
     "warm-palette",
     "amber-accent",
-    "kanban",
-    "food-service",
-    "back-office"
+    "dark-sidebar",
+    "state-board",
+    "service-dashboard",
+    "grouped-nav"
   ],
   "compat": {
     "agentSkills": [
@@ -47,13 +46,25 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a restaurant POS back-office admin dashboard — venue switcher sidebar, live orders kanban board, daily KPI tiles, top-selling items, sales sparkline, and recent orders table.",
-        "zh-CN": "使用这个插件完成以下任务：Build me a restaurant POS back-office admin dashboard — venue switcher sidebar, live orders kanban board, daily KPI tiles, top-selling items, sales sparkline, and recent orders table."
+        "en": "Apply this warm light-mode service admin aesthetic to my domain — dark sidebar with grouped nav, amber accent, 4 KPI tiles with sparklines, 3-column live state board, ranked items list with inline bars, area-fill trend chart, and dense records table with status pills, plus list, form, and detail screens.",
+        "zh-CN": "将这个暖色调轻模式服务管理风格应用到我的领域：深色侧边栏、琥珀色强调色、4 个带迷你图的 KPI 卡片、3 列实时状态看板、带内联进度条的排名列表、面积趋势图和带状态标签的密集记录表格，以及列表、表单和详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Savory POS Admin"
+          "title": "Service Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Service Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Service Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Service Admin — Detail"
         }
       ]
     },
@@ -71,7 +82,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {

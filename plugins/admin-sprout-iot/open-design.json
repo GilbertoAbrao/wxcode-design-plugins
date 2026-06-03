@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-sprout-iot",
-  "title": "Sprout IoT Admin",
-  "version": "0.1.0",
-  "description": "Dark-mode IoT device-fleet and telemetry console \u2014 left rail nav, gateway/site switcher, 4 KPI cards (online/offline/signal/alerts), multi-series sparkline telemetry panel, active alerts list, and a devices table with signal bars and firmware status.",
+  "title": "Sprout Admin",
+  "version": "0.2.0",
+  "description": "Dark technical-fresh admin aesthetic: deep navy canvas (#0c1118), raised panels, lime (#84cc16) and cyan (#22d3ee) dual accents, amber/red severity ramp, Inter type with tabular figures, and dense hairline-bordered tables. Archetype = context-switcher topbar + left label rail + 4 KPI cards + 2-column grid (multi-channel sparkline panel + severity feed) + full-width records table, plus matching list, form, and detail screens. Built for high-density live-data consoles that must read at a glance.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,14 +19,12 @@
     "operations",
     "web",
     "admin",
-    "iot",
-    "telemetry",
     "dark-mode",
     "technical",
     "lime-accent",
     "cyan-accent",
-    "device-fleet",
-    "monitoring"
+    "data-dense",
+    "enterprise"
   ],
   "compat": {
     "agentSkills": [
@@ -47,13 +45,25 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a dark IoT admin console for a device fleet \u2014 left nav rail, site/gateway switcher, 4 KPI cards showing online/offline counts, average signal strength, and open alerts, a telemetry sparkline panel for temperature/humidity/power, an active alerts list with severity pills, and a devices table with firmware version and signal bars.",
-        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me a dark IoT admin console for a device fleet \u2014 left nav rail, site/gateway switcher, 4 KPI cards showing online/offline counts, average signal strength, and open alerts, a telemetry sparkline panel for temperature/humidity/power, an active alerts list with severity pills, and a devices table with firmware version and signal bars."
+        "en": "Apply this dark technical admin aesthetic to my domain — deep navy canvas, lime/cyan dual accents, context-switcher topbar, left label rail, 4 KPI cards with sparklines, a multi-channel panel with stacked sparklines, a severity feed, and a dense records table with signal indicators, plus list / form / detail screens.",
+        "zh-CN": "将这个深色技术风格管理界面应用到我的领域：深海军蓝画布、青柠/青色双强调色、上下文切换顶栏、左侧标签栏、4 个带迷你图的 KPI 卡片、带堆叠迷你图的多通道面板、严重级别信息流，以及带信号指示器的密集记录表格，同时配套列表 / 表单 / 详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Sprout IoT Admin"
+          "title": "Sprout Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Sprout Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Sprout Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Sprout Admin — Detail"
         }
       ]
     },
@@ -71,7 +81,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {
@@ -90,8 +106,8 @@
       "fs:write"
     ],
     "provenance": {
-      "category": "themeforest-admin-templates",
-      "note": "category design-language reference only; original implementation"
+      "category": "admin-dashboards",
+      "note": "original archetype; no third-party template reproduced"
     }
   }
 }

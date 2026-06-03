@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sprout Admin — List</title>
+<style>
+:root {
+  --c-bg-deep:    #0c1118;
+  --c-bg-surface: #131b26;
+  --c-bg-raised:  #1a2533;
+  --c-border:     #223040;
+  --c-text:       #dfe7ef;
+  --c-muted:      #8597a8;
+  --c-lime:       #84cc16;
+  --c-cyan:       #22d3ee;
+  --c-amber:      #f59e0b;
+  --c-red:        #ef4444;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--c-bg-deep);color:var(--c-text);font-size:14px;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+
+.shell{display:flex;height:100vh;overflow:hidden}
+
+/* RAIL */
+.rail{width:220px;flex-shrink:0;background:var(--c-bg-surface);border-right:1px solid var(--c-border);display:flex;flex-direction:column;padding:0 0 16px;overflow-y:auto}
+.rail-brand{display:flex;align-items:center;gap:10px;padding:18px 18px 14px;border-bottom:1px solid var(--c-border)}
+.rail-brand-icon{width:32px;height:32px;border-radius:8px;background:var(--c-lime);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rail-brand-icon svg{color:#0c1118}
+.rail-brand-name{font-size:15px;font-weight:700;letter-spacing:-0.01em;color:var(--c-text)}
+.rail-brand-sub{font-size:10px;color:var(--c-muted);letter-spacing:0.04em;text-transform:uppercase}
+.rail-section{padding:20px 12px 4px;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--c-muted)}
+.rail-item{display:flex;align-items:center;gap:10px;padding:9px 14px;margin:1px 6px;border-radius:6px;font-size:13px;font-weight:500;color:var(--c-muted);cursor:pointer;transition:background .15s,color .15s;position:relative}
+.rail-item:hover{background:var(--c-bg-raised);color:var(--c-text)}
+.rail-item.active{background:var(--c-bg-raised);color:var(--c-text)}
+.rail-item.active::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:0 3px 3px 0;background:var(--c-lime)}
+.rail-item svg{flex-shrink:0;color:inherit}
+.rail-badge{margin-left:auto;background:var(--c-red);color:#fff;font-size:10px;font-weight:700;border-radius:10px;padding:1px 6px;min-width:18px;text-align:center}
+.rail-footer{margin-top:auto;padding:14px 16px 0;border-top:1px solid var(--c-border);display:flex;align-items:center;gap:8px;font-size:12px;color:var(--c-muted)}
+.rail-status-dot{width:8px;height:8px;border-radius:50%;background:var(--c-lime);flex-shrink:0;box-shadow:0 0 6px var(--c-lime)}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:56px;flex-shrink:0;background:var(--c-bg-surface);border-bottom:1px solid var(--c-border);display:flex;align-items:center;gap:12px;padding:0 20px}
+.ctx-switcher{display:flex;align-items:center;gap:6px;background:var(--c-bg-raised);border:1px solid var(--c-border);border-radius:6px;padding:6px 12px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;color:var(--c-text)}
+.ctx-switcher svg{color:var(--c-muted)}
+.topbar-search{flex:1;max-width:340px;display:flex;align-items:center;gap:8px;background:var(--c-bg-raised);border:1px solid var(--c-border);border-radius:6px;padding:6px 12px}
+.topbar-search input{background:transparent;border:none;outline:none;font-family:inherit;font-size:13px;color:var(--c-text);width:100%}
+.topbar-search input::placeholder{color:var(--c-muted)}
+.topbar-search svg{color:var(--c-muted);flex-shrink:0}
+.topbar-spacer{flex:1}
+.topbar-icon-btn{width:36px;height:36px;border-radius:6px;background:transparent;border:none;display:flex;align-items:center;justify-content:center;color:var(--c-muted);cursor:pointer;position:relative;transition:background .15s,color .15s}
+.topbar-icon-btn:hover{background:var(--c-bg-raised);color:var(--c-text)}
+.topbar-avatar{width:34px;height:34px;border-radius:50%;background:var(--c-bg-raised);border:2px solid var(--c-border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--c-cyan);cursor:pointer;flex-shrink:0}
+.topbar-user{font-size:13px;font-weight:500;color:var(--c-text);white-space:nowrap}
+.topbar-role{font-size:11px;color:var(--c-muted)}
+.content{flex:1;overflow-y:auto;padding:20px}
+
+/* PAGE HEADER */
+.page-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.page-title{font-size:18px;font-weight:700;color:var(--c-text)}
+.page-sub{font-size:12px;color:var(--c-muted);margin-top:2px}
+.btn-ghost{background:transparent;border:1px solid var(--c-border);border-radius:6px;padding:7px 14px;font-size:13px;color:var(--c-muted);cursor:pointer;transition:all .12s}
+.btn-ghost:hover{color:var(--c-text);border-color:var(--c-cyan)}
+.btn-primary{background:var(--c-lime);border:none;border-radius:6px;padding:7px 16px;font-size:13px;font-weight:600;color:#0c1118;cursor:pointer;transition:opacity .12s}
+.btn-primary:hover{opacity:.9}
+
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.toolbar-search{flex:1;min-width:200px;max-width:340px;display:flex;align-items:center;gap:8px;background:var(--c-bg-surface);border:1px solid var(--c-border);border-radius:6px;padding:7px 12px}
+.toolbar-search input{background:transparent;border:none;outline:none;font-family:inherit;font-size:13px;color:var(--c-text);width:100%}
+.toolbar-search input::placeholder{color:var(--c-muted)}
+.toolbar-search svg{color:var(--c-muted);flex-shrink:0}
+.filter-group{display:flex;align-items:center;gap:6px}
+.filter-label{font-size:11px;color:var(--c-muted);white-space:nowrap}
+.chip{font-size:11px;font-weight:500;border-radius:6px;padding:4px 10px;background:transparent;border:1px solid var(--c-border);color:var(--c-muted);cursor:pointer;transition:all .12s;white-space:nowrap}
+.chip.active{background:var(--c-bg-raised);color:var(--c-text)}
+.chip:hover{color:var(--c-text)}
+.chip-count{font-size:10px;margin-left:3px;color:var(--c-muted)}
+.chip.active .chip-count{color:var(--c-cyan)}
+
+/* TABLE */
+.rec-card{background:var(--c-bg-surface);border:1px solid var(--c-border);border-radius:10px;padding:0}
+.rec-table{width:100%;border-collapse:collapse}
+.rec-table th{font-size:10px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--c-muted);text-align:left;padding:10px 16px;border-bottom:1px solid var(--c-border)}
+.rec-table td{padding:10px 16px;font-size:13px;color:var(--c-text);border-bottom:1px solid var(--c-border)}
+.rec-table tr:last-child td{border-bottom:none}
+.rec-table tbody tr:hover td{background:var(--c-bg-raised)}
+.name-cell{display:flex;align-items:center;gap:9px}
+.dev-icon{width:28px;height:28px;border-radius:6px;background:var(--c-bg-raised);border:1px solid var(--c-border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dev-icon svg{color:var(--c-cyan)}
+.dev-icon.alt svg{color:var(--c-lime)}
+.dev-icon.act svg{color:var(--c-amber)}
+.dev-name{font-size:13px;font-weight:600;color:var(--c-text)}
+.dev-uid{font-size:10px;color:var(--c-muted);font-family:"Courier New",monospace}
+.ver-badge{font-size:11px;font-weight:500;color:var(--c-muted);background:var(--c-bg-raised);border:1px solid var(--c-border);border-radius:4px;padding:2px 7px;display:inline-block}
+.ver-badge.stale{color:var(--c-amber);border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.06)}
+.status-pill{font-size:10px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;border-radius:4px;padding:3px 8px;display:inline-block}
+.status-pill.ok{background:rgba(132,204,22,0.12);color:var(--c-lime)}
+.status-pill.err{background:rgba(239,68,68,0.12);color:var(--c-red)}
+.status-pill.warn{background:rgba(245,158,11,0.12);color:var(--c-amber)}
+.ts-cell{font-size:12px;color:var(--c-muted)}
+.sig-bars{display:flex;align-items:flex-end;gap:2px;height:16px}
+.sig-bar{width:4px;border-radius:1px;background:var(--c-border)}
+.sig-bar.on.s1{background:var(--c-red)}
+.sig-bar.on.s2{background:var(--c-amber)}
+.sig-bar.on.s3{background:var(--c-lime)}
+.sig-bar.on.s4{background:var(--c-lime)}
+.row-actions{display:flex;gap:6px;opacity:0;transition:opacity .12s}
+tr:hover .row-actions{opacity:1}
+.row-btn{background:transparent;border:1px solid var(--c-border);border-radius:4px;padding:3px 8px;font-size:11px;color:var(--c-muted);cursor:pointer;transition:all .12s}
+.row-btn:hover{color:var(--c-text);border-color:var(--c-cyan)}
+.rec-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--c-border);font-size:12px;color:var(--c-muted)}
+.pager{display:flex;gap:4px}
+.page-btn{width:28px;height:28px;border-radius:4px;background:transparent;border:1px solid var(--c-border);color:var(--c-muted);font-size:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .12s,color .12s}
+.page-btn:hover,.page-btn.active{background:var(--c-bg-raised);color:var(--c-text)}
+</style>
+</head>
+<body>
+<div class="shell">
+  <nav class="rail">
+    <div class="rail-brand">
+      <div class="rail-brand-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2C9 2 4 5.5 4 10.5C4 13.5 6.5 16 9 16C11.5 16 14 13.5 14 10.5C14 5.5 9 2 9 2Z" fill="currentColor"/><path d="M9 7V16" stroke="#0c1118" stroke-width="1.5" stroke-linecap="round"/><path d="M6 11L9 9M12 11L9 9" stroke="#0c1118" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <div><div class="rail-brand-name">Sprout Admin</div><div class="rail-brand-sub">Operations</div></div>
+    </div>
+    <div class="rail-section">Main</div>
+    <div class="rail-item"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="5.5" height="5.5" rx="1.5" fill="currentColor" opacity=".8"/><rect x="9.5" y="1" width="5.5" height="5.5" rx="1.5" fill="currentColor" opacity=".8"/><rect x="1" y="9.5" width="5.5" height="5.5" rx="1.5" fill="currentColor" opacity=".8"/><rect x="9.5" y="9.5" width="5.5" height="5.5" rx="1.5" fill="currentColor" opacity=".5"/></svg>Overview</div>
+    <div class="rail-item active"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 2V4M8 12V14M2 8H4M12 8H14M3.5 3.5L5 5M11 11L12.5 12.5M3.5 12.5L5 11M11 5L12.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Entities</div>
+    <div class="rail-item"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L9.2 5.5H13L10 7.7L11 11.2L8 9L5 11.2L6 7.7L3 5.5H6.8L8 2Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>Alerts<span class="rail-badge">7</span></div>
+    <div class="rail-item"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><polyline points="1,11 4,7 7,9 10,4 13,6 15,3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>Channels</div>
+    <div class="rail-item"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="5" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 5V4C5 2.9 5.9 2 7 2H9C10.1 2 11 2.9 11 4V5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="9" r="1.5" fill="currentColor" opacity=".6"/></svg>Groups</div>
+    <div class="rail-section">Manage</div>
+    <div class="rail-item"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/><path d="M8 1V3M8 13V15M1 8H3M13 8H15M2.6 2.6L4 4M12 12L13.4 13.4M2.6 13.4L4 12M12 4L13.4 2.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Settings</div>
+    <div class="rail-footer"><div class="rail-status-dot"></div>All systems nominal</div>
+  </nav>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="ctx-switcher">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M4 3V2C4 1.45 4.45 1 5 1H9C9.55 1 10 1.45 10 2V3" stroke="currentColor" stroke-width="1.3"/></svg>
+        Meridian Plant — GW-NORTH
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="topbar-search"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.4"/><path d="M9.5 9.5L12.5 12.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><input type="text" placeholder="Search records, alerts…"></div>
+      <div class="topbar-spacer"></div>
+      <button class="topbar-icon-btn"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8C2 4.69 4.69 2 8 2C10.13 2 12 3.04 13.15 4.65" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M14 8C14 11.31 11.31 14 8 14C5.87 14 4 12.96 2.85 11.35" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M13 2V5H10M3 14V11H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="topbar-avatar">KV</div>
+      <div><div class="topbar-user">Kaito Vasquez</div><div class="topbar-role">Fleet Engineer</div></div>
+    </header>
+
+    <main class="content">
+      <div class="page-hdr">
+        <div>
+          <div class="page-title">All Records</div>
+          <div class="page-sub">Meridian Plant · 150 records</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-ghost">Export CSV</button>
+          <button class="btn-primary">+ Add Record</button>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="toolbar-search">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.4"/><path d="M9.5 9.5L12.5 12.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <input type="text" placeholder="Filter by name, UID, category…">
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Status</span>
+          <span class="chip active">All <span class="chip-count">150</span></span>
+          <span class="chip">Online <span class="chip-count">142</span></span>
+          <span class="chip">Offline <span class="chip-count">8</span></span>
+          <span class="chip">Warning <span class="chip-count">14</span></span>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Category</span>
+          <span class="chip active">All</span>
+          <span class="chip">Sensor</span>
+          <span class="chip">Actuator</span>
+          <span class="chip">Gateway</span>
+        </div>
+      </div>
+
+      <div class="rec-card">
+        <table class="rec-table">
+          <thead>
+            <tr><th>Record</th><th>Category</th><th>Group</th><th>Version</th><th>Signal</th><th>Last Seen</th><th>Status</th><th></th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="name-cell"><div class="dev-icon alt"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="3.5" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M4 3.5V2.5C4 1.95 4.45 1.5 5 1.5H9C9.55 1.5 10 1.95 10 2.5V3.5" stroke="currentColor" stroke-width="1.3"/><circle cx="7" cy="7.5" r="1.2" fill="currentColor" opacity=".7"/></svg></div><div><div class="dev-name">GRP-NORTH-01</div><div class="dev-uid">uid:f4:a3:28:0e</div></div></div></td>
+              <td style="color:var(--c-muted)">Gateway</td><td style="color:var(--c-muted)">North Wing</td>
+              <td><span class="ver-badge">v3.1.0</span></td>
+              <td><div class="sig-bars"><div class="sig-bar on s4" style="height:4px"></div><div class="sig-bar on s4" style="height:7px"></div><div class="sig-bar on s4" style="height:10px"></div><div class="sig-bar on s4" style="height:14px"></div></div></td>
+              <td class="ts-cell">just now</td><td><span class="status-pill ok">Online</span></td>
+              <td><div class="row-actions"><button class="row-btn">View</button><button class="row-btn">Edit</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="name-cell"><div class="dev-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="2" stroke="currentColor" stroke-width="1.3"/><path d="M7 1V3M7 11V13M1 7H3M11 7H13M2.8 2.8L4.2 4.2M9.8 9.8L11.2 11.2M2.8 11.2L4.2 9.8M9.8 4.2L11.2 2.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div><div><div class="dev-name">REC-COLD-A3</div><div class="dev-uid">uid:7c:11:9f:b2</div></div></div></td>
+              <td style="color:var(--c-muted)">Sensor</td><td style="color:var(--c-muted)">Cold Storage</td>
+              <td><span class="ver-badge">v2.9.1</span></td>
+              <td><div class="sig-bars"><div class="sig-bar on s3" style="height:4px"></div><div class="sig-bar on s3" style="height:7px"></div><div class="sig-bar on s3" style="height:10px"></div><div class="sig-bar" style="height:14px"></div></div></td>
+              <td class="ts-cell">2 s ago</td><td><span class="status-pill warn">Warning</span></td>
+              <td><div class="row-actions"><button class="row-btn">View</button><button class="row-btn">Edit</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="name-cell"><div class="dev-icon act"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="5" width="10" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 5V4C5 2.9 5.9 2 7 2H7C8.1 2 9 2.9 9 4V5" stroke="currentColor" stroke-width="1.3"/><path d="M7 7.5V9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div><div><div class="dev-name">ACT-VALVE-12</div><div class="dev-uid">uid:aa:52:3d:7e</div></div></div></td>
+              <td style="color:var(--c-muted)">Actuator</td><td style="color:var(--c-muted)">Production Bay</td>
+              <td><span class="ver-badge stale">v2.6.3</span></td>
+              <td><div class="sig-bars"><div class="sig-bar on s2" style="height:4px"></div><div class="sig-bar on s2" style="height:7px"></div><div class="sig-bar" style="height:10px"></div><div class="sig-bar" style="height:14px"></div></div></td>
+              <td class="ts-cell">5 s ago</td><td><span class="status-pill warn">Warning</span></td>
+              <td><div class="row-actions"><button class="row-btn">View</button><button class="row-btn">Edit</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="name-cell"><div class="dev-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><polyline points="1,10 3.5,6 6,8 8.5,3 11,5 13,2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div><div><div class="dev-name">REC-PWR-07</div><div class="dev-uid">uid:3b:78:c1:04</div></div></div></td>
+              <td style="color:var(--c-muted)">Meter</td><td style="color:var(--c-muted)">Main Panel</td>
+              <td><span class="ver-badge">v3.0.2</span></td>
+              <td><div class="sig-bars"><div class="sig-bar on s3" style="height:4px"></div><div class="sig-bar on s3" style="height:7px"></div><div class="sig-bar on s3" style="height:10px"></div><div class="sig-bar" style="height:14px"></div></div></td>
+              <td class="ts-cell">12 s ago</td><td><span class="status-pill ok">Online</span></td>
+              <td><div class="row-actions"><button class="row-btn">View</button><button class="row-btn">Edit</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="name-cell"><div class="dev-icon alt"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="3.5" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M4 3.5V2.5C4 1.95 4.45 1.5 5 1.5H9C9.55 1.5 10 1.95 10 2.5V3.5" stroke="currentColor" stroke-width="1.3"/><circle cx="7" cy="7.5" r="1.2" fill="currentColor" opacity=".7"/></svg></div><div><div class="dev-name">GRP-ROOF-04</div><div class="dev-uid">uid:d9:0f:61:22</div></div></div></td>
+              <td style="color:var(--c-muted)">Gateway</td><td style="color:var(--c-muted)">Roof Level</td>
+              <td><span class="ver-badge stale">v3.0.8</span></td>
+              <td><div class="sig-bars"><div class="sig-bar on s1" style="height:4px"></div><div class="sig-bar" style="height:7px"></div><div class="sig-bar" style="height:10px"></div><div class="sig-bar" style="height:14px"></div></div></td>
+              <td class="ts-cell">9 min ago</td><td><span class="status-pill err">Offline</span></td>
+              <td><div class="row-actions"><button class="row-btn">View</button><button class="row-btn">Edit</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="name-cell"><div class="dev-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="2" stroke="currentColor" stroke-width="1.3"/><path d="M7 1V3M7 11V13M1 7H3M11 7H13M2.8 2.8L4.2 4.2M9.8 9.8L11.2 11.2M2.8 11.2L4.2 9.8M9.8 4.2L11.2 2.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div><div><div class="dev-name">REC-HUM-09</div><div class="dev-uid">uid:2f:b6:55:d1</div></div></div></td>
+              <td style="color:var(--c-muted)">Sensor</td><td style="color:var(--c-muted)">Warehouse A</td>
+              <td><span class="ver-badge">v3.1.0</span></td>
+              <td><div class="sig-bars"><div class="sig-bar on s4" style="height:4px"></div><div class="sig-bar on s4" style="height:7px"></div><div class="sig-bar on s4" style="height:10px"></div><div class="sig-bar on s4" style="height:14px"></div></div></td>
+              <td class="ts-cell">4 s ago</td><td><span class="status-pill ok">Online</span></td>
+              <td><div class="row-actions"><button class="row-btn">View</button><button class="row-btn">Edit</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="name-cell"><div class="dev-icon act"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="5" width="10" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 5V4C5 2.9 5.9 2 7 2H7C8.1 2 9 2.9 9 4V5" stroke="currentColor" stroke-width="1.3"/><path d="M7 7.5V9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div><div><div class="dev-name">ACT-PUMP-03</div><div class="dev-uid">uid:8c:3a:f0:77</div></div></div></td>
+              <td style="color:var(--c-muted)">Actuator</td><td style="color:var(--c-muted)">Utility Room</td>
+              <td><span class="ver-badge">v2.9.1</span></td>
+              <td><div class="sig-bars"><div class="sig-bar on s3" style="height:4px"></div><div class="sig-bar on s3" style="height:7px"></div><div class="sig-bar on s3" style="height:10px"></div><div class="sig-bar" style="height:14px"></div></div></td>
+              <td class="ts-cell">28 s ago</td><td><span class="status-pill ok">Online</span></td>
+              <td><div class="row-actions"><button class="row-btn">View</button><button class="row-btn">Edit</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="name-cell"><div class="dev-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="2" stroke="currentColor" stroke-width="1.3"/><path d="M7 1V3M7 11V13M1 7H3M11 7H13M2.8 2.8L4.2 4.2M9.8 9.8L11.2 11.2M2.8 11.2L4.2 9.8M9.8 4.2L11.2 2.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div><div><div class="dev-name">REC-VIBR-02</div><div class="dev-uid">uid:e1:44:82:5c</div></div></div></td>
+              <td style="color:var(--c-muted)">Sensor</td><td style="color:var(--c-muted)">Motor Bank B</td>
+              <td><span class="ver-badge">v2.9.4</span></td>
+              <td><div class="sig-bars"><div class="sig-bar on s3" style="height:4px"></div><div class="sig-bar on s3" style="height:7px"></div><div class="sig-bar on s3" style="height:10px"></div><div class="sig-bar" style="height:14px"></div></div></td>
+              <td class="ts-cell">18 s ago</td><td><span class="status-pill warn">Warning</span></td>
+              <td><div class="row-actions"><button class="row-btn">View</button><button class="row-btn">Edit</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="rec-footer">
+          <span>Showing 1–8 of 150</span>
+          <div class="pager">
+            <button class="page-btn">‹</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">…</button>
+            <button class="page-btn">19</button>
+            <button class="page-btn">›</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

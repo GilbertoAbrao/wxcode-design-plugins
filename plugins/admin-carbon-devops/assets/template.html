@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Carbon Admin — {Screen Title}</title>
+<style>
+/*
+  Carbon Admin — template seed.
+  Copy this file, replace every {placeholder} with real domain content,
+  and drop the region skeletons from references/layouts.md into <main>.
+*/
+
+:root {
+  --accent:         #22c55e;   /* green — active nav, primary CTA, pass state, delta-up */
+  --accent-hi:      #4ade80;
+  --accent-dim:     color-mix(in srgb, #22c55e 12%, transparent);
+  --blue:           #3b82f6;   /* info, links, secondary accent, search focus */
+  --blue-hi:        #60a5fa;
+  --blue-dim:       color-mix(in srgb, #3b82f6 12%, transparent);
+  --state-pass:     #22c55e;
+  --state-pass-dim: color-mix(in srgb, #22c55e 12%, transparent);
+  --state-fail:     #ef4444;
+  --state-fail-dim: color-mix(in srgb, #ef4444 12%, transparent);
+  --state-run:      #f59e0b;   /* amber — in-progress / running */
+  --state-run-dim:  color-mix(in srgb, #f59e0b 12%, transparent);
+  --state-skip:     #6e7681;   /* muted — cancelled / skipped */
+  --state-skip-dim: color-mix(in srgb, #6e7681 12%, transparent);
+  --delta-up:       #4ade80;
+  --delta-down:     #f87171;
+  --sev-p1:         #ef4444;
+  --sev-p2:         #f59e0b;
+  --sev-p3:         #3b82f6;
+}
+
+/* ── RESET ── */
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── BODY ── */
+body {
+  background: #0b0d10;          /* canvas */
+  color: #e6edf3;               /* text-primary */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn .3s ease-out;
+}
+@keyframes fadeIn  { from { opacity: 0 } to { opacity: 1 } }
+@keyframes pulse-dot { 0%,100% { opacity:1; transform:scale(1) } 50% { opacity:.45; transform:scale(.75) } }
+
+/* ── MONOSPACE (IDs, hashes, branch names, codes) ── */
+.mono { font-family: ui-monospace,"SF Mono",Menlo,"Cascadia Code",monospace; }
+
+/* ── TOP NAVBAR (48px, sticky) ── */
+.navbar {
+  height: 48px; background: #14171c; border-bottom: 1px solid #262c34;
+  display: flex; align-items: center; gap: 10px; padding: 0 14px;
+  position: sticky; top: 0; z-index: 100; flex-shrink: 0;
+}
+.nav-btn { background:none; border:none; color:#8b949e; cursor:pointer; padding:6px; border-radius:6px; display:flex; align-items:center; transition:.15s; }
+.nav-btn:hover { color:#e6edf3; background:#1c2128; }
+
+/* Entity switcher */
+.entity-switcher { display:flex; align-items:center; gap:7px; padding:4px 10px; background:#1c2128; border:1px solid #262c34; border-radius:6px; cursor:pointer; color:#e6edf3; font-size:13px; white-space:nowrap; }
+.entity-switcher .ename { font-weight:600; }
+.code-badge { font-size:10px; padding:1px 6px; background:#262c34; border-radius:10px; color:#8b949e; font-family:ui-monospace,"SF Mono",Menlo,monospace; }
+
+/* Env pill switcher */
+.env-switcher { display:flex; gap:4px; }
+.env-pill { padding:3px 10px; border-radius:12px; font-size:11px; font-weight:600; cursor:pointer; border:1px solid transparent; letter-spacing:.02em; text-transform:uppercase; transition:.15s; }
+.env-pill.active  { background:var(--accent-dim); border-color:var(--accent); color:var(--accent); }
+.env-pill:not(.active) { color:#8b949e; border-color:#262c34; }
+
+/* Search */
+.nav-search { flex:1; max-width:300px; margin:0 auto; position:relative; }
+.nav-search input { width:100%; background:#0b0d10; border:1px solid #262c34; border-radius:6px; color:#e6edf3; font-size:12px; padding:5px 10px 5px 30px; outline:none; font-family:inherit; transition:.15s; }
+.nav-search input:focus { border-color:var(--blue); }
+.nav-search input::placeholder { color:#8b949e; }
+.nav-search .si { position:absolute; left:8px; top:50%; transform:translateY(-50%); color:#8b949e; }
+
+.nav-right { display:flex; align-items:center; gap:8px; margin-left:auto; }
+.bell-wrap { position:relative; }
+.bell-dot { position:absolute; top:2px; right:2px; width:8px; height:8px; background:var(--state-fail); border-radius:50%; border:1.5px solid #14171c; }
+.avatar { width:30px; height:30px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--blue)); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#0b0d10; cursor:pointer; }
+
+/* ── SHELL ── */
+.layout { display:flex; flex:1; overflow:hidden; }
+
+/* Left icon rail (48px) */
+.rail { width:48px; background:#14171c; border-right:1px solid #262c34; display:flex; flex-direction:column; align-items:center; padding:12px 0; gap:4px; flex-shrink:0; }
+.rail-item { position:relative; width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#8b949e; transition:.15s; }
+.rail-item:hover { color:#e6edf3; background:#1c2128; }
+.rail-item.active { color:var(--accent); background:var(--accent-dim); }
+.rail-item.active::before { content:''; position:absolute; left:-6px; top:50%; transform:translateY(-50%); width:3px; height:18px; background:var(--accent); border-radius:0 2px 2px 0; }
+.rail-spacer { flex:1; }
+
+/* ── MAIN CONTENT ── */
+.main { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:14px; }
+
+/* Page header */
+.page-header { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+.page-title   { font-size:18px; font-weight:700; color:#e6edf3; }
+.page-subtitle{ font-size:12px; color:#8b949e; margin-top:2px; }
+.header-actions { display:flex; gap:8px; }
+
+/* Buttons */
+.btn-ghost   { padding:6px 14px; background:transparent; border:1px solid #262c34; border-radius:6px; color:#8b949e; font-size:12px; font-family:inherit; cursor:pointer; transition:.15s; }
+.btn-ghost:hover { color:#e6edf3; border-color:#30363d; }
+.btn-primary { padding:6px 14px; background:var(--accent); border:none; border-radius:6px; color:#0b0d10; font-size:12px; font-weight:700; font-family:inherit; cursor:pointer; transition:.15s; }
+.btn-primary:hover { background:var(--accent-hi); }
+.btn-primary:disabled { opacity:.35; cursor:not-allowed; }
+
+/* Card */
+.card { background:#14171c; border:1px solid #262c34; border-radius:8px; overflow:hidden; }
+.card-header { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid #262c34; }
+.card-title  { font-size:13px; font-weight:700; color:#e6edf3; display:flex; align-items:center; gap:7px; }
+.card-count  { font-size:11px; font-weight:600; padding:1px 7px; background:#1c2128; border:1px solid #262c34; border-radius:10px; color:#8b949e; }
+.view-all    { font-size:12px; color:var(--blue); text-decoration:none; }
+.view-all:hover { color:var(--blue-hi); }
+
+/* KPI tiles */
+.kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+.kpi-tile  { background:#14171c; border:1px solid #262c34; border-radius:8px; padding:16px 18px; position:relative; overflow:hidden; }
+.kpi-label { font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#8b949e; margin-bottom:6px; }
+.kpi-value { font-size:28px; font-weight:700; color:#e6edf3; line-height:1; margin-bottom:6px; font-variant-numeric:tabular-nums; }
+.kpi-value.green { color:var(--accent); }
+.kpi-value.amber { color:var(--state-run); }
+.kpi-value.red   { color:var(--state-fail); }
+.kpi-delta { display:inline-flex; align-items:center; gap:3px; font-size:11px; font-weight:600; padding:2px 6px; border-radius:10px; }
+.kpi-delta.up   { color:var(--delta-up);   background:var(--state-pass-dim); }
+.kpi-delta.down { color:var(--delta-down); background:var(--state-fail-dim); }
+.kpi-sparkline  { position:absolute; top:14px; right:14px; opacity:.55; }
+
+/* Status / record pills */
+.status-pill { display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:10px; font-size:10px; font-weight:700; }
+.status-pill .sdot { width:5px; height:5px; border-radius:50%; background:currentColor; }
+.status-pill.pass { color:var(--state-pass); background:var(--state-pass-dim); }
+.status-pill.fail { color:var(--state-fail); background:var(--state-fail-dim); }
+.status-pill.run  { color:var(--state-run);  background:var(--state-run-dim);  }
+.status-pill.skip { color:var(--state-skip); background:var(--state-skip-dim); }
+.status-pill.run .sdot { animation:pulse-dot 2s ease-in-out infinite; }
+
+/* Stage chips (pipeline board) */
+.stage-chip { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:600; border:1px solid; }
+.stage-chip.pass { color:var(--state-pass); border-color:var(--state-pass); background:var(--state-pass-dim); }
+.stage-chip.fail { color:var(--state-fail); border-color:var(--state-fail); background:var(--state-fail-dim); }
+.stage-chip.run  { color:var(--state-run);  border-color:var(--state-run);  background:var(--state-run-dim);  }
+.stage-chip.skip { color:var(--state-skip); border-color:var(--state-skip); background:var(--state-skip-dim); }
+.run-dot { width:6px; height:6px; border-radius:50%; background:currentColor; display:inline-block; animation:pulse-dot 2s ease-in-out infinite; }
+
+/* Severity feed dots */
+.sev-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.sev-dot.p1 { background:var(--sev-p1); }
+.sev-dot.p2 { background:var(--sev-p2); }
+.sev-dot.p3 { background:var(--sev-p3); }
+
+/* Dense table */
+.rec-table-wrap { overflow-x:auto; }
+.rec-table { width:100%; border-collapse:collapse; font-size:12px; }
+.rec-table th { padding:8px 14px; text-align:left; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:#8b949e; border-bottom:1px solid #262c34; background:#14171c; white-space:nowrap; }
+.rec-table td { padding:10px 14px; border-bottom:1px solid #1c2128; vertical-align:middle; }
+.rec-table tr:last-child td { border-bottom:none; }
+.rec-table tr:hover td { background:#1a1f27; }
+.id-cell  { font-family:ui-monospace,"SF Mono",Menlo,monospace; color:var(--blue); font-size:11px; }
+.sha-cell { font-family:ui-monospace,"SF Mono",Menlo,monospace; color:#8b949e; font-size:11px; }
+.code-cell{ font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:11px; color:#c9d1d9; }
+.num-cell { font-variant-numeric:tabular-nums; }
+.rec-footer { display:flex; align-items:center; justify-content:space-between; padding:10px 16px; border-top:1px solid #262c34; font-size:11px; color:#8b949e; }
+.pagination { display:flex; gap:4px; }
+.page-btn { width:28px; height:28px; border-radius:5px; border:1px solid #262c34; background:transparent; color:#8b949e; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:.15s; }
+.page-btn:hover { color:#e6edf3; border-color:#30363d; }
+.page-btn.active { background:var(--accent-dim); border-color:var(--accent); color:var(--accent); font-weight:700; }
+
+/* Form fields */
+.field { display:flex; flex-direction:column; gap:5px; }
+.field.full  { grid-column:1/-1; }
+.field-label { font-size:12px; font-weight:600; color:#c9d1d9; display:flex; align-items:center; gap:4px; }
+.req  { color:var(--accent); font-weight:700; }
+.control { background:#0b0d10; border:1px solid #262c34; border-radius:6px; padding:8px 11px; color:#e6edf3; font-size:13px; font-family:inherit; outline:none; transition:.15s; width:100%; }
+.control:focus { border-color:var(--blue); box-shadow:0 0 0 2px var(--blue-dim); }
+.control::placeholder { color:#8b949e; }
+.field.invalid .control { border-color:var(--state-fail); }
+.helper   { font-size:11px; color:#8b949e; }
+.error-msg{ display:flex; align-items:center; gap:5px; font-size:11px; color:var(--state-fail); }
+
+/* Breadcrumb */
+.breadcrumb { display:flex; align-items:center; gap:6px; font-size:12px; color:#6e7681; }
+.breadcrumb a { color:#8b949e; text-decoration:none; }
+.breadcrumb a:hover { color:var(--accent-hi); }
+</style>
+</head>
+<body>
+
+<!-- ── NAVBAR ─────────────────────────────────────────────────────── -->
+<nav class="navbar">
+  <button class="nav-btn" title="Menu">
+    <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </button>
+
+  <!-- Entity switcher: replace ename + code-badge with the real primary entity -->
+  <div class="entity-switcher">
+    <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="5" rx="1" fill="currentColor" opacity=".6"/><rect x="9" y="2" width="5" height="5" rx="1" fill="currentColor"/><rect x="2" y="9" width="5" height="5" rx="1" fill="currentColor" opacity=".4"/><rect x="9" y="9" width="5" height="5" rx="1" fill="currentColor" opacity=".3"/></svg>
+    <span class="ename">{Entity name}</span>
+    <span class="code-badge">{code}</span>
+    <svg width="12" height="12" fill="none" viewBox="0 0 12 12"><path d="M3 5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+
+  <!-- Env pill switcher: replace labels with domain context values -->
+  <div class="env-switcher">
+    <span class="env-pill active">{ctx-A}</span>
+    <span class="env-pill">{ctx-B}</span>
+    <span class="env-pill">{ctx-C}</span>
+  </div>
+
+  <div class="nav-search">
+    <svg class="si" width="13" height="13" fill="none" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <input type="text" placeholder="Jump to {entity}, {code}, {field}…">
+  </div>
+
+  <div class="nav-right">
+    <div class="bell-wrap">
+      <button class="nav-btn" title="Alerts">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M8 2a5 5 0 0 0-5 5v2l-1 2h12l-1-2V7a5 5 0 0 0-5-5zm0 12a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2z" stroke="currentColor" stroke-width="1.3"/></svg>
+      </button>
+      <span class="bell-dot"></span>
+    </div>
+    <div class="avatar">{IN}</div>
+  </div>
+</nav>
+
+<!-- ── SHELL ──────────────────────────────────────────────────────── -->
+<div class="layout">
+
+  <!-- Left icon rail: update titles + active item for each screen -->
+  <aside class="rail">
+    <div class="rail-item active" title="{Screen 1}">
+      <svg width="18" height="18" fill="none" viewBox="0 0 18 18"><rect x="2" y="2" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="10" y="2" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="10" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="10" y="10" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>
+    </div>
+    <div class="rail-item" title="{Screen 2}">
+      <svg width="18" height="18" fill="none" viewBox="0 0 18 18"><path d="M3 5h3v8H3zM7.5 3h3v12h-3zM12 7h3v6h-3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="rail-item" title="{Screen 3}">
+      <svg width="18" height="18" fill="none" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.4"/><path d="M7 6l5 3-5 3V6z" fill="currentColor"/></svg>
+    </div>
+    <div class="rail-item" title="{Screen 4}">
+      <svg width="18" height="18" fill="none" viewBox="0 0 18 18"><path d="M9 3L2 15h14L9 3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M9 8v4M9 13.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </div>
+    <div class="rail-spacer"></div>
+    <div class="rail-item" title="Settings">
+      <svg width="18" height="18" fill="none" viewBox="0 0 18 18"><circle cx="9" cy="9" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M9 1.5v2M9 14.5v2M1.5 9h2M14.5 9h2M3.7 3.7l1.4 1.4M12.9 12.9l1.4 1.4M3.7 14.3l1.4-1.4M12.9 5.1l1.4-1.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    </div>
+  </aside>
+
+  <!-- ── MAIN CONTENT — drop region skeletons from references/layouts.md here ── -->
+  <main class="main">
+
+    <div class="page-header">
+      <div>
+        <div class="page-title">{Screen title}</div>
+        <div class="page-subtitle">{scope · context · timestamp}</div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-ghost">{Secondary action}</button>
+        <button class="btn-primary">+ {Primary action}</button>
+      </div>
+    </div>
+
+    <!-- Paste KPI tiles, board, chart, table, form, or detail regions here -->
+
+  </main>
+</div>
+
+</body>
+</html>

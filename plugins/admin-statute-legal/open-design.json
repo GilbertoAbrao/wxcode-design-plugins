@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-statute-legal",
-  "title": "Statute Legal Admin",
-  "version": "0.1.0",
-  "description": "Refined light-mode law firm dashboard for case and matter management — practice-area sidebar, KPI tiles for active cases / billable hours / deadlines / realization rate, matters table with status pills, upcoming deadlines panel, matters-by-practice chart, and recent documents list. Burgundy-gold accent palette on warm white surfaces.",
+  "title": "Statute Admin",
+  "version": "0.2.0",
+  "description": "Refined warm-white professional admin aesthetic: warm-white canvas (#faf8f6), deep-burgundy accent (#9f1239 / #be123c), gold secondary accent (#b45309), Inter type with tabular figures, and white raised cards with a 3px accent top stripe. Archetype = dark sidebar with entity-switcher grouped nav + sticky topbar with search and period selector + 4 KPI tiles + 2-column grid (records table left, deadline feed + bar chart right) + full-width items list, plus matching list, form, and detail screens. Built for authoritative yet approachable professional service consoles.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,14 +19,14 @@
     "operations",
     "web",
     "admin",
-    "legal",
-    "case-management",
-    "law-firm",
-    "matter-management",
     "light-mode",
-    "refined-professional",
+    "warm-white",
     "burgundy",
-    "gold-accent"
+    "gold-accent",
+    "dark-sidebar",
+    "professional",
+    "refined",
+    "enterprise"
   ],
   "compat": {
     "agentSkills": [
@@ -47,13 +47,25 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a refined law firm admin dashboard for case and matter management — practice-area sidebar, 4 KPI tiles (active cases, billable hours MTD, deadlines this week, realization rate), matters table with status pills, upcoming deadlines panel, matters-by-practice chart, recent documents list. Burgundy and gold accents on warm white.",
-        "zh-CN": "使用这个插件完成以下任务：Build me a refined law firm admin dashboard for case and matter management — practice-area sidebar, 4 KPI tiles (active cases, billable hours MTD, deadlines this week, realization rate), matters table with status pills, upcoming deadlines panel, matters-by-practice chart, recent documents list. Burgundy and gold accents on warm white."
+        "en": "Apply this refined warm-white professional admin aesthetic to my domain — dark sidebar with entity-switcher grouped nav, sticky topbar with search and period selector, 4 KPI tiles with burgundy and gold accent stripes, a records table with status pills, a deadline feed and bar chart side panel, and a full-width documents list, plus list / form / detail screens.",
+        "zh-CN": "将这个精致温白色专业管理界面风格应用到我的领域：深色侧边栏带实体切换分组导航、顶栏搜索和时段选择器、4 个 KPI 卡片（深红和金色强调色条纹）、带状态标签的记录表格、截止日期动态和横向柱状图侧栏，以及全宽文档列表，并配套列表 / 表单 / 详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Statute Legal Admin"
+          "title": "Statute Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Statute Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Statute Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Statute Admin — Detail"
         }
       ]
     },
@@ -71,7 +83,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {

@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aurora Admin — Form</title>
+<style>
+:root {
+  --c-bg:          #f8fafc;
+  --c-surface:     #ffffff;
+  --c-border:      #e2e8f0;
+  --c-border-soft: #f1f5f9;
+  --c-text:        #0f172a;
+  --c-muted:       #475569;
+  --c-faint:       #94a3b8;
+  --c-indigo:      #6366f1;
+  --c-indigo-lt:   #eef2ff;
+  --c-indigo-mid:  #818cf8;
+  --c-violet:      #7c3aed;
+  --c-green:       #10b981;
+  --c-green-lt:    #ecfdf5;
+  --c-red:         #ef4444;
+  --c-red-lt:      #fef2f2;
+  --c-amber:       #f59e0b;
+  --sidebar-w:     240px;
+  --topbar-h:      60px;
+  --radius-sm:     8px;
+  --radius-md:     12px;
+  --shadow-sm:     0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); font-size: 14px; line-height: 1.5; color: var(--c-text); background: var(--c-bg); min-height: 100vh; display: flex; }
+
+/* Sidebar */
+.sidebar { width: var(--sidebar-w); flex-shrink: 0; background: var(--c-surface); border-right: 1px solid var(--c-border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 20; overflow-y: auto; }
+.sidebar-logo { display: flex; align-items: center; gap: 10px; padding: 20px 20px 16px; border-bottom: 1px solid var(--c-border-soft); }
+.sidebar-logo-text { font-size: 15px; font-weight: 700; letter-spacing: -.3px; color: var(--c-text); }
+.sidebar-logo-text span { color: var(--c-indigo); }
+.sidebar-section { padding: 20px 12px 4px; }
+.sidebar-section-label { font-size: 10px; font-weight: 600; letter-spacing: .8px; text-transform: uppercase; color: var(--c-faint); padding: 0 8px; margin-bottom: 6px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--radius-sm); color: var(--c-muted); font-size: 13.5px; font-weight: 500; cursor: pointer; text-decoration: none; transition: background .12s, color .12s; margin-bottom: 1px; }
+.nav-item:hover { background: var(--c-bg); color: var(--c-text); }
+.nav-item.active { background: var(--c-indigo-lt); color: var(--c-indigo); font-weight: 600; }
+.nav-item svg { flex-shrink: 0; opacity: .7; }
+.nav-item.active svg { opacity: 1; }
+.nav-badge { margin-left: auto; background: var(--c-indigo); color: #fff; font-size: 10px; font-weight: 700; border-radius: 100px; padding: 1px 6px; }
+.sidebar-bottom { margin-top: auto; padding: 12px; border-top: 1px solid var(--c-border-soft); }
+.sidebar-user { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--radius-sm); cursor: pointer; }
+.sidebar-user:hover { background: var(--c-bg); }
+.avatar-sm { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--c-indigo), var(--c-violet)); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+.sidebar-user-info { flex: 1; min-width: 0; }
+.sidebar-user-name { font-size: 13px; font-weight: 600; color: var(--c-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar-user-role { font-size: 11px; color: var(--c-faint); }
+
+/* Main */
+.main-wrap { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+.topbar { height: var(--topbar-h); background: var(--c-surface); border-bottom: 1px solid var(--c-border); display: flex; align-items: center; padding: 0 24px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--c-muted); }
+.breadcrumb-sep { color: var(--c-faint); }
+.breadcrumb-current { color: var(--c-text); font-weight: 600; }
+.topbar-search { margin-left: auto; display: flex; align-items: center; gap: 8px; background: var(--c-bg); border: 1px solid var(--c-border); border-radius: var(--radius-sm); padding: 6px 12px; width: 220px; }
+.topbar-search input { border: none; background: transparent; font-family: var(--font); font-size: 13px; color: var(--c-text); outline: none; width: 100%; }
+.topbar-search input::placeholder { color: var(--c-faint); }
+.topbar-actions { display: flex; align-items: center; gap: 8px; }
+.icon-btn { width: 36px; height: 36px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; background: none; border: none; cursor: pointer; color: var(--c-muted); }
+.notif-wrap { position: relative; }
+.notif-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; background: var(--c-red); border-radius: 50%; border: 1.5px solid var(--c-surface); }
+.topbar-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--c-indigo), var(--c-violet)); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
+
+/* Page */
+.page-body { padding: 28px 24px; display: flex; flex-direction: column; gap: 20px; max-width: 820px; }
+.page-header { display: flex; align-items: flex-end; justify-content: space-between; }
+.page-title { font-size: 22px; font-weight: 700; letter-spacing: -.4px; color: var(--c-text); }
+.page-subtitle { font-size: 13px; color: var(--c-muted); margin-top: 2px; }
+
+/* Form cards */
+.form-card { background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-md); padding: 24px; box-shadow: var(--shadow-sm); }
+.card-section-title { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: var(--c-text); margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--c-border-soft); }
+.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 20px; }
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field.full { grid-column: 1 / -1; }
+.field-label { font-size: 13px; font-weight: 600; color: var(--c-text); }
+.req { color: var(--c-red); margin-left: 2px; }
+.control {
+  width: 100%; padding: 9px 12px;
+  background: var(--c-surface); border: 1.5px solid var(--c-border);
+  border-radius: var(--radius-sm); font-family: var(--font); font-size: 13.5px;
+  color: var(--c-text); outline: none;
+  transition: border-color .12s, box-shadow .12s;
+}
+.control:focus { border-color: var(--c-indigo); box-shadow: 0 0 0 3px rgba(99,102,241,.12); }
+.control::placeholder { color: var(--c-faint); }
+select.control { cursor: pointer; }
+textarea.control { resize: vertical; min-height: 80px; }
+.helper { font-size: 11.5px; color: var(--c-faint); line-height: 1.4; }
+.error-msg { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--c-red); font-weight: 500; }
+
+/* Invalid field state */
+.field.invalid .control { border-color: var(--c-red); }
+.field.invalid .control:focus { box-shadow: 0 0 0 3px rgba(239,68,68,.12); }
+
+/* Form footer */
+.form-footer { display: flex; align-items: center; justify-content: space-between; background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-md); padding: 16px 24px; box-shadow: var(--shadow-sm); }
+.form-hint { font-size: 12px; color: var(--c-faint); }
+.footer-actions { display: flex; gap: 10px; }
+.btn-ghost { padding: 8px 16px; background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--radius-sm); color: var(--c-muted); font-family: var(--font); font-size: 13px; font-weight: 500; cursor: pointer; transition: background .12s, color .12s; }
+.btn-ghost:hover { background: var(--c-bg); color: var(--c-text); }
+.btn-primary { padding: 8px 20px; background: var(--c-indigo); border: none; border-radius: var(--radius-sm); color: #fff; font-family: var(--font); font-size: 13px; font-weight: 600; cursor: pointer; transition: background .12s; }
+.btn-primary:hover:not(:disabled) { background: var(--c-indigo-mid); }
+.btn-primary:disabled { opacity: .45; cursor: not-allowed; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="8" fill="var(--c-indigo)"/><path d="M7 20 Q14 6 21 20" stroke="white" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M10 20 Q14 11 18 20" stroke="#a5b4fc" stroke-width="1.6" fill="none" stroke-linecap="round"/><circle cx="14" cy="9.5" r="2" fill="#e0e7ff"/></svg>
+    <span class="sidebar-logo-text">Brand<span>.</span></span>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Overview</div>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h5v5H2V2zm0 7h5v5H2V9zm7-7h5v5H9V2zm0 7h5v5H9V9z"/></svg>Dashboard</a>
+    <a class="nav-item active" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="1" y="3" width="14" height="10" rx="2"/><path d="M1 6h14"/></svg>
+      Records
+      <span class="nav-badge">4.2k</span>
+    </a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">System</div>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>Settings</a>
+  </div>
+  <div class="sidebar-bottom">
+    <div class="sidebar-user">
+      <div class="avatar-sm">MA</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">Marta Alves</div>
+        <div class="sidebar-user-role">Growth Lead</div>
+      </div>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--c-faint)" stroke-width="1.5" stroke-linecap="round"><path d="M3 5l4 4 4-4"/></svg>
+    </div>
+  </div>
+</aside>
+
+<div class="main-wrap">
+  <header class="topbar">
+    <nav class="breadcrumb">
+      <span>Platform</span>
+      <span class="breadcrumb-sep">›</span>
+      <a href="#" style="color:var(--c-muted);text-decoration:none">Records</a>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-current">New Record</span>
+    </nav>
+    <div class="topbar-search">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="var(--c-faint)" stroke-width="1.5" stroke-linecap="round"><circle cx="6" cy="6" r="4"/><path d="M10 10l2.5 2.5"/></svg>
+      <input type="text" placeholder="Search…">
+    </div>
+    <div class="topbar-actions">
+      <div class="notif-wrap">
+        <button class="icon-btn"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M9 2a5 5 0 0 1 5 5c0 3 1 4 2 5H2c1-1 2-2 2-5a5 5 0 0 1 5-5z"/><path d="M7 14a2 2 0 0 0 4 0"/></svg></button>
+        <span class="notif-dot"></span>
+      </div>
+      <div class="topbar-avatar">MA</div>
+    </div>
+  </header>
+
+  <main class="page-body">
+
+    <div class="page-header">
+      <div>
+        <div class="page-title">New Record</div>
+        <div class="page-subtitle">Fill in the fields below to create a new record.</div>
+      </div>
+    </div>
+
+    <form novalidate>
+
+      <!-- Section 1: Core details -->
+      <div class="form-card" style="margin-bottom:16px">
+        <div class="card-section-title">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--c-indigo)" stroke-width="1.7" stroke-linecap="round"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8h6M5 5h6M5 11h3"/></svg>
+          Core Details
+        </div>
+        <div class="field-grid">
+
+          <!-- Entity name — required, valid -->
+          <div class="field">
+            <label class="field-label" for="name">Entity Name <span class="req">*</span></label>
+            <input id="name" class="control" type="text" value="Riya Kapoor" placeholder="Full name or identifier">
+            <span class="helper">Used as the primary display label across the platform.</span>
+          </div>
+
+          <!-- Category — required select, valid -->
+          <div class="field">
+            <label class="field-label" for="category">Category <span class="req">*</span></label>
+            <select id="category" class="control">
+              <option value="">Select a category…</option>
+              <option selected>Growth</option>
+              <option>Acquisition</option>
+              <option>Retention</option>
+              <option>Engagement</option>
+            </select>
+            <span class="helper">Determines which funnel stage this record belongs to.</span>
+          </div>
+
+          <!-- Source — required select, invalid (no selection) -->
+          <div class="field invalid">
+            <label class="field-label" for="source">Source <span class="req">*</span></label>
+            <select id="source" class="control" aria-invalid="true">
+              <option value="" selected>Select a source…</option>
+              <option>Organic</option>
+              <option>Paid</option>
+              <option>Referral</option>
+              <option>Email</option>
+              <option>Social</option>
+            </select>
+            <span class="error-msg">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="5"/><path d="M6 3.5v3M6 8.5v.5"/></svg>
+              Source is required to assign attribution.
+            </span>
+          </div>
+
+          <!-- Region — optional text -->
+          <div class="field">
+            <label class="field-label" for="region">Region</label>
+            <input id="region" class="control" type="text" value="" placeholder="e.g. Brazil, Germany, UAE…">
+            <span class="helper">Optional. Leave blank to classify as Global.</span>
+          </div>
+
+          <!-- Notes — optional textarea, full width -->
+          <div class="field full">
+            <label class="field-label" for="notes">Notes</label>
+            <textarea id="notes" class="control" placeholder="Any additional context for this record…"></textarea>
+            <span class="helper">Visible to all team members with access to this record.</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Section 2: Metrics & targets -->
+      <div class="form-card" style="margin-bottom:16px">
+        <div class="card-section-title">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--c-indigo)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M1 13 5 8l3 3 3-5 3 2"/><circle cx="5" cy="8" r="1.2" fill="var(--c-indigo)" stroke="none"/></svg>
+          Metrics &amp; Targets
+        </div>
+        <div class="field-grid">
+
+          <!-- Target count — required, invalid (zero) -->
+          <div class="field invalid">
+            <label class="field-label" for="target">Target Count <span class="req">*</span></label>
+            <input id="target" class="control" type="number" value="0" min="1" aria-invalid="true">
+            <span class="error-msg">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="5"/><path d="M6 3.5v3M6 8.5v.5"/></svg>
+              Must be greater than 0.
+            </span>
+          </div>
+
+          <!-- Conversion goal — required, valid -->
+          <div class="field">
+            <label class="field-label" for="goal">Conversion Goal (%) <span class="req">*</span></label>
+            <input id="goal" class="control" type="number" value="4.5" min="0.1" max="100" step="0.1">
+            <span class="helper">Percentage target for this period. Range: 0.1–100.</span>
+          </div>
+
+          <!-- Start date — required, valid -->
+          <div class="field">
+            <label class="field-label" for="start">Start Date <span class="req">*</span></label>
+            <input id="start" class="control" type="date" value="2025-06-01">
+            <span class="helper">Tracking begins from this date.</span>
+          </div>
+
+          <!-- End date — required, invalid (in the past) -->
+          <div class="field invalid">
+            <label class="field-label" for="end">End Date <span class="req">*</span></label>
+            <input id="end" class="control" type="date" value="2025-05-28" aria-invalid="true">
+            <span class="error-msg">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="6" r="5"/><path d="M6 3.5v3M6 8.5v.5"/></svg>
+              End date cannot be in the past or before the start date.
+            </span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Form footer -->
+      <div class="form-footer">
+        <span class="form-hint">Fields marked <span class="req">*</span> are required. Fix the highlighted errors before saving.</span>
+        <div class="footer-actions">
+          <button type="button" class="btn-ghost">Cancel</button>
+          <button type="submit" class="btn-primary" disabled>Create Record</button>
+        </div>
+      </div>
+
+    </form>
+
+  </main>
+</div>
+
+</body>
+</html>

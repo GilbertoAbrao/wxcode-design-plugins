@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Records List</title>
+<style>
+:root {
+  --color-accent:       #4f46e5;
+  --color-accent-mid:   #6366f1;
+  --color-accent-bg:    #eef2ff;
+  --color-success:      #16a34a;
+  --color-success-bg:   #dcfce7;
+  --color-warn:         #d97706;
+  --color-warn-bg:      #fef3c7;
+  --color-danger:       #dc2626;
+  --color-danger-bg:    #fee2e2;
+  --color-probation:    #4338ca;
+  --color-probation-bg: #e0e7ff;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:14px;color:#1e1e2d;background:#f8f8fb;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;border:none;background:none;font:inherit}
+svg{display:block}
+
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* Sidebar (compact — same tokens, collapsed state) */
+.sidebar{width:240px;min-width:240px;background:#fff;border-right:1px solid #e8e8ef;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0}
+.sidebar-logo{display:flex;align-items:center;gap:10px;padding:20px 20px 16px;border-bottom:1px solid #e8e8ef}
+.sidebar-logo-text{font-size:15px;font-weight:700;color:#1e1e2d;letter-spacing:-0.01em}
+.sidebar-logo-text span{color:var(--color-accent)}
+.org-switcher{margin:12px 12px 8px;padding:10px 12px;background:#f8f8fb;border:1px solid #e8e8ef;border-radius:8px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.org-switcher-inner{display:flex;align-items:center;gap:8px}
+.org-avatar{width:28px;height:28px;border-radius:6px;background:var(--color-accent-bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--color-accent)}
+.org-name{font-size:12px;font-weight:600;color:#1e1e2d}
+.org-sub{font-size:11px;color:#9ca3af}
+.nav-section{padding:8px 0 4px}
+.nav-section-label{padding:6px 20px 4px;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#9ca3af}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 20px;font-size:13px;color:#6b7280;position:relative;cursor:pointer;transition:background .12s,color .12s}
+.nav-item:hover{background:#f8f8fb;color:#1e1e2d}
+.nav-item.active{background:var(--color-accent-bg);color:var(--color-accent);font-weight:600}
+.nav-item.active::before{content:"";position:absolute;left:0;top:4px;bottom:4px;width:3px;border-radius:0 3px 3px 0;background:var(--color-accent)}
+.nav-item svg{flex-shrink:0;opacity:.7}
+.nav-item.active svg{opacity:1}
+.nav-badge{margin-left:auto;background:var(--color-accent-bg);color:var(--color-accent);font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px}
+.sidebar-footer{margin-top:auto;border-top:1px solid #e8e8ef;padding:14px 16px;display:flex;align-items:center;gap:10px}
+.sidebar-footer-avatar{width:32px;height:32px;border-radius:50%;background:var(--color-accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff}
+.sidebar-footer-info{flex:1;min-width:0}
+.sidebar-footer-name{font-size:12px;font-weight:600;color:#1e1e2d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sidebar-footer-role{font-size:11px;color:#9ca3af}
+
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+/* Topbar */
+.topbar{height:60px;min-height:60px;background:#fff;border-bottom:1px solid #e8e8ef;display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0}
+.topbar-title{display:flex;flex-direction:column;line-height:1.2;min-width:0;flex-shrink:0}
+.topbar-page{font-size:15px;font-weight:700;color:#1e1e2d;white-space:nowrap}
+.topbar-breadcrumb{font-size:11px;color:#9ca3af}
+.topbar-breadcrumb span{color:var(--color-accent)}
+.topbar-avatar-wrap{margin-left:auto;display:flex;align-items:center;gap:8px;cursor:pointer}
+.topbar-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--color-accent),var(--color-accent-mid));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.topbar-uname{font-size:13px;font-weight:600;color:#1e1e2d}
+
+/* Content */
+.content{flex:1;overflow-y:auto;padding:24px}
+
+/* Toolbar */
+.list-toolbar{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.toolbar-search{position:relative;flex:1;max-width:320px}
+.toolbar-search input{width:100%;height:36px;padding:0 12px 0 36px;border:1px solid #e8e8ef;border-radius:8px;background:#fff;font-size:13px;color:#1e1e2d;outline:none}
+.toolbar-search input::placeholder{color:#9ca3af}
+.toolbar-search input:focus{border-color:var(--color-accent)}
+.toolbar-search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#9ca3af;pointer-events:none}
+.filter-group{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.filter-label{font-size:11px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.chip{padding:5px 12px;border-radius:99px;font-size:12px;font-weight:500;background:#fff;border:1px solid #e8e8ef;color:#6b7280;cursor:pointer;display:flex;align-items:center;gap:5px}
+.chip:hover{border-color:var(--color-accent);color:var(--color-accent)}
+.chip.active{background:var(--color-accent-bg);border-color:var(--color-accent-bg);color:var(--color-accent);font-weight:600}
+.chip-count{font-size:10px;font-weight:700;background:rgba(79,70,229,.12);color:var(--color-accent);padding:0 5px;border-radius:99px}
+.chip.active .chip-count{background:rgba(79,70,229,.2)}
+.btn-primary{display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;background:var(--color-accent);color:#fff;font-size:12px;font-weight:600;margin-left:auto}
+.btn-primary:hover{background:var(--color-accent-mid)}
+
+/* Table card */
+.table-card{background:#fff;border:1px solid #e8e8ef;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.table-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 14px;border-bottom:1px solid #e8e8ef;gap:10px}
+.table-title{font-size:14px;font-weight:700;color:#1e1e2d}
+.table-count-badge{font-size:12px;color:#9ca3af;background:#f8f8fb;border:1px solid #e8e8ef;padding:2px 8px;border-radius:99px}
+.sort-controls{display:flex;align-items:center;gap:8px;margin-left:auto}
+.sort-label{font-size:12px;color:#9ca3af}
+.sort-select{height:30px;padding:0 8px;border:1px solid #e8e8ef;border-radius:6px;font-size:12px;color:#1e1e2d;background:#fff;outline:none}
+table{width:100%;border-collapse:collapse}
+thead tr{background:#f8f8fb}
+th{padding:10px 14px;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#9ca3af;text-align:left;white-space:nowrap;cursor:pointer;user-select:none}
+th:first-child{padding-left:20px}
+th:last-child{padding-right:20px}
+th .sort-arrow{opacity:.4;margin-left:4px;font-size:10px}
+th.sort-asc .sort-arrow,th.sort-desc .sort-arrow{opacity:1;color:var(--color-accent)}
+tbody tr{border-top:1px solid #f1f1f5;transition:background .1s}
+tbody tr:hover{background:#f8f8fb}
+td{padding:12px 14px;font-size:13px;color:#1e1e2d;vertical-align:middle}
+td:first-child{padding-left:20px}
+td:last-child{padding-right:20px}
+.rec-cell{display:flex;align-items:center;gap:10px}
+.rec-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.rec-name{font-size:13px;font-weight:600;color:#1e1e2d}
+.rec-sub{font-size:11px;color:#9ca3af}
+.status-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600}
+.status-pill::before{content:"";width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.s-active{color:var(--color-success);background:var(--color-success-bg)}
+.s-active::before{background:var(--color-success)}
+.s-warn{color:var(--color-warn);background:var(--color-warn-bg)}
+.s-warn::before{background:var(--color-warn)}
+.s-info{color:var(--color-probation);background:var(--color-probation-bg)}
+.s-info::before{background:var(--color-probation)}
+.s-danger{color:var(--color-danger);background:var(--color-danger-bg)}
+.s-danger::before{background:var(--color-danger)}
+.row-actions{display:flex;align-items:center;gap:4px;opacity:0;transition:opacity .12s}
+tbody tr:hover .row-actions{opacity:1}
+.row-btn{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:500;color:#6b7280;border:1px solid #e8e8ef;background:#fff;cursor:pointer}
+.row-btn:hover{color:var(--color-accent);border-color:var(--color-accent)}
+.table-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid #e8e8ef;font-size:12px;color:#9ca3af}
+.pagination{display:flex;align-items:center;gap:4px}
+.page-btn{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:12px;color:#6b7280;cursor:pointer}
+.page-btn:hover{background:#f8f8fb}
+.page-btn.active{background:var(--color-accent);color:#fff;font-weight:600}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <rect width="28" height="28" rx="7" fill="var(--color-accent)"/>
+        <polygon points="14,4 24,10 24,18 14,24 4,18 4,10" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="14" cy="14" r="3" fill="#fff"/>
+      </svg>
+      <span class="sidebar-logo-text">Meri<span>dian</span></span>
+    </div>
+    <div class="org-switcher">
+      <div class="org-switcher-inner">
+        <div class="org-avatar">NV</div>
+        <div><div class="org-name">NorthVault Group</div><div class="org-sub">847 members</div></div>
+      </div>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:#9ca3af"><path d="M4 5.5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <nav class="nav-section">
+      <div class="nav-section-label">Overview</div>
+      <div class="nav-item"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1.5" fill="currentColor"/><rect x="9" y="2" width="5" height="5" rx="1.5" fill="currentColor" opacity=".5"/><rect x="2" y="9" width="5" height="5" rx="1.5" fill="currentColor" opacity=".5"/><rect x="9" y="9" width="5" height="5" rx="1.5" fill="currentColor" opacity=".5"/></svg>Dashboard</div>
+      <div class="nav-item"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M2 13c0-2.761 2.686-5 6-5s6 2.239 6 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Headcount<span class="nav-badge">847</span></div>
+    </nav>
+    <nav class="nav-section">
+      <div class="nav-section-label">People</div>
+      <div class="nav-item active"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M1 13c0-2.2 2.239-4 5-4s5 1.8 5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="12" cy="5" r="2" stroke="currentColor" stroke-width="1.3" opacity=".5"/><path d="M14 13c0-1.5-1-2.8-2.5-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity=".5"/></svg>Directory<span class="nav-badge">847</span></div>
+      <div class="nav-item"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a6 6 0 010 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M8 2a6 6 0 000 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" opacity=".4"/><path d="M5 8h6M8 5v6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Time Off</div>
+    </nav>
+    <nav class="nav-section">
+      <div class="nav-section-label">Talent</div>
+      <div class="nav-item"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a3 3 0 100 6 3 3 0 000-6z" fill="currentColor" opacity=".4"/><path d="M3 13a5 5 0 0110 0" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M11 5h4M13 3v4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Recruitment<span class="nav-badge">23</span></div>
+      <div class="nav-item"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 8l1.5 1.5L10.5 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Performance</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-footer-avatar">KR</div>
+      <div class="sidebar-footer-info">
+        <div class="sidebar-footer-name">Kira Reynolds</div>
+        <div class="sidebar-footer-role">Admin</div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-title">
+        <span class="topbar-page">Directory</span>
+        <span class="topbar-breadcrumb">NorthVault / <span>All Records</span></span>
+      </div>
+      <div class="topbar-avatar-wrap">
+        <div class="topbar-avatar">KR</div>
+        <span class="topbar-uname">Kira Reynolds</span>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- Toolbar -->
+      <div class="list-toolbar">
+        <div class="toolbar-search">
+          <svg class="toolbar-search-icon" width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.4"/><path d="M10 10l2.5 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <input type="text" placeholder="Search by name, role, or category…">
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Status</span>
+          <span class="chip active">All <span class="chip-count">847</span></span>
+          <span class="chip">Active <span class="chip-count">701</span></span>
+          <span class="chip">On Leave <span class="chip-count">89</span></span>
+          <span class="chip">Probation <span class="chip-count">34</span></span>
+          <span class="chip">Inactive <span class="chip-count">23</span></span>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Category</span>
+          <span class="chip active">All</span>
+          <span class="chip">Engineering</span>
+          <span class="chip">Sales</span>
+          <span class="chip">Design</span>
+          <span class="chip">Product</span>
+        </div>
+        <button class="btn-primary">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Add Record
+        </button>
+      </div>
+
+      <!-- Table -->
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">All Records</div>
+          <div class="table-count-badge">847</div>
+          <div class="sort-controls">
+            <span class="sort-label">Sort by</span>
+            <select class="sort-select">
+              <option>Name (A–Z)</option>
+              <option>Start Date</option>
+              <option>Category</option>
+              <option>Status</option>
+            </select>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th class="sort-asc">Name <span class="sort-arrow">↑</span></th>
+              <th>Role</th>
+              <th>Category</th>
+              <th>Manager</th>
+              <th>Status</th>
+              <th>Start Date</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="rec-cell"><div class="rec-avatar" style="background:#6366f1">AL</div><div><div class="rec-name">Adriana Lopes</div><div class="rec-sub">adriana.lopes@example.io</div></div></div></td>
+              <td>Senior Engineer</td><td>Engineering</td><td>T. Barrett</td>
+              <td><span class="status-pill s-active">Active</span></td>
+              <td>14 Mar 2022</td>
+              <td><div class="row-actions"><button class="row-btn">View</button><button class="row-btn">Edit</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="rec-cell"><div class="rec-avatar" style="background:#10b981">MT</div><div><div class="rec-name">Marcus Tran</div><div class="rec-sub">m.tran@example.io</div></div></div></td>
+              <td>Account Lead</td><td>Sales</td><td>J. Osei</td>
+              <td><span class="status-pill s-active">Active</span></td>
+              <td>02 Aug 2021</td>
+              <td><div class="row-actions"><button class="row-btn">View</button><button class="row-btn">Edit</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="rec-cell"><div class="rec-avatar" style="background:#ec4899">SP</div><div><div class="rec-name">Simone Park</div><div class="rec-sub">simone.park@example.io</div></div></div></td>
+              <td>Product Designer</td><td>Design</td><td>R. Kapoor</td>
+              <td><span class="status-pill s-warn">On Leave</span></td>
+              <td>09 Jan 2023</td>
+              <td><div class="row-actions"><button class="row-btn">View</button><button class="row-btn">Edit</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="rec-cell"><div class="rec-avatar" style="background:#f59e0b">RK</div><div><div class="rec-name">Raj Kapoor</div><div class="rec-sub">raj.kapoor@example.io</div></div></div></td>
+              <td>Product Manager</td><td>Product</td><td>C. Mbeki</td>
+              <td><span class="status-pill s-active">Active</span></td>
+              <td>17 May 2020</td>
+              <td><div class="row-actions"><button class="row-btn">View</button><button class="row-btn">Edit</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="rec-cell"><div class="rec-avatar" style="background:#4f46e5">EF</div><div><div class="rec-name">Elena Fischer</div><div class="rec-sub">e.fischer@example.io</div></div></div></td>
+              <td>Finance Analyst</td><td>Finance</td><td>D. Okafor</td>
+              <td><span class="status-pill s-info">Probation</span></td>
+              <td>12 Apr 2026</td>
+              <td><div class="row-actions"><button class="row-btn">View</button><button class="row-btn">Edit</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="rec-cell"><div class="rec-avatar" style="background:#8b5cf6">DO</div><div><div class="rec-name">Deon Okafor</div><div class="rec-sub">d.okafor@example.io</div></div></div></td>
+              <td>Operations Lead</td><td>Operations</td><td>C. Mbeki</td>
+              <td><span class="status-pill s-active">Active</span></td>
+              <td>28 Oct 2019</td>
+              <td><div class="row-actions"><button class="row-btn">View</button><button class="row-btn">Edit</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="rec-cell"><div class="rec-avatar" style="background:#0ea5e9">YN</div><div><div class="rec-name">Yuki Nakamura</div><div class="rec-sub">yuki.n@example.io</div></div></div></td>
+              <td>Sales Rep</td><td>Sales</td><td>J. Osei</td>
+              <td><span class="status-pill s-info">Probation</span></td>
+              <td>03 Mar 2026</td>
+              <td><div class="row-actions"><button class="row-btn">View</button><button class="row-btn">Edit</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="rec-cell"><div class="rec-avatar" style="background:#dc2626">BW</div><div><div class="rec-name">Brenda Walsh</div><div class="rec-sub">b.walsh@example.io</div></div></div></td>
+              <td>QA Engineer</td><td>Engineering</td><td>T. Barrett</td>
+              <td><span class="status-pill s-danger">Inactive</span></td>
+              <td>11 Jun 2018</td>
+              <td><div class="row-actions"><button class="row-btn">View</button><button class="row-btn">Edit</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="table-footer">
+          <span>Showing 1–8 of 847</span>
+          <div class="pagination">
+            <button class="page-btn">‹</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">…</button>
+            <button class="page-btn">106</button>
+            <button class="page-btn">›</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>

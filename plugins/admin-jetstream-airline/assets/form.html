@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jetstream Admin — New Record</title>
+<style>
+:root {
+  --accent-indigo:     #6366f1;
+  --accent-indigo-dim: rgba(99,102,241,.15);
+  --accent-sky:        #38bdf8;
+  --accent-sky-dim:    rgba(56,189,248,.15);
+  --state-active:      #22c55e;
+  --state-active-dim:  rgba(34,197,94,.10);
+  --state-warn:        #f59e0b;
+  --state-warn-dim:    rgba(245,158,11,.10);
+  --state-muted:       #8a98ad;
+  --state-muted-dim:   rgba(138,152,173,.08);
+  --error:             #ef4444;
+  --error-dim:         rgba(239,68,68,.10);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#0a0f1a;color:#e4ecf6;font-size:14px;line-height:1.5}
+button,input,select,textarea{font-family:inherit;cursor:pointer}
+.shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+/* Navbar */
+.navbar{height:48px;background:#111a2b;border-bottom:1px solid #24314a;display:flex;align-items:center;padding:0 12px;gap:12px;flex-shrink:0;z-index:100}
+.entity-switcher{display:flex;align-items:center;gap:6px;padding:5px 10px;background:#18243a;border:1px solid #24314a;border-radius:7px;font-size:12px;font-weight:600;color:#e4ecf6;letter-spacing:.04em;cursor:pointer}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--state-active);flex-shrink:0;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.search-wrap{flex:1;max-width:340px;position:relative}
+.search-wrap svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:#8a98ad}
+.search-wrap input{width:100%;background:#18243a;border:1px solid #24314a;border-radius:7px;color:#e4ecf6;font-size:13px;padding:6px 10px 6px 32px;outline:none}
+.search-wrap input::placeholder{color:#8a98ad}
+.search-wrap input:focus{border-color:var(--accent-indigo)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.bell-btn{position:relative;background:none;border:none;padding:6px;color:#8a98ad;display:flex;align-items:center}
+.avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent-indigo),var(--accent-sky));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;cursor:pointer}
+.bell-badge{position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:var(--state-warn);border:2px solid #111a2b}
+.body-row{display:flex;flex:1;overflow:hidden}
+/* Icon rail */
+.icon-rail{width:48px;background:#111a2b;border-right:1px solid #24314a;display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:4px;flex-shrink:0;overflow-y:auto}
+.rail-btn{width:36px;height:36px;background:none;border:none;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#8a98ad;transition:background .15s,color .15s}
+.rail-btn:hover{background:#18243a;color:#e4ecf6}
+.rail-btn.active{background:var(--accent-indigo-dim);color:var(--accent-sky)}
+.rail-divider{width:24px;height:1px;background:#24314a;margin:4px 0}
+.rail-spacer{flex:1}
+/* Main */
+.main{flex:1;overflow-y:auto;padding:20px 24px 40px}
+.page-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.page-title{font-size:18px;font-weight:700;color:#e4ecf6;letter-spacing:-.01em}
+.page-sub{font-size:12px;color:#8a98ad;margin-top:2px}
+.hdr-spacer{flex:1}
+.btn-ghost{background:none;border:1px solid #24314a;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:500;color:#8a98ad;transition:border-color .15s,color .15s}
+.btn-ghost:hover{border-color:var(--accent-sky);color:var(--accent-sky)}
+.btn-primary{background:var(--accent-indigo);border:none;border-radius:7px;padding:6px 14px;font-size:12px;font-weight:600;color:#fff;transition:opacity .15s}
+.btn-primary:hover:not(:disabled){opacity:.85}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed}
+/* Breadcrumb */
+.breadcrumb{font-size:12px;color:#8a98ad;margin-bottom:16px}
+.breadcrumb a{color:#8a98ad;text-decoration:none}
+.breadcrumb a:hover{color:var(--accent-sky)}
+.breadcrumb span{color:#e4ecf6}
+/* Form cards */
+.form-wrap{display:flex;flex-direction:column;gap:16px;max-width:760px}
+.card{background:#18243a;border:1px solid #24314a;border-radius:10px}
+.card-section-title{display:flex;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid #24314a;font-size:12px;font-weight:700;color:#8a98ad;letter-spacing:.05em;text-transform:uppercase}
+.card-section-title svg{color:var(--accent-indigo)}
+.card-body{padding:18px}
+/* Field grid */
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 20px}
+@media(max-width:680px){.field-grid{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:4px}
+.field.full{grid-column:1/-1}
+.field-label{font-size:12px;font-weight:600;color:#8a98ad;display:flex;align-items:center;gap:3px}
+.req{color:var(--accent-sky);font-weight:700}
+.control{background:#0a0f1a;border:1px solid #24314a;border-radius:6px;color:#e4ecf6;font-size:13px;padding:8px 10px;outline:none;transition:border-color .15s;width:100%}
+.control::placeholder{color:#8a98ad}
+.control:focus{border-color:var(--accent-indigo)}
+select.control{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 16 16' fill='none' stroke='%238a98ad' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px;cursor:pointer}
+select.control option{background:#18243a}
+textarea.control{resize:vertical;min-height:80px}
+.helper{font-size:11px;color:#8a98ad;line-height:1.4}
+/* Invalid field */
+.field.invalid .control{border-color:var(--error);background:rgba(239,68,68,.04)}
+.field.invalid .control:focus{border-color:var(--error)}
+.error-msg{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--error);line-height:1.4}
+.error-msg svg{flex-shrink:0}
+/* Form footer */
+.form-footer{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:#18243a;border:1px solid #24314a;border-radius:10px;gap:12px;flex-wrap:wrap}
+.form-hint{font-size:12px;color:#8a98ad}
+.footer-actions{display:flex;gap:8px}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <nav class="navbar">
+    <div class="entity-switcher">
+      <span class="live-dot"></span>
+      <span>KVX HUB</span>
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>
+    </div>
+    <div class="search-wrap">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>
+      <input type="text" placeholder="Search records, locations, resources…">
+    </div>
+    <div class="nav-right">
+      <button class="bell-btn" aria-label="Alerts">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="bell-badge"></span>
+      </button>
+      <div class="avatar">OP</div>
+    </div>
+  </nav>
+
+  <div class="body-row">
+    <aside class="icon-rail" aria-label="Navigation">
+      <button class="rail-btn" title="Dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      </button>
+      <button class="rail-btn active" title="Records">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      </button>
+      <button class="rail-btn" title="Routes">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <button class="rail-btn" title="Locations">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 7v14M21 7v14M5 7a7 7 0 0 1 14 0M10 21v-4a2 2 0 0 1 4 0v4"/></svg>
+      </button>
+      <button class="rail-btn" title="Resources">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      </button>
+      <div class="rail-divider"></div>
+      <button class="rail-btn" title="Reports">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg>
+      </button>
+      <div class="rail-spacer"></div>
+      <button class="rail-btn" title="Settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </aside>
+
+    <main class="main">
+      <div class="page-header">
+        <div>
+          <div class="page-title">New Record</div>
+          <div class="page-sub">KVX Hub · Create a new scheduled record</div>
+        </div>
+      </div>
+
+      <div class="breadcrumb" style="margin-top:-8px;margin-bottom:20px">
+        <a href="#">Records</a> › <span>New Record</span>
+      </div>
+
+      <form class="form-wrap" novalidate>
+
+        <!-- Section: Identity -->
+        <div class="card">
+          <div class="card-section-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+            Identity
+          </div>
+          <div class="card-body">
+            <div class="field-grid">
+              <!-- Identifier — required, invalid example -->
+              <div class="field invalid">
+                <label class="field-label" for="rec-id">Record Identifier <span class="req">*</span></label>
+                <input id="rec-id" class="control" type="text" value="REC-" aria-invalid="true" placeholder="REC-000">
+                <span class="error-msg">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><line x1="8" y1="5" x2="8" y2="8"/><circle cx="8" cy="11" r=".5" fill="currentColor"/></svg>
+                  Must be at least 6 characters (e.g. REC-401)
+                </span>
+              </div>
+
+              <!-- Description -->
+              <div class="field">
+                <label class="field-label" for="rec-desc">Description</label>
+                <input id="rec-desc" class="control" type="text" placeholder="Short description of this record">
+                <span class="helper">Optional — visible in list and detail views</span>
+              </div>
+
+              <!-- Unit — required select -->
+              <div class="field">
+                <label class="field-label" for="rec-unit">Unit <span class="req">*</span></label>
+                <select id="rec-unit" class="control">
+                  <option value="">Select unit…</option>
+                  <option>UNIT-KVX-04 — Type A-Large</option>
+                  <option>UNIT-KVX-11 — Type B-Med</option>
+                  <option>UNIT-KVX-07 — Type C-XL</option>
+                </select>
+                <span class="helper">Only units with Available status are listed</span>
+              </div>
+
+              <!-- Priority -->
+              <div class="field">
+                <label class="field-label" for="rec-priority">Priority</label>
+                <select id="rec-priority" class="control">
+                  <option value="">Standard</option>
+                  <option>High</option>
+                  <option>Critical</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Route & Schedule -->
+        <div class="card">
+          <div class="card-section-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+            Route &amp; Schedule
+          </div>
+          <div class="card-body">
+            <div class="field-grid">
+              <!-- Origin — required -->
+              <div class="field">
+                <label class="field-label" for="rec-origin">Origin <span class="req">*</span></label>
+                <input id="rec-origin" class="control" type="text" value="KVX" placeholder="Hub code">
+                <span class="helper">3-letter hub or location code</span>
+              </div>
+
+              <!-- Destination — required -->
+              <div class="field">
+                <label class="field-label" for="rec-dest">Destination <span class="req">*</span></label>
+                <input id="rec-dest" class="control" type="text" placeholder="Destination code">
+                <span class="helper">3-letter hub or location code</span>
+              </div>
+
+              <!-- Location / Bay — required select -->
+              <div class="field">
+                <label class="field-label" for="rec-bay">Assigned Location <span class="req">*</span></label>
+                <select id="rec-bay" class="control">
+                  <option value="">Select location…</option>
+                  <option>Bay A03</option>
+                  <option>Bay A08</option>
+                  <option>Bay B15</option>
+                  <option>Bay D11</option>
+                </select>
+                <span class="helper">Only unoccupied locations are shown</span>
+              </div>
+
+              <!-- Scheduled date/time — required, not in the past -->
+              <div class="field">
+                <label class="field-label" for="rec-sched">Scheduled Time <span class="req">*</span></label>
+                <input id="rec-sched" class="control" type="datetime-local" value="2026-06-02T17:00">
+                <span class="helper">Must be a future date and time</span>
+              </div>
+
+              <!-- Capacity -->
+              <div class="field">
+                <label class="field-label" for="rec-cap">Booked Capacity <span class="req">*</span></label>
+                <input id="rec-cap" class="control" type="number" min="1" placeholder="0" style="font-variant-numeric:tabular-nums">
+                <span class="helper">Must be greater than 0 and within unit capacity</span>
+              </div>
+
+              <!-- Notes -->
+              <div class="field full">
+                <label class="field-label" for="rec-notes">Notes</label>
+                <textarea id="rec-notes" class="control" placeholder="Any relevant operational notes…"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="form-footer">
+          <span class="form-hint">Fields marked <span class="req">*</span> are required.</span>
+          <div class="footer-actions">
+            <button type="button" class="btn-ghost">Cancel</button>
+            <button type="submit" class="btn-primary" disabled>Create Record</button>
+          </div>
+        </div>
+
+      </form>
+    </main>
+  </div>
+</div>
+</body>
+</html>

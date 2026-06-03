@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-talent-ats",
-  "title": "Talent ATS Admin",
-  "version": "0.1.0",
-  "description": "Recruiting & applicant-tracking dashboard archetype — left sidebar with requisition switcher, topbar with period picker and avatar, 4 KPI cards (open roles / candidates / interviews / time-to-hire), kanban-style hiring pipeline, recruiting funnel SVG, candidates table, and upcoming-interviews side panel. Indigo + pink accent, light HR aesthetic.",
+  "title": "Light Indigo Admin",
+  "version": "0.2.0",
+  "description": "Light admin aesthetic: white sidebar on a near-white canvas, indigo accent (#4f46e5) + pink secondary (#ec4899), 1px slate borders, 12px-radius cards with a whisper shadow. Archetype = left sidebar (entity switcher + grouped nav) + topbar (search + period picker + avatar) + 4 KPI cards with sparklines + a kanban-style stage board + a conversion funnel chart + an upcoming-items side panel + a full-width records table, plus matching list, form, and detail screens.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,15 +19,14 @@
     "operations",
     "web",
     "admin",
-    "recruiting",
-    "ats",
     "light-mode",
-    "hr",
-    "hiring",
-    "pipeline",
+    "indigo-accent",
+    "pink-accent",
     "kanban",
-    "indigo",
-    "pink-accent"
+    "stage-board",
+    "sparklines",
+    "funnel-chart",
+    "left-sidebar"
   ],
   "compat": {
     "agentSkills": [
@@ -48,13 +47,29 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a recruiting ATS admin dashboard — left sidebar with requisition switcher, 4 KPI tiles (open roles, candidates, interviews, time-to-hire), hiring pipeline board, recruiting funnel chart, candidates table, and upcoming interviews panel.",
-        "zh-CN": "使用这个插件完成以下任务：Build me a recruiting ATS admin dashboard — left sidebar with requisition switcher, 4 KPI tiles (open roles, candidates, interviews, time-to-hire), hiring pipeline board, recruiting funnel chart, candidates table, and upcoming interviews panel."
+        "en": "Apply this light indigo admin aesthetic to my domain — left sidebar with entity switcher and grouped nav, 4 KPI cards with sparklines, a kanban-style stage board, a conversion funnel chart with an upcoming-items side panel, and a full-width records table, plus list, form, and detail screens.",
+        "zh-CN": "将这个清爽靛蓝风格管理界面应用到我的领域：左侧边栏含实体切换器与分组导航、4 个带迷你图的 KPI 卡片、看板式阶段看板、转化漏斗图与即将到来事项侧栏，以及全宽记录表格，并配套列表、表单和详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Talent ATS Admin"
+          "title": "Light Indigo Admin — Dashboard"
+        },
+        {
+          "path": "./assets/dashboard.html",
+          "title": "Light Indigo Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Light Indigo Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Light Indigo Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Light Indigo Admin — Detail"
         }
       ]
     },
@@ -72,7 +87,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {

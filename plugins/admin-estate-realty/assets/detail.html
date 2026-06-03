@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin — Record Detail</title>
+<style>
+:root {
+  --color-accent:        #0d9488;
+  --color-accent-mid:    #14b8a6;
+  --color-accent-hover:  #0b7a70;
+  --color-accent-light:  #ccfbf1;
+  --color-accent-faint:  #f0fdfa;
+  --color-success:       #16a34a;
+  --color-success-bg:    #dcfce7;
+  --color-warning:       #d97706;
+  --color-warning-bg:    #fef3c7;
+  --color-danger:        #dc2626;
+  --color-danger-bg:     #fee2e2;
+  --color-text:          #1e2d2b;
+  --color-muted:         #64748b;
+  --color-border:        #e3e9e9;
+  --color-surface:       #ffffff;
+  --color-bg:            #f7f9f9;
+  --color-bg-subtle:     #fafcfc;
+  --color-sidebar:       #0f2623;
+  --color-sidebar-item:  rgba(255,255,255,0.07);
+  --color-sidebar-text:  #a8c5c2;
+  --color-sidebar-active:#e2f0ef;
+  --color-sidebar-head:  rgba(255,255,255,0.30);
+  --color-pill-blue:     #1d4ed8;
+  --color-pill-blue-bg:  #dbeafe;
+  --radius-card:         12px;
+  --shadow-card:         0 2px 10px rgba(13,148,136,0.07);
+  --font-sans:           "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); background: var(--color-bg); color: var(--color-text); font-size: 14px; line-height: 1.5; min-height: 100vh; display: flex; }
+
+.sidebar { width: 240px; min-height: 100vh; background: var(--color-sidebar); display: flex; flex-direction: column; flex-shrink: 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+.sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 22px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+.brand-mark { width: 36px; height: 36px; background: var(--color-accent); border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.brand-name { color: #fff; font-size: 15px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.2; }
+.brand-name span { display: block; font-size: 10px; font-weight: 400; color: var(--color-sidebar-text); }
+.nav-section { padding: 16px 14px 2px; }
+.nav-section-label { font-size: 9.5px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--color-sidebar-head); padding: 0 6px; margin-bottom: 4px; }
+.nav-item { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 7px; color: var(--color-sidebar-text); font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s, color 0.15s; margin-bottom: 1px; position: relative; text-decoration: none; }
+.nav-item:hover { background: var(--color-sidebar-item); color: #e2f0ef; }
+.nav-item.active { background: rgba(20,184,166,0.18); color: var(--color-sidebar-active); }
+.nav-item.active::before { content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 3px; background: var(--color-accent-mid); border-radius: 0 3px 3px 0; }
+.nav-badge { margin-left: auto; background: var(--color-accent); color: #fff; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 20px; }
+.sidebar-footer { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.07); padding: 14px 16px; display: flex; align-items: center; gap: 10px; }
+.sidebar-footer-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--color-accent); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+.sidebar-footer-info { flex: 1; min-width: 0; }
+.sidebar-footer-name { color: #e2f0ef; font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar-footer-role { color: var(--color-sidebar-text); font-size: 10.5px; }
+
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.topbar { height: 60px; background: var(--color-surface); border-bottom: 1px solid var(--color-border); display: flex; align-items: center; padding: 0 24px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+.topbar-title { font-size: 16px; font-weight: 700; color: var(--color-text); letter-spacing: -0.01em; }
+.breadcrumb { font-size: 13px; color: var(--color-muted); display: flex; align-items: center; gap: 6px; }
+.breadcrumb a { color: var(--color-accent); text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.topbar-avatar { display: flex; align-items: center; gap: 8px; cursor: pointer; flex-shrink: 0; margin-left: auto; }
+.topbar-avatar-circle { width: 34px; height: 34px; border-radius: 50%; background: var(--color-accent); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 700; }
+.topbar-avatar-name { font-size: 13px; font-weight: 600; color: var(--color-text); }
+
+.page-body { padding: 24px; display: flex; flex-direction: column; gap: 18px; }
+.btn-ghost { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: transparent; color: var(--color-muted); font-family: var(--font-sans); font-size: 13px; font-weight: 500; border: 1px solid var(--color-border); border-radius: 8px; cursor: pointer; margin-right: 8px; transition: border-color 0.15s; }
+.btn-ghost:hover { border-color: var(--color-accent-mid); color: var(--color-accent); }
+.btn-primary { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--color-accent); color: #fff; font-family: var(--font-sans); font-size: 13px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; transition: background 0.15s; }
+.btn-primary:hover { background: var(--color-accent-hover); }
+
+/* Card */
+.card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-card); box-shadow: var(--shadow-card); overflow: hidden; }
+.card-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--color-border); }
+.card-title { font-size: 14px; font-weight: 700; color: var(--color-text); }
+.card-sub { font-size: 12px; color: var(--color-muted); margin-top: 1px; }
+
+/* Pill */
+.pill { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.pill-active   { background: var(--color-success-bg); color: var(--color-success); }
+.pill-pending  { background: var(--color-warning-bg); color: var(--color-warning); }
+.pill-progress { background: var(--color-pill-blue-bg); color: var(--color-pill-blue); }
+
+/* Detail header */
+.detail-header {
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius-card); box-shadow: var(--shadow-card);
+  padding: 22px 24px;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+}
+.detail-title-block { display: flex; flex-direction: column; gap: 6px; }
+.detail-id-row { display: flex; align-items: center; gap: 10px; }
+.detail-id { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-muted); background: var(--color-bg); border: 1px solid var(--color-border); padding: 2px 8px; border-radius: 6px; }
+.detail-name { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; color: var(--color-text); line-height: 1.2; }
+.detail-sub { font-size: 13px; color: var(--color-muted); }
+.detail-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+/* Meta grid */
+.meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
+.meta-cell { padding: 18px 20px; border-right: 1px solid var(--color-border); }
+.meta-cell:last-child { border-right: none; }
+.meta-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-muted); margin-bottom: 4px; }
+.meta-value { font-size: 15px; font-weight: 700; color: var(--color-text); font-variant-numeric: tabular-nums; }
+.meta-sub { font-size: 11.5px; color: var(--color-muted); margin-top: 2px; }
+
+/* 2-col related panels */
+.related-grid { display: grid; grid-template-columns: 60fr 40fr; gap: 16px; align-items: start; }
+
+/* Related table */
+table { width: 100%; border-collapse: collapse; }
+thead th { font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-muted); padding: 10px 16px; text-align: left; background: var(--color-bg); border-bottom: 1px solid var(--color-border); }
+tbody tr { border-bottom: 1px solid var(--color-border); }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:nth-child(even) { background: var(--color-bg-subtle); }
+tbody tr:hover { background: var(--color-accent-faint); }
+tbody td { padding: 10px 16px; font-size: 13px; color: var(--color-text); font-variant-numeric: tabular-nums; }
+
+/* Activity feed */
+.activity-list { padding: 4px 0; }
+.activity-row { display: flex; align-items: flex-start; gap: 10px; padding: 12px 20px; border-bottom: 1px solid var(--color-border); }
+.activity-row:last-child { border-bottom: none; }
+.activity-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-accent); flex-shrink: 0; margin-top: 5px; }
+.activity-dot.info { background: var(--color-muted); }
+.activity-body { flex: 1; min-width: 0; }
+.activity-text { font-size: 13px; color: var(--color-text); }
+.activity-text strong { font-weight: 600; }
+.activity-time { font-size: 11px; color: var(--color-muted); margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-mark"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" fill="currentColor" fill-opacity=".3" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/><rect x="7.5" y="11.5" width="5" height="6.5" rx="1" fill="#fff"/></svg></div>
+    <div class="brand-name">Meridian Group<span>Back Office</span></div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">Overview</div>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" fill="currentColor"/><rect x="9" y="2" width="5" height="5" rx="1" fill="currentColor" fill-opacity=".5"/><rect x="2" y="9" width="5" height="5" rx="1" fill="currentColor" fill-opacity=".5"/><rect x="9" y="9" width="5" height="5" rx="1" fill="currentColor"/></svg>Dashboard</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">Records</div>
+    <a class="nav-item active" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8.5L8 2l6 6.5V14a.5.5 0 01-.5.5h-11A.5.5 0 012 14V8.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><rect x="6" y="10" width="4" height="4.5" rx=".6" fill="currentColor" fill-opacity=".35"/></svg>Active Listings<span class="nav-badge">47</span></a>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 5.5v2.75l1.75 1.75" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Pending Review<span class="nav-badge">9</span></a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">Pipeline</div>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 13l3.5-4.5L8 11l2.5-5L14 13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Pipeline</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">Team</div>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 13c0-2.485 2.015-4.5 4.5-4.5s4.5 2.015 4.5 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Members</a>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v3.5h2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Settings</a>
+  </div>
+  <div class="sidebar-footer">
+    <div class="sidebar-footer-avatar">PR</div>
+    <div class="sidebar-footer-info"><div class="sidebar-footer-name">Patricia Ruiz</div><div class="sidebar-footer-role">Broker of Record</div></div>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="breadcrumb">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M8.5 3.5L5 7l3.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <a href="#">Active Listings</a>
+      <span>›</span>
+      <span style="color:var(--color-text);font-weight:600">REF# 2024-8831</span>
+    </div>
+    <div class="topbar-avatar">
+      <div class="topbar-avatar-circle">PR</div>
+      <span class="topbar-avatar-name">Patricia R.</span>
+    </div>
+  </header>
+
+  <div class="page-body">
+    <!-- Detail header -->
+    <div class="detail-header">
+      <div class="detail-title-block">
+        <div class="detail-id-row">
+          <span class="detail-id">REF# 2024-8831</span>
+          <span class="pill pill-active">Active</span>
+        </div>
+        <div class="detail-name">1842 Lombard St #3</div>
+        <div class="detail-sub">Type A · Downtown SF · Listed May 12, 2026</div>
+      </div>
+      <div class="detail-actions">
+        <button class="btn-ghost">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5v11M1.5 7h11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Archive
+        </button>
+        <button class="btn-primary">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9.5 2.5l2 2-6 6H3.5v-2l6-6z" stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Edit Listing
+        </button>
+      </div>
+    </div>
+
+    <!-- Meta grid -->
+    <div class="card">
+      <div class="meta-grid">
+        <div class="meta-cell">
+          <div class="meta-label">Asking Price</div>
+          <div class="meta-value">$1,250,000</div>
+          <div class="meta-sub">Type A · Downtown SF</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Listing Agent</div>
+          <div class="meta-value">Kara Lee</div>
+          <div class="meta-sub">14 active · 9 closed this month</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Days Since Listed</div>
+          <div class="meta-value">22 days</div>
+          <div class="meta-sub">Go-live May 12, 2026</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Region</div>
+          <div class="meta-value">Downtown SF</div>
+          <div class="meta-sub">Branch: Meridian Group HQ</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Pipeline Stage</div>
+          <div class="meta-value">Active</div>
+          <div class="meta-sub">No offer received yet</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Expiry</div>
+          <div class="meta-value">Aug 12, 2026</div>
+          <div class="meta-sub">90-day listing window</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related panels: deal history + activity -->
+    <div class="related-grid">
+      <!-- Deal history -->
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Offer History</div><div class="card-sub">3 offers received</div></div>
+          <button class="btn-ghost" style="margin:0">+ Log Offer</button>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Buyer Side</th><th>Offer Value</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="color:var(--color-muted)">Jun 1, 2026</td>
+              <td>Buyer A via Agent X</td>
+              <td>$1,190,000</td>
+              <td><span class="pill" style="background:#fee2e2;color:#dc2626">Declined</span></td>
+            </tr>
+            <tr>
+              <td style="color:var(--color-muted)">May 28, 2026</td>
+              <td>Buyer B via Agent Y</td>
+              <td>$1,150,000</td>
+              <td><span class="pill" style="background:#fee2e2;color:#dc2626">Declined</span></td>
+            </tr>
+            <tr>
+              <td style="color:var(--color-muted)">May 22, 2026</td>
+              <td>Buyer C (direct)</td>
+              <td>$1,100,000</td>
+              <td><span class="pill" style="background:#fee2e2;color:#dc2626">Declined</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Activity feed -->
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Activity</div><div class="card-sub">Recent events</div></div>
+        </div>
+        <div class="activity-list">
+          <div class="activity-row">
+            <div class="activity-dot"></div>
+            <div class="activity-body">
+              <div class="activity-text"><strong>Kara Lee</strong> declined offer of $1,190,000.</div>
+              <div class="activity-time">Jun 1, 2026 · 3:22 PM</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-dot info"></div>
+            <div class="activity-body">
+              <div class="activity-text"><strong>Ryan Morales</strong> updated the asking price.</div>
+              <div class="activity-time">May 30, 2026 · 10:05 AM</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-dot"></div>
+            <div class="activity-body">
+              <div class="activity-text"><strong>Kara Lee</strong> declined offer of $1,150,000.</div>
+              <div class="activity-time">May 28, 2026 · 4:48 PM</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-dot info"></div>
+            <div class="activity-body">
+              <div class="activity-text">Listing status changed to <strong>Active</strong>.</div>
+              <div class="activity-time">May 12, 2026 · 9:00 AM</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-dot info"></div>
+            <div class="activity-body">
+              <div class="activity-text">Listing created by <strong>Patricia Ruiz</strong>.</div>
+              <div class="activity-time">May 10, 2026 · 2:15 PM</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

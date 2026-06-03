@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-carbon-devops",
-  "title": "Carbon DevOps Admin",
+  "title": "Carbon Admin",
   "version": "0.1.0",
-  "description": "Dark-mode CI/CD operations dashboard — terminal-inspired admin for pipeline runs, deploy frequency, build health, and incident tracking. Original archetype built for DevOps and platform engineering teams.",
+  "description": "Near-black terminal admin aesthetic: carbon canvas (#0b0d10), raised panels (#14171c), green accent (#22c55e), blue secondary (#3b82f6), monospace IDs and codes on every key cell, amber/red state pills. Archetype = entity-switcher navbar with env pill switcher + icon rail + 4 KPI tiles with sparklines + pipeline board with stage chips + inline SVG bar chart + severity feed side panel + dense records table, plus matching list, form, and detail screens.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,15 +19,13 @@
     "operations",
     "web",
     "admin",
-    "devops",
-    "ci-cd",
     "dark-mode",
     "terminal-vibe",
-    "pipelines",
-    "deployments",
-    "platform-engineering",
     "monospace",
-    "green-accent"
+    "green-accent",
+    "status-board",
+    "data-dense",
+    "stage-chips"
   ],
   "compat": {
     "agentSkills": [
@@ -48,13 +46,25 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a dark-mode DevOps admin dashboard for CI/CD pipelines — top navbar with repo/env switcher, left icon rail, KPI tiles for deploys and build health, pipeline board with stage chips, deploy frequency chart, builds table, and incident panel.",
-        "zh-CN": "使用这个插件完成以下任务：Build me a dark-mode DevOps admin dashboard for CI/CD pipelines — top navbar with repo/env switcher, left icon rail, KPI tiles for deploys and build health, pipeline board with stage chips, deploy frequency chart, builds table, and incident panel."
+        "en": "Apply this dark carbon terminal admin aesthetic to my domain — near-black canvas, green accent, entity-switcher navbar with env pills, icon rail, 4 KPI tiles with sparklines, a pipeline board with stage chips, an inline SVG bar chart, a severity-feed side panel, and a dense records table with status pills, plus list, form, and detail screens.",
+        "zh-CN": "将这个深色碳终端风格应用到我的领域：近黑底色、绿色强调色、带环境标签的实体切换导航栏、图标侧栏、带迷你折线图的 4 个 KPI 卡片、带阶段状态标签的管道看板、内联 SVG 条形图、严重性信息流侧面板，以及带状态标签的密集记录表格，并配套列表、表单和详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Carbon DevOps Admin"
+          "title": "Carbon Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Carbon Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Carbon Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Carbon Admin — Detail"
         }
       ]
     },
@@ -72,7 +82,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {

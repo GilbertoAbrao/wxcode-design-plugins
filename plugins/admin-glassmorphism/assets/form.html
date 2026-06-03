@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Member</title>
+<style>
+  :root {
+    --bg-base: #0d1117;
+    --bg-mid: #1c1f2a;
+    --cyan: #4dd0e1;
+    --cyan-dim: rgba(77,208,225,0.15);
+    --white-95: rgba(255,255,255,0.95);
+    --white-60: rgba(255,255,255,0.60);
+    --white-30: rgba(255,255,255,0.30);
+    --white-10: rgba(255,255,255,0.10);
+    --white-06: rgba(255,255,255,0.06);
+    --white-04: rgba(255,255,255,0.04);
+    --pink-glass: rgba(244,114,182,0.18);
+    --pink-text: #f472b6;
+    --glass-bg: rgba(255,255,255,0.04);
+    --glass-border: 1px solid rgba(255,255,255,0.10);
+    --glass-shadow: 0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
+    --glass-blur: blur(18px) saturate(120%);
+    --radius: 16px;
+    --sidebar-w: 240px;
+    --topbar-h: 72px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background-color: var(--bg-base); color: var(--white-95);
+    min-height: 100vh; overflow-x: hidden; position: relative;
+  }
+  .aurora {
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 10% 20%, rgba(77,208,225,0.18) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 85% 15%, rgba(167,139,250,0.14) 0%, transparent 55%),
+      radial-gradient(ellipse 70% 60% at 70% 80%, rgba(244,114,182,0.12) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 20% 85%, rgba(59,130,246,0.10) 0%, transparent 50%),
+      linear-gradient(160deg, #0f1520 0%, #0d1117 40%, #111828 100%);
+  }
+  .grain {
+    position: fixed; inset: 0; z-index: 1; opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+  .shell { position: relative; z-index: 2; display: flex; min-height: 100vh; }
+  .sidebar {
+    width: var(--sidebar-w); min-height: 100vh; flex-shrink: 0;
+    background: var(--glass-bg); backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur); border-right: var(--glass-border);
+    box-shadow: var(--glass-shadow); display: flex; flex-direction: column; padding: 28px 16px; gap: 8px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 0 8px 24px; border-bottom: 1px solid var(--white-06); margin-bottom: 8px; }
+  .brand-icon { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, var(--cyan) 0%, #818cf8 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .brand-name { font-size: 15px; font-weight: 700; letter-spacing: 0.08em; color: var(--white-95); }
+  .brand-sub { font-size: 9px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--white-60); margin-top: 1px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: pointer; color: var(--white-60); font-size: 13.5px; font-weight: 500; transition: background 0.15s, color 0.15s; text-decoration: none; }
+  .nav-item:hover { background: var(--white-04); color: var(--white-95); }
+  .nav-item.active { background: var(--cyan-dim); color: var(--cyan); border: 1px solid rgba(77,208,225,0.20); box-shadow: inset 0 1px 0 rgba(77,208,225,0.12), 0 0 16px rgba(77,208,225,0.06); }
+  .sidebar-spacer { flex: 1; }
+  .sidebar-footer { padding: 12px 8px 0; border-top: 1px solid var(--white-06); display: flex; align-items: center; gap: 10px; }
+  .avatar-sm { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #818cf8, var(--cyan)); flex-shrink: 0; }
+  .footer-info { flex: 1; overflow: hidden; }
+  .footer-name { font-size: 12.5px; font-weight: 600; color: var(--white-95); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .footer-role { font-size: 11px; color: var(--white-60); }
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .topbar {
+    height: var(--topbar-h); background: var(--glass-bg); backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur); border-bottom: var(--glass-border);
+    box-shadow: var(--glass-shadow); display: flex; align-items: center;
+    padding: 0 28px; gap: 16px; flex-shrink: 0;
+  }
+  .topbar-title { font-size: 17px; font-weight: 700; color: var(--white-95); flex: 1; }
+  .topbar-actions { display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 38px; height: 38px; border-radius: 10px; background: var(--white-06); border: 1px solid var(--white-10); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--white-60); }
+  .avatar-md { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #818cf8, var(--cyan)); border: 2px solid rgba(77,208,225,0.35); cursor: pointer; flex-shrink: 0; }
+  .content { padding: 28px; display: flex; flex-direction: column; gap: 20px; flex: 1; max-width: 800px; }
+  .breadcrumb { font-size: 12px; color: var(--white-60); display: flex; align-items: center; gap: 6px; }
+  .breadcrumb a { color: var(--cyan); text-decoration: none; }
+  .page-title { font-size: 22px; font-weight: 800; color: var(--white-95); }
+  .page-sub { font-size: 13px; color: var(--white-60); margin-top: 3px; }
+  .glass { background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border: var(--glass-border); border-radius: var(--radius); box-shadow: var(--glass-shadow); }
+  .card-section-title {
+    display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--white-60);
+    padding: 18px 24px 14px; border-bottom: 1px solid var(--white-06);
+  }
+  .card-body { padding: 20px 24px; }
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field.full { grid-column: 1 / -1; }
+  .field-label { font-size: 12px; font-weight: 600; color: var(--white-95); letter-spacing: 0.01em; }
+  .req { color: #f472b6; margin-left: 2px; }
+  .control {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--white-10);
+    border-radius: 10px; padding: 9px 12px; font-size: 13px; color: var(--white-95);
+    outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+    font-family: inherit; width: 100%;
+  }
+  .control:focus { border-color: rgba(77,208,225,0.45); box-shadow: 0 0 0 3px rgba(77,208,225,0.08); }
+  .control::placeholder { color: var(--white-30); }
+  .field.invalid .control { border-color: rgba(244,114,182,0.55); box-shadow: 0 0 0 3px rgba(244,114,182,0.07); }
+  .helper { font-size: 11px; color: var(--white-60); }
+  .error-msg { font-size: 11px; color: var(--pink-text); display: flex; align-items: center; gap: 4px; }
+  .form-footer { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; background: rgba(255,255,255,0.02); border-top: 1px solid var(--white-06); border-radius: 0 0 var(--radius) var(--radius); }
+  .form-hint { font-size: 12px; color: var(--white-60); }
+  .footer-actions { display: flex; gap: 10px; }
+  .btn-ghost { font-size: 13px; font-weight: 600; padding: 8px 18px; border-radius: 10px; border: 1px solid var(--white-10); background: var(--white-04); color: var(--white-95); cursor: pointer; }
+  .btn-primary { font-size: 13px; font-weight: 600; padding: 8px 18px; border-radius: 10px; border: none; background: var(--cyan); color: #0d1117; cursor: pointer; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+</style>
+</head>
+<body>
+<div class="aurora"></div>
+<div class="grain"></div>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <polygon points="9,2 16,6 16,12 9,16 2,12 2,6" fill="none" stroke="#fff" stroke-width="1.5"/>
+          <polygon points="9,5 13,7.5 13,12 9,14 5,12 5,7.5" fill="rgba(255,255,255,0.35)"/>
+        </svg>
+      </div>
+      <div><div class="brand-name">NEXUS</div><div class="brand-sub">Admin</div></div>
+    </div>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/>
+        <rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/>
+      </svg>Overview
+    </a>
+    <a class="nav-item active" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.31 2.69-6 6-6s6 2.69 6 6"/>
+      </svg>Members
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="2" y="4" width="12" height="9" rx="1.5"/><path d="M5 4V3a1 1 0 011-1h4a1 1 0 011 1v1"/>
+      </svg>Subscriptions
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M2 11l4-4 3 3 5-6"/>
+      </svg>Analytics
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M3 4h10M3 8h7M3 12h9"/>
+      </svg>Campaigns
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="8" cy="8" r="2.5"/>
+        <path d="M13.2 10a5.5 5.5 0 01-.5.9l1.1 1.1-1.4 1.4-1.1-1.1a5.5 5.5 0 01-.9.5V14h-2v-1.2a5.5 5.5 0 01-.9-.5l-1.1 1.1L4.9 12l1.1-1.1a5.5 5.5 0 01-.5-.9H4V8h1.2a5.5 5.5 0 01.5-.9L4.6 6l1.4-1.4 1.1 1.1a5.5 5.5 0 01.9-.5V4h2v1.2a5.5 5.5 0 01.9.5l1.1-1.1L13.4 6l-1.1 1.1a5.5 5.5 0 01.5.9H14v2h-1.2z"/>
+      </svg>Settings
+    </a>
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-footer">
+      <div class="avatar-sm"></div>
+      <div class="footer-info">
+        <div class="footer-name">Jordan Ellis</div>
+        <div class="footer-role">Platform Admin</div>
+      </div>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-title">Add Member</div>
+      <div class="topbar-actions">
+        <div class="icon-btn">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M8 2a4.5 4.5 0 014.5 4.5c0 2.5.5 3.5 1.5 4H2c1-0.5 1.5-1.5 1.5-4A4.5 4.5 0 018 2z"/>
+            <path d="M6.5 13.5a1.5 1.5 0 003 0"/>
+          </svg>
+        </div>
+        <div class="avatar-md"></div>
+      </div>
+    </header>
+    <main class="content">
+      <div class="breadcrumb">
+        <a href="#">Members</a>
+        <span>›</span>
+        <span>Add Member</span>
+      </div>
+      <div>
+        <div class="page-title">Add Member</div>
+        <div class="page-sub">Create a new member account and assign their plan.</div>
+      </div>
+      <form novalidate>
+        <div class="glass" style="margin-bottom: 16px;">
+          <div class="card-section-title">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="7" cy="4.5" r="2.5"/><path d="M1.5 12.5c0-2.76 2.46-5 5.5-5s5.5 2.24 5.5 5"/>
+            </svg>
+            Identity
+          </div>
+          <div class="card-body">
+            <div class="field-grid">
+              <div class="field">
+                <label class="field-label" for="f-handle">Handle <span class="req">*</span></label>
+                <input id="f-handle" class="control" type="text" placeholder="@handle" value="">
+                <span class="helper">Must be unique across the platform.</span>
+              </div>
+              <div class="field">
+                <label class="field-label" for="f-name">Display Name <span class="req">*</span></label>
+                <input id="f-name" class="control" type="text" placeholder="Full name or alias" value="">
+                <span class="helper">Shown publicly on the member's profile.</span>
+              </div>
+              <div class="field invalid">
+                <label class="field-label" for="f-email">Email <span class="req">*</span></label>
+                <input id="f-email" class="control" type="email" placeholder="you@example.com" value="not-an-email" aria-invalid="true">
+                <span class="error-msg">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="6" cy="6" r="5"/><path d="M6 4v2.5M6 8.5h.01"/>
+                  </svg>
+                  Enter a valid email address.
+                </span>
+              </div>
+              <div class="field">
+                <label class="field-label" for="f-category">Content Category <span class="req">*</span></label>
+                <select id="f-category" class="control">
+                  <option value="">Select category…</option>
+                  <option>Music &amp; Audio</option>
+                  <option>Visual Art</option>
+                  <option>Tech &amp; Code</option>
+                  <option>Wellness &amp; Fitness</option>
+                  <option>Food &amp; Culture</option>
+                  <option>Photography</option>
+                  <option>Education</option>
+                </select>
+                <span class="helper">Used to match the member with relevant campaigns.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="glass" style="margin-bottom: 16px;">
+          <div class="card-section-title">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="1" y="3" width="12" height="8" rx="1.5"/><path d="M1 6h12"/>
+            </svg>
+            Plan &amp; Metrics
+          </div>
+          <div class="card-body">
+            <div class="field-grid">
+              <div class="field">
+                <label class="field-label" for="f-plan">Plan <span class="req">*</span></label>
+                <select id="f-plan" class="control">
+                  <option value="">Select plan…</option>
+                  <option>Rising</option>
+                  <option>Pro</option>
+                  <option selected>Elite</option>
+                  <option>Partner</option>
+                </select>
+                <span class="helper">Determines revenue share rate and feature access.</span>
+              </div>
+              <div class="field">
+                <label class="field-label" for="f-audience">Audience Size</label>
+                <input id="f-audience" class="control" type="number" placeholder="0" value="892000">
+                <span class="helper">Total follower count across all channels. Must be ≥ 0.</span>
+              </div>
+              <div class="field full">
+                <label class="field-label" for="f-notes">Internal Notes</label>
+                <textarea id="f-notes" class="control" rows="3" placeholder="Onboarding notes, referral source, special agreements…" style="resize:vertical"></textarea>
+                <span class="helper">Not visible to the member. Max 500 characters.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-footer glass">
+          <span class="form-hint">Fields marked <span class="req">*</span> are required.</span>
+          <div class="footer-actions">
+            <button type="button" class="btn-ghost">Cancel</button>
+            <button type="submit" class="btn-primary" disabled>Add Member</button>
+          </div>
+        </div>
+      </form>
+    </main>
+  </div>
+</div>
+</body>
+</html>

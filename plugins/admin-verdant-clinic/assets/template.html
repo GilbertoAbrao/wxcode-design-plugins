@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{Screen title}</title>
+<style>
+/* ── Verdant Admin — design token seed ─────────────────────
+   Copy this file as a starting point for any new screen.
+   Replace every {placeholder} with the real domain content.
+   Do NOT hardcode chromatic hex values in CSS rules — use
+   var(--token) or currentColor throughout.
+──────────────────────────────────────────────────────────── */
+:root {
+  /* Accent */
+  --accent-emerald:      #10b981;
+  --accent-teal:         #0d9488;
+  --accent-emerald-dim:  #ecfdf5;
+  --accent-emerald-mid:  #6ee7b7;
+  --accent-teal-dim:     #ccfbf1;
+
+  /* Status pills (3 tones + info) */
+  --status-stable-bg:    #d1fae5;
+  --status-stable-text:  #065f46;
+  --status-pending-bg:   #fef3c7;
+  --status-pending-text: #92400e;
+  --status-urgent-bg:    #fce7f3;
+  --status-urgent-text:  #9d174d;
+  --status-info-bg:      #dbeafe;
+  --status-info-text:    #1e40af;
+
+  /* Sparklines / charts */
+  --spark-emerald:       #10b981;
+  --spark-teal:          #0d9488;
+  --spark-amber:         #f59e0b;
+  --spark-rose:          #f43f5e;
+  --chart-bar-1:         #10b981;
+  --chart-bar-2:         #0d9488;
+  --chart-bar-3:         #6ee7b7;
+  --chart-bar-4:         #14b8a6;
+}
+
+/* ── Reset ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px; line-height: 1.5;
+  background: #f7faf9; color: #1e293b;
+  display: flex; height: 100vh; overflow: hidden;
+}
+a { color: var(--accent-emerald); text-decoration: none; }
+a:hover { color: var(--accent-teal); }
+button { cursor: pointer; border: none; background: none; font: inherit; }
+
+/* ── Sidebar (240px) ────────────────────────────────────── */
+.sidebar {
+  width: 240px; min-width: 240px; background: #fff;
+  border-right: 1px solid #e3ece9;
+  display: flex; flex-direction: column; height: 100vh; overflow-y: auto;
+}
+.sidebar-logo { display: flex; align-items: center; gap: 10px; padding: 20px 18px 16px; border-bottom: 1px solid #e3ece9; }
+.logo-icon { width: 32px; height: 32px; flex-shrink: 0; }
+/* Logo: inline SVG mark goes inside .logo-icon */
+.logo-text { font-size: 15px; font-weight: 700; color: #1e293b; letter-spacing: -.2px; }
+.logo-text span { color: var(--accent-emerald); }
+
+/* Entity switcher */
+.entity-switcher {
+  margin: 14px 12px 6px; padding: 8px 10px;
+  background: #f7faf9; border: 1px solid #e3ece9; border-radius: 8px;
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer; font-size: 13px; color: #475569; font-weight: 500;
+}
+.entity-switcher:hover { border-color: var(--accent-emerald); }
+
+/* Nav groups */
+.nav-group { padding: 10px 0 4px; }
+.nav-group-label { padding: 0 18px 4px; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #94a3b8; }
+.nav-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 7px 14px 7px 16px; margin: 1px 8px; border-radius: 7px;
+  color: #475569; font-size: 13.5px; font-weight: 500;
+  cursor: pointer; transition: background .13s, color .13s; position: relative;
+}
+.nav-item:hover { background: #f1f5f3; color: #1e293b; }
+.nav-item.active { background: var(--accent-emerald-dim); color: var(--accent-emerald); font-weight: 600; }
+.nav-item.active::before { content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 3px; background: var(--accent-emerald); border-radius: 0 3px 3px 0; }
+.nav-badge { margin-left: auto; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; background: var(--status-urgent-bg); color: var(--status-urgent-text); }
+.nav-badge.amber { background: var(--status-pending-bg); color: var(--status-pending-text); }
+
+/* Sidebar footer */
+.sidebar-footer { margin-top: auto; padding: 14px 12px; border-top: 1px solid #e3ece9; display: flex; align-items: center; gap: 10px; }
+.sidebar-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--accent-emerald); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.sidebar-user { flex: 1; min-width: 0; }
+.sidebar-user-name { font-size: 13px; font-weight: 600; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar-user-role { font-size: 11px; color: #94a3b8; }
+
+/* ── Main area ──────────────────────────────────────────── */
+.main-area { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+
+/* Topbar */
+.topbar { height: 60px; background: #fff; border-bottom: 1px solid #e3ece9; display: flex; align-items: center; padding: 0 24px; gap: 16px; flex-shrink: 0; }
+.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #94a3b8; white-space: nowrap; }
+.breadcrumb-sep { color: #cbd5e1; }
+.breadcrumb-current { color: #1e293b; font-weight: 600; }
+.search-wrap { flex: 1; max-width: 360px; position: relative; }
+.search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #94a3b8; pointer-events: none; }
+.search-input { width: 100%; padding: 7px 12px 7px 34px; background: #f7faf9; border: 1px solid #e3ece9; border-radius: 8px; font-size: 13px; color: #1e293b; outline: none; transition: border-color .15s; }
+.search-input::placeholder { color: #94a3b8; }
+.search-input:focus { border-color: var(--accent-emerald); background: #fff; }
+.topbar-right { display: flex; align-items: center; gap: 14px; margin-left: auto; }
+.date-badge { font-size: 12px; font-weight: 600; color: #475569; background: #f1f5f3; padding: 4px 10px; border-radius: 6px; white-space: nowrap; }
+.top-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--accent-emerald); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; cursor: pointer; border: 2px solid var(--accent-emerald-dim); }
+
+/* Scrollable body */
+.page-body { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+
+/* Page header */
+.page-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.page-title { font-size: 20px; font-weight: 700; color: #1e293b; }
+.page-subtitle { font-size: 13px; color: #94a3b8; margin-top: 1px; }
+.page-actions { display: flex; gap: 8px; align-items: center; }
+.btn-ghost { padding: 7px 14px; border: 1px solid #e3ece9; border-radius: 8px; font-size: 13px; font-weight: 500; color: #475569; background: #fff; transition: border-color .13s, color .13s; cursor: pointer; }
+.btn-ghost:hover { border-color: var(--accent-emerald); color: var(--accent-emerald); }
+.btn-primary { padding: 7px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; color: #fff; background: var(--accent-emerald); transition: background .13s; cursor: pointer; }
+.btn-primary:hover { background: var(--accent-teal); }
+
+/* Card shell */
+.card { background: #fff; border: 1px solid #e3ece9; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.05); overflow: hidden; }
+.card-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 12px; border-bottom: 1px solid #e3ece9; }
+.card-title { font-size: 14px; font-weight: 700; color: #1e293b; }
+.card-subtitle { font-size: 12px; color: #94a3b8; margin-top: 1px; }
+.view-all { font-size: 12px; font-weight: 600; color: var(--accent-emerald); }
+.view-all:hover { color: var(--accent-teal); }
+
+/* KPI card row */
+.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+@media (max-width: 1100px) { .kpi-row { grid-template-columns: repeat(2, 1fr); } }
+.kpi-card { background: #fff; border: 1px solid #e3ece9; border-radius: 12px; padding: 18px 20px 14px; box-shadow: 0 1px 4px rgba(0,0,0,.05); }
+.kpi-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.kpi-label { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #94a3b8; }
+.kpi-icon { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; }
+.kpi-icon.emerald { background: var(--accent-emerald-dim); color: var(--accent-emerald); }
+.kpi-icon.teal    { background: var(--accent-teal-dim);    color: var(--accent-teal); }
+.kpi-icon.amber   { background: var(--status-pending-bg);  color: var(--spark-amber); }
+.kpi-icon.rose    { background: var(--status-urgent-bg);   color: var(--spark-rose); }
+.kpi-value { font-size: 28px; font-weight: 800; color: #0f172a; line-height: 1.1; letter-spacing: -.5px; font-variant-numeric: tabular-nums; }
+.kpi-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+.delta-chip { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 5px; display: inline-flex; align-items: center; gap: 2px; }
+.delta-chip.up   { background: var(--status-stable-bg);  color: var(--status-stable-text); }
+.delta-chip.down { background: var(--status-urgent-bg);  color: var(--status-urgent-text); }
+.delta-chip.flat { background: #f1f5f9; color: #475569; }
+
+/* Status pills */
+.status-pill { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.pill-stable  { background: var(--status-stable-bg);  color: var(--status-stable-text); }
+.pill-pending { background: var(--status-pending-bg); color: var(--status-pending-text); }
+.pill-urgent  { background: var(--status-urgent-bg);  color: var(--status-urgent-text); }
+.pill-info    { background: var(--status-info-bg);    color: var(--status-info-text); }
+
+/* Entity dots (avatar circles) */
+.entity-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; color: #fff; }
+.dot-em { background: var(--accent-emerald); }
+.dot-tl { background: var(--accent-teal); }
+.dot-am { background: var(--spark-amber); }
+.dot-sl { background: #64748b; }
+
+/* ── Drop your screen-specific CSS below this line ─────── */
+</style>
+</head>
+<body>
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg class="logo-icon" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <rect width="32" height="32" rx="8" fill="var(--accent-emerald-dim)"/>
+      <rect x="14" y="7" width="4" height="18" rx="2" fill="var(--accent-emerald)"/>
+      <rect x="7"  y="14" width="18" height="4" rx="2" fill="var(--accent-emerald)"/>
+    </svg>
+    <span class="logo-text"><span>{Brand}</span> Admin</span>
+  </div>
+
+  <div class="entity-switcher" role="combobox" aria-label="Entity switcher">
+    <span>{Active entity / group}</span>
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <nav aria-label="Main navigation">
+    <!-- Repeat .nav-group blocks as needed -->
+    <div class="nav-group">
+      <div class="nav-group-label">{Group label}</div>
+      <div class="nav-item active" role="link" tabindex="0">
+        <!-- inline SVG icon -->
+        {Nav item}
+      </div>
+      <div class="nav-item" role="link" tabindex="0">
+        <!-- inline SVG icon -->
+        {Nav item}
+        <!-- optional: <span class="nav-badge">{n}</span> -->
+      </div>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-avatar">{Initials}</div>
+    <div class="sidebar-user">
+      <div class="sidebar-user-name">{User name}</div>
+      <div class="sidebar-user-role">{Role}</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══ MAIN AREA ═══ -->
+<div class="main-area">
+
+  <header class="topbar" role="banner">
+    <div class="breadcrumb" aria-label="Breadcrumb">
+      <span>{Parent}</span>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">{Current screen}</span>
+    </div>
+    <div class="search-wrap" role="search">
+      <svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M13 13l4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <input class="search-input" type="search" placeholder="Search {entities}…" aria-label="Search" />
+    </div>
+    <div class="topbar-right">
+      <div class="date-badge">{Date / context}</div>
+      <div class="top-avatar">{Initials}</div>
+    </div>
+  </header>
+
+  <main class="page-body" id="main-content">
+
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">{Screen title}</h1>
+        <p class="page-subtitle">{Scope · context · date}</p>
+      </div>
+      <div class="page-actions">
+        <button class="btn-ghost">{Secondary action}</button>
+        <button class="btn-primary">+ {Primary action}</button>
+      </div>
+    </div>
+
+    <!-- ── Drop screen content here ──
+         See references/layouts.md for paste-ready region skeletons:
+         - KPI card row    → .kpi-row + .kpi-card ×4
+         - 2-column grid   → .mid-grid (schedule table + chart panel)
+         - Records table   → .card > table.records-table
+         - List toolbar    → .toolbar (search + filter chips)
+         - Form sections   → .card > .card-section-title + .card-body > .field-grid
+         - Detail header   → .detail-header + .meta-grid + .lower-grid
+    ── -->
+
+  </main>
+</div>
+
+</body>
+</html>

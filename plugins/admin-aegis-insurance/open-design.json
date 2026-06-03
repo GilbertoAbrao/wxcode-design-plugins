@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-aegis-insurance",
-  "title": "Aegis Insurance Admin",
+  "title": "Aegis Admin",
   "version": "0.1.0",
-  "description": "Institutional light-mode operations dashboard for an insurance carrier — policy & claims lifecycle management. Left sidebar with line-of-business switcher, topbar with period filter, 4 KPI cards, claims pipeline board, policies table, renewals panel, and inline SVG claims trend chart.",
+  "description": "Institutional light-mode admin aesthetic: white cards on a cool #f6f8fb page, deep-navy sidebar (#0f2057) with teal accent (#14b8a6), navy-600 (#2563eb) as the primary interactive color, Inter type, and inline sparklines. Archetype = 240px grouped sidebar (entity switcher + labeled nav groups) + sticky topbar + 4 KPI cards + horizontal pipeline board (4 stages) + 2-column lower grid (records table + side panel) + full-width inline SVG trend chart, plus matching list, form, and detail screens.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,15 +19,13 @@
     "operations",
     "web",
     "admin",
-    "insurance",
-    "claims",
-    "policies",
     "light-mode",
     "institutional",
     "navy-teal",
-    "carrier-ops",
-    "renewals",
-    "loss-ratio"
+    "pipeline-board",
+    "sidebar-grouped",
+    "card-surface",
+    "enterprise"
   ],
   "compat": {
     "agentSkills": [
@@ -48,13 +46,29 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me an insurance carrier admin dashboard — line-of-business sidebar, KPI cards for active policies, open claims, renewals due and loss ratio, a claims pipeline board, policies table, renewals panel, and a claims trend chart.",
-        "zh-CN": "使用这个插件完成以下任务：Build me an insurance carrier admin dashboard — line-of-business sidebar, KPI cards for active policies, open claims, renewals due and loss ratio, a claims pipeline board, policies table, renewals panel, and a claims trend chart."
+        "en": "Apply this light institutional admin aesthetic to my domain — white cards on cool-grey page, deep-navy sidebar with teal accent, 4 KPI cards with sparklines, horizontal pipeline board, grouped nav sidebar, records table with side panel, and an inline SVG trend chart, plus list, form, and detail screens.",
+        "zh-CN": "将这个浅色机构风格应用到我的领域：白色卡片搭配冷灰底色、深海军蓝侧边栏与青绿强调色、4 个 KPI 卡片含迷你折线图、水平流程看板、分组导航侧边栏、记录表格与侧栏面板，以及内联 SVG 趋势图，并配套列表 / 表单 / 详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Aegis Insurance Admin"
+          "title": "Aegis Admin — Dashboard"
+        },
+        {
+          "path": "./assets/dashboard.html",
+          "title": "Aegis Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Aegis Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Aegis Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Aegis Admin — Detail"
         }
       ]
     },
@@ -72,7 +86,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {

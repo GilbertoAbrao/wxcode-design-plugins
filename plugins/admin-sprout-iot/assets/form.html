@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sprout Admin — New Record</title>
+<style>
+:root {
+  --c-bg-deep:    #0c1118;
+  --c-bg-surface: #131b26;
+  --c-bg-raised:  #1a2533;
+  --c-border:     #223040;
+  --c-text:       #dfe7ef;
+  --c-muted:      #8597a8;
+  --c-lime:       #84cc16;
+  --c-cyan:       #22d3ee;
+  --c-amber:      #f59e0b;
+  --c-red:        #ef4444;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--c-bg-deep);color:var(--c-text);font-size:14px;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+
+.shell{display:flex;height:100vh;overflow:hidden}
+
+/* RAIL */
+.rail{width:220px;flex-shrink:0;background:var(--c-bg-surface);border-right:1px solid var(--c-border);display:flex;flex-direction:column;padding:0 0 16px;overflow-y:auto}
+.rail-brand{display:flex;align-items:center;gap:10px;padding:18px 18px 14px;border-bottom:1px solid var(--c-border)}
+.rail-brand-icon{width:32px;height:32px;border-radius:8px;background:var(--c-lime);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rail-brand-icon svg{color:#0c1118}
+.rail-brand-name{font-size:15px;font-weight:700;letter-spacing:-0.01em;color:var(--c-text)}
+.rail-brand-sub{font-size:10px;color:var(--c-muted);letter-spacing:0.04em;text-transform:uppercase}
+.rail-section{padding:20px 12px 4px;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--c-muted)}
+.rail-item{display:flex;align-items:center;gap:10px;padding:9px 14px;margin:1px 6px;border-radius:6px;font-size:13px;font-weight:500;color:var(--c-muted);cursor:pointer;transition:background .15s,color .15s;position:relative}
+.rail-item:hover{background:var(--c-bg-raised);color:var(--c-text)}
+.rail-item.active{background:var(--c-bg-raised);color:var(--c-text)}
+.rail-item.active::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:0 3px 3px 0;background:var(--c-lime)}
+.rail-item svg{flex-shrink:0;color:inherit}
+.rail-badge{margin-left:auto;background:var(--c-red);color:#fff;font-size:10px;font-weight:700;border-radius:10px;padding:1px 6px;min-width:18px;text-align:center}
+.rail-footer{margin-top:auto;padding:14px 16px 0;border-top:1px solid var(--c-border);display:flex;align-items:center;gap:8px;font-size:12px;color:var(--c-muted)}
+.rail-status-dot{width:8px;height:8px;border-radius:50%;background:var(--c-lime);flex-shrink:0;box-shadow:0 0 6px var(--c-lime)}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:56px;flex-shrink:0;background:var(--c-bg-surface);border-bottom:1px solid var(--c-border);display:flex;align-items:center;gap:12px;padding:0 20px}
+.ctx-switcher{display:flex;align-items:center;gap:6px;background:var(--c-bg-raised);border:1px solid var(--c-border);border-radius:6px;padding:6px 12px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;color:var(--c-text)}
+.ctx-switcher svg{color:var(--c-muted)}
+.topbar-spacer{flex:1}
+.topbar-icon-btn{width:36px;height:36px;border-radius:6px;background:transparent;border:none;display:flex;align-items:center;justify-content:center;color:var(--c-muted);cursor:pointer;transition:background .15s,color .15s}
+.topbar-icon-btn:hover{background:var(--c-bg-raised);color:var(--c-text)}
+.topbar-avatar{width:34px;height:34px;border-radius:50%;background:var(--c-bg-raised);border:2px solid var(--c-border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--c-cyan);cursor:pointer;flex-shrink:0}
+.topbar-user{font-size:13px;font-weight:500;color:var(--c-text);white-space:nowrap}
+.topbar-role{font-size:11px;color:var(--c-muted)}
+.content{flex:1;overflow-y:auto;padding:20px}
+
+/* PAGE HEADER */
+.breadcrumb{font-size:12px;color:var(--c-muted);margin-bottom:12px}
+.breadcrumb a{color:var(--c-cyan)}
+.breadcrumb span{margin:0 6px;color:var(--c-border)}
+.page-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.page-title{font-size:18px;font-weight:700;color:var(--c-text)}
+.page-sub{font-size:12px;color:var(--c-muted);margin-top:2px}
+
+/* FORM */
+.form-wrap{max-width:760px}
+.card{background:var(--c-bg-surface);border:1px solid var(--c-border);border-radius:10px;margin-bottom:16px}
+.card-section-title{display:flex;align-items:center;gap:8px;padding:14px 18px;border-bottom:1px solid var(--c-border);font-size:12px;font-weight:600;color:var(--c-muted);text-transform:uppercase;letter-spacing:0.06em}
+.card-section-title svg{color:var(--c-cyan)}
+.card-body{padding:18px}
+
+/* FIELD GRID */
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field.full{grid-column:1/-1}
+.field-label{font-size:12px;font-weight:500;color:var(--c-text)}
+.req{color:var(--c-red)}
+.control{background:var(--c-bg-raised);border:1px solid var(--c-border);border-radius:6px;padding:8px 12px;font-family:inherit;font-size:13px;color:var(--c-text);outline:none;transition:border-color .15s}
+.control:focus{border-color:var(--c-cyan)}
+.control::placeholder{color:var(--c-muted)}
+select.control{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%238597a8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.helper{font-size:11px;color:var(--c-muted)}
+
+/* INVALID STATE */
+.field.invalid .control{border-color:var(--c-red);background:rgba(239,68,68,0.04)}
+.field.invalid .control:focus{border-color:var(--c-red)}
+.error-msg{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--c-red)}
+.error-msg svg{flex-shrink:0}
+
+/* FORM FOOTER */
+.form-footer{display:flex;align-items:center;justify-content:space-between;padding:16px 0 0}
+.form-hint{font-size:12px;color:var(--c-muted)}
+.form-hint .req{color:var(--c-red)}
+.footer-actions{display:flex;gap:10px}
+.btn-ghost{background:transparent;border:1px solid var(--c-border);border-radius:6px;padding:8px 16px;font-size:13px;color:var(--c-muted);cursor:pointer;transition:all .12s}
+.btn-ghost:hover{color:var(--c-text);border-color:var(--c-cyan)}
+.btn-primary{background:var(--c-lime);border:none;border-radius:6px;padding:8px 18px;font-size:13px;font-weight:600;color:#0c1118;cursor:pointer;transition:opacity .12s}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed}
+.btn-primary:not(:disabled):hover{opacity:.9}
+</style>
+</head>
+<body>
+<div class="shell">
+  <nav class="rail">
+    <div class="rail-brand">
+      <div class="rail-brand-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2C9 2 4 5.5 4 10.5C4 13.5 6.5 16 9 16C11.5 16 14 13.5 14 10.5C14 5.5 9 2 9 2Z" fill="currentColor"/><path d="M9 7V16" stroke="#0c1118" stroke-width="1.5" stroke-linecap="round"/><path d="M6 11L9 9M12 11L9 9" stroke="#0c1118" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <div><div class="rail-brand-name">Sprout Admin</div><div class="rail-brand-sub">Operations</div></div>
+    </div>
+    <div class="rail-section">Main</div>
+    <div class="rail-item"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="5.5" height="5.5" rx="1.5" fill="currentColor" opacity=".8"/><rect x="9.5" y="1" width="5.5" height="5.5" rx="1.5" fill="currentColor" opacity=".8"/><rect x="1" y="9.5" width="5.5" height="5.5" rx="1.5" fill="currentColor" opacity=".8"/><rect x="9.5" y="9.5" width="5.5" height="5.5" rx="1.5" fill="currentColor" opacity=".5"/></svg>Overview</div>
+    <div class="rail-item active"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 2V4M8 12V14M2 8H4M12 8H14M3.5 3.5L5 5M11 11L12.5 12.5M3.5 12.5L5 11M11 5L12.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Entities</div>
+    <div class="rail-item"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L9.2 5.5H13L10 7.7L11 11.2L8 9L5 11.2L6 7.7L3 5.5H6.8L8 2Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>Alerts<span class="rail-badge">7</span></div>
+    <div class="rail-item"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><polyline points="1,11 4,7 7,9 10,4 13,6 15,3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>Channels</div>
+    <div class="rail-item"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="5" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 5V4C5 2.9 5.9 2 7 2H9C10.1 2 11 2.9 11 4V5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="9" r="1.5" fill="currentColor" opacity=".6"/></svg>Groups</div>
+    <div class="rail-section">Manage</div>
+    <div class="rail-item"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/><path d="M8 1V3M8 13V15M1 8H3M13 8H15M2.6 2.6L4 4M12 12L13.4 13.4M2.6 13.4L4 12M12 4L13.4 2.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Settings</div>
+    <div class="rail-footer"><div class="rail-status-dot"></div>All systems nominal</div>
+  </nav>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="ctx-switcher">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M4 3V2C4 1.45 4.45 1 5 1H9C9.55 1 10 1.45 10 2V3" stroke="currentColor" stroke-width="1.3"/></svg>
+        Meridian Plant — GW-NORTH
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="topbar-spacer"></div>
+      <div class="topbar-avatar">KV</div>
+      <div><div class="topbar-user">Kaito Vasquez</div><div class="topbar-role">Fleet Engineer</div></div>
+    </header>
+
+    <main class="content">
+      <div class="breadcrumb">
+        <a href="#">Entities</a><span>›</span>New Record
+      </div>
+      <div class="page-hdr">
+        <div>
+          <div class="page-title">New Record</div>
+          <div class="page-sub">Add a new entity to the fleet</div>
+        </div>
+      </div>
+
+      <form class="form-wrap" novalidate>
+
+        <!-- IDENTITY -->
+        <div class="card">
+          <div class="card-section-title">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4V7L9 9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            Identity
+          </div>
+          <div class="card-body">
+            <div class="field-grid">
+
+              <div class="field invalid">
+                <label class="field-label" for="rec-name">Display Name <span class="req">*</span></label>
+                <input id="rec-name" class="control" type="text" value="REC-" aria-invalid="true">
+                <span class="error-msg">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1L11 10H1L6 1Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6 5V7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="6" cy="8.5" r=".5" fill="currentColor"/></svg>
+                  Name must be at least 5 characters
+                </span>
+              </div>
+
+              <div class="field">
+                <label class="field-label" for="rec-uid">Hardware UID <span class="req">*</span></label>
+                <input id="rec-uid" class="control" type="text" placeholder="uid:xx:xx:xx:xx" style="font-family:'Courier New',monospace">
+                <span class="helper">MAC-style UID from the device label (uid:xx:xx:xx:xx)</span>
+              </div>
+
+              <div class="field">
+                <label class="field-label" for="rec-category">Category <span class="req">*</span></label>
+                <select id="rec-category" class="control">
+                  <option value="">Select category…</option>
+                  <option>Sensor</option>
+                  <option>Actuator</option>
+                  <option>Gateway</option>
+                  <option>Meter</option>
+                  <option>Controller</option>
+                </select>
+                <span class="helper">Determines which channel templates are available</span>
+              </div>
+
+              <div class="field">
+                <label class="field-label" for="rec-group">Group <span class="req">*</span></label>
+                <select id="rec-group" class="control">
+                  <option value="">Select group…</option>
+                  <option>North Wing</option>
+                  <option>Cold Storage</option>
+                  <option>Production Bay</option>
+                  <option>Roof Level</option>
+                  <option>Utility Room</option>
+                  <option>Warehouse A</option>
+                </select>
+                <span class="helper">Physical location or logical grouping</span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- CONNECTIVITY -->
+        <div class="card">
+          <div class="card-section-title">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="7" cy="7" r="1.5" fill="currentColor" opacity=".7"/></svg>
+            Connectivity
+          </div>
+          <div class="card-body">
+            <div class="field-grid">
+
+              <div class="field">
+                <label class="field-label" for="rec-gateway">Gateway <span class="req">*</span></label>
+                <select id="rec-gateway" class="control">
+                  <option value="">Select gateway…</option>
+                  <option selected>GW-NORTH-01</option>
+                  <option>GW-DOCK-01</option>
+                  <option>GW-ROOF-04</option>
+                </select>
+                <span class="helper">Upstream gateway that relays this entity's data</span>
+              </div>
+
+              <div class="field invalid">
+                <label class="field-label" for="rec-interval">Polling Interval (s) <span class="req">*</span></label>
+                <input id="rec-interval" class="control" type="number" value="0" min="1" aria-invalid="true">
+                <span class="error-msg">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1L11 10H1L6 1Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6 5V7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="6" cy="8.5" r=".5" fill="currentColor"/></svg>
+                  Must be a whole number greater than 0
+                </span>
+              </div>
+
+              <div class="field">
+                <label class="field-label" for="rec-firmware">Firmware Channel <span class="req">*</span></label>
+                <select id="rec-firmware" class="control">
+                  <option value="">Select channel…</option>
+                  <option selected>stable</option>
+                  <option>beta</option>
+                  <option>lts</option>
+                </select>
+                <span class="helper">Over-the-air update channel for this entity</span>
+              </div>
+
+              <div class="field">
+                <label class="field-label" for="rec-timeout">Offline Timeout (min)</label>
+                <input id="rec-timeout" class="control" type="number" value="5" min="1">
+                <span class="helper">Minutes of silence before entity is marked Offline</span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- NOTES -->
+        <div class="card">
+          <div class="card-section-title">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="2" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M4 5H10M4 7.5H8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            Notes
+          </div>
+          <div class="card-body">
+            <div class="field full">
+              <label class="field-label" for="rec-notes">Notes</label>
+              <textarea id="rec-notes" class="control" rows="3" placeholder="Optional installation notes, location details…" style="resize:vertical"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <span class="form-hint">Fields marked <span class="req">*</span> are required.</span>
+          <div class="footer-actions">
+            <button type="button" class="btn-ghost">Cancel</button>
+            <button type="submit" class="btn-primary" disabled>Add Record</button>
+          </div>
+        </div>
+
+      </form>
+    </main>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Service Admin — Record Detail</title>
+<style>
+  :root {
+    --amber:        #f59e0b;
+    --amber-light:  #fef3c7;
+    --amber-mid:    #fcd34d;
+    --tomato:       #ef4444;
+    --tomato-light: #fee2e2;
+    --green:        #22c55e;
+    --green-light:  #dcfce7;
+    --surface:      #faf8f5;
+    --card:         #ffffff;
+    --border:       #ece6df;
+    --sidebar-bg:   #1c1917;
+    --sidebar-text: #d6d3d1;
+    --sidebar-act:  #f59e0b;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --shadow:       0 1px 4px rgba(0,0,0,.07), 0 2px 8px rgba(0,0,0,.04);
+    --radius:       10px;
+    --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--surface); color: var(--text-primary); display: flex; min-height: 100vh; font-size: 14px; line-height: 1.5; }
+
+  .sidebar { width: 240px; min-height: 100vh; background: var(--sidebar-bg); display: flex; flex-direction: column; flex-shrink: 0; position: sticky; top: 0; }
+  .sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 20px 18px 16px; border-bottom: 1px solid rgba(255,255,255,.06); }
+  .brand-mark { width: 34px; height: 34px; background: var(--amber); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .brand-mark svg { color: #1c1917; }
+  .brand-name { font-size: 13px; font-weight: 700; color: #fff; line-height: 1.2; }
+  .brand-sub { font-size: 10px; color: var(--sidebar-text); letter-spacing: .05em; text-transform: uppercase; }
+  .entity-switcher { margin: 12px 12px 8px; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; padding: 8px 10px; display: flex; align-items: center; gap: 8px; cursor: pointer; background: rgba(255,255,255,.04); }
+  .entity-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; flex-shrink: 0; }
+  .entity-label { font-size: 12px; color: #e7e5e4; flex: 1; }
+  .entity-caret svg { width: 12px; height: 12px; color: var(--sidebar-text); }
+  .nav-section { padding: 16px 0 4px; }
+  .nav-label { font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(214,211,209,.45); padding: 0 18px; margin-bottom: 4px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 18px; font-size: 13px; color: var(--sidebar-text); cursor: pointer; position: relative; transition: background .15s; }
+  .nav-item:hover { background: rgba(255,255,255,.05); }
+  .nav-item.active { color: #fff; background: rgba(245,158,11,.12); }
+  .nav-item.active::before { content: ""; position: absolute; left: 0; top: 4px; bottom: 4px; width: 3px; background: var(--sidebar-act); border-radius: 0 2px 2px 0; }
+  .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; opacity: .7; }
+  .nav-item.active svg { opacity: 1; color: var(--sidebar-act); }
+  .nav-badge { margin-left: auto; background: var(--tomato); color: #fff; font-size: 10px; font-weight: 700; border-radius: 10px; padding: 1px 6px; }
+  .sidebar-footer { margin-top: auto; border-top: 1px solid rgba(255,255,255,.06); padding: 14px 18px; display: flex; align-items: center; gap: 10px; }
+  .staff-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--amber); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #1c1917; flex-shrink: 0; }
+  .staff-name { font-size: 12px; color: #e7e5e4; flex: 1; }
+  .staff-role { font-size: 10px; color: var(--sidebar-text); }
+  .end-link { font-size: 10px; color: var(--tomato); cursor: pointer; margin-left: auto; }
+
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .topbar { height: 60px; background: var(--card); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 16px; padding: 0 24px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-size: 15px; font-weight: 700; flex-shrink: 0; }
+  .topbar-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+  .icon-btn { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; color: var(--text-secondary); }
+  .icon-btn:hover { background: var(--surface); }
+  .notif-dot { position: absolute; top: 5px; right: 5px; width: 7px; height: 7px; background: var(--tomato); border-radius: 50%; border: 1.5px solid var(--card); }
+  .mgr-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--amber); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #1c1917; cursor: pointer; }
+
+  .content { padding: 24px; flex: 1; display: flex; flex-direction: column; gap: 16px; }
+
+  .breadcrumb { font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
+  .breadcrumb a { color: var(--amber); text-decoration: none; font-weight: 500; }
+  .breadcrumb a:hover { text-decoration: underline; }
+
+  .btn { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: var(--font); border: none; }
+  .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); }
+  .btn-primary { background: var(--amber); color: #1c1917; }
+
+  /* ── DETAIL HEADER ───────────────────────────────────────────── */
+  .detail-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .detail-id-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .detail-id { font-size: 22px; font-weight: 800; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+  .detail-name { font-size: 14px; color: var(--text-secondary); }
+  .pill { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+  .pill.paid { background: var(--green-light); color: #15803d; }
+  .pill.pending { background: var(--amber-light); color: #92400e; }
+  .pill.cancelled { background: var(--tomato-light); color: #b91c1c; }
+  .detail-actions { display: flex; gap: 10px; flex-shrink: 0; }
+
+  /* ── CARD ────────────────────────────────────────────────────── */
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .card-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+  .card-title { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 7px; }
+  .card-title svg { color: var(--amber); }
+  .card-link { font-size: 12px; color: var(--amber); font-weight: 600; cursor: pointer; text-decoration: none; }
+
+  /* ── META GRID ───────────────────────────────────────────────── */
+  .meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); padding: 18px; gap: 0; }
+  .meta-cell { padding: 12px 14px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .meta-cell:nth-child(3n) { border-right: none; }
+  .meta-cell:nth-last-child(-n+3) { border-bottom: none; }
+  .meta-label { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 4px; }
+  .meta-value { font-size: 14px; font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+  .meta-value.amber { color: var(--amber); }
+  .meta-sub { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+
+  /* ── TWO-COL GRID ────────────────────────────────────────────── */
+  .two-col { display: grid; grid-template-columns: 7fr 5fr; gap: 16px; align-items: start; }
+
+  /* ── LINE ITEMS TABLE ────────────────────────────────────────── */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { font-size: 10px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--text-secondary); padding: 10px 16px; text-align: left; border-bottom: 1px solid var(--border); background: var(--card); white-space: nowrap; }
+  thead th.num { text-align: right; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .12s; }
+  tbody tr:hover { background: var(--surface); }
+  tbody tr:last-child { border-bottom: none; }
+  td { padding: 10px 16px; color: var(--text-primary); font-variant-numeric: tabular-nums; vertical-align: middle; }
+  td.num { text-align: right; }
+  .item-name { font-weight: 600; }
+  .item-cat { font-size: 11px; color: var(--text-secondary); }
+  .total-row td { font-weight: 700; border-top: 2px solid var(--border); }
+
+  /* ── ACTIVITY FEED ───────────────────────────────────────────── */
+  .activity-list { padding: 6px 0; }
+  .activity-row { display: flex; align-items: flex-start; gap: 12px; padding: 10px 18px; border-bottom: 1px solid var(--border); }
+  .activity-row:last-child { border-bottom: none; }
+  .activity-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .activity-dot.green { background: var(--green); }
+  .activity-dot.amber { background: var(--amber); }
+  .activity-dot.slate { background: #94a3b8; }
+  .activity-body { flex: 1; min-width: 0; }
+  .activity-desc { font-size: 13px; color: var(--text-primary); line-height: 1.4; }
+  .activity-time { font-size: 11px; color: var(--text-secondary); margin-top: 2px; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-mark">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3" y="3" width="5" height="5" rx="1" fill="currentColor"/>
+        <rect x="10" y="3" width="5" height="5" rx="1" fill="currentColor" opacity=".5"/>
+        <rect x="3" y="10" width="5" height="5" rx="1" fill="currentColor" opacity=".5"/>
+        <rect x="10" y="10" width="5" height="5" rx="1" fill="currentColor" opacity=".35"/>
+      </svg>
+    </div>
+    <div>
+      <div class="brand-name">Soleil Group</div>
+      <div class="brand-sub">Back Office</div>
+    </div>
+  </div>
+  <div class="entity-switcher">
+    <div class="entity-dot"></div>
+    <span class="entity-label">Soleil Centrale</span>
+    <div class="entity-caret">
+      <svg viewBox="0 0 12 12" fill="none"><path d="M3 4.5l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+  <nav>
+    <div class="nav-section">
+      <div class="nav-label">Overview</div>
+      <div class="nav-item">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".8"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".4"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".4"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".4"/></svg>
+        Dashboard
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v3.5l2.5 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Live Queue
+        <span class="nav-badge">7</span>
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Operations</div>
+      <div class="nav-item active">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="5" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 5V3.5a3 3 0 016 0V5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Slots
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M8 1.5L10 6h4.5l-3.6 2.6 1.4 4.4L8 10.4l-4.3 2.6 1.4-4.4L1.5 6H6L8 1.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        Bookings
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Reports</div>
+      <div class="nav-item">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M2 13l4-5 3 3 3-5 2 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Analytics
+      </div>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="staff-avatar">AL</div>
+    <div>
+      <div class="staff-name">Adriana Lopes</div>
+      <div class="staff-role">Shift Lead</div>
+    </div>
+    <div class="end-link">End Shift</div>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-title">Record #2090</div>
+    <div class="topbar-right">
+      <div class="icon-btn">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2a5 5 0 015 5v3l1.5 2.5H2.5L4 10V7a5 5 0 015-5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M7 14.5a2 2 0 004 0" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <div class="notif-dot"></div>
+      </div>
+      <div class="mgr-avatar">AL</div>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <div class="breadcrumb">
+      <a href="#">Records</a>
+      <span>›</span>
+      <span>#2090</span>
+    </div>
+
+    <div class="detail-header">
+      <div>
+        <div class="detail-id-row">
+          <span class="detail-id">#2090</span>
+          <span class="pill paid">Paid</span>
+        </div>
+        <div class="detail-name">Slot B-06 · Zone B · Level 2 · 3 Jun 2026</div>
+      </div>
+      <div class="detail-actions">
+        <button class="btn btn-ghost">Print Receipt</button>
+        <button class="btn btn-primary">Edit Record</button>
+      </div>
+    </div>
+
+    <!-- Meta grid -->
+    <div class="card">
+      <div class="meta-grid">
+        <div class="meta-cell">
+          <div class="meta-label">Location</div>
+          <div class="meta-value">Slot B-06</div>
+          <div class="meta-sub">Zone B · Level 2</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Guest</div>
+          <div class="meta-value">Sofia Reinholt</div>
+          <div class="meta-sub">Party of 2</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Total</div>
+          <div class="meta-value amber">€ 107.00</div>
+          <div class="meta-sub">Paid · 8:52 PM</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Period</div>
+          <div class="meta-value">Evening</div>
+          <div class="meta-sub">5:00 PM – 11:00 PM</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Staff</div>
+          <div class="meta-value">Adriana Lopes</div>
+          <div class="meta-sub">Shift Lead</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Created</div>
+          <div class="meta-value">8:34 PM</div>
+          <div class="meta-sub">3 Jun 2026</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two-column layout -->
+    <div class="two-col">
+
+      <!-- Line items table -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h11"/></svg>
+            Line Items
+          </div>
+          <span style="font-size:12px;color:var(--text-secondary)">3 items</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Category</th>
+                <th class="num">Qty</th>
+                <th class="num">Unit price</th>
+                <th class="num">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div class="item-name">Deluxe Experience Set</div><div class="item-cat">Premium tier</div></td>
+                <td>Package</td>
+                <td class="num">2</td>
+                <td class="num">€ 42.00</td>
+                <td class="num">€ 84.00</td>
+              </tr>
+              <tr>
+                <td><div class="item-name">Add-on Bundle</div><div class="item-cat">Extras</div></td>
+                <td>Add-on</td>
+                <td class="num">1</td>
+                <td class="num">€ 18.00</td>
+                <td class="num">€ 18.00</td>
+              </tr>
+              <tr>
+                <td><div class="item-name">Beverage</div><div class="item-cat">Beverage</div></td>
+                <td>Drink</td>
+                <td class="num">1</td>
+                <td class="num">€ 5.00</td>
+                <td class="num">€ 5.00</td>
+              </tr>
+              <tr class="total-row">
+                <td colspan="4" style="font-size:13px;color:var(--text-secondary)">Total</td>
+                <td class="num" style="color:var(--amber)">€ 107.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Activity feed -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Activity Log
+          </div>
+        </div>
+        <div class="activity-list">
+          <div class="activity-row">
+            <div class="activity-dot green"></div>
+            <div class="activity-body">
+              <div class="activity-desc">Payment confirmed · € 107.00</div>
+              <div class="activity-time">8:52 PM · Adriana Lopes</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-dot green"></div>
+            <div class="activity-body">
+              <div class="activity-desc">Service completed — guest departed</div>
+              <div class="activity-time">8:49 PM · system</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-dot amber"></div>
+            <div class="activity-body">
+              <div class="activity-desc">Add-on Bundle added to record</div>
+              <div class="activity-time">8:41 PM · Adriana Lopes</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-dot slate"></div>
+            <div class="activity-body">
+              <div class="activity-desc">Record accepted and moved to In Progress</div>
+              <div class="activity-time">8:36 PM · Adriana Lopes</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-dot slate"></div>
+            <div class="activity-body">
+              <div class="activity-desc">Record created — Slot B-06 assigned</div>
+              <div class="activity-time">8:34 PM · system</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>

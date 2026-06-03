@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Relay Admin — New Record</title>
+<style>
+:root {
+  --accent:          #7c3aed;
+  --accent-light:    #8b5cf6;
+  --accent-tint:     #ede9fe;
+  --status-green:    #16a34a;
+  --status-green-bg: #dcfce7;
+  --status-amber:    #d97706;
+  --status-amber-bg: #fef3c7;
+  --status-red:      #dc2626;
+  --status-red-bg:   #fee2e2;
+  --status-slate:    #475569;
+  --status-slate-bg: #f1f5f9;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 13px; color: #334155; background: #f1f5f9;
+  height: 100vh; display: flex; overflow: hidden;
+}
+
+/* ── Sidebar ─────────────────────────────────── */
+.sidebar { width: 240px; min-width: 240px; background: #fff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; overflow-y: auto; }
+.sidebar-logo { display: flex; align-items: center; gap: 10px; padding: 18px 20px 16px; border-bottom: 1px solid #e2e8f0; }
+.sidebar-logo-text { font-size: 15px; font-weight: 700; color: #1e293b; letter-spacing: -0.01em; }
+.sidebar-section { padding: 16px 12px 4px; }
+.sidebar-section-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: #94a3b8; padding: 0 8px 6px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 7px; cursor: pointer; color: #475569; font-size: 13px; font-weight: 500; margin-bottom: 1px; position: relative; text-decoration: none; }
+.nav-item:hover { background: #f8fafc; color: #1e293b; }
+.nav-item.active { background: var(--accent-tint); color: var(--accent); }
+.nav-item.active::before { content: ""; position: absolute; left: -12px; top: 4px; bottom: 4px; width: 3px; border-radius: 0 2px 2px 0; background: var(--accent); }
+.nav-item svg { flex-shrink: 0; opacity: 0.75; }
+.nav-item.active svg { opacity: 1; color: var(--accent); }
+.nav-badge { margin-left: auto; background: var(--accent); color: #fff; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; min-width: 20px; text-align: center; }
+.sidebar-footer { margin-top: auto; padding: 12px 16px; border-top: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px; }
+.footer-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--accent-tint); color: var(--accent); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.footer-name { font-size: 13px; font-weight: 600; color: #1e293b; line-height: 1.2; }
+.footer-role { font-size: 11px; color: #94a3b8; }
+.presence-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--status-green); margin-left: auto; flex-shrink: 0; border: 1.5px solid #fff; }
+
+/* ── Main shell ──────────────────────────────── */
+.main-shell { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.topbar { height: 56px; background: #fff; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; padding: 0 24px; gap: 16px; flex-shrink: 0; }
+.topbar-title { font-size: 15px; font-weight: 700; color: #1e293b; }
+.topbar-breadcrumb { font-size: 12px; color: #94a3b8; margin-top: 1px; }
+.topbar-title-block { display: flex; flex-direction: column; }
+.topbar-actions { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+.icon-btn { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #475569; background: transparent; border: none; position: relative; }
+.icon-btn:hover { background: #f1f5f9; }
+.notif-dot { position: absolute; top: 5px; right: 5px; width: 7px; height: 7px; background: var(--status-amber); border-radius: 50%; border: 1.5px solid #fff; }
+.topbar-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-tint); color: var(--accent); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid var(--accent-light); }
+
+.content { flex: 1; overflow-y: auto; padding: 24px; }
+
+/* ── Form shell ──────────────────────────────── */
+.form-wrap { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+
+.breadcrumb { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #64748b; }
+.breadcrumb a { color: #475569; text-decoration: none; }
+.breadcrumb a:hover { color: var(--accent-light); }
+.breadcrumb svg { color: #cbd5e1; }
+.page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.page-title { font-size: 18px; font-weight: 700; color: #1e293b; }
+.page-subtitle { font-size: 13px; color: #94a3b8; margin-top: 2px; }
+
+/* ── Form cards ──────────────────────────────── */
+.card { background: #fff; border: 1px solid #e9ecf3; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.04); }
+.card-section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; padding: 13px 20px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 7px; }
+.card-section-title svg { color: var(--accent); }
+.card-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+
+.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field.full { grid-column: 1 / -1; }
+
+.field-label { font-size: 12.5px; font-weight: 600; color: #334155; display: flex; align-items: center; gap: 4px; }
+.req { color: var(--accent); font-weight: 700; }
+
+.control {
+  background: #fff; border: 1px solid #e2e8f0; border-radius: 7px;
+  padding: 9px 12px; color: #1e293b; font-size: 13px; font-family: inherit;
+  outline: none; transition: border-color .15s, box-shadow .15s; width: 100%;
+}
+.control::placeholder { color: #94a3b8; }
+.control:focus { border-color: var(--accent-light); box-shadow: 0 0 0 3px var(--accent-tint); }
+textarea.control { resize: vertical; min-height: 80px; line-height: 1.5; }
+select.control {
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat; background-position: right 12px center;
+  padding-right: 34px; cursor: pointer;
+}
+
+/* Inline validation states */
+.field.invalid .control { border-color: var(--status-red); }
+.field.invalid .control:focus { box-shadow: 0 0 0 3px var(--status-red-bg); }
+
+.helper { font-size: 11.5px; color: #94a3b8; line-height: 1.4; }
+.error-msg { font-size: 11.5px; color: var(--status-red); display: flex; align-items: center; gap: 5px; line-height: 1.4; }
+.error-msg svg { flex-shrink: 0; }
+
+/* Priority radio group */
+.priority-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.prio-opt { position: relative; flex: 1; min-width: 110px; }
+.prio-opt input { position: absolute; opacity: 0; pointer-events: none; }
+.prio-opt label { display: flex; align-items: center; gap: 8px; padding: 9px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 7px; cursor: pointer; font-size: 13px; font-weight: 500; color: #475569; transition: border-color .15s, color .15s; }
+.prio-opt label .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.prio-opt:nth-child(1) label .dot { background: var(--status-red); }
+.prio-opt:nth-child(2) label .dot { background: var(--status-amber); }
+.prio-opt:nth-child(3) label .dot { background: var(--status-slate); }
+.prio-opt input:checked + label { border-color: var(--accent-light); color: var(--accent); background: var(--accent-tint); }
+
+/* Form footer */
+.form-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 4px; }
+.form-hint { font-size: 12px; color: #94a3b8; }
+.footer-actions { display: flex; gap: 8px; }
+.btn-ghost { padding: 9px 18px; background: transparent; border: 1px solid #e2e8f0; border-radius: 7px; color: #475569; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; transition: border-color .15s, color .15s; }
+.btn-ghost:hover { border-color: #cbd5e1; color: #1e293b; }
+.btn-primary { padding: 9px 18px; background: var(--accent); border: 1px solid var(--accent); border-radius: 7px; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
+.btn-primary:hover { background: var(--accent-light); }
+.btn-primary:disabled { background: #e2e8f0; border-color: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="7" fill="var(--accent)"/><path d="M7 10.5C7 9.12 8.12 8 9.5 8h9C19.88 8 21 9.12 21 10.5v5c0 1.38-1.12 2.5-2.5 2.5H15l-3 3v-3H9.5C8.12 16 7 14.88 7 13.5v-3z" fill="white"/><circle cx="10.5" cy="12" r="1" fill="var(--accent)"/><circle cx="14" cy="12" r="1" fill="var(--accent)"/><circle cx="17.5" cy="12" r="1" fill="var(--accent)"/></svg>
+    <span class="sidebar-logo-text">Relay Support</span>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Inbox</div>
+    <a class="nav-item active" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4.5C2 3.67 2.67 3 3.5 3h9c.83 0 1.5.67 1.5 1.5v7c0 .83-.67 1.5-1.5 1.5h-9C2.67 12 2 11.33 2 10.5v-7z" stroke="currentColor" stroke-width="1.25"/><path d="M2 5.5l6 4 6-4" stroke="currentColor" stroke-width="1.25"/></svg>
+      All Open
+      <span class="nav-badge">47</span>
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="2.5" stroke="currentColor" stroke-width="1.25"/><path d="M3 13c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+      My Tickets
+      <span class="nav-badge">8</span>
+    </a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Settings</div>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.25"/><path d="M5 6.5h6M5 9.5h4" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+      Queues
+    </a>
+  </div>
+  <div class="sidebar-footer">
+    <div class="footer-avatar">SL</div>
+    <div><div class="footer-name">Sara Lindqvist</div><div class="footer-role">Support Lead</div></div>
+    <div class="presence-dot"></div>
+  </div>
+</aside>
+
+<!-- MAIN SHELL -->
+<div class="main-shell">
+  <header class="topbar">
+    <div class="topbar-title-block">
+      <span class="topbar-title">New Record</span>
+      <span class="topbar-breadcrumb">Support / All Records / New</span>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2.25C6.38 2.25 4.25 4.38 4.25 7v.5L3 10h12l-1.25-2.5V7c0-2.62-2.13-4.75-4.75-4.75z" stroke="currentColor" stroke-width="1.3"/><path d="M7.5 13.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <span class="notif-dot"></span>
+      </button>
+      <div class="topbar-avatar">SL</div>
+    </div>
+  </header>
+
+  <div class="content">
+    <form class="form-wrap" novalidate>
+
+      <div class="breadcrumb">
+        <a href="#">All Records</a>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>New Record</span>
+      </div>
+
+      <div class="page-header">
+        <div>
+          <div class="page-title">New Record</div>
+          <div class="page-subtitle">Open a new item and route it to an assignee</div>
+        </div>
+      </div>
+
+      <!-- Section: Details -->
+      <div class="card">
+        <div class="card-section-title">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="1.5" width="10" height="11" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 4.5h6M4 7h6M4 9.5h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Details
+        </div>
+        <div class="card-body">
+          <div class="field-grid">
+
+            <!-- Subject — required, valid -->
+            <div class="field full">
+              <label class="field-label" for="subject">Subject <span class="req">*</span></label>
+              <input id="subject" class="control" type="text" value="SSO login failing for enterprise org" autocomplete="off">
+              <span class="helper">A concise one-line description visible in the queue.</span>
+            </div>
+
+            <!-- Requester email — required, INVALID (shows inline error) -->
+            <div class="field invalid">
+              <label class="field-label" for="email">Requester email <span class="req">*</span></label>
+              <input id="email" class="control" type="email" value="ana.pereira@" aria-invalid="true" autocomplete="off">
+              <span class="error-msg">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M6.5 4v3M6.5 8.5v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                Enter a valid email address (e.g. name@company.com).
+              </span>
+            </div>
+
+            <!-- Category — required select -->
+            <div class="field">
+              <label class="field-label" for="category">Category <span class="req">*</span></label>
+              <select id="category" class="control">
+                <option value="">Select a category…</option>
+                <option value="auth" selected>Authentication</option>
+                <option value="billing">Billing &amp; Payments</option>
+                <option value="integrations">Integrations</option>
+                <option value="reports">Reports</option>
+                <option value="api">API</option>
+                <option value="onboarding">Onboarding</option>
+                <option value="account">Account</option>
+                <option value="other">Other</option>
+              </select>
+              <span class="helper">Used to route the item to the correct queue.</span>
+            </div>
+
+            <!-- Priority — required radio group -->
+            <div class="field full">
+              <label class="field-label">Priority <span class="req">*</span></label>
+              <div class="priority-row">
+                <div class="prio-opt">
+                  <input type="radio" name="priority" id="p-high" value="high">
+                  <label for="p-high"><span class="dot"></span>P1 — Critical</label>
+                </div>
+                <div class="prio-opt">
+                  <input type="radio" name="priority" id="p-med" value="medium" checked>
+                  <label for="p-med"><span class="dot"></span>P2 — High</label>
+                </div>
+                <div class="prio-opt">
+                  <input type="radio" name="priority" id="p-low" value="low">
+                  <label for="p-low"><span class="dot"></span>P3 — Normal</label>
+                </div>
+              </div>
+              <span class="helper">P1 triggers a 4-hour SLA breach window; P2 triggers 8h; P3 triggers 24h.</span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Description & Routing -->
+      <div class="card">
+        <div class="card-section-title">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="5.5" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M2.5 12c0-2.49 2.01-4.5 4.5-4.5s4.5 2.01 4.5 4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Description &amp; Routing
+        </div>
+        <div class="card-body">
+          <div class="field-grid">
+
+            <!-- Description — optional -->
+            <div class="field full">
+              <label class="field-label" for="desc">Description</label>
+              <textarea id="desc" class="control" placeholder="Describe the issue in detail…">Enterprise org "Halcyon Labs" reports that SSO via SAML is broken after their IdP certificate was rotated yesterday. All users receive a 401. Urgent — blocking 140 users.</textarea>
+              <span class="helper">Optional. Visible to the assignee and in the detail view.</span>
+            </div>
+
+            <!-- Assignee — optional select -->
+            <div class="field">
+              <label class="field-label" for="assignee">Assignee</label>
+              <select id="assignee" class="control">
+                <option value="">Unassigned</option>
+                <option value="sl">Sara Lindqvist</option>
+                <option value="jk" selected>Jin Kim</option>
+                <option value="rm">Rita Moura</option>
+                <option value="tc">Tariq Chen</option>
+                <option value="pv">Priya Venkat</option>
+              </select>
+              <span class="helper">Leave blank to route via queue rules.</span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="form-footer">
+        <span class="form-hint">Fields marked <span class="req">*</span> are required.</span>
+        <div class="footer-actions">
+          <button type="button" class="btn-ghost">Cancel</button>
+          <button type="submit" class="btn-primary" disabled>Create Record</button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+</body>
+</html>

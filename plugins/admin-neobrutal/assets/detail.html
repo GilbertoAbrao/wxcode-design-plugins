@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio OS — Project Detail</title>
+<style>
+  :root {
+    --ink:   #000000;
+    --coral: #F5A86E;
+    --lime:  #8FD14F;
+    --cream: #FFF5E6;
+    --paper: #ffffff;
+    --lav:   #B8A4FF;
+    --yell:  #FDE74C;
+    --cyan:  #90E0EF;
+    --font-mono: ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --font-ui:   system-ui,-apple-system,sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-ui); background: var(--paper); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
+  .shell { display: flex; flex: 1; min-height: 0; }
+
+  /* SIDEBAR */
+  .sidebar { width: 220px; min-width: 220px; border-right: 3px solid var(--ink); display: flex; flex-direction: column; }
+  .sidebar-brand { background: var(--coral); border-bottom: 3px solid var(--ink); padding: 18px 16px; }
+  .brand-eyebrow { font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7; }
+  .brand-name { font-family: var(--font-mono); font-size: 18px; font-weight: 700; letter-spacing: -0.02em; margin-top: 2px; }
+  .sidebar-nav { list-style: none; padding: 12px 0; flex: 1; }
+  .sidebar-nav li a { display: flex; align-items: center; gap: 10px; padding: 10px 16px; font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; color: var(--ink); border-left: 3px solid transparent; }
+  .sidebar-nav li a .glyph { font-size: 14px; width: 16px; text-align: center; flex-shrink: 0; }
+  .sidebar-nav li.active a { background: var(--lime); border-left-color: var(--ink); }
+  .sidebar-nav li a:hover { background: var(--cream); }
+  .sidebar-footer { border-top: 2px solid var(--ink); padding: 12px 16px; }
+  .user-block { display: flex; align-items: center; gap: 10px; }
+  .avatar-sm { width: 32px; height: 32px; background: var(--coral); border: 2px solid var(--ink); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .user-name { font-family: var(--font-mono); font-size: 12px; font-weight: 700; }
+  .user-role { font-family: var(--font-mono); font-size: 10px; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* MAIN */
+  .main-col { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar { border-bottom: 3px solid var(--ink); padding: 12px 24px; display: flex; align-items: center; gap: 12px; }
+  .topbar-title { font-family: var(--font-mono); font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; flex-shrink: 0; }
+  .topbar-actions { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+  .topbar-avatar { width: 36px; height: 36px; background: var(--coral); border: 2px solid var(--ink); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 13px; font-weight: 700; }
+
+  .content { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+
+  /* BREADCRUMB */
+  .breadcrumb { font-family: var(--font-mono); font-size: 11px; opacity: 0.55; }
+  .breadcrumb a { color: var(--ink); text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+
+  /* DETAIL HEADER */
+  .detail-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .detail-title-block { display: flex; flex-direction: column; gap: 6px; }
+  .detail-id-row { display: flex; align-items: center; gap: 10px; }
+  .detail-id { font-family: var(--font-mono); font-size: 12px; font-weight: 700; opacity: 0.55; }
+  .status-pill { display: inline-block; padding: 3px 10px; border: 2px solid var(--ink); font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+  .pill-active { background: var(--lime); }
+  .pill-review { background: var(--coral); }
+  .pill-hold   { background: var(--yell); }
+  .pill-done   { background: #D0D0D0; }
+  .pill-draft  { background: var(--lav); }
+  .detail-name { font-family: var(--font-mono); font-size: 22px; font-weight: 700; line-height: 1.2; }
+  .detail-sub  { font-family: var(--font-ui); font-size: 13px; opacity: 0.65; }
+  .detail-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .btn-ghost { background: var(--paper); border: 2px solid var(--ink); font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 8px 16px; cursor: pointer; color: var(--ink); }
+  .btn-ghost:hover { background: var(--cream); }
+  .btn-primary { background: var(--lime); border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 8px 16px; cursor: pointer; color: var(--ink); }
+  .btn-primary:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 var(--ink); }
+
+  /* META GRID */
+  .meta-panel { border: 3px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+  .meta-panel-header { background: var(--ink); color: var(--paper); padding: 10px 16px; }
+  .meta-panel-title { font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+  .meta-grid { display: grid; grid-template-columns: repeat(3,1fr); padding: 16px; gap: 16px; }
+  .meta-cell { display: flex; flex-direction: column; gap: 4px; }
+  .meta-label { font-family: var(--font-mono); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.5; }
+  .meta-value { font-family: var(--font-mono); font-size: 14px; font-weight: 700; }
+  .meta-sub   { font-family: var(--font-ui); font-size: 11px; opacity: 0.55; }
+
+  /* TWO-COL LOWER */
+  .two-col { display: grid; grid-template-columns: 1fr 340px; gap: 16px; align-items: start; }
+
+  /* PANEL */
+  .panel { border: 3px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+  .panel-header { background: var(--ink); color: var(--paper); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; }
+  .panel-title { font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+  .panel-meta  { font-family: var(--font-mono); font-size: 10px; opacity: 0.6; }
+
+  /* MINI TABLE */
+  .mini-table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 12px; }
+  .mini-table thead th { padding: 8px 14px; text-align: left; font-weight: 700; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; background: var(--cream); border-bottom: 2px solid var(--ink); white-space: nowrap; }
+  .mini-table tbody tr:nth-child(odd)  { background: var(--cream); }
+  .mini-table tbody tr:nth-child(even) { background: var(--paper); }
+  .mini-table tbody td { padding: 9px 14px; border-bottom: 1px solid var(--ink); vertical-align: middle; }
+  .mini-table tbody tr:last-child td { border-bottom: none; }
+  .inv-status { display: inline-block; padding: 1px 7px; border: 2px solid var(--ink); font-family: var(--font-mono); font-size: 10px; font-weight: 700; text-transform: uppercase; }
+  .inv-paid    { background: var(--lime); }
+  .inv-pending { background: var(--yell); }
+  .inv-overdue { background: var(--coral); }
+
+  /* ACTIVITY */
+  .activity-feed { display: flex; flex-direction: column; }
+  .activity-card { background: var(--cream); border: 2px solid var(--ink); border-top: none; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+  .activity-card:first-child { border-top: 2px solid var(--ink); }
+  .activity-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .activity-icon { width: 22px; height: 22px; flex-shrink: 0; border: 2px solid var(--ink); display: flex; align-items: center; justify-content: center; }
+  .activity-icon.c1 { background: var(--lime); }
+  .activity-icon.c2 { background: var(--coral); }
+  .activity-icon.c3 { background: var(--yell); }
+  .activity-icon.c4 { background: var(--lav); }
+  .activity-body { flex: 1; }
+  .activity-event { font-family: var(--font-mono); font-size: 11px; font-weight: 700; line-height: 1.4; }
+  .activity-sub   { font-family: var(--font-ui); font-size: 11px; opacity: 0.65; margin-top: 2px; }
+  .activity-time  { font-family: var(--font-mono); font-size: 10px; opacity: 0.55; white-space: nowrap; flex-shrink: 0; padding-top: 2px; }
+
+  /* FOOTER */
+  .footer { border-top: 3px solid var(--ink); background: var(--ink); color: var(--paper); padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .footer-meta { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; opacity: 0.7; display: flex; gap: 20px; }
+  .footer-link { background: var(--coral); color: var(--ink); border: 2px solid var(--paper); font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 10px; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-eyebrow">Atelier Mosaic</div>
+      <div class="brand-name">Studio OS</div>
+    </div>
+    <ul class="sidebar-nav">
+      <li><a href="#"><span class="glyph">&gt;</span>Dashboard</a></li>
+      <li class="active"><a href="#"><span class="glyph">#</span>Projects</a></li>
+      <li><a href="#"><span class="glyph">*</span>Clients</a></li>
+      <li><a href="#"><span class="glyph">+</span>Invoices</a></li>
+      <li><a href="#"><span class="glyph">%</span>Time Logs</a></li>
+      <li><a href="#"><span class="glyph">@</span>Settings</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <div class="user-block">
+        <div class="avatar-sm">LC</div>
+        <div>
+          <div class="user-name">Lena Chai</div>
+          <div class="user-role">Studio Lead</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-col">
+    <header class="topbar">
+      <span class="topbar-title">Project Detail</span>
+      <div class="topbar-actions">
+        <div class="topbar-avatar">LC</div>
+      </div>
+    </header>
+
+    <main class="content">
+      <div class="breadcrumb"><a href="#">Projects</a> › Brand Identity Relaunch</div>
+
+      <!-- DETAIL HEADER -->
+      <div class="detail-header">
+        <div class="detail-title-block">
+          <div class="detail-id-row">
+            <span class="detail-id">PRJ-0022</span>
+            <span class="status-pill pill-active">Active</span>
+          </div>
+          <div class="detail-name">Brand Identity Relaunch</div>
+          <div class="detail-sub">Vanta Supply Co. · Lena Chai · Due Jun 12</div>
+        </div>
+        <div class="detail-actions">
+          <button class="btn-ghost">Archive</button>
+          <button class="btn-primary">Edit</button>
+        </div>
+      </div>
+
+      <!-- META GRID -->
+      <div class="meta-panel">
+        <div class="meta-panel-header">
+          <span class="meta-panel-title">Project Info</span>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-cell">
+            <div class="meta-label">Client</div>
+            <div class="meta-value">Vanta Supply Co.</div>
+            <div class="meta-sub">Key account</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Owner</div>
+            <div class="meta-value">Lena Chai</div>
+            <div class="meta-sub">Studio Lead</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Due Date</div>
+            <div class="meta-value">Jun 12, 2024</div>
+            <div class="meta-sub">10 days from today</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Priority</div>
+            <div class="meta-value">High</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Billable Hours</div>
+            <div class="meta-value">48 h</div>
+            <div class="meta-sub">of 80 h estimated</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Created</div>
+            <div class="meta-value">Apr 03, 2024</div>
+            <div class="meta-sub">by Lena Chai</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TWO-COL: invoices + activity -->
+      <div class="two-col">
+
+        <!-- LINKED INVOICES -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Linked Invoices</span>
+            <span class="panel-meta">3 invoices</span>
+          </div>
+          <table class="mini-table">
+            <thead>
+              <tr><th>Invoice #</th><th>Description</th><th>Amount</th><th>Due</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>INV-0038</td><td>Brand Strategy Phase 1</td><td>€12,000</td><td>Apr 30</td><td><span class="inv-status inv-paid">Paid</span></td></tr>
+              <tr><td>INV-0041</td><td>Visual Identity System</td><td>€18,500</td><td>May 31</td><td><span class="inv-status inv-paid">Paid</span></td></tr>
+              <tr><td>INV-0047</td><td>Guidelines + Handoff</td><td>€9,000</td><td>Jun 14</td><td><span class="inv-status inv-pending">Pending</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ACTIVITY FEED -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Activity</span>
+            <span class="panel-meta">last 7 days</span>
+          </div>
+          <div class="activity-feed">
+            <div class="activity-card">
+              <div class="activity-top">
+                <div class="activity-icon c1">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="8" stroke="#000" stroke-width="1.5"/><polyline points="3,11 3,9 6,9" stroke="#000" stroke-width="1.5" stroke-linecap="square"/></svg>
+                </div>
+                <div class="activity-body">
+                  <div class="activity-event">Feedback approved on cover concepts</div>
+                  <div class="activity-sub">Marcus Obi · 3 rounds resolved</div>
+                </div>
+                <div class="activity-time">Today</div>
+              </div>
+            </div>
+            <div class="activity-card">
+              <div class="activity-top">
+                <div class="activity-icon c3">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" stroke="#000" stroke-width="1.5"/><line x1="3" y1="4" x2="9" y2="4" stroke="#000" stroke-width="1.5" stroke-linecap="square"/><line x1="3" y1="7" x2="7" y2="7" stroke="#000" stroke-width="1.5" stroke-linecap="square"/></svg>
+                </div>
+                <div class="activity-body">
+                  <div class="activity-event">Invoice INV-0041 paid</div>
+                  <div class="activity-sub">€18,500 received</div>
+                </div>
+                <div class="activity-time">Yesterday</div>
+              </div>
+            </div>
+            <div class="activity-card">
+              <div class="activity-top">
+                <div class="activity-icon c2">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="6,1 6,8" stroke="#000" stroke-width="1.5" stroke-linecap="square"/><polyline points="3,5 6,1 9,5" stroke="#000" stroke-width="1.5" stroke-linecap="square"/><polyline points="1,9 1,11 11,11 11,9" stroke="#000" stroke-width="1.5" stroke-linecap="square"/></svg>
+                </div>
+                <div class="activity-body">
+                  <div class="activity-event">Final logo set uploaded</div>
+                  <div class="activity-sub">Lena Chai · 12 files</div>
+                </div>
+                <div class="activity-time">Jun 01</div>
+              </div>
+            </div>
+            <div class="activity-card">
+              <div class="activity-top">
+                <div class="activity-icon c4">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="4" r="2.5" stroke="#000" stroke-width="1.5"/><path d="M1 11c0-2.761 2.239-5 5-5s5 2.239 5 5" stroke="#000" stroke-width="1.5" stroke-linecap="square"/></svg>
+                </div>
+                <div class="activity-body">
+                  <div class="activity-event">Client review call scheduled</div>
+                  <div class="activity-sub">Jun 10 · 14:00 CET</div>
+                </div>
+                <div class="activity-time">May 31</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-meta">
+        <span>Studio OS v1.4.2</span>
+        <span>Build #20240527</span>
+        <span>ENV: production</span>
+      </div>
+      <a href="#" class="footer-link">Support</a>
+    </footer>
+  </div>
+</div>
+</body>
+</html>

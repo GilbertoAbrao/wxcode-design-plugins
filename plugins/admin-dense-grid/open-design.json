@@ -3,8 +3,8 @@
   "specVersion": "1.0.0",
   "name": "wxcode-admin-dense-grid",
   "title": "Dense Grid Admin",
-  "version": "0.1.0",
-  "description": "High-density dark-mode operations dashboard in the trading-desk style — compact rows, monospace tabular figures, color-coded deltas, watchlist, positions table, order book, sparkline strip, and stats row. Maximum information per pixel with a 4-px spacing grid.",
+  "version": "0.2.0",
+  "description": "Maximum-information-density dark-mode admin aesthetic: near-black canvas (#0c0f12), blue accent (#3b82f6), green/red directional signals, all-monospace tabular figures on a 4-px grid. Archetype = slim toolbar + 2-column main grid: primary data table + secondary mini-table (left), sparkline strip + depth panel + stats strip (right). Every pixel earns its place.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,15 +19,14 @@
     "operations",
     "web",
     "admin",
-    "data-ops",
     "dense",
     "dark-mode",
-    "trading-desk",
     "monospace",
     "compact",
-    "watchlist",
-    "order-book",
-    "high-density"
+    "high-density",
+    "tabular",
+    "data-grid",
+    "blue-accent"
   ],
   "compat": {
     "agentSkills": [
@@ -48,13 +47,29 @@
     },
     "useCase": {
       "query": {
-        "en": "Build a high-density dark-mode operations dashboard — trading-desk style with compact watchlist, positions table, order book, sparkline strip, and monospace tabular figures.",
-        "zh-CN": "使用这个插件完成以下任务：Build a high-density dark-mode operations dashboard — trading-desk style with compact watchlist, positions table, order book, sparkline strip, and monospace tabular figures."
+        "en": "Apply this high-density dark-mode terminal aesthetic to my domain",
+        "zh-CN": "将这种高密度深色模式终端风格应用到我的领域"
       },
       "exampleOutputs": [
         {
-          "path": "./example.html",
-          "title": "Dense Grid Admin"
+          "path": "./assets/dashboard.html",
+          "title": "Dense Grid Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Dense Grid Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Dense Grid Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Dense Grid Admin — Detail"
+        },
+        {
+          "path": "./assets/template.html",
+          "title": "Dense Grid Admin — Template Seed"
         }
       ]
     },
@@ -72,7 +87,12 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {

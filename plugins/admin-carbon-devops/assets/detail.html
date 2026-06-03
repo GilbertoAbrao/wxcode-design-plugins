@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Carbon Admin — Run Detail</title>
+<style>
+:root {
+  --accent:         #22c55e;
+  --accent-hi:      #4ade80;
+  --accent-dim:     color-mix(in srgb, #22c55e 12%, transparent);
+  --blue:           #3b82f6;
+  --blue-hi:        #60a5fa;
+  --blue-dim:       color-mix(in srgb, #3b82f6 12%, transparent);
+  --state-pass-dim: color-mix(in srgb, #22c55e 12%, transparent);
+  --state-fail-dim: color-mix(in srgb, #ef4444 12%, transparent);
+  --state-run-dim:  color-mix(in srgb, #f59e0b 12%, transparent);
+  --state-skip-dim: color-mix(in srgb, #6e7681 12%, transparent);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0b0d10;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:13px;line-height:1.5;min-height:100vh;display:flex;flex-direction:column;animation:fadeIn .3s ease-out;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.75)}}
+
+/* NAVBAR */
+.navbar{height:48px;background:#14171c;border-bottom:1px solid #262c34;display:flex;align-items:center;gap:10px;padding:0 14px;position:sticky;top:0;z-index:100;flex-shrink:0;}
+.nav-btn{background:none;border:none;color:#8b949e;cursor:pointer;padding:6px;border-radius:6px;display:flex;align-items:center;transition:.15s;}
+.nav-btn:hover{color:#e6edf3;background:#1c2128;}
+.entity-switcher{display:flex;align-items:center;gap:7px;padding:4px 10px;background:#1c2128;border:1px solid #262c34;border-radius:6px;cursor:pointer;color:#e6edf3;font-size:13px;white-space:nowrap;}
+.entity-switcher .ename{font-weight:600;}
+.code-badge{font-size:10px;padding:1px 6px;background:#262c34;border-radius:10px;color:#8b949e;font-family:ui-monospace,"SF Mono",Menlo,monospace;}
+.env-switcher{display:flex;gap:4px;}
+.env-pill{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid transparent;letter-spacing:.02em;text-transform:uppercase;transition:.15s;}
+.env-pill.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+.env-pill:not(.active){color:#8b949e;border-color:#262c34;}
+.nav-search{flex:1;max-width:300px;margin:0 auto;position:relative;}
+.nav-search input{width:100%;background:#0b0d10;border:1px solid #262c34;border-radius:6px;color:#e6edf3;font-size:12px;padding:5px 10px 5px 30px;outline:none;font-family:inherit;transition:.15s;}
+.nav-search input:focus{border-color:var(--blue);}
+.nav-search input::placeholder{color:#8b949e;}
+.nav-search .si{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:#8b949e;}
+.nav-right{display:flex;align-items:center;gap:8px;margin-left:auto;}
+.bell-wrap{position:relative;}
+.bell-dot{position:absolute;top:2px;right:2px;width:8px;height:8px;background:#ef4444;border-radius:50%;border:1.5px solid #14171c;}
+.avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--blue));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#0b0d10;cursor:pointer;}
+
+/* SHELL */
+.layout{display:flex;flex:1;overflow:hidden;}
+.rail{width:48px;background:#14171c;border-right:1px solid #262c34;display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;flex-shrink:0;}
+.rail-item{position:relative;width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8b949e;transition:.15s;}
+.rail-item:hover{color:#e6edf3;background:#1c2128;}
+.rail-item.active{color:var(--accent);background:var(--accent-dim);}
+.rail-item.active::before{content:'';position:absolute;left:-6px;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--accent);border-radius:0 2px 2px 0;}
+.rail-spacer{flex:1;}
+
+/* MAIN */
+.main{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;}
+
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:#6e7681;}
+.breadcrumb a{color:#8b949e;text-decoration:none;}
+.breadcrumb a:hover{color:var(--accent-hi);}
+
+.detail-header{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+.detail-title-block{display:flex;flex-direction:column;gap:5px;}
+.detail-id-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.detail-id{font-size:22px;font-weight:700;color:#e6edf3;font-family:ui-monospace,"SF Mono",Menlo,monospace;}
+.status-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:10px;font-size:11px;font-weight:700;}
+.status-pill .sdot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+.status-pill.pass{color:#22c55e;background:var(--state-pass-dim);}
+.status-pill.fail{color:#ef4444;background:var(--state-fail-dim);}
+.status-pill.run{color:#f59e0b;background:var(--state-run-dim);}
+.status-pill.skip{color:#6e7681;background:var(--state-skip-dim);}
+.detail-name{font-size:13px;color:#8b949e;}
+.detail-actions{display:flex;gap:8px;flex-shrink:0;}
+.btn-ghost{padding:7px 14px;background:transparent;border:1px solid #262c34;border-radius:6px;color:#8b949e;font-size:12px;font-family:inherit;cursor:pointer;transition:.15s;}
+.btn-ghost:hover{color:#e6edf3;border-color:#30363d;}
+.btn-primary{padding:7px 14px;background:var(--accent);border:none;border-radius:6px;color:#0b0d10;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;transition:.15s;}
+.btn-primary:hover{background:var(--accent-hi);}
+
+/* CARD */
+.card{background:#14171c;border:1px solid #262c34;border-radius:8px;overflow:hidden;}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #262c34;}
+.card-title{font-size:13px;font-weight:700;color:#e6edf3;display:flex;align-items:center;gap:7px;}
+
+/* META GRID */
+.meta-grid{display:grid;grid-template-columns:repeat(3,1fr);padding:16px;gap:14px;}
+.meta-cell{display:flex;flex-direction:column;gap:3px;}
+.meta-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#6e7681;}
+.meta-value{font-size:13px;color:#e6edf3;font-weight:500;}
+.meta-value.mono{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;}
+.meta-sub{font-size:11px;color:#8b949e;}
+
+/* TWO-COL */
+.two-col{display:grid;grid-template-columns:7fr 5fr;gap:14px;align-items:start;}
+
+/* STAGE STEPS TABLE */
+.steps-table{width:100%;border-collapse:collapse;font-size:12px;}
+.steps-table th{padding:8px 14px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#8b949e;border-bottom:1px solid #262c34;white-space:nowrap;}
+.steps-table td{padding:10px 14px;border-bottom:1px solid #1c2128;vertical-align:middle;}
+.steps-table tr:last-child td{border-bottom:none;}
+.steps-table tr:hover td{background:#1a1f27;}
+.step-name{font-weight:600;color:#e6edf3;}
+.step-runner{font-family:ui-monospace,"SF Mono",Menlo,monospace;color:#8b949e;font-size:11px;}
+.dur-cell{color:#8b949e;font-variant-numeric:tabular-nums;font-size:11px;}
+.step-log{color:var(--blue);font-size:11px;text-decoration:none;}
+.step-log:hover{color:var(--blue-hi);}
+
+/* ACTIVITY FEED */
+.activity-list{display:flex;flex-direction:column;}
+.activity-row{display:flex;align-items:flex-start;gap:10px;padding:10px 16px;border-bottom:1px solid #1c2128;}
+.activity-row:last-child{border-bottom:none;}
+.activity-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#1c2128;flex-shrink:0;color:#8b949e;}
+.activity-body{flex:1;min-width:0;}
+.activity-desc{font-size:12px;color:#e6edf3;}
+.activity-desc strong{color:var(--accent);}
+.activity-meta{font-size:11px;color:#6e7681;margin-top:2px;}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <button class="nav-btn" title="Menu">
+    <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </button>
+  <div class="entity-switcher">
+    <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="5" rx="1" fill="currentColor" opacity=".6"/><rect x="9" y="2" width="5" height="5" rx="1" fill="currentColor"/><rect x="2" y="9" width="5" height="5" rx="1" fill="currentColor" opacity=".4"/><rect x="9" y="9" width="5" height="5" rx="1" fill="currentColor" opacity=".3"/></svg>
+    <span class="ename">acme-api</span>
+    <span class="code-badge">main</span>
+    <svg width="12" height="12" fill="none" viewBox="0 0 12 12"><path d="M3 5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <div class="env-switcher">
+    <span class="env-pill active">prod</span>
+    <span class="env-pill">staging</span>
+    <span class="env-pill">canary</span>
+  </div>
+  <div class="nav-search">
+    <svg class="si" width="13" height="13" fill="none" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <input type="text" placeholder="Jump to run, commit, branch…">
+  </div>
+  <div class="nav-right">
+    <div class="bell-wrap">
+      <button class="nav-btn" title="Alerts"><svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M8 2a5 5 0 0 0-5 5v2l-1 2h12l-1-2V7a5 5 0 0 0-5-5zm0 12a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2z" stroke="currentColor" stroke-width="1.3"/></svg></button>
+      <span class="bell-dot"></span>
+    </div>
+    <div class="avatar">AL</div>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <aside class="rail">
+    <div class="rail-item" title="Dashboard">
+      <svg width="18" height="18" fill="none" viewBox="0 0 18 18"><rect x="2" y="2" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="10" y="2" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="10" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="10" y="10" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>
+    </div>
+    <div class="rail-item active" title="Pipelines">
+      <svg width="18" height="18" fill="none" viewBox="0 0 18 18"><path d="M3 5h3v8H3zM7.5 3h3v12h-3zM12 7h3v6h-3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="rail-item" title="Runs">
+      <svg width="18" height="18" fill="none" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.4"/><path d="M7 6l5 3-5 3V6z" fill="currentColor"/></svg>
+    </div>
+    <div class="rail-item" title="Incidents">
+      <svg width="18" height="18" fill="none" viewBox="0 0 18 18"><path d="M9 3L2 15h14L9 3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M9 8v4M9 13.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </div>
+    <div class="rail-spacer"></div>
+    <div class="rail-item" title="Settings">
+      <svg width="18" height="18" fill="none" viewBox="0 0 18 18"><circle cx="9" cy="9" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M9 1.5v2M9 14.5v2M1.5 9h2M14.5 9h2M3.7 3.7l1.4 1.4M12.9 12.9l1.4 1.4M3.7 14.3l1.4-1.4M12.9 5.1l1.4-1.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <div class="breadcrumb">
+      <a href="#">Pipeline Runs</a>
+      <svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M3 2l4 3-4 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>#1847</span>
+    </div>
+
+    <div class="detail-header">
+      <div class="detail-title-block">
+        <div class="detail-id-row">
+          <span class="detail-id">#1847</span>
+          <span class="status-pill pass"><span class="sdot"></span>Passed</span>
+        </div>
+        <span class="detail-name">acme-api/build · feat/auth · 3f2a9c4</span>
+      </div>
+      <div class="detail-actions">
+        <button class="btn-ghost">Re-run</button>
+        <button class="btn-ghost">Download Logs</button>
+        <button class="btn-primary">View Artifact</button>
+      </div>
+    </div>
+
+    <!-- Meta grid -->
+    <div class="card">
+      <div class="meta-grid">
+        <div class="meta-cell">
+          <div class="meta-label">Repository</div>
+          <div class="meta-value">acme-api</div>
+          <div class="meta-sub">acme-org</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Branch</div>
+          <div class="meta-value mono">feat/auth</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Commit</div>
+          <div class="meta-value mono">3f2a9c4</div>
+          <div class="meta-sub">Add JWT refresh endpoint</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Triggered by</div>
+          <div class="meta-value">alice</div>
+          <div class="meta-sub">push event</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Started</div>
+          <div class="meta-value">14:32:07 UTC</div>
+          <div class="meta-sub">2 min ago</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Duration</div>
+          <div class="meta-value" style="font-variant-numeric:tabular-nums">6m 41s</div>
+          <div class="meta-sub">avg 5m 52s on this branch</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two-col: stage steps + activity log -->
+    <div class="two-col">
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path d="M3 5h3v8H3zM7.5 3h3v12h-3zM12 7h3v6h-3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            Stage Steps
+          </div>
+        </div>
+        <table class="steps-table">
+          <thead>
+            <tr>
+              <th>Step</th>
+              <th>Runner</th>
+              <th>Status</th>
+              <th>Duration</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="step-name">Checkout</span></td>
+              <td><span class="step-runner">runner-01</span></td>
+              <td><span class="status-pill pass"><span class="sdot"></span>Passed</span></td>
+              <td class="dur-cell">0m 04s</td>
+              <td><a href="#" class="step-log">Logs</a></td>
+            </tr>
+            <tr>
+              <td><span class="step-name">Install deps</span></td>
+              <td><span class="step-runner">runner-01</span></td>
+              <td><span class="status-pill pass"><span class="sdot"></span>Passed</span></td>
+              <td class="dur-cell">1m 12s</td>
+              <td><a href="#" class="step-log">Logs</a></td>
+            </tr>
+            <tr>
+              <td><span class="step-name">Build</span></td>
+              <td><span class="step-runner">runner-01</span></td>
+              <td><span class="status-pill pass"><span class="sdot"></span>Passed</span></td>
+              <td class="dur-cell">2m 08s</td>
+              <td><a href="#" class="step-log">Logs</a></td>
+            </tr>
+            <tr>
+              <td><span class="step-name">Unit tests</span></td>
+              <td><span class="step-runner">runner-02</span></td>
+              <td><span class="status-pill pass"><span class="sdot"></span>Passed</span></td>
+              <td class="dur-cell">1m 44s</td>
+              <td><a href="#" class="step-log">Logs</a></td>
+            </tr>
+            <tr>
+              <td><span class="step-name">Integration tests</span></td>
+              <td><span class="step-runner">runner-02</span></td>
+              <td><span class="status-pill pass"><span class="sdot"></span>Passed</span></td>
+              <td class="dur-cell">0m 58s</td>
+              <td><a href="#" class="step-log">Logs</a></td>
+            </tr>
+            <tr>
+              <td><span class="step-name">Publish artifact</span></td>
+              <td><span class="step-runner">runner-01</span></td>
+              <td><span class="status-pill pass"><span class="sdot"></span>Passed</span></td>
+              <td class="dur-cell">0m 35s</td>
+              <td><a href="#" class="step-log">Logs</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path d="M8 2a6 6 0 1 0 0 12A6 6 0 0 0 8 2zM8 5v4l2 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Run Log
+          </div>
+        </div>
+        <div class="activity-list">
+          <div class="activity-row">
+            <div class="activity-icon">
+              <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M6 8l2 2 4-4" stroke="#22c55e" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="activity-body">
+              <div class="activity-desc"><strong>Run completed</strong> — all stages passed</div>
+              <div class="activity-meta">14:38:48 UTC · 2 min ago</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-icon">
+              <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path d="M3 5h3v8H3zM7.5 3h3v12h-3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="activity-body">
+              <div class="activity-desc">Artifact published to staging registry</div>
+              <div class="activity-meta">14:38:13 UTC</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-icon">
+              <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path d="M13 7A5 5 0 0 0 3 7v1l-1 2h12l-1-2V7z" stroke="currentColor" stroke-width="1.3"/></svg>
+            </div>
+            <div class="activity-body">
+              <div class="activity-desc">Integration tests passed — 84 of 84</div>
+              <div class="activity-meta">14:37:38 UTC</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-icon">
+              <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path d="M13 7A5 5 0 0 0 3 7v1l-1 2h12l-1-2V7z" stroke="currentColor" stroke-width="1.3"/></svg>
+            </div>
+            <div class="activity-body">
+              <div class="activity-desc">Unit tests passed — 312 of 312</div>
+              <div class="activity-meta">14:36:53 UTC</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-icon">
+              <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><rect x="3" y="5" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M6 5V3.5a2 2 0 0 1 4 0V5" stroke="currentColor" stroke-width="1.3"/></svg>
+            </div>
+            <div class="activity-body">
+              <div class="activity-desc">Build compiled — 0 warnings, 0 errors</div>
+              <div class="activity-meta">14:34:45 UTC</div>
+            </div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-icon">
+              <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v3l1.5 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            </div>
+            <div class="activity-body">
+              <div class="activity-desc">Run started — triggered by <strong>alice</strong></div>
+              <div class="activity-meta">14:32:07 UTC</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>

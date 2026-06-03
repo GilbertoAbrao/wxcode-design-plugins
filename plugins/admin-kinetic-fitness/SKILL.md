@@ -1,24 +1,25 @@
 ---
 name: admin-kinetic-fitness
 description: |
-  Dark-mode gym and fitness studio operations admin — energetic dark-green
-  canvas with lime accent, slim topbar (brand + search + location picker +
-  avatar), compact left icon rail, 4 KPI tiles (active members, check-ins
-  today, classes today, 30-day retention), class schedule list with inline
-  capacity bars, weekly attendance area chart (inline SVG), members table
-  with plan tier and status pill, and coach/trainer panel. Original archetype
-  for gym chains, boutique studios, and personal-training businesses.
+  Energetic dark-green admin aesthetic: deep forest-green canvas (#0f1410),
+  raised panels (#19211a / #232e25), lime accent (#84cc16) on a muted-green
+  neutral ramp, Inter type with tabular-nums on every figure, compact 13px
+  rows, 10px radii, hairline #2c3a2f borders, and crisp status pills. Archetype
+  = slim topbar (brand + search + entity-switcher + avatar) + icon rail + 4 KPI
+  tiles + 2-column row (schedule/slot-list with inline capacity bars + area-chart
+  card) + full-width records table with plan-tier and status pills + 3-card
+  personnel panel. Built for high-density operational consoles with an energetic,
+  athletic character.
 triggers:
-  - "gym admin"
-  - "fitness dashboard"
-  - "studio management"
-  - "fitness admin"
-  - "gym management"
-  - "personal training admin"
-  - "class schedule dashboard"
-  - "dark fitness dashboard"
-  - "painel academia"
-  - "健身房管理后台"
+  - "dark green admin"
+  - "energetic dark admin"
+  - "lime accent dashboard"
+  - "forest-green operations console"
+  - "athletic dark admin"
+  - "capacity-bar schedule panel"
+  - "dark green data dense"
+  - "painel verde escuro"
+example_prompt: "Apply this energetic dark-green admin aesthetic to my domain"
 od:
   mode: prototype
   surface: web
@@ -31,115 +32,175 @@ od:
     sections: [color, typography, layout, components]
   craft:
     requires: [pixel-discipline, laws-of-ux]
-  example_prompt: "Build me a dark-mode fitness studio admin dashboard — slim topbar with location switch, icon rail sidebar, 4 KPI tiles (active members, check-ins, classes, retention), class schedule with capacity bars, weekly attendance chart, members table, and coach panel."
 ---
 
-# Kinetic Fitness Admin Skill
+# Kinetic Admin — Visual Archetype
 
-Produce the canonical dark-mode gym and fitness studio operations dashboard.
-Energetic feel anchored in a deep forest-green canvas with lime accent — built
-for gym operators who live in the back-office between member check-ins.
+This plugin contributes a **look** (energetic dark-green, lime accent, dense
+tabular data) and a **structure** (slim topbar + icon rail + KPI tiles +
+schedule/capacity panel + chart card + records table + personnel cards, plus
+list / form / detail screens). It does **not** contribute a domain — the subject
+matter comes from the Knowledge Base and the user's prompt. Treat the example
+below as illustration only.
+
+## Visual language        (AUTHORITATIVE)
+
+The non-negotiable look. Declare every chromatic value as a `:root` CSS custom
+property; hardcode the neutral dark-green ramp.
+
+- **Canvas / surfaces:** page `#0f1410`; raised panel `#19211a`; inset / hover
+  `#232e25`; hairline border `#2c3a2f`; stronger hover border `#3a4c3d`.
+- **Text ramp:** primary `#e6efe6`, secondary `#c5d5c5`, muted `#93a392`, faint
+  `#5a6e5a`.
+- **Accent:** `--accent: #84cc16` (lime green), `--accent-bright: #a3e635`,
+  `--accent-dim: rgba(132,204,22,.18)`, `--accent-muted: rgba(132,204,22,.08)`.
+  Primary CTAs, active nav bar, key figures, progress fills, chart strokes.
+- **Status ramp (as tokens):** `--state-active #84cc16`, `--state-frozen
+  #60a5fa`, `--state-overdue #f87171`, `--state-pending #f59e0b`, each with a
+  `…-bg` tint at ~13% alpha for pill backgrounds. Deltas: `--delta-up #84cc16`,
+  `--delta-down #f87171`.
+- **Typography:** `"Inter", system-ui, -apple-system, "Segoe UI", Roboto,
+  sans-serif`. Base 13px. `font-variant-numeric: tabular-nums` on **every**
+  numeric cell. Micro-labels are 10–11px, `text-transform: uppercase`,
+  `letter-spacing` ~.08em, muted. Big figures 28px / weight 800 /
+  `letter-spacing: -.03em`. Codes in a mono face (`"Courier New", monospace`).
+- **Density & radius:** compact 11px vertical row padding, 18–20px tile padding,
+  16px grid gaps; panel radius 10px, control radius 7–8px, pill radius 20px,
+  capacity bars 5–6px tall / 3px radius.
+- **Borders & shadows:** 1px hairlines do the separation work; no drop shadows
+  on panels (flat, athletic-terminal feel). 1px inner row dividers `#232e25`.
+- **Motion:** subtle only — `.12s` background/border hover transitions, `.3s`
+  width transitions on capacity bars. Default easing stays gentle; never bouncy.
+
+## Layout archetype       (AUTHORITATIVE, domain-neutral)
+
+Regions and component patterns, described by shape and behavior — not meaning.
+
+- **Top topbar** (48px, `#19211a`, 1px bottom border, sticky): brand icon + name
+  in accent → **search** pill (dark bg) → flexible spacer → **entity-switcher**
+  (pill button with leading icon + chevron, entity name) → notification icon with
+  dot → avatar circle (initials) + name + chevron.
+- **Left icon rail** (52px, `#19211a`, 1px right border): 4–6 icon-only nav
+  items (active item has accent color + left accent bar + inset bg; hover lifts
+  to inset bg), a divider, then additional items. Each carries a native `title`
+  tooltip. No text labels.
+- **Main content** (page bg, 20–24px padding, vertical flex flow): a **page
+  header** (title + sub-line on the left, ghost + primary buttons on the right),
+  then the region stack below.
+- **KPI tile row** (4 tiles, equal grid, gap 16px): each tile = raised panel
+  with an icon chip top-right, an uppercase micro-label, a big tabular figure,
+  an optional sub-line, and a delta chip. Figures and icon chips recolor by state
+  (lime / amber / red) via token.
+- **2-column row (7fr / 5fr, gap 16px):**
+  - **Left — slot/schedule board:** a titled panel whose rows are
+    `[time] [item name] [facilitator] [capacity bar + fraction]`. Capacity bars:
+    thin filled-lime bars with a "Full" pill when capacity is reached. Followed or
+    preceded by a view-all link.
+  - **Right — area-chart card:** a titled panel with a sub-label, a legend, and
+    an inline SVG area chart (two series: current/lime fill + prior/muted dashed
+    line). X-axis label row + dotted gridlines.
+- **Full-width records table:** titled panel with ghost + primary header actions,
+  a sticky uppercase header, dense rows with **status pills**, an avatar-initial
+  column, plan/tier text, right-aligned numerics, last-activity timestamp, and a
+  footer with a result count + pager.
+- **Personnel card row** (3 cards, equal grid): each card = inset-bg panel with
+  an avatar circle (initials, lime bg, dark text) + name + specialty tag +
+  this-period activity count + star rating (lime stars).
+- **Records list screen:** the records-table archetype as its own page —
+  search + filter chips + a count, the same dense table, and a pager.
+- **Record form screen:** sectioned cards of labelled fields; **rules appear as
+  inline validation** — required marks (`*`), helper text under the field, and
+  inline error messages on invalid fields, with the primary submit
+  disabled-until-valid. No rules/checklist/validation-status panel.
+- **Record detail screen:** a header band (title + status pill + key actions), a
+  meta grid of label/value pairs, and one or more related-data sub-panels (the
+  slot-board row pattern or a mini-table) below.
+
+## Applying to a domain   (the contract)
+
+The domain comes from the Knowledge Base + the user's prompt. Extract THIS
+domain's equivalent of the archetype slots — its primary entities, key metrics,
+status states, record list/columns, form fields and their rules, and detail
+fields — and map them onto the archetype above. If no KB/domain is supplied
+(standalone), use the Example instantiation below.
+
+Do NOT invent a "rules" / "checklist" / "validation-status" panel; domain rules
+become inline field validation. Do NOT render build/implementation notes or
+designer controls — every screen is a finished product screen.
+
+## Example instantiation (illustrative only — NOT the domain)
+
+> One concrete example so standalone Open Design has a complete brief. In WXCode
+> this is IGNORED — replace every label with the real domain's equivalent
+> (entities, metrics, states, columns, fields) drawn from the KB + prompt.
+
+```
+Domain (illustrative): a boutique fitness studio and gym operations back-office.
+
+Entity switcher → location: "Downtown Studio ▾".
+Rail items       → Dashboard, Members, Schedule, Classes, Analytics, Settings.
+
+KPI tiles (4):
+  • Active Members 1,847 (lime, ▲ +34 this month, person icon).
+  • Check-ins Today 312 (▲ +18 vs yesterday, scan icon).
+  • Classes Today 18 ("8 completed · 10 upcoming", calendar icon).
+  • 30-Day Retention 91.4% (▲ +1.2 pp, shield-check icon).
+
+Schedule board (left) → "Today's Classes" — rows of
+  [06:00] [HIIT Ignite] [Coach Priya Mehra] [████░░ 24/30].
+  [07:30] [Power Lift] [Coach Dom Vasquez] [████░░░░ 16/30].
+  [09:00] [Yoga Flow] [Coach Anika Torres] [██████████ 20/20 · Full pill].
+  [10:30] [Spin Burn] [Coach Dev Okafor] [█████░░░░ 18/28].
+  [12:00] [Core & Stretch] [Coach Priya Mehra] [██░░░░░░ 8/25].
+  [17:00] [Boxing Basics] [Coach Marcus Reid] [███░░░░░ 12/20].
+
+Chart card (right) → "Weekly Attendance" — area chart, two series:
+  This week (lime fill/stroke): [210, 280, 265, 310, 290, 420, 380].
+  Last week (muted dashed, no fill): [195, 255, 240, 285, 270, 395, 360].
+  X-axis: Mon Tue Wed Thu Fri Sat Sun.
+
+Records table → "Members": Name + avatar / Plan / Status pill / Last Visit /
+  Actions.  Status: Active (lime) / Frozen (blue) / Overdue (red).
+
+List screen → all members, search + filter chips (status, plan type),
+  paginated.
+
+Form screen → "New Member": full name (required), email (required, valid email),
+  plan (required select), start date (required, not in the past), emergency
+  contact (optional). Rules shown as required marks + helper text + inline
+  errors; "Add Member" disabled until valid.
+
+Detail screen → one member: header (name + status pill + actions), meta grid
+  (plan, join date, last visit, check-ins this month, retention score), and a
+  "Upcoming Classes" slot-board + recent activity feed.
+
+Personnel panel → 3 personnel cards: [avatar] [name] [specialty tag]
+  [activity count this week] [★ rating].
+  • Priya Mehra | HIIT & Yoga | 8 sessions | ★★★★★ 4.9
+  • Dom Vasquez | Strength     | 6 sessions | ★★★★☆ 4.7
+  • Marcus Reid  | Boxing & HIIT| 5 sessions | ★★★★★ 4.8
+```
 
 ## Workflow
 
-1. Read the active DESIGN.md (if present); otherwise use lime (#84cc16) on a
-   deep dark-green canvas (#0f1410 / #19211a / #232e25).
-2. Extract from the brief: gym/studio name, location(s), primary KPIs (active
-   members, today's check-ins, today's classes, 30-day retention), class types
-   and coaches, membership plan tiers.
-3. Layout:
-
-   ### Top navbar (48px, full-width, bg #19211a, border-bottom #2c3a2f)
-   - Left: compact brand mark (barbell SVG icon) + studio name in lime.
-   - Centre-left: search input (dark bg #232e25, 32px tall, placeholder
-     "Search members, classes…").
-   - Centre-right: location picker dropdown ("Downtown Studio ▾").
-   - Right: notification bell icon + avatar circle (initials) + chevron.
-
-   ### Left icon rail (52px wide, full-height, bg #19211a, border-right #2c3a2f)
-   Six icon-only items vertically stacked (grid/dashboard, members, calendar,
-   dumbbell/classes, chart/analytics, settings). Active item: lime icon,
-   lime left-bar, #232e25 background. Tooltip on hover (not required for
-   prototype). No text labels — icon rail only.
-
-   ### Main content area (calc(100% - 52px), scrollable)
-   padding 20px 24px.
-
-   #### KPI tiles row (4 equal columns, gap 16px)
-   Each tile: bg #19211a, border #2c3a2f, border-radius 10px, padding 18px 20px.
-   - Tile 1 — Active Members: count 1 847, delta +34 this month (lime up arrow).
-     Icon: person silhouette SVG, lime.
-   - Tile 2 — Check-ins Today: count 312, delta vs yesterday (lime / muted-red
-     down arrow). Icon: scan/barcode SVG.
-   - Tile 3 — Classes Today: count 18, "8 completed · 10 upcoming". Icon:
-     calendar-clock SVG.
-   - Tile 4 — 30-day Retention: 91.4%, delta +1.2 pp. Icon: shield-check SVG.
-   Each tile has: small uppercase muted label (10px, letter-spacing 0.08em),
-   large number (28px, #e6efe6), delta chip, icon top-right (20×20, currentColor
-   via var()).
-
-   #### Two-column row (7fr / 5fr, gap 16px, margin-top 16px)
-
-   **LEFT — Class Schedule (today)**
-   Card bg #19211a, border #2c3a2f, border-radius 10px. Header: "Today's Classes"
-   + "View all →" lime link. List of 6 classes (time / class name / coach /
-   capacity bar + fraction):
-   - 06:00  |  HIIT Ignite      |  Coach Priya Mehra   |  ██████░░ 24/30
-   - 07:30  |  Power Lift       |  Coach Dom Vasquez   |  ████░░░░ 16/30
-   - 09:00  |  Yoga Flow        |  Coach Anika Torres  |  ██████████ 20/20 (full, lime pill)
-   - 10:30  |  Spin Burn        |  Coach Dev Okafor    |  █████░░░░ 18/28
-   - 12:00  |  Core & Stretch   |  Coach Priya Mehra   |  ██░░░░░░  8/25
-   - 17:00  |  Boxing Basics    |  Coach Marcus Reid   |  ███░░░░░ 12/20
-   Capacity bar: full-width bg #232e25, filled lime (#84cc16), height 6px,
-   border-radius 3px. "Full" pill: bg lime/20, color lime, 10px text.
-
-   **RIGHT — Weekly Attendance Chart**
-   Card bg #19211a, border #2c3a2f, border-radius 10px. Header: "Weekly
-   Attendance" + "This week vs last week" muted sub-label.
-   Inline SVG area chart (100% wide, 140px tall). Two series: this week (lime
-   fill, 30% opacity; lime stroke 1.5px) and last week (muted stroke #93a392,
-   dashed, no fill). X-axis: Mon Tue Wed Thu Fri Sat Sun. Grid lines: #2c3a2f.
-   Invented data points this week: [210, 280, 265, 310, 290, 420, 380].
-   Last week: [195, 255, 240, 285, 270, 395, 360].
-
-   #### Members Table (full-width, margin-top 16px)
-   Card bg #19211a, border #2c3a2f, border-radius 10px. Header: "Members" +
-   search icon + "Export CSV" ghost button (border lime, color lime).
-   Table columns: Name / Plan / Status / Last Visit / Actions.
-   8 rows of invented members:
-   | Jess Kamara     | Elite Annual   | Active   🟢 | 2 hrs ago    | ⋯ |
-   | Tobias Wren     | Monthly Flex   | Active   🟢 | Yesterday    | ⋯ |
-   | Chloe Nakamura  | Elite Annual   | Active   🟢 | 3 days ago   | ⋯ |
-   | Rafael Osei     | Day Pass       | Active   🟢 | Today        | ⋯ |
-   | Nina Castillo   | Monthly Flex   | Frozen   🔵 | 12 days ago  | ⋯ |
-   | Kwame Diallo    | Elite Annual   | Active   🟢 | 4 hrs ago    | ⋯ |
-   | Sasha Petrova   | Monthly Flex   | Overdue  🔴 | 18 days ago  | ⋯ |
-   | Leo Andrade     | Student Plan   | Active   🟢 | 1 day ago    | ⋯ |
-   Status pills: Active = bg lime/15, color lime; Frozen = bg #3b82f6/15,
-   color #60a5fa; Overdue = bg red/15, color #f87171. Hover row: bg #232e25.
-
-   #### Coach Panel row (3 equal columns, gap 16px, margin-top 16px)
-   3 coach cards, bg #232e25, border #2c3a2f, border-radius 10px, padding 16px.
-   Each: avatar circle (2-letter initials, lime bg, #0f1410 text, 40px) + name
-   + specialty tag + this-week class count + rating (★ out of 5, lime stars).
-   - Priya Mehra   | HIIT & Yoga    | 8 classes this week | ★★★★★ 4.9
-   - Dom Vasquez   | Strength       | 6 classes this week | ★★★★☆ 4.7
-   - Marcus Reid   | Boxing & HIIT  | 5 classes this week | ★★★★★ 4.8
-
-4. Typography: system font stack only ("Inter", system-ui, -apple-system,
-   "Segoe UI", Roboto, sans-serif). Never load external fonts.
-5. All chromatic colors via :root CSS custom properties (--color-accent,
-   --color-accent-dim, --color-accent-muted, --color-text-primary,
-   --color-text-muted, --color-status-active, --color-status-frozen,
-   --color-status-overdue). Neutral dark backgrounds and borders may be
-   hardcoded. SVG fill/stroke must reference currentColor or var() — never
-   chromatic hex literals.
-6. Single inline <style> block, semantic HTML, no external assets, no CDNs.
-   Target file size 10–30 KB.
+1. Read the active DESIGN.md (if present); otherwise use this plugin's Visual
+   language tokens.
+2. Extract THIS domain's equivalent of the archetype slots — primary entities,
+   key metrics, status states, record columns, form fields + rules, detail fields
+   — from the KB + prompt. Standalone: use the Example instantiation above.
+3. Build each screen in the Visual language + Layout archetype above, imitating
+   the example set in `assets/` (dashboard, list, form, detail) and the
+   `assets/template.html` seed — with fresh content for the real domain, NOT the
+   example labels.
+4. Express domain rules as INLINE field validation (required marks, helper text,
+   inline errors, disabled-until-valid submit). Never render
+   rules/checklist/validation-status/build-note panels or designer/demo controls.
+5. One inline `<style>`, semantic HTML5, `tabular-nums` on figures, no external
+   assets, no CDNs — self-contained.
 
 ## Output contract
 
 ```
-<artifact identifier="admin-kinetic-fitness" type="text/html" title="Kinetic Fitness Admin">
+<artifact identifier="admin-kinetic-fitness" type="text/html" title="Kinetic Admin">
 <!doctype html>...</artifact>
 ```

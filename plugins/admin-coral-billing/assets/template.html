@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coral Admin — Shell Seed</title>
+<!--
+  SEED SKELETON — copy this file as the starting point for a new screen in the
+  Coral light-mode admin skin. It carries the :root token block and the app shell
+  (fixed sidebar with workspace switcher + grouped nav + bottom user row, and a
+  sticky topbar with search + period tabs + avatar). Replace the product name, the
+  workspace-switcher label, the nav section labels and items, the topbar period
+  tabs, and the <main> content with the real domain's equivalents. Mark the active
+  nav item with .active. Keep the token block intact.
+-->
+<style>
+:root {
+  /* Accent (coral hue) */
+  --coral:        #f43f5e;
+  --coral-light:  #fb7185;
+  --coral-muted:  #fff1f2;
+  /* Navigation neutral */
+  --slate:        #475569;
+  --slate-light:  #64748b;
+  /* Status ramp — add/remove states to match the domain */
+  --green:        #16a34a;
+  --green-muted:  #f0fdf4;
+  --amber:        #d97706;
+  --amber-muted:  #fffbeb;
+  --red:          #dc2626;
+  --red-muted:    #fef2f2;
+  /* Surfaces */
+  --surface:      #f8f9fb;   /* page background */
+  --card:         #ffffff;   /* sidebar, topbar, cards */
+  --border:       #e6e9ef;   /* dividers, card borders */
+}
+
+/* ─── Reset ──────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:14px;color:#111827;background:var(--surface)}
+button{font:inherit;cursor:pointer;border:none;background:none}
+a{text-decoration:none;color:inherit}
+
+/* ─── App Shell ───────────────────────────────────────────────── */
+.shell{display:flex;height:100vh;overflow:hidden}
+
+/* ─── Sidebar (240px fixed) ──────────────────────────────────── */
+aside.sidebar{width:240px;min-width:240px;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;padding:20px 12px}
+.sidebar-logo{display:flex;align-items:center;gap:9px;padding:0 8px 16px}
+.sidebar-logo-name{font-size:15px;font-weight:600;color:var(--slate)}
+.workspace-pill{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);border-radius:8px;padding:6px 10px;margin-bottom:20px;color:var(--slate);font-size:12px;font-weight:500;cursor:pointer}
+.workspace-pill:hover{background:var(--surface)}
+/* Nav section label */
+.nav-section-label{font-size:10px;font-weight:600;letter-spacing:.08em;color:#9ca3af;text-transform:uppercase;padding:0 8px;margin-bottom:4px;margin-top:12px}
+/* Nav item: 36px tall, 8px radius, coral on active */
+.nav-item{display:flex;align-items:center;gap:10px;padding:0 8px;height:36px;border-radius:8px;color:var(--slate);font-size:13px;font-weight:500;cursor:pointer;position:relative;transition:background .12s}
+.nav-item:hover{background:var(--surface)}
+.nav-item.active{background:var(--coral-muted);color:var(--coral)}
+.nav-item.active::before{content:'';position:absolute;left:-12px;top:50%;transform:translateY(-50%);width:3px;height:20px;border-radius:0 2px 2px 0;background:var(--coral)}
+.nav-item svg{flex-shrink:0;opacity:.7}
+.nav-item.active svg{opacity:1;color:var(--coral)}
+.nav-badge{margin-left:auto;background:var(--coral);color:#fff;font-size:10px;font-weight:700;border-radius:9px;padding:1px 6px;line-height:16px}
+/* Bottom user row */
+.sidebar-bottom{margin-top:auto;padding-top:16px;border-top:1px solid var(--border)}
+.sidebar-user{display:flex;align-items:center;gap:10px;padding:8px}
+.avatar-sm{width:30px;height:30px;border-radius:50%;background:var(--coral);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.sidebar-user-info{flex:1;min-width:0}
+.sidebar-user-name{font-size:12px;font-weight:600;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sidebar-user-role{font-size:11px;color:#9ca3af}
+
+/* ─── Main Column ─────────────────────────────────────────────── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* ─── Topbar (56px sticky) ───────────────────────────────────── */
+header.topbar{height:56px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;padding:0 24px;flex-shrink:0;position:sticky;top:0;z-index:10}
+.search-wrap{position:relative;width:260px}
+.search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#9ca3af;pointer-events:none}
+.search-input{width:100%;height:34px;border:1px solid var(--border);border-radius:8px;padding:0 10px 0 34px;font-size:13px;color:#374151;background:#fff;outline:none;transition:border .15s}
+.search-input::placeholder{color:#9ca3af}
+.search-input:focus{border-color:var(--coral-light)}
+/* Period selector tabs — flush, active = 2px coral bottom border */
+.period-tabs{display:flex;gap:0;margin-left:auto}
+.period-tab{font-size:13px;font-weight:500;padding:0 14px;height:56px;border-bottom:2px solid transparent;color:#6b7280;transition:color .12s,border-color .12s;white-space:nowrap}
+.period-tab.active{color:var(--coral);border-bottom-color:var(--coral)}
+.period-tab:hover:not(.active){color:var(--slate)}
+.topbar-actions{display:flex;align-items:center;gap:12px}
+.bell-wrap{position:relative;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:8px;cursor:pointer}
+.bell-wrap:hover{background:var(--surface)}
+.bell-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--coral);border:2px solid #fff}
+.avatar-topbar{width:34px;height:34px;border-radius:50%;background:var(--slate);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;cursor:pointer}
+
+/* ─── Page content slot ───────────────────────────────────────── */
+.page-content{flex:1;overflow-y:auto;padding:24px}
+
+/* ─── Shared components ───────────────────────────────────────── */
+/* Page heading */
+.page-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.page-heading-left h1{font-size:20px;font-weight:700;color:#111827}
+.period-badge{display:inline-block;margin-top:4px;font-size:11px;font-weight:500;color:var(--slate-light);background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:2px 8px}
+.page-heading-actions{display:flex;gap:10px;align-items:center}
+/* Buttons */
+.btn-ghost{height:34px;padding:0 14px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:500;color:var(--slate);background:#fff;transition:border-color .12s,color .12s}
+.btn-ghost:hover{border-color:var(--slate);color:#111827}
+.btn-primary{height:34px;padding:0 16px;border-radius:8px;font-size:13px;font-weight:600;color:#fff;background:var(--coral);transition:background .12s}
+.btn-primary:hover{background:var(--coral-light)}
+.btn-primary:disabled{background:#fda4af;cursor:not-allowed}
+/* Card */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
+.card-title{font-size:15px;font-weight:600;color:#111827}
+.card-subtitle{font-size:12px;color:#9ca3af;margin-top:2px}
+/* KPI card */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.05);display:flex;flex-direction:column;gap:10px}
+.kpi-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af}
+.kpi-value{font-size:24px;font-weight:700;color:#111827;font-variant-numeric:tabular-nums;line-height:1}
+.delta{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:2px 7px;border-radius:6px}
+.delta.up{background:var(--green-muted);color:var(--green)}
+.delta.down{background:var(--red-muted);color:var(--red)}
+/* Status pills */
+.pill{display:inline-block;font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px}
+.pill-paid{background:var(--green-muted);color:var(--green)}
+.pill-pending{background:var(--amber-muted);color:var(--amber)}
+.pill-failed{background:var(--red-muted);color:var(--red)}
+/* Table */
+table{width:100%;border-collapse:collapse}
+thead th{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#9ca3af;padding:10px 20px;text-align:left;background:var(--surface);border-bottom:1px solid var(--border)}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#f8f9fb}
+tbody td{padding:12px 20px;font-size:13px;color:#374151;font-variant-numeric:tabular-nums}
+/* Pagination */
+.pagination{display:flex;gap:6px}
+.page-btn{height:28px;min-width:28px;padding:0 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-weight:500;color:var(--slate);background:#fff;transition:border-color .12s}
+.page-btn:hover{border-color:var(--slate-light)}
+.page-btn.active{background:var(--coral);color:#fff;border-color:var(--coral)}
+/* Form fields */
+.field{display:flex;flex-direction:column;gap:5px}
+.field-label{font-size:12.5px;font-weight:600;color:#374151;display:flex;align-items:center;gap:4px}
+.req{color:var(--coral);font-weight:700}
+.control{width:100%;height:36px;border:1px solid var(--border);border-radius:8px;padding:0 12px;font-size:13.5px;font-family:inherit;color:#111827;background:#fff;outline:none;transition:border-color .15s,box-shadow .15s}
+.control:focus{border-color:var(--coral-light);box-shadow:0 0 0 3px var(--coral-muted)}
+.control::placeholder{color:#9ca3af}
+.field.invalid .control{border-color:var(--red);background:var(--red-muted)}
+.helper{font-size:11.5px;color:#9ca3af}
+.error-msg{display:flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;color:var(--red)}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <!-- Replace with domain logo mark (inline SVG) + product name -->
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <rect width="28" height="28" rx="7" fill="var(--coral)"/>
+        <path d="M14 5L21 12L14 23L7 12Z" fill="white" opacity="0.9"/>
+        <path d="M14 5L21 12L14 16L7 12Z" fill="white"/>
+      </svg>
+      <span class="sidebar-logo-name">{Product Name}</span>
+    </div>
+
+    <div class="workspace-pill">
+      <span>{Workspace Name}</span>
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+        <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <nav>
+      <!-- Repeat nav-section-label + nav-items for each section -->
+      <div class="nav-section-label">{Section Label}</div>
+      <div class="nav-item active">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor"/>
+          <rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/>
+          <rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/>
+          <rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".5"/>
+        </svg>
+        {Nav Item}
+      </div>
+      <div class="nav-item">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/>
+          <path d="M1 6h14" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        {Nav Item}
+        <!-- Optional: <span class="nav-badge">{n}</span> -->
+      </div>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-user">
+        <div class="avatar-sm">{Initials}</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name">{User Name}</div>
+          <div class="sidebar-user-role">{Role}</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="search-wrap">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <input class="search-input" type="search" placeholder="Search {entity, entity}…" aria-label="Search">
+      </div>
+
+      <!-- Replace tabs with the domain's period/filter dimensions -->
+      <nav class="period-tabs" aria-label="Period">
+        <button class="period-tab">{Dim A}</button>
+        <button class="period-tab active">{Dim B}</button>
+        <button class="period-tab">{Dim C}</button>
+        <button class="period-tab">{Dim D}</button>
+      </nav>
+
+      <div class="topbar-actions">
+        <div class="bell-wrap" role="button" aria-label="Notifications">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+            <path d="M9 1.5A5.5 5.5 0 003.5 7v4l-1.5 2h14l-1.5-2V7A5.5 5.5 0 009 1.5z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+            <path d="M7 15a2 2 0 004 0" stroke="currentColor" stroke-width="1.5" fill="none"/>
+          </svg>
+          <span class="bell-dot"></span>
+        </div>
+        <div class="avatar-topbar" aria-label="Profile">{Initials}</div>
+      </div>
+    </header>
+
+    <main class="page-content">
+      <!--
+        Drop your screen's region stack here:
+          .page-heading
+          .kpi-grid (4 .kpi-card)
+          .mid-row grid (trend chart + breakdown bars)
+          .bottom-row grid (table card + side panel)
+        See assets/dashboard.html, list.html, form.html, detail.html and
+        references/layouts.md for paste-ready skeletons.
+      -->
+    </main>
+  </div>
+</div>
+
+</body>
+</html>

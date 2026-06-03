@@ -3,8 +3,8 @@
   "specVersion": "1.0.0",
   "name": "wxcode-admin-pixel-liveops",
   "title": "Pixel LiveOps Admin",
-  "version": "0.1.0",
-  "description": "Dark-mode game studio live-operations dashboard — neon purple/cyan accent on deep-space backgrounds. Sidebar game switcher, topbar period filter, 4 KPI tiles (DAU / D1 retention / ARPDAU / live events), DAU chart, live events board, top in-game items table, player segments panel. Original archetype for game ops teams.",
+  "version": "0.2.0",
+  "description": "Deep-space dark admin aesthetic: near-black canvas (#0c0a14), neon purple (#a855f7) and cyan (#22d3ee) dual-accent on a violet-tinted dark neutral ramp, compact tabular typography, glowing pill hover states. Archetype = full-height sidebar (entity switcher + grouped nav sections + footer user chip) + topbar (title · search · period-selector pills) + 4 KPI tiles with sparklines + 2-column grid (area-chart card + segments side panel) + full-width status-event table + full-width ranked items list, plus list, form, and detail screens.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,14 +19,14 @@
     "operations",
     "web",
     "admin",
-    "gaming",
-    "liveops",
     "dark-mode",
     "neon",
-    "game-studio",
-    "analytics",
-    "real-time",
-    "playful-techy"
+    "violet",
+    "deep-space",
+    "dual-accent",
+    "status-event",
+    "ranked-list",
+    "sidebar-nav"
   ],
   "compat": {
     "agentSkills": [
@@ -47,13 +47,29 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a dark-mode live-ops admin dashboard for a game studio — sidebar with game switcher, KPI tiles for DAU/retention/ARPDAU/live events, a DAU trend chart, a live events board with status pills, a top in-game items list, and a player segments panel.",
-        "zh-CN": "使用这个插件完成以下任务：Build me a dark-mode live-ops admin dashboard for a game studio — sidebar with game switcher, KPI tiles for DAU/retention/ARPDAU/live events, a DAU trend chart, a live events board with status pills, a top in-game items list, and a player segments panel."
+        "en": "Apply this deep-space neon-purple admin aesthetic to my domain — full-height sidebar with entity switcher and grouped nav sections, topbar with search and period selector, 4 KPI tiles with sparklines, an area-chart card with a segments side panel, a full-width status-event table with type chips and status pills, and a ranked items list with proportional bars, plus list, form, and detail screens.",
+        "zh-CN": "将这个深空霓虹紫风格应用到我的领域：带实体切换器和分组导航的全高侧栏、带搜索和时间选择器的顶栏、4 个带迷你图的 KPI 卡片、带分段侧栏的趋势图卡片、带类型标签和状态标签的状态事件表格，以及带比例条形的排名列表，并配套列表 / 表单 / 详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Pixel LiveOps Admin"
+          "title": "Pixel LiveOps — Dashboard"
+        },
+        {
+          "path": "./assets/dashboard.html",
+          "title": "Pixel LiveOps — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Pixel LiveOps — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Pixel LiveOps — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Pixel LiveOps — Detail"
         }
       ]
     },
@@ -71,7 +87,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {

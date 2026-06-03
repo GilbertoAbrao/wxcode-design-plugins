@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin — New Transfer</title>
+<style>
+:root {
+  --c-navy:#1e3a8a;--c-blue:#2563eb;--c-blue-light:#dbeafe;
+  --c-teal:#0d9488;--c-teal-light:#ccfbf1;
+  --c-green:#16a34a;--c-green-light:#dcfce7;
+  --c-red:#ef4444;--c-red-light:#fee2e2;
+  --c-amber:#d97706;--c-amber-light:#fef3c7;
+  --c-canvas:#f6f8fb;--c-surface:#ffffff;--c-border:#e4e8ef;
+  --c-border-focus:#93c5fd;--c-border-error:#ef4444;
+  --c-text-primary:#1e293b;--c-text-muted:#64748b;--c-text-faint:#94a3b8;
+  --c-sidebar-bg:#0f2460;--c-sidebar-text:#c7d4f0;
+  --c-sidebar-active-bg:rgba(255,255,255,.10);--c-sidebar-active-bar:#38bdf8;
+  --c-shadow-sm:0 1px 3px rgba(30,58,138,.07),0 1px 2px rgba(30,58,138,.04);
+  --r-card:10px;
+  --font:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);font-size:14px;color:var(--c-text-primary);background:var(--c-canvas);line-height:1.5;min-height:100vh;display:flex}
+button,input,select{font:inherit}
+.tabnum{font-variant-numeric:tabular-nums}
+.shell{display:flex;width:100%;min-height:100vh}
+
+/* Sidebar */
+.sidebar{width:260px;min-width:260px;background:var(--c-sidebar-bg);display:flex;flex-direction:column;overflow:hidden}
+.sb-brand{display:flex;align-items:center;gap:10px;padding:22px 20px 20px;border-bottom:1px solid rgba(255,255,255,.07)}
+.sb-logo{width:34px;height:34px}
+.sb-wordmark{font-size:16px;font-weight:700;color:#fff;letter-spacing:.02em}
+.sb-wordmark span{color:#38bdf8}
+.sb-nav{padding:20px 16px;flex:1}
+.sb-nav-group{margin-bottom:20px}
+.sb-section-label{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(199,212,240,.45);padding:0 4px 8px}
+.sb-nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;color:var(--c-sidebar-text);font-size:.85rem;font-weight:500;transition:background .15s,color .15s;position:relative}
+.sb-nav-item:hover,.sb-nav-item.active{background:var(--c-sidebar-active-bg);color:#fff}
+.sb-nav-item.active::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;border-radius:0 3px 3px 0;background:var(--c-sidebar-active-bar)}
+.sb-nav-icon{width:18px;height:18px;flex-shrink:0;opacity:.75}
+.sb-nav-item.active .sb-nav-icon,.sb-nav-item:hover .sb-nav-icon{opacity:1}
+.sb-user{display:flex;align-items:center;gap:10px;padding:16px 20px;border-top:1px solid rgba(255,255,255,.07)}
+.sb-user-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--c-blue),var(--c-teal));display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:#fff;flex-shrink:0}
+.sb-user-name{font-size:.82rem;font-weight:600;color:#e2e8f4}
+.sb-user-role{font-size:.7rem;color:var(--c-sidebar-text)}
+
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:auto}
+.topbar{height:60px;background:var(--c-surface);border-bottom:1px solid var(--c-border);display:flex;align-items:center;gap:12px;padding:0 24px;position:sticky;top:0;z-index:10;box-shadow:var(--c-shadow-sm)}
+.topbar-title{font-size:1rem;font-weight:700;color:var(--c-text-primary);white-space:nowrap}
+.topbar-spacer{flex:1}
+.topbar-actions{display:flex;align-items:center;gap:6px}
+.topbar-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--c-navy),var(--c-teal));display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:#fff;cursor:pointer;flex-shrink:0;border:2px solid var(--c-border)}
+
+/* Page */
+.page{padding:24px;display:flex;flex-direction:column;gap:20px;max-width:860px}
+.page-header{display:flex;align-items:center;justify-content:space-between}
+.page-header-left h1{font-size:1.15rem;font-weight:700;color:var(--c-text-primary)}
+.page-header-left p{font-size:.82rem;color:var(--c-text-muted);margin-top:2px}
+.breadcrumb{font-size:.8rem;color:var(--c-text-muted)}
+.breadcrumb a{color:var(--c-blue);text-decoration:none}
+.breadcrumb a:hover{text-decoration:underline}
+
+/* Card */
+.card{background:var(--c-surface);border-radius:var(--r-card);border:1px solid var(--c-border);box-shadow:var(--c-shadow-sm);overflow:hidden}
+.card-section-title{display:flex;align-items:center;gap:8px;padding:16px 20px;border-bottom:1px solid var(--c-border);font-size:.82rem;font-weight:700;color:var(--c-text-muted);text-transform:uppercase;letter-spacing:.05em}
+.card-body{padding:20px}
+
+/* Form */
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 20px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field.full{grid-column:1/-1}
+.field-label{font-size:.8rem;font-weight:600;color:var(--c-text-primary)}
+.req{color:var(--c-red);margin-left:2px}
+.control{height:38px;border:1px solid var(--c-border);border-radius:8px;padding:0 12px;font-size:.85rem;color:var(--c-text-primary);background:var(--c-canvas);outline:none;transition:border-color .15s;width:100%}
+.control:focus{border-color:var(--c-border-focus);background:#fff}
+.field.invalid .control{border-color:var(--c-border-error);background:#fff9f9}
+.control-prefix-wrap{position:relative}
+.control-prefix{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:.9rem;font-weight:600;color:var(--c-text-muted);pointer-events:none}
+.control.with-prefix{padding-left:26px}
+select.control{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.helper{font-size:.73rem;color:var(--c-text-muted)}
+.error-msg{display:flex;align-items:center;gap:4px;font-size:.73rem;color:var(--c-red);font-weight:500}
+textarea.control{height:80px;padding:10px 12px;resize:vertical;line-height:1.5}
+
+/* Footer */
+.form-footer{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:var(--c-canvas);border-top:1px solid var(--c-border)}
+.form-hint{font-size:.78rem;color:var(--c-text-muted)}
+.footer-actions{display:flex;gap:8px}
+.btn{height:36px;padding:0 16px;border-radius:8px;border:none;cursor:pointer;font-size:.82rem;font-weight:600;display:inline-flex;align-items:center;gap:6px;transition:opacity .15s}
+.btn-ghost{background:transparent;color:var(--c-text-muted);border:1px solid var(--c-border)}
+.btn-ghost:hover{background:var(--c-canvas)}
+.btn-primary{background:linear-gradient(135deg,var(--c-navy),var(--c-blue));color:#fff}
+.btn-primary:hover:not(:disabled){opacity:.9}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <svg class="sb-logo" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+        <rect width="34" height="34" rx="8" fill="rgba(255,255,255,.1)"/>
+        <path d="M17 5 L28 9.5 V18 C28 23.5 22.8 28.3 17 30 C11.2 28.3 6 23.5 6 18 V9.5 Z" fill="none" stroke="rgba(56,189,248,.8)" stroke-width="1.5"/>
+        <path d="M17 8 L25.5 11.5 V18 C25.5 22.3 21.6 26.1 17 27.5 C12.4 26.1 8.5 22.3 8.5 18 V11.5 Z" fill="rgba(37,99,235,.35)"/>
+        <path d="M13 17.5 L15.5 20 L21 14.5" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="sb-wordmark">Crestline<span>Trust</span></span>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-nav-group">
+        <div class="sb-section-label">Overview</div>
+        <div class="sb-nav-item">
+          <svg class="sb-nav-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="11" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="11" width="6" height="6" rx="1.5"/><rect x="11" y="11" width="6" height="6" rx="1.5"/></svg>
+          Dashboard
+        </div>
+      </div>
+      <div class="sb-nav-group">
+        <div class="sb-section-label">Payments</div>
+        <div class="sb-nav-item active">
+          <svg class="sb-nav-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M9 1v16M5 5l4-4 4 4M5 13l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Transfers
+        </div>
+        <div class="sb-nav-item">
+          <svg class="sb-nav-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 9l4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="9" r="7.5"/></svg>
+          Transactions
+        </div>
+        <div class="sb-nav-item">
+          <svg class="sb-nav-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="1.5" y="4" width="15" height="11" rx="2"/><path d="M1.5 8h15" stroke-linecap="round"/></svg>
+          Cards
+        </div>
+      </div>
+      <div class="sb-nav-group">
+        <div class="sb-section-label">Settings</div>
+        <div class="sb-nav-item">
+          <svg class="sb-nav-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="9" cy="9" r="2.5"/><path d="M9 1v2.5M9 14.5V17M1 9h2.5M14.5 9H17M3.05 3.05l1.77 1.77M13.18 13.18l1.77 1.77M3.05 14.95l1.77-1.77M13.18 4.82l1.77-1.77" stroke-linecap="round"/></svg>
+          Settings
+        </div>
+      </div>
+    </nav>
+    <div class="sb-user">
+      <div class="sb-user-avatar">AL</div>
+      <div>
+        <div class="sb-user-name">Alex Laurent</div>
+        <div class="sb-user-role">Account Holder</div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-title">New Transfer</div>
+      <div class="topbar-spacer"></div>
+      <div class="topbar-actions">
+        <div class="topbar-avatar" aria-label="Profile">AL</div>
+      </div>
+    </header>
+
+    <main class="page">
+      <div class="page-header">
+        <div class="page-header-left">
+          <div class="breadcrumb"><a href="#">Transfers</a> › New Transfer</div>
+          <h1 style="margin-top:6px">New Transfer</h1>
+          <p>Fields marked <span style="color:var(--c-red)">*</span> are required.</p>
+        </div>
+      </div>
+
+      <form novalidate>
+
+        <!-- Section: Recipient -->
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-section-title">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="8" cy="5.5" r="2.5"/><path d="M3 13c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke-linecap="round"/></svg>
+            Recipient
+          </div>
+          <div class="card-body">
+            <div class="field-grid">
+
+              <!-- Recipient — required, no value: invalid state shown -->
+              <div class="field full invalid">
+                <label class="field-label" for="f-recipient">Recipient <span class="req">*</span></label>
+                <select id="f-recipient" class="control" aria-invalid="true" aria-describedby="err-recipient">
+                  <option value="">Select a recipient…</option>
+                  <option>Theo Karim · Personal</option>
+                  <option>Sylvia Lund · Business</option>
+                  <option>Ravi Chandra · Personal</option>
+                  <option>Nadia Park · Personal</option>
+                </select>
+                <span class="error-msg" id="err-recipient">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="6" cy="6" r="5"/><path d="M6 4v2.5M6 8.3v.2" stroke-linecap="round"/></svg>
+                  Please select a recipient to continue
+                </span>
+              </div>
+
+              <!-- Source account — required -->
+              <div class="field">
+                <label class="field-label" for="f-account">From Account <span class="req">*</span></label>
+                <select id="f-account" class="control">
+                  <option value="">Select account…</option>
+                  <option selected>Primary Checking ····3812 — $12,480.55</option>
+                  <option>Savings Reserve ····5507 — $34,210.00</option>
+                </select>
+                <span class="helper">Balance must cover the transfer amount.</span>
+              </div>
+
+              <!-- Amount — required, > 0 -->
+              <div class="field">
+                <label class="field-label" for="f-amount">Amount <span class="req">*</span></label>
+                <div class="control-prefix-wrap">
+                  <span class="control-prefix">$</span>
+                  <input id="f-amount" class="control with-prefix tabnum" type="number" min="0.01" step="0.01" placeholder="0.00">
+                </div>
+                <span class="helper">Enter a value greater than $0.00.</span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Scheduling -->
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-section-title">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="1.5" y="2" width="13" height="13" rx="2"/><path d="M5 1v3M11 1v3M1.5 7h13" stroke-linecap="round"/></svg>
+            Scheduling
+          </div>
+          <div class="card-body">
+            <div class="field-grid">
+
+              <!-- Transfer date — required, not in the past -->
+              <div class="field">
+                <label class="field-label" for="f-date">Transfer Date <span class="req">*</span></label>
+                <input id="f-date" class="control" type="date" value="2026-06-05">
+                <span class="helper">Date must be today or in the future.</span>
+              </div>
+
+              <!-- Repeat — optional -->
+              <div class="field">
+                <label class="field-label" for="f-repeat">Repeat</label>
+                <select id="f-repeat" class="control">
+                  <option value="" selected>One-time</option>
+                  <option>Weekly</option>
+                  <option>Monthly</option>
+                  <option>Quarterly</option>
+                </select>
+                <span class="helper">Schedule recurring transfers at the same interval.</span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Details -->
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-section-title">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 4h12M2 8h8M2 12h6" stroke-linecap="round"/></svg>
+            Details
+          </div>
+          <div class="card-body">
+            <div class="field-grid">
+              <!-- Reference — optional -->
+              <div class="field">
+                <label class="field-label" for="f-reference">Reference</label>
+                <input id="f-reference" class="control" type="text" placeholder="e.g. Invoice #2034">
+                <span class="helper">Visible to the recipient on their statement.</span>
+              </div>
+
+              <!-- Note — optional -->
+              <div class="field">
+                <label class="field-label" for="f-note">Note</label>
+                <input id="f-note" class="control" type="text" placeholder="e.g. Dinner split">
+                <span class="helper">Private note for your own records.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="card">
+          <div class="form-footer">
+            <span class="form-hint">Fields marked <span class="req">*</span> are required.</span>
+            <div class="footer-actions">
+              <button type="button" class="btn btn-ghost">Cancel</button>
+              <button type="submit" class="btn btn-primary" disabled>Send Transfer</button>
+            </div>
+          </div>
+        </div>
+
+      </form>
+    </main>
+  </div>
+
+</div>
+</body>
+</html>

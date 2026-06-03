@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lumex Ops — New Shipment</title>
+<style>
+  :root {
+    --c-indigo:    #6366f1;
+    --c-indigo-d:  #4f46e5;
+    --c-indigo-lt: #eef2ff;
+    --c-rose:      #f43f5e;
+    --c-rose-d:    #e11d48;
+    --c-rose-lt:   #fff1f2;
+    --c-green:     #22c55e;
+    --c-green-lt:  #f0fdf4;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #f6f7f9; color: #1e293b;
+    min-height: 100vh; font-size: 14px; line-height: 1.5;
+  }
+
+  /* ── Header ────────────────────────────────────────────────── */
+  .header {
+    display: flex; align-items: center; gap: 12px;
+    height: 52px; padding: 0 24px;
+    background: #ffffff; border-bottom: 1px solid #e8eaee;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .header-brand {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 700; font-size: 15px; letter-spacing: -0.02em;
+    color: #1e293b; flex-shrink: 0;
+  }
+  .header-spacer { flex: 1; }
+  .header-right { display: flex; align-items: center; gap: 16px; }
+  .avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--c-indigo);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: #fff; cursor: pointer; flex-shrink: 0;
+  }
+
+  /* ── Page ──────────────────────────────────────────────────── */
+  .page { max-width: 860px; margin: 0 auto; padding: 24px; }
+  .breadcrumb {
+    font-size: 12px; color: #94a3b8; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .breadcrumb a { color: var(--c-indigo); text-decoration: none; }
+  .page-title { font-size: 20px; font-weight: 700; color: #1e293b; letter-spacing: -0.02em; margin-bottom: 20px; }
+
+  /* ── Buttons ─────────────────────────────────────────────────── */
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 18px; border-radius: 8px;
+    background: var(--c-indigo); color: #fff;
+    font-size: 13px; font-weight: 600; cursor: pointer; border: none;
+    transition: background 0.15s;
+  }
+  .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 18px; border-radius: 8px;
+    background: #ffffff; color: #334155;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    border: 1px solid #e8eaee; transition: background 0.15s;
+  }
+
+  /* ── Card ────────────────────────────────────────────────────── */
+  .card {
+    background: #ffffff; border: 1px solid #e8eaee;
+    border-radius: 14px; overflow: hidden; margin-bottom: 16px;
+  }
+  .card-section-title {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 600; color: #334155;
+    padding: 14px 20px; border-bottom: 1px solid #f1f5f9;
+    background: #f8fafc;
+  }
+  .card-body { padding: 20px; }
+
+  /* ── Form ────────────────────────────────────────────────────── */
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 20px; }
+  .field.full { grid-column: 1 / -1; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field-label { font-size: 12.5px; font-weight: 600; color: #334155; }
+  .req { color: var(--c-rose-d); margin-left: 2px; }
+  .control {
+    padding: 8px 12px; border-radius: 8px;
+    border: 1px solid #e8eaee; background: #ffffff;
+    font-size: 13px; color: #1e293b; font-family: inherit;
+    outline: none; transition: border-color 0.15s;
+    appearance: none; -webkit-appearance: none;
+  }
+  .control:focus { border-color: var(--c-indigo); box-shadow: 0 0 0 3px var(--c-indigo-lt); }
+  .control::placeholder { color: #94a3b8; }
+  select.control { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 30px; }
+  .helper { font-size: 11.5px; color: #94a3b8; }
+  .error-msg {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 11.5px; color: var(--c-rose-d); font-weight: 500;
+  }
+  .field.invalid .control { border-color: var(--c-rose); background: var(--c-rose-lt); }
+  .field.invalid .control:focus { box-shadow: 0 0 0 3px #ffe4e6; }
+
+  /* ── Form footer ─────────────────────────────────────────────── */
+  .form-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 4px;
+  }
+  .form-hint { font-size: 12px; color: #94a3b8; }
+  .footer-actions { display: flex; gap: 10px; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-brand">
+    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+      <rect width="30" height="30" rx="8" fill="var(--c-indigo)"/>
+      <path d="M7 10l4 10 4-6 4 6 4-10" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Lumex Ops
+  </div>
+  <div class="header-spacer"></div>
+  <div class="header-right">
+    <div class="avatar" title="Priya Nair">PN</div>
+  </div>
+</header>
+
+<div class="page">
+  <div class="breadcrumb">
+    <a href="#">Shipments</a>
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+    <span>New Shipment</span>
+  </div>
+  <div class="page-title">New Shipment</div>
+
+  <form novalidate>
+
+    <div class="card">
+      <div class="card-section-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        Route &amp; Carrier
+      </div>
+      <div class="card-body">
+        <div class="field-grid">
+
+          <div class="field">
+            <label class="field-label" for="origin">Origin Hub <span class="req">*</span></label>
+            <select id="origin" class="control" required>
+              <option value="">Select origin…</option>
+              <option>São Paulo (GRU)</option>
+              <option>Singapore (SIN)</option>
+              <option>Dubai (DXB)</option>
+              <option>Los Angeles (LAX)</option>
+              <option>Hamburg (HAM)</option>
+            </select>
+            <span class="helper">Hub where shipment will be picked up.</span>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="destination">Destination Hub <span class="req">*</span></label>
+            <select id="destination" class="control" required>
+              <option value="">Select destination…</option>
+              <option>Miami (MIA)</option>
+              <option>Sydney (SYD)</option>
+              <option>Frankfurt (FRA)</option>
+              <option>Tokyo (NRT)</option>
+              <option>New York (JFK)</option>
+            </select>
+            <span class="helper">Hub where shipment will be delivered.</span>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="carrier">Carrier <span class="req">*</span></label>
+            <select id="carrier" class="control" required>
+              <option value="">Select carrier…</option>
+              <option>APEX-3</option>
+              <option>Brightline Freight</option>
+              <option>SwiftCargo</option>
+              <option>NorthStar</option>
+            </select>
+            <span class="helper">Only carriers active on the chosen route are eligible.</span>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="cargo-type">Cargo Type <span class="req">*</span></label>
+            <select id="cargo-type" class="control" required>
+              <option value="">Select type…</option>
+              <option>General Freight</option>
+              <option>Perishable</option>
+              <option>Hazardous</option>
+              <option>Oversized</option>
+            </select>
+            <span class="helper">Determines handling and compliance requirements.</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-section-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Cargo Details
+      </div>
+      <div class="card-body">
+        <div class="field-grid">
+
+          <div class="field invalid">
+            <label class="field-label" for="weight">Weight (kg) <span class="req">*</span></label>
+            <input id="weight" class="control" type="number" min="1" value="0" aria-invalid="true" required>
+            <span class="error-msg">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Weight must be greater than 0.
+            </span>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="volume">Volume (m³)</label>
+            <input id="volume" class="control" type="number" min="0" step="0.1" placeholder="Optional">
+            <span class="helper">Required for oversized cargo.</span>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="pickup">Scheduled Pickup <span class="req">*</span></label>
+            <input id="pickup" class="control" type="date" required>
+            <span class="helper">Must be today or a future date.</span>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="priority">Priority <span class="req">*</span></label>
+            <select id="priority" class="control" required>
+              <option value="">Select priority…</option>
+              <option>Standard</option>
+              <option>Express</option>
+              <option>Critical</option>
+            </select>
+            <span class="helper">Express and Critical incur surcharges.</span>
+          </div>
+
+          <div class="field full">
+            <label class="field-label" for="notes">Handling Notes</label>
+            <textarea id="notes" class="control" rows="3" placeholder="Special handling instructions, fragile items, temperature requirements…" style="resize:vertical;"></textarea>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="form-footer">
+      <span class="form-hint">Fields marked <span class="req">*</span> are required.</span>
+      <div class="footer-actions">
+        <button type="button" class="btn-ghost">Cancel</button>
+        <button type="submit" class="btn-primary" disabled>Create Shipment</button>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+</body>
+</html>

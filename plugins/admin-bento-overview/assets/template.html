@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{App Name} — {Screen Title}</title>
+<style>
+  /* ── Chromatic tokens — copy this :root block into every screen ── */
+  :root {
+    --c-indigo:    #6366f1;
+    --c-indigo-d:  #4f46e5;
+    --c-indigo-lt: #eef2ff;
+    --c-teal:      #14b8a6;
+    --c-teal-d:    #0d9488;
+    --c-teal-lt:   #f0fdfa;
+    --c-amber:     #f59e0b;
+    --c-amber-d:   #d97706;
+    --c-amber-lt:  #fffbeb;
+    --c-rose:      #f43f5e;
+    --c-rose-d:    #e11d48;
+    --c-rose-lt:   #fff1f2;
+    --c-green:     #22c55e;
+    --c-green-lt:  #f0fdf4;
+  }
+
+  /* ── Reset & base ────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #f6f7f9; color: #1e293b;
+    min-height: 100vh; font-size: 14px; line-height: 1.5;
+  }
+
+  /* ── Sticky header ───────────────────────────────────────────── */
+  .header {
+    display: flex; align-items: center; gap: 12px;
+    height: 52px; padding: 0 24px;
+    background: #ffffff; border-bottom: 1px solid #e8eaee;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .header-brand {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 700; font-size: 15px; letter-spacing: -0.02em;
+    color: #1e293b; flex-shrink: 0;
+  }
+  /* Brand SVG monogram: replace with domain's initials / glyph */
+  .header-period { display: flex; gap: 4px; margin-left: 20px; }
+  .period-chip {
+    padding: 4px 12px; border-radius: 20px;
+    font-size: 12px; font-weight: 500;
+    border: 1px solid #e8eaee; background: #ffffff;
+    color: #64748b; cursor: pointer;
+    transition: background 0.15s;
+  }
+  .period-chip.active { background: var(--c-indigo); border-color: var(--c-indigo); color: #fff; }
+  .header-spacer { flex: 1; }
+  .header-sub { font-size: 12px; color: #94a3b8; display: flex; align-items: center; gap: 6px; }
+  .header-right { display: flex; align-items: center; gap: 16px; }
+  .icon-btn {
+    width: 34px; height: 34px; border-radius: 8px;
+    border: 1px solid #e8eaee; background: #ffffff;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; position: relative; color: #64748b;
+  }
+  .notif-dot {
+    position: absolute; top: 6px; right: 6px;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--c-rose); border: 2px solid #fff;
+  }
+  .avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--c-indigo);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: #fff; cursor: pointer; flex-shrink: 0;
+  }
+
+  /* ── Bento grid (dashboard screen) ──────────────────────────── */
+  .bento {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-auto-rows: 88px;
+    gap: 14px;
+    padding: 20px 24px 32px;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  /* Base tile */
+  .tile {
+    background: #ffffff; border: 1px solid #e8eaee;
+    border-radius: 14px; overflow: hidden; position: relative;
+  }
+  .tile-inner { padding: 18px 20px; height: 100%; display: flex; flex-direction: column; }
+  .tile-label {
+    font-size: 10.5px; font-weight: 600; letter-spacing: 0.07em;
+    text-transform: uppercase; color: #94a3b8; margin-bottom: 6px;
+  }
+
+  /* Tile span presets (vary as needed): */
+  /* .tile-hero     { grid-column: span 5; grid-row: span 2; } */
+  /* .tile-chart    { grid-column: span 7; grid-row: span 3; } */
+  /* .tile-kpi      { grid-column: span 3; grid-row: span 1; } */
+  /* .tile-activity { grid-column: span 5; grid-row: span 3; } */
+  /* .tile-donut    { grid-column: span 4; grid-row: span 3; } */
+  /* .tile-table    { grid-column: span 8; grid-row: span 3; } */
+  /* .tile-status   { grid-column: span 4; grid-row: span 2; } */
+
+  /* ── Status pills (reuse across all screens) ─────────────────── */
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+  .pill-ok    { background: #f0fdf4; color: #16a34a; }
+  .pill-warn  { background: var(--c-amber-lt); color: var(--c-amber-d); }
+  .pill-error { background: var(--c-rose-lt);  color: var(--c-rose-d); }
+  .pill-blue  { background: var(--c-indigo-lt); color: var(--c-indigo-d); }
+  .pill-teal  { background: var(--c-teal-lt);   color: var(--c-teal-d); }
+
+  /* ── Delta chips ─────────────────────────────────────────────── */
+  .delta-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 9px; border-radius: 20px; font-size: 12px; font-weight: 600;
+  }
+  .delta-up   { background: var(--c-green-lt); color: #16a34a; }
+  .delta-down { background: var(--c-rose-lt);  color: var(--c-rose-d); }
+
+  /* ── Shared buttons ──────────────────────────────────────────── */
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 8px;
+    background: var(--c-indigo); color: #fff;
+    font-size: 13px; font-weight: 600; cursor: pointer; border: none;
+    transition: background 0.15s;
+  }
+  .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 8px;
+    background: #ffffff; color: #334155;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    border: 1px solid #e8eaee; transition: background 0.15s;
+  }
+
+  /* ── Card wrapper (list / form / detail screens) ─────────────── */
+  .card {
+    background: #ffffff; border: 1px solid #e8eaee;
+    border-radius: 14px; overflow: hidden; margin-bottom: 16px;
+  }
+
+  /* ── accent borders ──────────────────────────────────────────── */
+  .tile-teal-border { border-top: 3px solid var(--c-teal); }
+  .tile-rose-border { border-top: 3px solid var(--c-rose); }
+  .hero-accent {
+    position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+    background: linear-gradient(to bottom, var(--c-indigo), var(--c-indigo-d));
+    border-radius: 14px 0 0 14px;
+  }
+
+  /* ── Page content area (list / form / detail) ────────────────── */
+  .page { max-width: 1280px; margin: 0 auto; padding: 24px; }
+  .page-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .page-title { font-size: 20px; font-weight: 700; color: #1e293b; letter-spacing: -0.02em; }
+  .page-subtitle { font-size: 13px; color: #64748b; margin-top: 2px; }
+
+  /* ── Form fields ─────────────────────────────────────────────── */
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field-label { font-size: 12.5px; font-weight: 600; color: #334155; }
+  .req { color: var(--c-rose-d); margin-left: 2px; }
+  .control {
+    padding: 8px 12px; border-radius: 8px;
+    border: 1px solid #e8eaee; background: #ffffff;
+    font-size: 13px; color: #1e293b; font-family: inherit;
+    outline: none; transition: border-color 0.15s; appearance: none;
+  }
+  .control:focus { border-color: var(--c-indigo); box-shadow: 0 0 0 3px var(--c-indigo-lt); }
+  .helper { font-size: 11.5px; color: #94a3b8; }
+  .error-msg { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--c-rose-d); font-weight: 500; }
+  .field.invalid .control { border-color: var(--c-rose); background: var(--c-rose-lt); }
+</style>
+</head>
+<body>
+
+<!-- ── Sticky header — replace brand and avatar initials ── -->
+<header class="header">
+  <div class="header-brand">
+    <!-- Replace SVG with domain monogram -->
+    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+      <rect width="30" height="30" rx="8" fill="var(--c-indigo)"/>
+      <text x="15" y="20" font-size="14" font-weight="700" fill="#fff" text-anchor="middle" font-family="sans-serif">{X}</text>
+    </svg>
+    {App Name}
+  </div>
+  <!-- Period chips: show on dashboard screens, hide on list/form/detail -->
+  <div class="header-period">
+    <button class="period-chip">Today</button>
+    <button class="period-chip active">7D</button>
+    <button class="period-chip">30D</button>
+    <button class="period-chip">Custom</button>
+  </div>
+  <div class="header-spacer"></div>
+  <div class="header-sub">{context label}</div>
+  <div class="header-right">
+    <div class="icon-btn" aria-label="Notifications">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="notif-dot"></span>
+    </div>
+    <div class="avatar">{XX}</div>
+  </div>
+</header>
+
+<!-- ── Drop the appropriate region skeleton below ── -->
+<!-- Dashboard: use <main class="bento"> with tile children -->
+<!-- List:      use <div class="page"> with toolbar + card + table -->
+<!-- Form:      use <div class="page"> with <form> + card sections -->
+<!-- Detail:    use <div class="page"> with detail-header + meta-grid + two-col -->
+
+</body>
+</html>

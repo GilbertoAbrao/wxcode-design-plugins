@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bloom Admin — Shell Seed</title>
+<!--
+  SEED SKELETON — copy this file as the starting point for a new screen in the
+  Bloom warm light-mode skin. It carries the :root token block and the app shell
+  (sidebar: org/scope switcher + grouped nav + user footer; topbar: title + search +
+  period tabs + notifications + avatar). Replace the org name, program chips, nav
+  groups and items, topbar title, and the <div class="content"> body with the real
+  domain's equivalents. Keep the token block intact.
+-->
+<style>
+:root {
+  /* Emerald accent */
+  --accent:         #10b981;
+  --accent-light:   #d1fae5;
+  --accent-dark:    #059669;
+  --accent-mid:     #34d399;
+  /* Coral counter-accent */
+  --coral:          #fb7185;
+  --coral-light:    #ffe4e8;
+  --coral-dark:     #e11d48;
+  /* Amber warm-neutral */
+  --amber:          #f59e0b;
+  --amber-light:    #fef3c7;
+  --amber-dark:     #92400e;
+  /* Surfaces */
+  --surface:        #f7fbf9;
+  --card:           #ffffff;
+  --border:         #e4ede9;
+  /* Text ramp (slate neutrals — may be hardcoded) */
+  --text-primary:   #1e293b;
+  --text-secondary: #64748b;
+  --text-muted:     #94a3b8;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px; color: var(--text-primary);
+  background: var(--surface); display: flex; min-height: 100vh; line-height: 1.5;
+}
+
+/* ── SIDEBAR ─────────────────────────────────────── */
+.sidebar {
+  width: 260px; flex-shrink: 0; background: var(--card);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  height: 100vh; position: sticky; top: 0; overflow-y: auto;
+}
+.org-switcher { padding: 20px 16px 14px; border-bottom: 1px solid var(--border); }
+.org-row { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 6px 8px; border-radius: 8px; transition: background .15s; }
+.org-row:hover { background: var(--surface); }
+.org-avatar { width: 34px; height: 34px; border-radius: 9px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.org-name { font-size: 13px; font-weight: 600; flex: 1; }
+.org-caret { color: var(--text-muted); }
+.program-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; padding: 0 8px; }
+.program-chip { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px; background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); cursor: pointer; transition: all .15s; }
+.program-chip.active { background: var(--accent-light); color: var(--accent-dark); border-color: var(--accent-light); }
+
+.nav { flex: 1; padding: 12px 10px; overflow-y: auto; }
+.nav-section-label { font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); padding: 10px 8px 4px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 7px; cursor: pointer; color: var(--text-secondary); font-size: 13px; font-weight: 500; position: relative; transition: all .15s; text-decoration: none; }
+.nav-item:hover { background: var(--surface); color: var(--text-primary); }
+.nav-item.active { background: var(--accent-light); color: var(--accent-dark); font-weight: 600; }
+.nav-item.active::before { content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 3px; border-radius: 0 3px 3px 0; background: var(--accent); }
+.nav-item svg { flex-shrink: 0; }
+.nav-item.active svg { color: var(--accent); }
+.nav-badge { margin-left: auto; font-size: 10px; font-weight: 700; background: var(--coral-light); color: var(--coral-dark); border-radius: 10px; padding: 1px 6px; }
+
+.sidebar-footer { padding: 14px 16px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+.user-avatar-sm { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-light); color: var(--accent-dark); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.user-info { flex: 1; }
+.user-name { font-size: 13px; font-weight: 600; }
+.user-role { font-size: 11px; color: var(--text-muted); }
+.signout-btn { font-size: 11px; color: var(--text-muted); cursor: pointer; background: none; border: none; padding: 2px 4px; border-radius: 4px; transition: color .15s; }
+.signout-btn:hover { color: var(--coral-dark); }
+
+/* ── MAIN ────────────────────────────────────────── */
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+/* ── TOPBAR ──────────────────────────────────────── */
+.topbar { height: 60px; background: var(--card); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 16px; padding: 0 24px; position: sticky; top: 0; z-index: 10; }
+.topbar-left { flex: 0 0 auto; }
+.page-title { font-size: 16px; font-weight: 700; }
+.page-sub   { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+.topbar-search { flex: 1; max-width: 360px; position: relative; }
+.topbar-search svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+.topbar-search input { width: 100%; height: 34px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); padding: 0 12px 0 34px; font-size: 13px; color: var(--text-primary); outline: none; transition: border-color .15s; }
+.topbar-search input:focus { border-color: var(--accent); }
+.topbar-search input::placeholder { color: var(--text-muted); }
+.topbar-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+.period-tabs { display: flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.period-tab { font-size: 11px; font-weight: 600; padding: 5px 11px; cursor: pointer; color: var(--text-secondary); border-right: 1px solid var(--border); transition: all .15s; white-space: nowrap; }
+.period-tab:last-child { border-right: none; }
+.period-tab.active { background: var(--card); color: var(--accent-dark); border-bottom: 2px solid var(--accent); }
+.notif-btn { position: relative; width: 34px; height: 34px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); transition: background .15s; }
+.notif-btn:hover { background: var(--surface); }
+.notif-dot { position: absolute; top: 7px; right: 7px; width: 7px; height: 7px; border-radius: 50%; background: var(--amber); border: 1.5px solid var(--card); }
+.topbar-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+/* ── REUSABLE PRIMITIVES ─────────────────────────── */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.card-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 12px; border-bottom: 1px solid var(--border); }
+.card-title { font-size: 14px; font-weight: 700; }
+.btn-primary { padding: 7px 14px; background: var(--accent); border: 1px solid var(--accent); border-radius: 8px; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background .15s; }
+.btn-primary:hover { background: var(--accent-dark); }
+.btn-primary:disabled { background: var(--border); border-color: var(--border); color: var(--text-muted); cursor: not-allowed; }
+.btn-ghost { padding: 7px 14px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; transition: all .15s; }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent-dark); }
+
+/* ── CONTENT SLOT ────────────────────────────────── */
+.content { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR: entity/scope switcher → grouped nav → user footer.
+     Relabel org name, program chips, nav section labels and items to the real domain. -->
+<aside class="sidebar">
+  <div class="org-switcher">
+    <div class="org-row">
+      <div class="org-avatar">·</div>                     <!-- replace · with first letter of org name -->
+      <span class="org-name">Organization Name</span>
+      <span class="org-caret">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </span>
+    </div>
+    <div class="program-chips">
+      <!-- 2–3 scope/filter chips; mark one .active -->
+      <span class="program-chip active">All</span>
+      <span class="program-chip">Area A</span>
+      <span class="program-chip">Area B</span>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <!-- Repeat nav-section-label + nav-item blocks for 3–4 groups -->
+    <div class="nav-section-label">Overview</div>
+    <a class="nav-item active">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      {Primary entity list}
+      <!-- Add <span class="nav-badge">{count}</span> if needed -->
+    </a>
+
+    <div class="nav-section-label">{Group B}</div>
+    <a class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      {List screen}
+    </a>
+    <a class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      {Segments / distribution}
+    </a>
+
+    <div class="nav-section-label">Settings</div>
+    <a class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      Team
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-avatar-sm">··</div>                  <!-- replace with user initials -->
+    <div class="user-info">
+      <div class="user-name">User Name</div>
+      <div class="user-role">Role</div>
+    </div>
+    <button class="signout-btn" title="Sign out">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN: topbar + content slot -->
+<div style="flex:1;display:flex;flex-direction:column;min-width:0;">
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="page-title">{Screen Title}</div>
+      <div class="page-sub">{context · date or scope}</div>
+    </div>
+
+    <div class="topbar-search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search…" aria-label="Search">
+    </div>
+
+    <div class="topbar-right">
+      <!-- Period tabs — relabel to the domain's time facets -->
+      <div class="period-tabs" role="tablist">
+        <button class="period-tab" role="tab">Period A</button>
+        <button class="period-tab active" role="tab">Period B</button>
+        <button class="period-tab" role="tab">Period C</button>
+      </div>
+
+      <button class="notif-btn" aria-label="Notifications">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-dot"></span>
+      </button>
+
+      <div class="topbar-avatar" title="User Name">··</div>
+    </div>
+  </header>
+
+  <!-- CONTENT SLOT — drop the screen body here.
+       See assets/*.html and references/layouts.md for region skeletons. -->
+  <div class="content">
+    <!-- content goes here -->
+  </div>
+</div>
+
+</body>
+</html>

@@ -3,8 +3,8 @@
   "specVersion": "1.0.0",
   "name": "wxcode-admin-ai-copilot",
   "title": "AI Copilot Admin",
-  "version": "0.1.0",
-  "description": "Admin dashboard with a permanent AI copilot rail. Deterministic widget canvas on the left, conversational agent on the right, Cmd+K command palette, inline suggestion chips, tool-call cards. The 2025 pattern for agentic admin UIs.",
+  "version": "0.2.0",
+  "description": "Split-pane admin aesthetic: deep-navy canvas (#0f1419), indigo accent (#6366f1), pink secondary (#ec4899), compact system-ui type, and hairline-bordered cards. Archetype = top bar with centered Cmd+K pill + 64px icon-only nav rail + scrollable widget canvas (KPI tiles × 4 + area-chart card + records table) + 380px right copilot rail (header · thread with tool-call cards + inline artifacts + suggestion chips · sticky composer) + 32px bottom status bar. Built for agentic admin UIs where the agent is a first-class layout region.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,11 +19,13 @@
     "operations",
     "web",
     "admin",
-    "ai-agent",
-    "copilot",
+    "dark-mode",
+    "split-pane",
+    "indigo-accent",
     "command-palette",
-    "chat-driven",
-    "split-pane"
+    "agent-rail",
+    "tool-call-card",
+    "data-dense"
   ],
   "compat": {
     "agentSkills": [
@@ -44,13 +46,29 @@
     },
     "useCase": {
       "query": {
-        "en": "Build an admin dashboard with a permanent AI copilot rail \u2014 left = widget canvas with KPIs / chart / table, right = chat with tool-call cards, top = Cmd+K palette, bottom status with agent idle/working.",
-        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild an admin dashboard with a permanent AI copilot rail \u2014 left = widget canvas with KPIs / chart / table, right = chat with tool-call cards, top = Cmd+K palette, bottom status with agent idle/working."
+        "en": "Apply this split-pane indigo-navy admin aesthetic to my domain — deep-navy canvas, indigo accent, centered Cmd+K pill, icon rail, KPI tiles, area-chart card, records table, permanent right copilot rail with tool-call cards and suggestion chips, bottom status bar.",
+        "zh-CN": "将这个分栏靛蓝深海军色管理后台风格应用到我的领域：深海军底色、靛蓝强调色、居中Cmd+K搜索栏、图标侧栏、KPI卡片、面积图、记录表格、带工具调用卡片和建议芯片的右侧AI副驾驶轨道、底部状态栏。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "AI Copilot Admin"
+          "title": "AI Copilot Admin — Dashboard"
+        },
+        {
+          "path": "./assets/dashboard.html",
+          "title": "AI Copilot Admin — Dashboard (asset)"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "AI Copilot Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "AI Copilot Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "AI Copilot Admin — Detail"
         }
       ]
     },
@@ -68,7 +86,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {
@@ -85,6 +109,10 @@
     "capabilities": [
       "prompt:inject",
       "fs:write"
-    ]
+    ],
+    "provenance": {
+      "category": "admin-dashboards",
+      "note": "original archetype; no third-party template reproduced"
+    }
   }
 }

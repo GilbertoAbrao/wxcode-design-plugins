@@ -3,8 +3,8 @@
   "specVersion": "1.0.0",
   "name": "wxcode-admin-glassmorphism",
   "title": "Glassmorphism Admin",
-  "version": "0.1.0",
-  "description": "Dark-mode admin built on frosted glass panels \u2014 translucent surfaces with backdrop blur over a soft colored aurora gradient, cyan accent, hairline white-alpha borders. Modern alternative to flat-card SaaS admins.",
+  "version": "0.2.0",
+  "description": "Dark-mode admin built on frosted glass panels — translucent surfaces (rgba white 4%) with backdrop-filter blur over a soft aurora gradient background, cyan accent (#4dd0e1), hairline white-alpha borders, soft inner glow on actives. Archetype = glass sidebar + glass topbar + 4 KPI tiles with sparklines + 2-column main grid (area chart / top-N list) + full-width glass records table with tinted status capsules, plus matching list, form, and detail screens.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -22,7 +22,10 @@
     "glassmorphism",
     "dark-mode",
     "frosted-glass",
-    "modern"
+    "aurora-gradient",
+    "backdrop-blur",
+    "modern",
+    "cyan-accent"
   ],
   "compat": {
     "agentSkills": [
@@ -43,13 +46,29 @@
     },
     "useCase": {
       "query": {
-        "en": "Make me a glassmorphism admin dashboard for a creator-economy platform \u2014 dark, aurora gradient background, frosted glass panels, cyan accent, KPI tiles, revenue chart, top creators table.",
-        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aMake me a glassmorphism admin dashboard for a creator-economy platform \u2014 dark, aurora gradient background, frosted glass panels, cyan accent, KPI tiles, revenue chart, top creators table."
+        "en": "Apply this frosted-glass admin aesthetic to my domain — aurora gradient canvas, glass sidebar, glass topbar, 4 KPI tiles with sparklines, area chart + top-N list grid, full-width records table with tinted status capsules, plus list, form, and detail screens.",
+        "zh-CN": "将这个毛玻璃风格应用到我的领域：极光渐变背景、玻璃侧栏、玻璃顶栏、4 个带迷你折线图的 KPI 卡片、面积图 + 排行列表的双列布局、带状态标签的全宽记录表格，以及配套的列表、表单和详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Glassmorphism Admin"
+          "title": "Glassmorphism Admin — Dashboard"
+        },
+        {
+          "path": "./assets/dashboard.html",
+          "title": "Glassmorphism Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Glassmorphism Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Glassmorphism Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Glassmorphism Admin — Detail"
         }
       ]
     },
@@ -67,7 +86,13 @@
         "typographic-rhythm"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {
@@ -84,6 +109,10 @@
     "capabilities": [
       "prompt:inject",
       "fs:write"
-    ]
+    ],
+    "provenance": {
+      "category": "admin-dashboards",
+      "note": "original archetype; no third-party template reproduced"
+    }
   }
 }

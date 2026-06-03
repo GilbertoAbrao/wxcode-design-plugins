@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin — Transaction Detail</title>
+<style>
+:root {
+  --c-navy:#1e3a8a;--c-blue:#2563eb;--c-blue-light:#dbeafe;
+  --c-teal:#0d9488;--c-teal-light:#ccfbf1;
+  --c-green:#16a34a;--c-green-light:#dcfce7;
+  --c-red:#ef4444;--c-red-light:#fee2e2;
+  --c-amber:#d97706;--c-amber-light:#fef3c7;
+  --c-violet:#7c3aed;--c-violet-light:#ede9fe;
+  --c-rose:#e11d48;--c-rose-light:#ffe4e6;
+  --c-canvas:#f6f8fb;--c-surface:#ffffff;--c-border:#e4e8ef;
+  --c-border-focus:#93c5fd;
+  --c-text-primary:#1e293b;--c-text-muted:#64748b;--c-text-faint:#94a3b8;
+  --c-sidebar-bg:#0f2460;--c-sidebar-text:#c7d4f0;
+  --c-sidebar-active-bg:rgba(255,255,255,.10);--c-sidebar-active-bar:#38bdf8;
+  --c-shadow-sm:0 1px 3px rgba(30,58,138,.07),0 1px 2px rgba(30,58,138,.04);
+  --r-card:10px;
+  --font:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);font-size:14px;color:var(--c-text-primary);background:var(--c-canvas);line-height:1.5;min-height:100vh;display:flex}
+button,input,select{font:inherit}
+.tabnum{font-variant-numeric:tabular-nums}
+.shell{display:flex;width:100%;min-height:100vh}
+
+/* Sidebar */
+.sidebar{width:260px;min-width:260px;background:var(--c-sidebar-bg);display:flex;flex-direction:column;overflow:hidden}
+.sb-brand{display:flex;align-items:center;gap:10px;padding:22px 20px 20px;border-bottom:1px solid rgba(255,255,255,.07)}
+.sb-logo{width:34px;height:34px}
+.sb-wordmark{font-size:16px;font-weight:700;color:#fff;letter-spacing:.02em}
+.sb-wordmark span{color:#38bdf8}
+.sb-nav{padding:20px 16px;flex:1}
+.sb-nav-group{margin-bottom:20px}
+.sb-section-label{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(199,212,240,.45);padding:0 4px 8px}
+.sb-nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;color:var(--c-sidebar-text);font-size:.85rem;font-weight:500;transition:background .15s,color .15s;position:relative}
+.sb-nav-item:hover,.sb-nav-item.active{background:var(--c-sidebar-active-bg);color:#fff}
+.sb-nav-item.active::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;border-radius:0 3px 3px 0;background:var(--c-sidebar-active-bar)}
+.sb-nav-icon{width:18px;height:18px;flex-shrink:0;opacity:.75}
+.sb-nav-item.active .sb-nav-icon,.sb-nav-item:hover .sb-nav-icon{opacity:1}
+.sb-user{display:flex;align-items:center;gap:10px;padding:16px 20px;border-top:1px solid rgba(255,255,255,.07)}
+.sb-user-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--c-blue),var(--c-teal));display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:#fff;flex-shrink:0}
+.sb-user-name{font-size:.82rem;font-weight:600;color:#e2e8f4}
+.sb-user-role{font-size:.7rem;color:var(--c-sidebar-text)}
+
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:auto}
+.topbar{height:60px;background:var(--c-surface);border-bottom:1px solid var(--c-border);display:flex;align-items:center;gap:12px;padding:0 24px;position:sticky;top:0;z-index:10;box-shadow:var(--c-shadow-sm)}
+.topbar-title{font-size:1rem;font-weight:700;color:var(--c-text-primary);white-space:nowrap}
+.topbar-spacer{flex:1}
+.topbar-actions{display:flex;align-items:center;gap:6px}
+.topbar-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--c-navy),var(--c-teal));display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:#fff;cursor:pointer;flex-shrink:0;border:2px solid var(--c-border)}
+
+/* Page */
+.page{padding:24px;display:flex;flex-direction:column;gap:20px}
+.breadcrumb{font-size:.8rem;color:var(--c-text-muted)}
+.breadcrumb a{color:var(--c-blue);text-decoration:none}
+.breadcrumb a:hover{text-decoration:underline}
+
+/* Detail header */
+.detail-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.detail-id-row{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.detail-id{font-family:"Courier New",monospace;font-size:1rem;font-weight:700;color:var(--c-text-primary);font-variant-numeric:tabular-nums}
+.s-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;font-size:.7rem;font-weight:600}
+.s-completed{background:var(--c-green-light);color:var(--c-green)}
+.s-pending{background:var(--c-amber-light);color:var(--c-amber)}
+.s-failed{background:var(--c-red-light);color:var(--c-red)}
+.s-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+.detail-merchant{font-size:.9rem;color:var(--c-text-muted)}
+.detail-actions{display:flex;gap:8px;flex-shrink:0}
+.btn{height:34px;padding:0 14px;border-radius:8px;border:none;cursor:pointer;font-size:.82rem;font-weight:600;display:inline-flex;align-items:center;gap:6px;transition:opacity .15s}
+.btn-ghost{background:transparent;color:var(--c-text-muted);border:1px solid var(--c-border)}
+.btn-ghost:hover{background:var(--c-canvas)}
+.btn-primary{background:linear-gradient(135deg,var(--c-navy),var(--c-blue));color:#fff}
+.btn-primary:hover{opacity:.9}
+.btn-red{background:var(--c-red-light);color:var(--c-red);border:1px solid var(--c-red)}
+
+/* Card */
+.card{background:var(--c-surface);border-radius:var(--r-card);border:1px solid var(--c-border);box-shadow:var(--c-shadow-sm);overflow:hidden}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--c-border)}
+.card-title{font-size:.9rem;font-weight:700;color:var(--c-text-primary)}
+.card-action{font-size:.78rem;color:var(--c-blue);font-weight:600;cursor:pointer;text-decoration:none}
+
+/* Meta grid */
+.meta-grid{display:grid;grid-template-columns:repeat(3,1fr);padding:20px;gap:20px}
+.meta-cell{display:flex;flex-direction:column;gap:2px}
+.meta-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--c-text-muted)}
+.meta-value{font-size:.9rem;font-weight:600;color:var(--c-text-primary);font-variant-numeric:tabular-nums}
+.meta-sub{font-size:.75rem;color:var(--c-text-muted)}
+
+/* Related panels grid */
+.two-col{display:grid;grid-template-columns:7fr 5fr;gap:16px;align-items:start}
+
+/* Similar transactions mini-table */
+.mini-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.mini-table thead th{padding:8px 16px;text-align:left;font-size:.63rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--c-text-muted);border-bottom:1px solid var(--c-border);background:var(--c-canvas)}
+.mini-table thead th.num{text-align:right}
+.mini-table tbody tr{transition:background .12s}
+.mini-table tbody tr:hover{background:#f0f4fb}
+.mini-table tbody td{padding:10px 16px;border-bottom:1px solid var(--c-border);vertical-align:middle}
+.mini-table tbody tr:last-child td{border-bottom:none}
+.amt-neg{color:var(--c-red);font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.amt-pos{color:var(--c-green);font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.rec-id{font-family:"Courier New",monospace;font-size:.75rem;color:var(--c-text-muted)}
+.tag{display:inline-block;padding:2px 7px;border-radius:99px;font-size:.68rem;font-weight:600}
+.tag-teal{background:var(--c-teal-light);color:var(--c-teal)}
+.tag-amber{background:var(--c-amber-light);color:var(--c-amber)}
+.tag-violet{background:var(--c-violet-light);color:var(--c-violet)}
+.tag-rose{background:var(--c-rose-light);color:var(--c-rose)}
+.tag-blue{background:var(--c-blue-light);color:var(--c-blue)}
+.tag-green{background:var(--c-green-light);color:var(--c-green)}
+
+/* Activity timeline */
+.activity-list{display:flex;flex-direction:column;padding:16px 20px;gap:0}
+.activity-item{display:flex;gap:12px;position:relative;padding-bottom:16px}
+.activity-item:last-child{padding-bottom:0}
+.activity-item:last-child::before{display:none}
+.activity-item::before{content:"";position:absolute;left:6px;top:16px;bottom:0;width:1px;background:var(--c-border)}
+.activity-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;margin-top:2px;border:2px solid var(--c-surface)}
+.activity-dot-blue{background:var(--c-blue)}
+.activity-dot-green{background:var(--c-green)}
+.activity-dot-amber{background:var(--c-amber)}
+.activity-dot-muted{background:var(--c-text-faint)}
+.activity-body{flex:1;min-width:0}
+.activity-event{font-size:.82rem;font-weight:600;color:var(--c-text-primary)}
+.activity-detail{font-size:.75rem;color:var(--c-text-muted)}
+.activity-time{font-size:.72rem;color:var(--c-text-faint);white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <svg class="sb-logo" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+        <rect width="34" height="34" rx="8" fill="rgba(255,255,255,.1)"/>
+        <path d="M17 5 L28 9.5 V18 C28 23.5 22.8 28.3 17 30 C11.2 28.3 6 23.5 6 18 V9.5 Z" fill="none" stroke="rgba(56,189,248,.8)" stroke-width="1.5"/>
+        <path d="M17 8 L25.5 11.5 V18 C25.5 22.3 21.6 26.1 17 27.5 C12.4 26.1 8.5 22.3 8.5 18 V11.5 Z" fill="rgba(37,99,235,.35)"/>
+        <path d="M13 17.5 L15.5 20 L21 14.5" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="sb-wordmark">Crestline<span>Trust</span></span>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-nav-group">
+        <div class="sb-section-label">Overview</div>
+        <div class="sb-nav-item">
+          <svg class="sb-nav-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="11" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="11" width="6" height="6" rx="1.5"/><rect x="11" y="11" width="6" height="6" rx="1.5"/></svg>
+          Dashboard
+        </div>
+      </div>
+      <div class="sb-nav-group">
+        <div class="sb-section-label">Payments</div>
+        <div class="sb-nav-item active">
+          <svg class="sb-nav-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 9l4 4 8-8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="9" r="7.5"/></svg>
+          Transactions
+        </div>
+        <div class="sb-nav-item">
+          <svg class="sb-nav-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M9 1v16M5 5l4-4 4 4M5 13l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Transfers
+        </div>
+        <div class="sb-nav-item">
+          <svg class="sb-nav-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="1.5" y="4" width="15" height="11" rx="2"/><path d="M1.5 8h15" stroke-linecap="round"/></svg>
+          Cards
+        </div>
+      </div>
+      <div class="sb-nav-group">
+        <div class="sb-section-label">Settings</div>
+        <div class="sb-nav-item">
+          <svg class="sb-nav-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="9" cy="9" r="2.5"/><path d="M9 1v2.5M9 14.5V17M1 9h2.5M14.5 9H17M3.05 3.05l1.77 1.77M13.18 13.18l1.77 1.77M3.05 14.95l1.77-1.77M13.18 4.82l1.77-1.77" stroke-linecap="round"/></svg>
+          Settings
+        </div>
+      </div>
+    </nav>
+    <div class="sb-user">
+      <div class="sb-user-avatar">AL</div>
+      <div>
+        <div class="sb-user-name">Alex Laurent</div>
+        <div class="sb-user-role">Account Holder</div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-title">Transaction Detail</div>
+      <div class="topbar-spacer"></div>
+      <div class="topbar-actions">
+        <div class="topbar-avatar" aria-label="Profile">AL</div>
+      </div>
+    </header>
+
+    <main class="page">
+      <div class="breadcrumb"><a href="#">Transactions</a> › TXN-009142</div>
+
+      <!-- Detail header -->
+      <div class="detail-header">
+        <div>
+          <div class="detail-id-row">
+            <span class="detail-id">TXN-009142</span>
+            <span class="s-pill s-completed"><span class="s-dot"></span>Completed</span>
+          </div>
+          <div class="detail-merchant">Verdana Fresh Market · Supermarket · Jun 01, 2026</div>
+        </div>
+        <div class="detail-actions">
+          <button class="btn btn-ghost">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 10.5v2h2L11 5.5 9 3.5 2 10.5ZM9 3.5l1.5-1.5 1 1L10 4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Export
+          </button>
+          <button class="btn btn-ghost btn-red">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 3.5h10M5 3.5V2.5h4v1M11 3.5l-.7 8H3.7L3 3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Dispute
+          </button>
+        </div>
+      </div>
+
+      <!-- Meta grid -->
+      <div class="card">
+        <div class="meta-grid">
+          <div class="meta-cell">
+            <div class="meta-label">Merchant</div>
+            <div class="meta-value">Verdana Fresh Market</div>
+            <div class="meta-sub">Supermarket · Downtown</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Category</div>
+            <div class="meta-value">Food &amp; Dining</div>
+            <div class="meta-sub">Grocery</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Amount</div>
+            <div class="meta-value tabnum" style="color:var(--c-red)">−$84.30</div>
+            <div class="meta-sub">Debit · USD</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Account</div>
+            <div class="meta-value">Primary Checking</div>
+            <div class="meta-sub">····3812</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Date &amp; Time</div>
+            <div class="meta-value">Jun 01, 2026</div>
+            <div class="meta-sub">14:32 UTC</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Reference</div>
+            <div class="meta-value" style="font-family:'Courier New',monospace;font-size:.82rem">REF-74918203</div>
+            <div class="meta-sub">Bank reference</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Two-column: similar records + activity -->
+      <div class="two-col">
+
+        <!-- Similar transactions mini-table -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Similar Transactions</span>
+            <a href="#" class="card-action">View all</a>
+          </div>
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Merchant</th>
+                <th>Category</th>
+                <th class="num">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="rec-id">TXN-009110</span></td>
+                <td style="color:var(--c-text-muted);white-space:nowrap">May 24, 2026</td>
+                <td style="font-weight:600">Verdana Fresh Market</td>
+                <td><span class="tag tag-teal">Food</span></td>
+                <td class="amt-neg">−$92.10</td>
+              </tr>
+              <tr>
+                <td><span class="rec-id">TXN-009078</span></td>
+                <td style="color:var(--c-text-muted);white-space:nowrap">May 17, 2026</td>
+                <td style="font-weight:600">Verdana Fresh Market</td>
+                <td><span class="tag tag-teal">Food</span></td>
+                <td class="amt-neg">−$77.45</td>
+              </tr>
+              <tr>
+                <td><span class="rec-id">TXN-009044</span></td>
+                <td style="color:var(--c-text-muted);white-space:nowrap">May 10, 2026</td>
+                <td style="font-weight:600">Brewer &amp; Stone Café</td>
+                <td><span class="tag tag-teal">Food</span></td>
+                <td class="amt-neg">−$12.40</td>
+              </tr>
+              <tr>
+                <td><span class="rec-id">TXN-008997</span></td>
+                <td style="color:var(--c-text-muted);white-space:nowrap">May 03, 2026</td>
+                <td style="font-weight:600">Verdana Fresh Market</td>
+                <td><span class="tag tag-teal">Food</span></td>
+                <td class="amt-neg">−$88.60</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Activity timeline -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Activity</span>
+          </div>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-dot activity-dot-green"></div>
+              <div class="activity-body">
+                <div class="activity-event">Transaction settled</div>
+                <div class="activity-detail">Funds cleared. Balance updated.</div>
+              </div>
+              <div class="activity-time">Jun 01 · 16:04</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot activity-dot-blue"></div>
+              <div class="activity-body">
+                <div class="activity-event">Authorization approved</div>
+                <div class="activity-detail">POS terminal · Downtown branch.</div>
+              </div>
+              <div class="activity-time">Jun 01 · 14:32</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot activity-dot-amber"></div>
+              <div class="activity-body">
+                <div class="activity-event">Authorization requested</div>
+                <div class="activity-detail">Merchant initiated $84.30 hold.</div>
+              </div>
+              <div class="activity-time">Jun 01 · 14:31</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot activity-dot-muted"></div>
+              <div class="activity-body">
+                <div class="activity-event">Card presented</div>
+                <div class="activity-detail">Contactless · Card ····3812.</div>
+              </div>
+              <div class="activity-time">Jun 01 · 14:31</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+</div>
+</body>
+</html>

@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-harbor-banking",
-  "title": "Harbor Banking Admin",
-  "version": "0.1.0",
-  "description": "Digital banking / personal finance operations console \u2014 light mode, navy-blue accent, teal secondary. Left account sidebar, topbar with search and notifications, hero payment-card SVG, 3 KPI tiles, spending donut chart, recent transactions table, and quick-transfer payees panel.",
+  "title": "Harbor Admin",
+  "version": "0.2.0",
+  "description": "Light-mode card admin aesthetic: white surfaces on a slate-tinted canvas (#f6f8fb), navy-to-blue primary gradient (#1e3a8a → #2563eb), teal secondary (#0d9488), 10px card radius, hairline borders, and subtle shadows. Archetype = narrow dark-navy entity-list sidebar + sticky topbar with search pill + hero row (stylized card SVG + 3 KPI tiles) + 2-column content area (donut chart + dense records table left; quick-action panel + scheduled items right). Optimised for high-trust, card-centric operations consoles.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,16 +19,16 @@
     "operations",
     "web",
     "admin",
-    "banking",
-    "fintech",
     "light-mode",
     "navy-blue",
     "teal",
-    "personal-finance",
-    "transactions",
-    "payment-card",
+    "card-centric",
     "trustworthy",
-    "clean-cards"
+    "white-surface",
+    "sidebar-admin",
+    "donut-chart",
+    "kpi-tiles",
+    "records-table"
   ],
   "compat": {
     "agentSkills": [
@@ -49,13 +49,29 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a digital banking admin console \u2014 accounts sidebar, topbar, a stylized payment card, 3 KPI tiles (balance / income / spending), a spending-by-category chart, recent transactions table, and a quick-transfer payees panel.",
-        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me a digital banking admin console \u2014 accounts sidebar, topbar, a stylized payment card, 3 KPI tiles (balance / income / spending), a spending-by-category chart, recent transactions table, and a quick-transfer payees panel."
+        "en": "Apply this light navy-teal card admin aesthetic to my domain",
+        "zh-CN": "将这个 light navy-teal 卡片风格的 admin 外观应用到我的领域"
       },
       "exampleOutputs": [
         {
-          "path": "./example.html",
-          "title": "Harbor Banking Admin"
+          "path": "./assets/dashboard.html",
+          "title": "Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Records List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "New Transfer Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Transaction Detail"
+        },
+        {
+          "path": "./assets/template.html",
+          "title": "Seed Template"
         }
       ]
     },
@@ -73,7 +89,12 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {

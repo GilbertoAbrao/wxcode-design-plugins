@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{Screen title}</title>
+<style>
+/* ── Paste the full token block below into every screen. ─────────── */
+:root {
+  --color-accent:       #e11d48;   /* rose-600 */
+  --color-accent-soft:  #ec4899;   /* pink-500 */
+  --color-accent-bg:    #fff1f5;
+  --color-indigo:       #4f46e5;
+  --color-indigo-soft:  #6366f1;
+  --color-indigo-bg:    #eef2ff;
+  --color-sky:          #0ea5e9;
+  --color-sky-bg:       #f0f9ff;
+  --color-amber:        #d97706;
+  --color-amber-bg:     #fffbeb;
+  --color-success:      #16a34a;
+  --color-success-bg:   #f0fdf4;
+  --color-warning:      #d97706;
+  --color-warning-bg:   #fffbeb;
+  --color-danger:       #dc2626;
+  --color-danger-bg:    #fef2f2;
+}
+
+/* ── Reset ────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px; line-height: 1.5; color: #0f172a;
+  background: #fafafa; display: flex;
+}
+
+/* ── Sidebar (240px fixed) ───────────────────────────────────────── */
+.sidebar {
+  width: 240px; min-height: 100vh; background: #ffffff;
+  border-right: 1px solid #ececf0;
+  display: flex; flex-direction: column; flex-shrink: 0;
+  position: sticky; top: 0;
+}
+.sidebar-brand {
+  display: flex; align-items: center; gap: 10px;
+  padding: 20px 18px 16px; border-bottom: 1px solid #ececf0;
+}
+.brand-icon {
+  width: 34px; height: 34px; border-radius: 9px;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-soft));
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+/* brand-name / brand-tagline: font-size 16/10px, #0f172a / #94a3b8 */
+
+.sidebar-nav { flex: 1; padding: 14px 0; overflow-y: auto; }
+.nav-section-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.7px;
+  text-transform: uppercase; color: #94a3b8; padding: 14px 18px 6px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px; padding: 8px 18px;
+  border-left: 3px solid transparent; color: #475569;
+  font-size: 13.5px; font-weight: 500;
+  transition: background 0.15s, color 0.15s; text-decoration: none; cursor: pointer;
+}
+.nav-item:hover { background: #fafafa; color: #0f172a; }
+.nav-item.active {
+  border-left-color: var(--color-accent);
+  background: var(--color-accent-bg); color: var(--color-accent); font-weight: 600;
+}
+/* .nav-badge: margin-left:auto; rose bg; 10px bold pill */
+
+.sidebar-footer { border-top: 1px solid #ececf0; padding: 14px 18px; }
+/* sidebar-user: avatar(32px indigo gradient) + name/role + upgrade-btn */
+/* upgrade-btn: full-width rose gradient pill */
+
+/* ── Main ───────────────────────────────────────────────────────── */
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; min-height: 100vh; }
+
+/* ── Topbar (60px) ──────────────────────────────────────────────── */
+.topbar {
+  height: 60px; background: #ffffff; border-bottom: 1px solid #ececf0;
+  display: flex; align-items: center; padding: 0 24px; gap: 16px;
+  position: sticky; top: 0; z-index: 10;
+}
+/* topbar-title (17px/700) + topbar-breadcrumb (12px/muted) + topbar-sep(flex:1) */
+/* search-box: f1f5f9 bg + ececf0 border + 8px radius + magnifier icon */
+/* date-range-btn: white + ececf0 border + calendar icon + label */
+/* topbar-bell: 36×36 f8fafc chip + bell-dot (7px rose) */
+/* topbar-avatar: 36px rose gradient circle */
+
+/* ── Content (24px padding, flex-col gap 24px) ──────────────────── */
+.content { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+
+/* ── Page header ────────────────────────────────────────────────── */
+/* .page-header: flex between; left=h1(20/700)+p(13/muted); right=btn-ghost+btn-primary */
+
+/* ── Buttons ────────────────────────────────────────────────────── */
+/* .btn-ghost: white bg, ececf0 border, radius 8px; hover rose */
+/* .btn-primary: rose gradient, white text, radius 8px */
+
+/* ── KPI card row ───────────────────────────────────────────────── */
+/* .kpi-row: grid 4col equal gap 16px */
+/* .kpi-card: white panel 12px radius, padding 18px 20px, shadow 0 2px 8px .04 */
+/*   .kpi-label: 10.5px UC LC #94a3b8 */
+/*   .kpi-value: 26px/800 tabular-nums; .kpi-sparkline: 52×26 inline SVG */
+/*   .kpi-delta.up/.down: tinted pill with arrow glyph */
+
+/* ── 7/5 middle row ─────────────────────────────────────────────── */
+/* .mid-row: grid 7fr 5fr gap 16px */
+/* LEFT: multi-series SVG line chart + area fills (rose/indigo/sky) + gridlines + axis labels */
+/* RIGHT: conversion funnel rows (step label + count + proportional fill bar + drop connector) */
+/*        + aggregate rate chip at foot */
+
+/* ── Records table ──────────────────────────────────────────────── */
+/* .table-card: white, ececf0 border, 12px radius, overflow hidden */
+/*   table header: card-title + card-subtitle + view-all + btn-primary */
+/*   thead th: 10.5px UC LC #94a3b8 / f8fafc bg / ececf0 border-bottom */
+/*   tbody tr: 1px f1f5f9 dividers; hover #fff7f8 */
+/*   .channel-chip: typed pills (channel-a/b/c/d = indigo/rose/sky/amber) */
+/*   .status-pill: status-live/paused/ended (green/amber/red) with status-dot */
+/*   table footer: showing N–M of T + pagination chips */
+
+/* ── List toolbar ───────────────────────────────────────────────── */
+/* .toolbar: white card + search-box + filter chip groups (.chip.active = rose) */
+
+/* ── Form fields with inline validation ─────────────────────────── */
+/* .field-grid: 1fr 1fr gap 16px 20px; .field.full = col-span 2 */
+/* .field-label: 12.5px/600 #334155; .req: rose asterisk */
+/* .control: 9px 12px padding, ececf0 border, 8px radius; focus = rose ring */
+/* .helper: 11.5px #94a3b8 below the control */
+/* .field.invalid .control: danger border + danger-bg */
+/* .error-msg: 11.5px danger + alert icon + specific rule message */
+/* form-footer: f8fafc strip, hint left, Cancel + disabled Submit right */
+
+/* ── Detail screen ──────────────────────────────────────────────── */
+/* .detail-header: white card; id-row (mono ID + status-pill + channel-chip) */
+/*   + detail-name (22px/800) + detail-sub (13px/muted) + actions right */
+/* .meta-grid: grid 3col, .meta-cell = label(UC tiny) + value(14/600) + sub */
+/* .two-col: 7fr 5fr; LEFT = mini perf bars; RIGHT = activity feed */
+
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR — copy from assets/dashboard.html, update .nav-item.active -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">
+      <!-- Brand icon SVG: flame glyph, white fill -->
+      <svg width="18" height="20" viewBox="0 0 18 20" fill="none">
+        <path d="M9 0C9 0 3 5.5 3 10.5C3 13.538 5.686 16 9 16C12.314 16 15 13.538 15 10.5C15 8.2 13.5 6.3 13.5 6.3C13.5 6.3 13 9 11 10C11 10 12 7.5 10.5 5.5C10.5 5.5 10.2 8.5 8 9.5C8 9.5 9.5 6 9 0Z" fill="#ffffff"/>
+        <path d="M9 13C7.9 13 7 13.9 7 15C7 16.1 7.9 17 9 17C10.1 17 11 16.1 11 15C11 13.9 10.1 13 9 13Z" fill="#ffffff" opacity="0.7"/>
+      </svg>
+    </div>
+    <div>
+      <div style="font-size:16px;font-weight:700;letter-spacing:-0.3px;color:#0f172a;">{Brand}</div>
+      <div style="font-size:10px;color:#94a3b8;letter-spacing:0.4px;text-transform:uppercase;">{Tagline}</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">{Section}</div>
+    <a class="nav-item active" href="#">
+      <!-- icon SVG -->
+      {Active nav item}
+    </a>
+    <a class="nav-item" href="#">
+      <!-- icon SVG -->
+      {Nav item}
+    </a>
+    <!-- repeat nav sections / items -->
+  </nav>
+  <div class="sidebar-footer">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+      <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--color-indigo),var(--color-indigo-soft));display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;">{AB}</div>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:#0f172a;">{Name}</div>
+        <div style="font-size:11px;color:#94a3b8;">{Role}</div>
+      </div>
+    </div>
+    <button style="display:block;width:100%;padding:8px;background:linear-gradient(135deg,var(--color-accent),var(--color-accent-soft));color:#fff;border:none;border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;">{CTA}</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <header class="topbar">
+    <div>
+      <div style="font-size:17px;font-weight:700;color:#0f172a;">{Page title}</div>
+      <div style="font-size:12px;color:#94a3b8;display:flex;align-items:center;gap:4px;">
+        <span>{Parent}</span>
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3.5 2l3 3-3 3" stroke="#94a3b8" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span style="color:#0f172a;font-weight:600;">{Current}</span>
+      </div>
+    </div>
+    <div style="flex:1;"></div>
+    <!-- search-box, date-range-btn, bell, avatar here -->
+    <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--color-accent),var(--color-accent-soft));display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;">{AB}</div>
+  </header>
+
+  <main class="content">
+
+    <!-- Page header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <h1 style="font-size:20px;font-weight:700;color:#0f172a;">{Screen title}</h1>
+        <p style="font-size:13px;color:#64748b;margin-top:2px;">{Scope · context · timestamp}</p>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button style="padding:8px 16px;border:1px solid #ececf0;border-radius:8px;background:#fff;font-size:13px;font-weight:500;color:#334155;cursor:pointer;">{Secondary}</button>
+        <button style="padding:8px 16px;border:none;border-radius:8px;background:linear-gradient(135deg,var(--color-accent),var(--color-accent-soft));color:#fff;font-size:13px;font-weight:600;cursor:pointer;">+ {Primary}</button>
+      </div>
+    </div>
+
+    <!--
+      INSERT REGION SKELETONS HERE from references/layouts.md:
+      • KPI card row          → .kpi-row with 4 .kpi-card tiles
+      • 7/5 middle split      → .mid-row (chart left, funnel right)
+      • Full-width records table
+      • List toolbar + table  → .toolbar + .table-card
+      • Form with inline validation
+      • Detail header + meta grid + two-col panels
+    -->
+
+  </main>
+</div>
+
+</body>
+</html>

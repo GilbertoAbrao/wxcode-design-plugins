@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-slate-commerce",
-  "title": "Slate Commerce Admin",
-  "version": "0.1.0",
-  "description": "A clean, light-mode e-commerce back-office dashboard with warm neutral surfaces, emerald accents, and amber highlights. Ships with a sidebar store switcher, topbar date range selector, four KPI cards with inline sparklines, a revenue bar chart, a recent orders table with status badges, and a top products list \u2014 everything a merchant needs at a glance.",
+  "title": "Slate Admin",
+  "version": "0.2.0",
+  "description": "Clean light-mode admin aesthetic: warm white canvas (#ffffff / #f9fafb), emerald accent (#10b981) for positive states and primary actions, amber (#f59e0b) for caution, Inter type with tabular figures, 10px radii, subtle card shadows, and warm slate neutrals. Archetype = fixed sidebar (entity switcher + sectioned nav + user footer) + topbar (search + range selector + notification bell + avatar) + 4 KPI cards with inline sparklines + a metric bar chart + a ranked items panel + a full-width records table with status badges, plus matching list, form, and detail screens.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -16,13 +16,14 @@
     "wxcode",
     "first-party",
     "prototype",
-    "e-commerce",
+    "operations",
     "web",
     "admin",
-    "back-office",
     "light-mode",
     "emerald",
-    "orders"
+    "sparklines",
+    "data-dense",
+    "enterprise"
   ],
   "compat": {
     "agentSkills": [
@@ -35,25 +36,33 @@
     "kind": "scenario",
     "taskKind": "new-generation",
     "mode": "prototype",
-    "scenario": "e-commerce",
+    "scenario": "operations",
     "surface": "web",
     "preview": {
       "type": "html",
       "entry": "./example.html"
     },
-    "provenance": {
-      "category": "themeforest-admin-templates",
-      "note": "category design-language reference only; original implementation"
-    },
     "useCase": {
       "query": {
-        "en": "Build me a light-mode e-commerce back-office dashboard \u2014 sidebar with store switcher, topbar with date range, 4 KPI cards with sparklines, a revenue bar chart, a recent orders table with status badges, and a top products list.",
-        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me a light-mode e-commerce back-office dashboard \u2014 sidebar with store switcher, topbar with date range, 4 KPI cards with sparklines, a revenue bar chart, a recent orders table with status badges, and a top products list."
+        "en": "Apply this clean light-mode admin aesthetic to my domain — fixed sidebar with entity switcher, topbar with search and range selector, 4 KPI cards with sparklines, a metric bar chart, a ranked items panel, and a dense records table with status badges, plus list / form / detail screens.",
+        "zh-CN": "将这个简洁的浅色管理界面风格应用到我的领域：固定侧边栏带实体切换器、顶栏带搜索和范围选择器、4 个带 sparkline 的 KPI 卡片、指标柱状图、排名项面板，以及带状态标签的密集记录表，并配套列表 / 表单 / 详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Slate Commerce Admin"
+          "title": "Slate Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Slate Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Slate Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Slate Admin — Detail"
         }
       ]
     },
@@ -71,7 +80,13 @@
         "typographic-rhythm"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {
@@ -88,6 +103,10 @@
     "capabilities": [
       "prompt:inject",
       "fs:write"
-    ]
+    ],
+    "provenance": {
+      "category": "admin-dashboards",
+      "note": "original archetype; no third-party template reproduced"
+    }
   }
 }

@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-bento-overview",
-  "title": "Bento Ops Overview",
-  "version": "0.1.0",
-  "description": "Operations overview dashboard built on a bento-grid layout — asymmetric tiles of varied sizes spanning a neutral canvas. One hero metric, an inline SVG area chart, KPI pills, donut chart, activity feed, mini-table, and status tile. Multi-accent palette: indigo, teal, amber, rose.",
+  "title": "Bento Overview",
+  "version": "0.2.0",
+  "description": "Light-mode bento-grid admin aesthetic: neutral canvas (#f6f7f9), white tiles, hairline borders, and a multi-accent palette of indigo, teal, amber, and rose. Archetype = sticky header with period chips + full-width asymmetric CSS grid of hero, chart, KPI, activity feed, donut, mini-table, and status tiles — no sidebar. Matching list, form, and detail screens complete the set.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -20,13 +20,13 @@
     "web",
     "admin",
     "bento-grid",
-    "overview",
     "light-mode",
     "multi-accent",
-    "kpi",
-    "dashboard",
-    "ops",
-    "asymmetric-layout"
+    "asymmetric-layout",
+    "indigo-accent",
+    "teal-accent",
+    "data-tiles",
+    "enterprise"
   ],
   "compat": {
     "agentSkills": [
@@ -47,13 +47,25 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a business operations overview dashboard using a bento-grid layout — asymmetric tile sizes, hero metric, SVG chart, KPI tiles, activity feed, donut, mini-table, and status tile.",
-        "zh-CN": "使用这个插件完成以下任务：Build me a business operations overview dashboard using a bento-grid layout — asymmetric tile sizes, hero metric, SVG chart, KPI tiles, activity feed, donut, mini-table, and status tile."
+        "en": "Apply this light bento-grid admin aesthetic to my domain — neutral canvas, multi-accent tiles, hero metric, area chart, KPI pills, activity feed, donut chart, mini-table, and status tile, plus list, form, and detail screens.",
+        "zh-CN": "将这个浅色宾托网格管理界面风格应用到我的领域：中性底色、多强调色磁贴、英雄指标、面积图、KPI 胶囊、活动流、环形图、迷你表格和状态磁贴，以及列表、表单和详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Bento Ops Overview"
+          "title": "Bento Overview — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Bento Overview — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Bento Overview — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Bento Overview — Detail"
         }
       ]
     },
@@ -71,7 +83,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {

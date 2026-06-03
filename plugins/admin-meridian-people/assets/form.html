@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>New Record</title>
+<style>
+:root {
+  --color-accent:      #4f46e5;
+  --color-accent-mid:  #6366f1;
+  --color-accent-bg:   #eef2ff;
+  --color-success:     #16a34a;
+  --color-success-bg:  #dcfce7;
+  --color-danger:      #dc2626;
+  --color-danger-bg:   #fee2e2;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:14px;color:#1e1e2d;background:#f8f8fb;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;border:none;background:none;font:inherit}
+svg{display:block}
+
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* Sidebar */
+.sidebar{width:240px;min-width:240px;background:#fff;border-right:1px solid #e8e8ef;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0}
+.sidebar-logo{display:flex;align-items:center;gap:10px;padding:20px 20px 16px;border-bottom:1px solid #e8e8ef}
+.sidebar-logo-text{font-size:15px;font-weight:700;color:#1e1e2d;letter-spacing:-0.01em}
+.sidebar-logo-text span{color:var(--color-accent)}
+.org-switcher{margin:12px 12px 8px;padding:10px 12px;background:#f8f8fb;border:1px solid #e8e8ef;border-radius:8px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.org-switcher-inner{display:flex;align-items:center;gap:8px}
+.org-avatar{width:28px;height:28px;border-radius:6px;background:var(--color-accent-bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--color-accent)}
+.org-name{font-size:12px;font-weight:600;color:#1e1e2d}
+.org-sub{font-size:11px;color:#9ca3af}
+.nav-section{padding:8px 0 4px}
+.nav-section-label{padding:6px 20px 4px;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#9ca3af}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 20px;font-size:13px;color:#6b7280;position:relative;cursor:pointer;transition:background .12s,color .12s}
+.nav-item:hover{background:#f8f8fb;color:#1e1e2d}
+.nav-item.active{background:var(--color-accent-bg);color:var(--color-accent);font-weight:600}
+.nav-item.active::before{content:"";position:absolute;left:0;top:4px;bottom:4px;width:3px;border-radius:0 3px 3px 0;background:var(--color-accent)}
+.nav-item svg{flex-shrink:0;opacity:.7}
+.nav-item.active svg{opacity:1}
+.sidebar-footer{margin-top:auto;border-top:1px solid #e8e8ef;padding:14px 16px;display:flex;align-items:center;gap:10px}
+.sidebar-footer-avatar{width:32px;height:32px;border-radius:50%;background:var(--color-accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff}
+.sidebar-footer-info{flex:1;min-width:0}
+.sidebar-footer-name{font-size:12px;font-weight:600;color:#1e1e2d}
+.sidebar-footer-role{font-size:11px;color:#9ca3af}
+
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+/* Topbar */
+.topbar{height:60px;min-height:60px;background:#fff;border-bottom:1px solid #e8e8ef;display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0}
+.topbar-title{display:flex;flex-direction:column;line-height:1.2;min-width:0;flex-shrink:0}
+.topbar-page{font-size:15px;font-weight:700;color:#1e1e2d;white-space:nowrap}
+.topbar-breadcrumb{font-size:11px;color:#9ca3af}
+.topbar-breadcrumb a{color:var(--color-accent);text-decoration:none}
+.topbar-avatar-wrap{margin-left:auto;display:flex;align-items:center;gap:8px}
+.topbar-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--color-accent),var(--color-accent-mid));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.topbar-uname{font-size:13px;font-weight:600;color:#1e1e2d}
+
+/* Content */
+.content{flex:1;overflow-y:auto;padding:24px}
+.form-container{max-width:760px}
+
+/* Breadcrumb */
+.breadcrumb{font-size:12px;color:#9ca3af;margin-bottom:16px;display:flex;align-items:center;gap:6px}
+.breadcrumb a{color:var(--color-accent)}
+.breadcrumb-sep{color:#d1d5db}
+
+/* Page heading */
+.page-heading{margin-bottom:20px}
+.page-heading-title{font-size:20px;font-weight:700;color:#1e1e2d}
+.page-heading-sub{font-size:13px;color:#6b7280;margin-top:2px}
+
+/* Cards */
+.form-card{background:#fff;border:1px solid #e8e8ef;border-radius:12px;margin-bottom:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.card-section-header{padding:16px 20px 14px;border-bottom:1px solid #e8e8ef;display:flex;align-items:center;gap:8px}
+.card-section-title{font-size:13px;font-weight:700;color:#1e1e2d}
+.card-section-sub{font-size:12px;color:#9ca3af;margin-left:auto}
+.card-body{padding:20px}
+
+/* Field grid */
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field.full{grid-column:1/-1}
+.field-label{font-size:12px;font-weight:600;color:#374151;display:flex;align-items:center;gap:3px}
+.req{color:var(--color-danger);font-size:12px}
+.control{height:36px;padding:0 12px;border:1px solid #e8e8ef;border-radius:8px;font-size:13px;color:#1e1e2d;background:#fff;outline:none;width:100%;transition:border-color .12s}
+.control:focus{border-color:var(--color-accent);box-shadow:0 0 0 3px rgba(79,70,229,.08)}
+select.control{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5l3 3 3-3' stroke='%239ca3af' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;appearance:none}
+textarea.control{height:80px;padding:10px 12px;resize:vertical;line-height:1.5}
+.helper{font-size:11px;color:#9ca3af;margin-top:1px}
+
+/* Invalid state */
+.field.invalid .control{border-color:var(--color-danger);background:#fff8f8}
+.field.invalid .control:focus{box-shadow:0 0 0 3px rgba(220,38,38,.08)}
+.error-msg{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-danger);margin-top:1px}
+
+/* Valid state (shown on touched+valid) */
+.field.valid .control{border-color:var(--color-success)}
+
+/* Avatar preview */
+.avatar-field{display:flex;align-items:center;gap:12px}
+.avatar-preview{width:48px;height:48px;border-radius:50%;background:var(--color-accent);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0}
+.avatar-upload{flex:1}
+.avatar-upload label{display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:4px}
+.avatar-btn{padding:6px 14px;border:1px solid #e8e8ef;border-radius:8px;font-size:12px;color:#6b7280;background:#fff;cursor:pointer}
+.avatar-btn:hover{border-color:var(--color-accent);color:var(--color-accent)}
+.avatar-note{font-size:11px;color:#9ca3af;margin-top:4px}
+
+/* Form footer */
+.form-footer{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:#fff;border:1px solid #e8e8ef;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.form-hint{font-size:12px;color:#9ca3af}
+.form-hint .req{font-size:12px}
+.footer-actions{display:flex;align-items:center;gap:10px}
+.btn-ghost{padding:7px 16px;border:1px solid #e8e8ef;border-radius:8px;font-size:13px;color:#6b7280;background:#fff}
+.btn-ghost:hover{border-color:var(--color-accent);color:var(--color-accent)}
+.btn-primary{padding:7px 20px;border-radius:8px;background:var(--color-accent);color:#fff;font-size:13px;font-weight:600}
+.btn-primary:hover{background:var(--color-accent-mid)}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <rect width="28" height="28" rx="7" fill="var(--color-accent)"/>
+        <polygon points="14,4 24,10 24,18 14,24 4,18 4,10" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="14" cy="14" r="3" fill="#fff"/>
+      </svg>
+      <span class="sidebar-logo-text">Meri<span>dian</span></span>
+    </div>
+    <div class="org-switcher">
+      <div class="org-switcher-inner">
+        <div class="org-avatar">NV</div>
+        <div><div class="org-name">NorthVault Group</div><div class="org-sub">847 members</div></div>
+      </div>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:#9ca3af"><path d="M4 5.5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <nav class="nav-section">
+      <div class="nav-section-label">People</div>
+      <div class="nav-item active">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M1 13c0-2.2 2.239-4 5-4s5 1.8 5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="12" cy="5" r="2" stroke="currentColor" stroke-width="1.3" opacity=".5"/><path d="M14 13c0-1.5-1-2.8-2.5-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity=".5"/></svg>
+        Directory
+      </div>
+      <div class="nav-item">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a6 6 0 010 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M8 2a6 6 0 000 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" opacity=".4"/><path d="M5 8h6M8 5v6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Time Off
+      </div>
+    </nav>
+    <nav class="nav-section">
+      <div class="nav-section-label">Settings</div>
+      <div class="nav-item">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/><path d="M8 2v1.5M8 12.5V14M2 8h1.5M12.5 8H14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Roles &amp; Permissions
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-footer-avatar">KR</div>
+      <div class="sidebar-footer-info">
+        <div class="sidebar-footer-name">Kira Reynolds</div>
+        <div class="sidebar-footer-role">Admin</div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-title">
+        <span class="topbar-page">Add Record</span>
+        <span class="topbar-breadcrumb"><a href="#">Directory</a> / New Record</span>
+      </div>
+      <div class="topbar-avatar-wrap">
+        <div class="topbar-avatar">KR</div>
+        <span class="topbar-uname">Kira Reynolds</span>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="form-container">
+
+        <div class="breadcrumb">
+          <a href="#">Directory</a>
+          <span class="breadcrumb-sep">›</span>
+          <span>New Record</span>
+        </div>
+
+        <div class="page-heading">
+          <div class="page-heading-title">Add New Record</div>
+          <div class="page-heading-sub">Fill in the details below. Fields marked <span style="color:var(--color-danger)">*</span> are required.</div>
+        </div>
+
+        <form novalidate>
+
+          <!-- Identity section -->
+          <div class="form-card">
+            <div class="card-section-header">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="color:var(--color-accent)"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M2 13c0-2.761 2.686-5 6-5s6 2.239 6 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              <span class="card-section-title">Identity</span>
+            </div>
+            <div class="card-body">
+              <div class="avatar-field" style="margin-bottom:20px">
+                <div class="avatar-preview">KR</div>
+                <div class="avatar-upload">
+                  <label>Profile photo</label>
+                  <button type="button" class="avatar-btn">Upload photo</button>
+                  <div class="avatar-note">JPG or PNG, max 2 MB</div>
+                </div>
+              </div>
+              <div class="field-grid">
+                <!-- Full name — valid -->
+                <div class="field valid">
+                  <label class="field-label" for="fname">Full Name <span class="req">*</span></label>
+                  <input id="fname" class="control" type="text" value="Kira Reynolds" autocomplete="name">
+                  <span class="helper">As it appears on official documents</span>
+                </div>
+                <!-- Preferred name -->
+                <div class="field">
+                  <label class="field-label" for="pname">Preferred Name</label>
+                  <input id="pname" class="control" type="text" placeholder="Optional">
+                  <span class="helper">Shown in the directory and notifications</span>
+                </div>
+                <!-- Email — invalid example -->
+                <div class="field invalid">
+                  <label class="field-label" for="email">Work Email <span class="req">*</span></label>
+                  <input id="email" class="control" type="email" value="kira.reynolds" aria-invalid="true" aria-describedby="email-err">
+                  <span class="error-msg" id="email-err">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M6 4v3M6 8.5v.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    Enter a valid email address (e.g. name@example.com)
+                  </span>
+                </div>
+                <!-- Phone -->
+                <div class="field">
+                  <label class="field-label" for="phone">Mobile Phone</label>
+                  <input id="phone" class="control" type="tel" placeholder="+1 (555) 000-0000">
+                  <span class="helper">Used for two-factor and urgent alerts</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Role section -->
+          <div class="form-card">
+            <div class="card-section-header">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="color:var(--color-accent)"><rect x="2" y="2" width="5" height="5" rx="1.5" fill="currentColor" opacity=".4"/><rect x="9" y="2" width="5" height="5" rx="1.5" fill="currentColor"/><rect x="2" y="9" width="5" height="5" rx="1.5" fill="currentColor" opacity=".4"/><rect x="9" y="9" width="5" height="5" rx="1.5" fill="currentColor" opacity=".4"/></svg>
+              <span class="card-section-title">Role &amp; Placement</span>
+            </div>
+            <div class="card-body">
+              <div class="field-grid">
+                <!-- Job title — required -->
+                <div class="field">
+                  <label class="field-label" for="title">Job Title <span class="req">*</span></label>
+                  <input id="title" class="control" type="text" placeholder="e.g. Senior Engineer">
+                  <span class="helper">Displayed on the profile and directory card</span>
+                </div>
+                <!-- Category — required select -->
+                <div class="field">
+                  <label class="field-label" for="dept">Category <span class="req">*</span></label>
+                  <select id="dept" class="control">
+                    <option value="">Select a category…</option>
+                    <option>Engineering</option>
+                    <option>Sales</option>
+                    <option>Design</option>
+                    <option>Product</option>
+                    <option>Operations</option>
+                    <option>Finance</option>
+                  </select>
+                  <span class="helper">Determines group membership and reporting line</span>
+                </div>
+                <!-- Manager -->
+                <div class="field">
+                  <label class="field-label" for="mgr">Direct Manager <span class="req">*</span></label>
+                  <select id="mgr" class="control">
+                    <option value="">Select manager…</option>
+                    <option selected>Tunde Barrett</option>
+                    <option>Chidi Mbeki</option>
+                    <option>Jamie Osei</option>
+                  </select>
+                  <span class="helper">Sets the approval chain for requests</span>
+                </div>
+                <!-- Location -->
+                <div class="field">
+                  <label class="field-label" for="loc">Office Location</label>
+                  <select id="loc" class="control">
+                    <option value="">Select location…</option>
+                    <option>London — HQ</option>
+                    <option>New York</option>
+                    <option>Remote</option>
+                  </select>
+                </div>
+                <!-- Contract type -->
+                <div class="field">
+                  <label class="field-label" for="contract">Contract Type <span class="req">*</span></label>
+                  <select id="contract" class="control">
+                    <option value="">Select…</option>
+                    <option>Full-time</option>
+                    <option>Part-time</option>
+                    <option>Contractor</option>
+                    <option>Intern</option>
+                  </select>
+                </div>
+                <!-- Start date — required, not in the past -->
+                <div class="field">
+                  <label class="field-label" for="start">Start Date <span class="req">*</span></label>
+                  <input id="start" class="control" type="date" min="2026-06-03">
+                  <span class="helper">Must be today or a future date</span>
+                </div>
+                <!-- Notes -->
+                <div class="field full">
+                  <label class="field-label" for="notes">Onboarding Notes</label>
+                  <textarea id="notes" class="control" placeholder="Any information for the manager or onboarding team…"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="form-footer">
+            <span class="form-hint">Fields marked <span class="req">*</span> are required before saving.</span>
+            <div class="footer-actions">
+              <button type="button" class="btn-ghost">Cancel</button>
+              <button type="submit" class="btn-primary" disabled>Create Record</button>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

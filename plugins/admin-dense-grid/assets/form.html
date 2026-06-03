@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dense Grid Admin — Form</title>
+<style>
+:root {
+  --up:          #22c55e;
+  --dn:          #ef4444;
+  --accent-blue: #3b82f6;
+  --text-primary:#d7dde4;
+  --text-muted:  #7b8694;
+  --mono: ui-monospace, Menlo, 'Courier New', monospace;
+  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: #0c0f12;
+  color: var(--text-primary);
+  font-family: var(--sans);
+  font-size: 12px;
+  line-height: 1.4;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+button { cursor: pointer; font-family: inherit; font-size: 11px; }
+input, select, textarea { font-family: inherit; font-size: 12px; }
+
+.muted { color: var(--text-muted); }
+.mono  { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+/* ── Toolbar ──────────────────────────────────────────────────── */
+.toolbar {
+  height: 36px;
+  background: #12161b;
+  border-bottom: 1px solid #232a31;
+  display: flex; align-items: center;
+  padding: 0 12px; gap: 12px; flex-shrink: 0;
+}
+.brand { display: flex; align-items: center; gap: 6px; }
+.brand-mark {
+  width: 20px; height: 20px; background: var(--accent-blue);
+  border-radius: 3px; display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: #fff;
+}
+.brand-name { font-size: 13px; font-weight: 600; }
+.tb-sep { width: 1px; height: 20px; background: #232a31; }
+.breadcrumb { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+.breadcrumb a { color: var(--accent-blue); text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.toolbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.avatar {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--accent-blue); color: #fff;
+  font-size: 10px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── Page layout ──────────────────────────────────────────────── */
+.page { flex: 1; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; overflow: auto; }
+.page-hdr { display: flex; align-items: center; justify-content: space-between; }
+.page-title { font-size: 14px; font-weight: 700; }
+.page-sub   { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+/* ── Card ─────────────────────────────────────────────────────── */
+.card {
+  background: #12161b;
+  border: 1px solid #232a31;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.card-section {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px;
+  border-bottom: 1px solid #232a31;
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.card-body { padding: 14px; }
+
+/* ── Field grid ───────────────────────────────────────────────── */
+.field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 20px;
+}
+.field.full { grid-column: 1 / -1; }
+
+/* ── Field ────────────────────────────────────────────────────── */
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field-label {
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.req { color: var(--dn); margin-left: 2px; }
+.control {
+  height: 30px;
+  background: #0c0f12;
+  border: 1px solid #232a31;
+  border-radius: 3px;
+  color: var(--text-primary);
+  padding: 0 10px;
+  outline: none;
+  transition: border-color .15s;
+  width: 100%;
+}
+.control:focus { border-color: var(--accent-blue); }
+select.control { padding-right: 24px; appearance: none; cursor: pointer; }
+.helper { font-size: 10px; color: var(--text-muted); line-height: 1.3; }
+
+/* ── Invalid field ────────────────────────────────────────────── */
+.field.invalid .control {
+  border-color: var(--dn);
+  background: rgba(239,68,68,.04);
+}
+.field.invalid .control:focus { border-color: var(--dn); }
+.error-msg {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 10px; color: var(--dn); line-height: 1.3;
+}
+
+/* ── Form footer ──────────────────────────────────────────────── */
+.form-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 0 0;
+  border-top: 1px solid #232a31;
+  margin-top: 4px;
+}
+.form-hint { font-size: 10px; color: var(--text-muted); }
+.footer-actions { display: flex; gap: 8px; }
+.btn-ghost {
+  height: 28px; padding: 0 12px; border-radius: 4px;
+  border: 1px solid #232a31; background: transparent;
+  color: var(--text-primary); font-size: 12px;
+  transition: border-color .15s;
+}
+.btn-ghost:hover { border-color: var(--accent-blue); }
+.btn-primary {
+  height: 28px; padding: 0 16px; border-radius: 4px;
+  border: none; background: var(--accent-blue);
+  color: #fff; font-size: 12px; font-weight: 600;
+}
+.btn-primary:hover:not(:disabled) { filter: brightness(1.1); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+</style>
+</head>
+<body>
+
+<!-- TOOLBAR -->
+<header class="toolbar">
+  <div class="brand">
+    <div class="brand-mark">NO</div>
+    <span class="brand-name">NovexOps</span>
+  </div>
+  <div class="tb-sep"></div>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="#">Instruments</a>
+    <span>›</span>
+    <span>Add Instrument</span>
+  </nav>
+  <div class="toolbar-right">
+    <div class="avatar">RM</div>
+  </div>
+</header>
+
+<!-- PAGE -->
+<main class="page">
+
+  <div class="page-hdr">
+    <div>
+      <div class="page-title">Add Instrument</div>
+      <div class="page-sub">Fields marked <span style="color:var(--dn);">*</span> are required</div>
+    </div>
+  </div>
+
+  <form novalidate>
+
+    <!-- Section: Identity -->
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-section">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <rect x="1" y="1" width="10" height="10" rx="2" stroke="currentColor" stroke-width="1.2"/>
+          <line x1="3" y1="5" x2="9" y2="5" stroke="currentColor" stroke-width="1.2"/>
+          <line x1="3" y1="7.5" x2="7" y2="7.5" stroke="currentColor" stroke-width="1.2"/>
+        </svg>
+        Identity
+      </div>
+      <div class="card-body">
+        <div class="field-grid">
+
+          <!-- Symbol — invalid (bad format) -->
+          <div class="field invalid">
+            <label class="field-label" for="symbol">Symbol <span class="req">*</span></label>
+            <input id="symbol" class="control mono" type="text" value="nov q" aria-invalid="true" aria-describedby="symbol-err">
+            <span id="symbol-err" class="error-msg" role="alert">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+                <circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="1.2"/>
+                <line x1="5" y1="3" x2="5" y2="5.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                <circle cx="5" cy="7" r=".5" fill="currentColor"/>
+              </svg>
+              2–6 uppercase letters only, no spaces (e.g. NOVQ)
+            </span>
+          </div>
+
+          <!-- Name — valid -->
+          <div class="field">
+            <label class="field-label" for="name">Name <span class="req">*</span></label>
+            <input id="name" class="control" type="text" value="Novex Corp" aria-describedby="name-help">
+            <span id="name-help" class="helper">Full display name for the instrument</span>
+          </div>
+
+          <!-- Category — valid -->
+          <div class="field">
+            <label class="field-label" for="category">Category <span class="req">*</span></label>
+            <select id="category" class="control" aria-describedby="category-help">
+              <option value="">Select…</option>
+              <option value="equity" selected>Equity</option>
+              <option value="etf">ETF</option>
+              <option value="index">Index</option>
+              <option value="commodity">Commodity</option>
+              <option value="custom">Custom</option>
+            </select>
+            <span id="category-help" class="helper">Determines column naming in the primary table</span>
+          </div>
+
+          <!-- Exchange — valid -->
+          <div class="field">
+            <label class="field-label" for="exchange">Exchange</label>
+            <input id="exchange" class="control" type="text" value="NQVX" aria-describedby="exchange-help">
+            <span id="exchange-help" class="helper">Optional — shown in the detail meta grid</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Section: Tracking -->
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-section">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <polyline points="1,9 4,5 6,7 9,3 11,5" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+        </svg>
+        Tracking
+      </div>
+      <div class="card-body">
+        <div class="field-grid">
+
+          <!-- Target price — valid -->
+          <div class="field">
+            <label class="field-label" for="target">Target Price <span class="req">*</span></label>
+            <input id="target" class="control mono" type="number" value="320.00" min="0.01" step="0.01" aria-describedby="target-help">
+            <span id="target-help" class="helper">Must be greater than 0</span>
+          </div>
+
+          <!-- Alert threshold — invalid (out of range) -->
+          <div class="field invalid">
+            <label class="field-label" for="alert">Alert Threshold % <span class="req">*</span></label>
+            <input id="alert" class="control mono" type="number" value="150" min="0" max="100" step="0.1" aria-invalid="true" aria-describedby="alert-err">
+            <span id="alert-err" class="error-msg" role="alert">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+                <circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="1.2"/>
+                <line x1="5" y1="3" x2="5" y2="5.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                <circle cx="5" cy="7" r=".5" fill="currentColor"/>
+              </svg>
+              Must be between 0 and 100
+            </span>
+          </div>
+
+          <!-- Notes — full width, optional -->
+          <div class="field full">
+            <label class="field-label" for="notes">Notes</label>
+            <textarea id="notes" class="control" rows="3" style="height:auto;padding-top:6px;padding-bottom:6px;resize:vertical;" aria-describedby="notes-help">Tracking for Q3 earnings catalyst.</textarea>
+            <span id="notes-help" class="helper">Optional — visible in the detail view only</span>
+          </div>
+
+        </div>
+
+        <div class="form-footer">
+          <span class="form-hint">Fields marked <span style="color:var(--dn);">*</span> are required</span>
+          <div class="footer-actions">
+            <button type="button" class="btn-ghost">Cancel</button>
+            <button type="submit" class="btn-primary" disabled>Add Instrument</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </form>
+
+</main>
+
+</body>
+</html>

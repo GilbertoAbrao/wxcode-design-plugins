@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-meridian-people",
-  "title": "Meridian People Admin",
-  "version": "0.1.0",
-  "description": "HR and people-operations admin dashboard \u2014 warm-professional light mode with indigo accent, left sidebar org/team switcher, 4 KPI tiles (headcount, attendance, open roles, turnover), headcount-over-time chart, department breakdown, employees table, and a time-off requests panel.",
+  "title": "Meridian Admin",
+  "version": "0.2.0",
+  "description": "Warm-professional light-mode admin aesthetic: off-white canvas (#f8f8fb), indigo accent (#4f46e5), white sidebar and cards with hairline borders and soft shadows, Inter type, 12px card radii, 11px uppercase micro-labels, and multi-tone status pills. Archetype = 240px fixed sidebar (entity-switcher card + grouped nav sections + footer user row) + 60px topbar (title/breadcrumb + search + period tabs + bell + avatar) + 4 KPI tiles (figure + delta chip + sparkline) + 2-column grid (area-chart card + horizontal-bar breakdown card) + full-width avatar-records table + 320px side-panel (queued-approvals list), plus matching list, form, and detail screens.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,13 +19,13 @@
     "operations",
     "web",
     "admin",
-    "hr",
-    "people",
     "light-mode",
     "warm-professional",
     "indigo-accent",
-    "headcount",
-    "workforce"
+    "sidebar-nav",
+    "soft-shadow",
+    "avatar-table",
+    "approval-panel"
   ],
   "compat": {
     "agentSkills": [
@@ -46,13 +46,25 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me an HR people-operations admin dashboard \u2014 left sidebar with org/team switcher, topbar with search and period selector, 4 KPI tiles for headcount / attendance / open roles / turnover, a headcount-over-time chart, department headcount bars, an employees table, and a time-off requests side panel.",
-        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me an HR people-operations admin dashboard \u2014 left sidebar with org/team switcher, topbar with search and period selector, 4 KPI tiles for headcount / attendance / open roles / turnover, a headcount-over-time chart, department headcount bars, an employees table, and a time-off requests side panel."
+        "en": "Apply this warm light-mode indigo-accent admin aesthetic to my domain — fixed sidebar with entity-switcher and grouped nav, topbar with search and period selector, 4 KPI tiles with sparklines, an area-chart card and a horizontal-bar breakdown card, a full-width avatar records table with status pills, and a queued-approvals side panel, plus list, form, and detail screens.",
+        "zh-CN": "将这个温暖专业的浅色调靛蓝强调色管理界面应用到我的领域：固定侧栏含实体切换和分组导航、顶栏含搜索和周期选择器、4 个带迷你图的 KPI 卡片、面积图卡片和水平条形分组卡片、带状态标签的头像记录表格，以及待批准事项侧边栏，并配套列表、表单和详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Meridian People Admin"
+          "title": "Meridian Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Meridian Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Meridian Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Meridian Admin — Detail"
         }
       ]
     },
@@ -70,7 +82,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {
@@ -89,8 +107,8 @@
       "fs:write"
     ],
     "provenance": {
-      "category": "themeforest-admin-templates",
-      "note": "category design-language reference only; original implementation"
+      "category": "admin-dashboards",
+      "note": "original archetype; no third-party template reproduced"
     }
   }
 }

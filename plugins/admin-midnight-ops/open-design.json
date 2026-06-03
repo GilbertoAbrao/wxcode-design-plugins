@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-midnight-ops",
-  "title": "Midnight Ops Console",
-  "version": "0.1.0",
-  "description": "A production-grade dark-mode operations and observability dashboard built for on-call engineers and SRE teams. Features a compact left icon rail, four live metric tiles with inline trend sparklines, a time-series throughput chart, an active incidents table with severity pills, and a per-service health status list \u2014 all in a high-contrast teal-on-midnight palette optimised for 3 AM focus.",
+  "title": "Midnight Ops",
+  "version": "0.2.0",
+  "description": "Dark navy teal-accent admin aesthetic: midnight-navy canvas (#0b1120), raised cool-grey panels, teal-to-cyan accent gradient (#14b8a6 / #22d3ee), glowing status dots, Inter type with tabular figures, and compact hairline-bordered tables. Archetype = slim navbar (logo + search + context switcher + icon actions + avatar) + compact left icon rail + 4 metric tiles with inline sparklines + full-width time-series area chart + status-list side panel + full-width records table with severity and state pills, plus matching list, form, and detail screens. Built for high-density real-time consoles.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,10 +19,12 @@
     "operations",
     "web",
     "admin",
-    "observability",
     "dark-mode",
-    "teal",
-    "ops-console"
+    "navy",
+    "teal-accent",
+    "status-board",
+    "data-dense",
+    "enterprise"
   ],
   "compat": {
     "agentSkills": [
@@ -41,19 +43,27 @@
       "type": "html",
       "entry": "./example.html"
     },
-    "provenance": {
-      "category": "themeforest-admin-templates",
-      "note": "category design-language reference only; original implementation"
-    },
     "useCase": {
       "query": {
-        "en": "Build me a dark-mode operations console \u2014 top navbar, icon rail, 4 metric tiles with trends, a time-series chart, an active incidents table with status pills, and a service-health list.",
-        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me a dark-mode operations console \u2014 top navbar, icon rail, 4 metric tiles with trends, a time-series chart, an active incidents table with status pills, and a service-health list."
+        "en": "Apply this dark navy teal-accent admin aesthetic to my domain — midnight canvas, teal-to-cyan accent, slim navbar with context switcher, compact icon rail, 4 metric tiles with sparklines, a time-series area chart, a status-list side panel, and a dense records table with severity and state pills, plus list, form, and detail screens.",
+        "zh-CN": "将这个深色海军蓝青色强调风格应用到我的领域：午夜深蓝底色、青色渐变强调色、上下文切换导航栏、紧凑图标侧栏、4 个带趋势迷你图的指标卡片、时间序列面积图、状态列表侧栏，以及带严重级别和状态标签的密集记录表格，并配套列表 / 表单 / 详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Midnight Ops Console"
+          "title": "Midnight Ops — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Midnight Ops — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Midnight Ops — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Midnight Ops — Detail"
         }
       ]
     },
@@ -71,7 +81,13 @@
         "state-coverage"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {
@@ -88,6 +104,10 @@
     "capabilities": [
       "prompt:inject",
       "fs:write"
-    ]
+    ],
+    "provenance": {
+      "category": "admin-dashboards",
+      "note": "original archetype; no third-party template reproduced"
+    }
   }
 }

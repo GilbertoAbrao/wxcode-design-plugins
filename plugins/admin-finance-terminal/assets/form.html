@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terminal Admin — New Dispatch Order</title>
+<style>
+  :root {
+    --bg: #0E0E0E;
+    --panel: #1A1A1A;
+    --ink: #ffffff;
+    --ink-dim: #888888;
+    --amber: #FFB800;
+    --green: #00C851;
+    --grid: #2a2a2a;
+    --err: #ff4444;
+    --err-dim: rgba(255,68,68,.12);
+    --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.4;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .shell {
+    display: grid;
+    grid-template-rows: 32px 24px 1fr 36px;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  /* ── STATUS BAR ── */
+  .statusbar {
+    display: flex; align-items: center; padding: 0 12px;
+    border-bottom: 1px solid var(--grid); background: var(--panel); gap: 20px; flex-shrink: 0;
+  }
+  .statusbar .logo { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: var(--amber); white-space: nowrap; }
+  .statusbar .sep { color: var(--grid); }
+  .statusbar .meta { font-size: 11px; color: var(--ink-dim); white-space: nowrap; }
+  .statusbar .chip { font-size: 10px; padding: 1px 6px; border: 1px solid var(--grid); color: var(--ink-dim); letter-spacing: 0.08em; }
+  .statusbar .chip.live { border-color: var(--green); color: var(--green); }
+  .statusbar .latency { font-size: 11px; color: var(--green); }
+  .statusbar .spacer { flex: 1; }
+  .statusbar .hint { font-family: var(--font-sans); font-size: 11px; color: var(--ink-dim); }
+  .statusbar .clock { font-size: 12px; color: var(--amber); letter-spacing: 0.05em; }
+
+  /* ── TICKER STRIP ── */
+  .ticker {
+    display: flex; align-items: center; border-bottom: 1px solid var(--grid);
+    background: #111111; overflow: hidden; padding: 0 8px;
+  }
+  .ticker-label { font-size: 10px; color: var(--amber); letter-spacing: 0.1em; padding-right: 12px; border-right: 1px solid var(--grid); margin-right: 4px; white-space: nowrap; flex-shrink: 0; }
+  .ticker-items { display: flex; gap: 0; overflow: hidden; flex: 1; }
+  .ticker-item { display: flex; align-items: center; gap: 6px; padding: 0 12px; border-right: 1px solid var(--grid); white-space: nowrap; flex-shrink: 0; }
+  .ticker-item .sym { font-size: 10px; letter-spacing: 0.06em; color: var(--ink-dim); }
+  .ticker-item .price { font-size: 11px; color: var(--ink); }
+  .ticker-item .delta { font-size: 10px; }
+  .delta.up { color: var(--green); }
+  .delta.dn { color: var(--amber); }
+
+  /* ── BODY ── */
+  .body { display: grid; grid-template-columns: 200px 1fr; overflow: hidden; min-height: 0; }
+
+  /* ── LEFT RAIL ── */
+  .rail { border-right: 1px solid var(--grid); background: var(--panel); display: flex; flex-direction: column; overflow-y: auto; }
+  .rail-header { padding: 8px 10px; border-bottom: 1px solid var(--grid); font-size: 10px; letter-spacing: 0.12em; color: var(--ink-dim); }
+  .rail-item { display: flex; align-items: center; padding: 7px 10px; border-bottom: 1px solid var(--grid); cursor: default; gap: 8px; }
+  .rail-item:hover { background: #222222; }
+  .rail-item.active { background: #1f1a00; border-left: 2px solid var(--amber); }
+  .rail-item .fkey { font-size: 10px; color: var(--amber); width: 22px; flex-shrink: 0; }
+  .rail-item .label { flex: 1; font-size: 11px; letter-spacing: 0.04em; color: var(--ink); }
+  .rail-item.active .label { color: var(--amber); }
+  .rail-item .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--grid); flex-shrink: 0; }
+  .rail-item.active .dot { background: var(--amber); }
+  .rail-item.ok .dot { background: var(--green); }
+  .rail-footer { margin-top: auto; padding: 8px 10px; border-top: 1px solid var(--grid); font-size: 10px; color: var(--ink-dim); }
+
+  /* ── FORM AREA ── */
+  .form-area { overflow-y: auto; flex: 1; padding: 16px 20px; display: flex; flex-direction: column; gap: 0; }
+
+  /* breadcrumb */
+  .breadcrumb { display: flex; align-items: center; gap: 7px; font-size: 10px; color: var(--ink-dim); margin-bottom: 12px; letter-spacing: 0.04em; }
+  .breadcrumb a { color: var(--ink-dim); text-decoration: none; }
+  .breadcrumb a:hover { color: var(--amber); }
+
+  /* page header */
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+  .page-title { font-size: 14px; font-weight: 700; color: var(--ink); letter-spacing: 0.04em; }
+  .page-subtitle { font-size: 11px; color: var(--ink-dim); margin-top: 3px; }
+
+  /* form wrapper */
+  .form-wrap { max-width: 760px; display: flex; flex-direction: column; gap: 12px; }
+
+  /* section card */
+  .card { background: var(--panel); border: 1px solid var(--grid); overflow: hidden; }
+  .card-section-title {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-dim); padding: 10px 14px; border-bottom: 1px solid var(--grid);
+    display: flex; align-items: center; gap: 7px;
+  }
+  .card-section-title .title-icon { color: var(--amber); }
+  .card-body { padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+
+  /* field grid */
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field.full { grid-column: 1 / -1; }
+
+  .field-label { font-size: 11px; font-weight: 600; color: #cccccc; display: flex; align-items: center; gap: 4px; letter-spacing: 0.04em; }
+  .req { color: var(--amber); font-weight: 700; }
+
+  .control {
+    background: var(--bg); border: 1px solid var(--grid);
+    padding: 7px 10px; color: var(--ink); font-size: 11px; font-family: var(--font-mono);
+    outline: none; width: 100%; font-variant-numeric: tabular-nums; letter-spacing: 0.02em;
+  }
+  .control::placeholder { color: var(--ink-dim); }
+  .control:focus { border-color: var(--amber); outline: none; }
+  textarea.control { resize: vertical; min-height: 64px; line-height: 1.5; }
+  select.control {
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat; background-position: right 10px center; padding-right: 30px; cursor: pointer;
+  }
+
+  .field.invalid .control { border-color: var(--err); }
+  .field.invalid .control:focus { outline: 1px solid var(--err); }
+
+  .helper { font-size: 10.5px; color: var(--ink-dim); line-height: 1.4; }
+  .error-msg { font-size: 10.5px; color: var(--err); display: flex; align-items: center; gap: 5px; line-height: 1.4; }
+  .error-msg svg { flex-shrink: 0; }
+
+  /* priority selector */
+  .priority-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .prio-opt { flex: 1; min-width: 100px; }
+  .prio-opt input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+  .prio-label {
+    display: block; padding: 6px 10px; text-align: center; font-size: 11px; letter-spacing: 0.06em;
+    background: var(--bg); border: 1px solid var(--grid); color: var(--ink-dim); cursor: pointer;
+  }
+  .prio-opt input:checked + .prio-label { border-color: var(--amber); color: var(--amber); background: rgba(255,184,0,.06); }
+  .prio-label:hover { border-color: #444; color: var(--ink); }
+
+  /* form footer */
+  .form-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 14px; background: var(--panel); border: 1px solid var(--grid);
+    margin-top: 0;
+  }
+  .form-hint { font-size: 10px; color: var(--ink-dim); }
+  .footer-actions { display: flex; gap: 8px; }
+  .btn-ghost {
+    padding: 6px 14px; background: transparent; border: 1px solid var(--grid);
+    color: var(--ink-dim); font-family: var(--font-mono); font-size: 11px; cursor: pointer; letter-spacing: 0.04em;
+  }
+  .btn-ghost:hover { border-color: var(--amber); color: var(--amber); }
+  .btn-primary {
+    padding: 6px 14px; background: var(--amber); border: 1px solid var(--amber);
+    color: #000; font-family: var(--font-mono); font-size: 11px; font-weight: 700; cursor: pointer; letter-spacing: 0.04em;
+  }
+  .btn-primary:hover { background: #ffc933; }
+  .btn-primary:disabled { background: #444; border-color: #444; color: var(--ink-dim); cursor: not-allowed; }
+
+  /* ── COMMAND LINE ── */
+  .cmdline {
+    display: flex; align-items: center; padding: 0 12px;
+    border-top: 1px solid var(--grid); background: var(--panel); gap: 10px; flex-shrink: 0;
+  }
+  .cmd-prompt { color: var(--amber); font-size: 12px; letter-spacing: 0.04em; white-space: nowrap; }
+  .cmd-input {
+    flex: 1; background: transparent; border: none; outline: none;
+    color: var(--ink); font-family: var(--font-mono); font-size: 12px; caret-color: var(--amber);
+  }
+  .cmd-hints { display: flex; gap: 6px; flex-shrink: 0; }
+  .cmd-hint {
+    font-size: 10px; padding: 1px 7px; border: 1px solid var(--grid);
+    color: var(--ink-dim); letter-spacing: 0.04em; cursor: default;
+  }
+  .cmd-hint:hover { border-color: var(--amber); color: var(--amber); }
+  .cmd-sep { color: var(--grid); font-size: 11px; }
+
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--grid); }
+
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .blink { animation: blink 1s step-end infinite; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- STATUS BAR -->
+  <header class="statusbar">
+    <span class="logo">AXYS DISPATCH</span>
+    <span class="sep">|</span>
+    <span class="meta">SHIFT B · NIGHT</span>
+    <span class="sep">|</span>
+    <span class="chip live">LIVE</span>
+    <span class="chip">SID-2026-0602-N2</span>
+    <span class="sep">|</span>
+    <span class="latency">LAT 4ms</span>
+    <span class="sep">|</span>
+    <span class="meta">USER: OPS.SILVA</span>
+    <div class="spacer"></div>
+    <span class="hint">F1 HELP</span>
+    <span class="sep">|</span>
+    <span class="clock" id="clock">22:14:07</span>
+  </header>
+
+  <!-- TICKER STRIP -->
+  <div class="ticker">
+    <span class="ticker-label">FLEET</span>
+    <div class="ticker-items">
+      <div class="ticker-item"><span class="sym">TRK-084</span><span class="price">1,247 km</span><span class="delta up">+82</span></div>
+      <div class="ticker-item"><span class="sym">TRK-091</span><span class="price">IDLE</span><span class="delta dn">▼</span></div>
+      <div class="ticker-item"><span class="sym">TRK-112</span><span class="price">832 km</span><span class="delta up">+14</span></div>
+      <div class="ticker-item"><span class="sym">ON TIME</span><span class="price">91.8%</span><span class="delta dn">-1.2</span></div>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- LEFT RAIL -->
+    <nav class="rail">
+      <div class="rail-header">MODULES</div>
+      <div class="rail-item"><span class="fkey">F1</span><span class="label">HELP</span><span class="dot"></span></div>
+      <div class="rail-item"><span class="fkey">F2</span><span class="label">OVERVIEW</span><span class="dot"></span></div>
+      <div class="rail-item ok"><span class="fkey">F3</span><span class="label">ROUTES</span><span class="dot"></span></div>
+      <div class="rail-item ok"><span class="fkey">F4</span><span class="label">DRIVERS</span><span class="dot"></span></div>
+      <div class="rail-item"><span class="fkey">F5</span><span class="label">ALERTS</span><span class="dot"></span></div>
+      <div class="rail-item"><span class="fkey">F6</span><span class="label">FUELING</span><span class="dot"></span></div>
+      <div class="rail-item ok active"><span class="fkey">F7</span><span class="label">SCHEDULE</span><span class="dot"></span></div>
+      <div class="rail-item"><span class="fkey">F8</span><span class="label">ADMIN</span><span class="dot"></span></div>
+      <div class="rail-footer">v3.7.2 / PROD</div>
+    </nav>
+
+    <!-- FORM AREA -->
+    <div class="form-area">
+
+      <div class="breadcrumb">
+        <a href="#">SCHEDULE</a>
+        <span>›</span>
+        <span>NEW ORDER</span>
+      </div>
+
+      <div class="page-header">
+        <div>
+          <div class="page-title">NEW DISPATCH ORDER</div>
+          <div class="page-subtitle">SHIFT B · 2026-06-02 · NIGHT</div>
+        </div>
+      </div>
+
+      <form class="form-wrap" novalidate>
+
+        <!-- UNIT & ROUTE -->
+        <div class="card">
+          <div class="card-section-title">
+            <svg class="title-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            UNIT &amp; ROUTE
+          </div>
+          <div class="card-body">
+            <div class="field-grid">
+
+              <!-- Unit: required select -->
+              <div class="field invalid">
+                <label class="field-label" for="unit">UNIT <span class="req">*</span></label>
+                <select id="unit" class="control" aria-invalid="true">
+                  <option value="">SELECT UNIT...</option>
+                  <option>TRK-084 — HEAVY (SP)</option>
+                  <option>TRK-091 — HEAVY (IDLE)</option>
+                  <option>VAN-019 — VAN (STANDBY)</option>
+                  <option>VAN-031 — VAN (STANDBY)</option>
+                </select>
+                <span class="error-msg">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  Select an available unit to continue
+                </span>
+              </div>
+
+              <!-- Route: required -->
+              <div class="field">
+                <label class="field-label" for="route">ROUTE CODE <span class="req">*</span></label>
+                <input id="route" class="control" type="text" placeholder="e.g. R-14, U-04" value="">
+                <span class="helper">Use predefined route codes; new codes require F8 ADMIN approval</span>
+              </div>
+
+              <!-- Departure time: required, not in past -->
+              <div class="field">
+                <label class="field-label" for="depart">DEPARTURE TIME <span class="req">*</span></label>
+                <input id="depart" class="control" type="datetime-local" value="">
+                <span class="helper">Must be a future time; past times are rejected by dispatch</span>
+              </div>
+
+              <!-- Origin: required -->
+              <div class="field">
+                <label class="field-label" for="origin">ORIGIN TERMINAL <span class="req">*</span></label>
+                <input id="origin" class="control" type="text" placeholder="e.g. SP Terminal" value="">
+                <span class="helper">The terminal where the unit departs from</span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- CARGO & DRIVER -->
+        <div class="card">
+          <div class="card-section-title">
+            <svg class="title-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><line x1="12" y1="7" x2="12" y2="17"/></svg>
+            CARGO &amp; DRIVER
+          </div>
+          <div class="card-body">
+            <div class="field-grid">
+
+              <!-- Cargo type: required select -->
+              <div class="field">
+                <label class="field-label" for="cargo">CARGO TYPE <span class="req">*</span></label>
+                <select id="cargo" class="control">
+                  <option value="">SELECT TYPE...</option>
+                  <option>FMCG · Sealed</option>
+                  <option>Electronics</option>
+                  <option>Auto Parts</option>
+                  <option>Pharma · Cold Chain</option>
+                  <option>Agri Bulk</option>
+                  <option>Steel</option>
+                  <option>Packages</option>
+                </select>
+                <span class="helper">Determines insurance class and vehicle temperature requirements</span>
+              </div>
+
+              <!-- Driver: required select -->
+              <div class="field">
+                <label class="field-label" for="driver">DRIVER <span class="req">*</span></label>
+                <select id="driver" class="control">
+                  <option value="">ASSIGN DRIVER...</option>
+                  <option>G.FERREIRA (Available)</option>
+                  <option>R.SANTOS (Available)</option>
+                  <option>P.COSTA (Standby)</option>
+                  <option>E.BARBOSA (Standby)</option>
+                </select>
+                <span class="helper">Only drivers with valid license and rest period can be assigned</span>
+              </div>
+
+              <!-- Package count: numeric, > 0 when cargo = Packages -->
+              <div class="field">
+                <label class="field-label" for="pkg-count">PACKAGE COUNT</label>
+                <input id="pkg-count" class="control" type="number" min="1" placeholder="0" value="">
+                <span class="helper">Required when Cargo Type is "Packages"; must be greater than 0</span>
+              </div>
+
+              <!-- Priority -->
+              <div class="field">
+                <label class="field-label">PRIORITY</label>
+                <div class="priority-row">
+                  <div class="prio-opt">
+                    <input type="radio" name="priority" id="prio-low" value="low">
+                    <label class="prio-label" for="prio-low">LOW</label>
+                  </div>
+                  <div class="prio-opt">
+                    <input type="radio" name="priority" id="prio-std" value="standard" checked>
+                    <label class="prio-label" for="prio-std">STANDARD</label>
+                  </div>
+                  <div class="prio-opt">
+                    <input type="radio" name="priority" id="prio-urg" value="urgent">
+                    <label class="prio-label" for="prio-urg">URGENT</label>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Notes: full width -->
+            <div class="field full">
+              <label class="field-label" for="notes">OPERATIONAL NOTES</label>
+              <textarea id="notes" class="control" placeholder="Additional context for ops team or driver..."></textarea>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- FORM FOOTER -->
+        <div class="form-footer">
+          <span class="form-hint">Fields marked <span class="req">*</span> are required.</span>
+          <div class="footer-actions">
+            <button type="button" class="btn-ghost">CANCEL</button>
+            <button type="submit" class="btn-primary" disabled>DISPATCH</button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- COMMAND LINE -->
+  <div class="cmdline">
+    <span class="cmd-prompt">CMD&gt;<span class="blink">_</span></span>
+    <input class="cmd-input" type="text" placeholder="TYPE COMMAND OR USE HINT CHIPS..." spellcheck="false" autocomplete="off">
+    <div class="cmd-hints">
+      <span class="cmd-hint">UNITS AVAILABLE</span>
+      <span class="cmd-hint">DRIVERS STANDBY</span>
+    </div>
+    <span class="cmd-sep">|</span>
+    <span style="font-size:10px;color:var(--ink-dim);">TAB COMPLETE &nbsp; ESC CLEAR</span>
+  </div>
+
+</div>
+
+<script>
+  (function() {
+    function pad(n) { return String(n).padStart(2, '0'); }
+    function tick() {
+      var d = new Date();
+      var s = pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()) + ':' + pad(d.getUTCSeconds());
+      var el = document.getElementById('clock');
+      if (el) el.textContent = s;
+    }
+    tick(); setInterval(tick, 1000);
+  })();
+</script>
+</body>
+</html>

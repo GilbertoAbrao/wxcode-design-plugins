@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Record Detail</title>
+<style>
+:root {
+  --accent:#ea580c;--accent-hover:#c2410c;--accent-light:#fff7ed;
+  --amber:#f59e0b;--amber-light:#fffbeb;
+  --success:#16a34a;--success-light:#f0fdf4;
+  --danger:#dc2626;--danger-light:#fef2f2;
+  --warn:#d97706;
+  --surface:#ffffff;--bg:#f8f9fb;--border:#e6e9ee;
+  --text:#1e293b;--muted:#64748b;
+  --sidebar-bg:#1a2235;--sidebar-text:#94a3b8;--sidebar-active:#ffffff;
+  --radius-sm:6px;--radius-md:10px;
+  --shadow-card:0 1px 4px rgba(0,0,0,.06);
+  --font:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);font-size:14px;color:var(--text);background:var(--bg);min-height:100vh;display:flex}
+button{font-family:var(--font);cursor:pointer;border:none;outline:none}
+
+/* Sidebar */
+.sidebar{width:240px;flex-shrink:0;background:var(--sidebar-bg);display:flex;flex-direction:column;min-height:100vh;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar-brand{display:flex;align-items:center;gap:10px;padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.06)}
+.brand-icon{width:34px;height:34px;flex-shrink:0}
+.brand-name{color:#fff;font-size:15px;font-weight:700}
+.brand-sub{color:var(--sidebar-text);font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+.entity-switcher{margin:14px 12px 8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-sm);padding:8px 10px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.switcher-label{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--sidebar-text);margin-bottom:2px}
+.switcher-value{font-size:13px;font-weight:600;color:#fff}
+.nav-group{margin-top:18px}
+.nav-group-label{font-size:10px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;color:rgba(148,163,184,.55);padding:0 18px;margin-bottom:4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 18px;font-size:13px;font-weight:500;color:var(--sidebar-text);cursor:pointer;border-left:3px solid transparent;transition:background .15s,color .15s}
+.nav-item:hover{background:rgba(255,255,255,.04);color:#fff}
+.nav-item.active{background:rgba(234,88,12,.15);border-left-color:var(--accent);color:var(--sidebar-active)}
+.ni{width:16px;height:16px;flex-shrink:0;opacity:.75}
+.sidebar-footer{margin-top:auto;padding:14px 16px;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:10px}
+.sa{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0}
+.sn{font-size:13px;font-weight:600;color:#fff}
+.sr{font-size:10px;color:var(--sidebar-text)}
+
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{height:60px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;position:sticky;top:0;z-index:20}
+.tb-title{font-size:15px;font-weight:700}
+.tb-crumb{font-size:12px;color:var(--muted);margin-top:1px}
+.tb-space{flex:1}
+.bell{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;color:var(--muted)}
+.bell-dot{position:absolute;top:7px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--amber);border:1.5px solid var(--surface)}
+.av-wrap{display:flex;align-items:center;gap:8px;cursor:pointer}
+.av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--amber));display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700}
+.av-name{font-size:13px;font-weight:600}
+
+/* Body */
+.page-body{flex:1;padding:24px;display:flex;flex-direction:column;gap:20px}
+
+/* Header band */
+.detail-header{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-card);padding:20px 24px;display:flex;align-items:center;gap:16px}
+.detail-id{font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--text);font-family:"SF Mono","Consolas",monospace}
+.status-pill{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.04em}
+.pill-transit{background:var(--accent-light);color:var(--accent)}
+.detail-header-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.detail-header-actions{margin-left:auto;display:flex;gap:8px}
+.btn-ghost{height:34px;padding:0 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;color:var(--muted);background:transparent;border:1px solid var(--border);display:flex;align-items:center;gap:5px;transition:border-color .15s,color .15s}
+.btn-ghost:hover{border-color:var(--muted);color:var(--text)}
+.btn-primary{height:34px;padding:0 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;color:#fff;background:var(--accent);display:flex;align-items:center;gap:5px;transition:background .15s}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-danger{height:34px;padding:0 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;color:var(--danger);background:transparent;border:1px solid var(--border);display:flex;align-items:center;gap:5px;transition:border-color .15s,background .15s}
+.btn-danger:hover{border-color:var(--danger);background:var(--danger-light)}
+
+/* Two-column detail layout */
+.detail-grid{display:grid;grid-template-columns:5fr 7fr;gap:16px;align-items:start}
+
+/* Meta card */
+.meta-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-card);overflow:hidden}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border)}
+.card-title{font-size:13px;font-weight:700;color:var(--text)}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.meta-item{padding:12px 20px;border-bottom:1px solid var(--border)}
+.meta-item:nth-last-child(-n+2){border-bottom:none}
+.meta-label{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.meta-value{font-size:13px;font-weight:600;color:var(--text)}
+.meta-value.mono{font-family:"SF Mono","Consolas",monospace;font-size:12px}
+.meta-value.accent{color:var(--accent)}
+
+/* Progress bar in meta */
+.progress-wrap{background:var(--border);height:4px;border-radius:2px;overflow:hidden;margin-top:6px}
+.progress-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--amber))}
+
+/* Sub-panels */
+.sub-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-card);overflow:hidden}
+.sub-panel+.sub-panel{margin-top:16px}
+.route-row{display:grid;grid-template-columns:120px 90px 1fr 100px;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid var(--border)}
+.route-row:last-child{border-bottom:none}
+.route-row:nth-child(odd){background:var(--bg)}
+.rr-label{font-size:12px;font-weight:600;color:var(--text)}
+.rr-sub{font-size:11px;color:var(--muted)}
+.rr-state{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700}
+.state-done{background:var(--success-light);color:var(--success)}
+.state-active{background:var(--accent-light);color:var(--accent)}
+.state-pending{background:#f1f5f9;color:#475569}
+.rr-time{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.rr-eta{font-size:12px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
+
+/* Activity feed */
+.activity-feed{display:flex;flex-direction:column;gap:0}
+.activity-item{display:flex;align-items:flex-start;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border)}
+.activity-item:last-child{border-bottom:none}
+.activity-dot-wrap{display:flex;flex-direction:column;align-items:center;gap:0;padding-top:3px}
+.activity-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dot-accent{background:var(--accent)}
+.dot-success{background:var(--success)}
+.dot-muted{background:#cbd5e1}
+.dot-amber{background:var(--amber)}
+.activity-line{width:1px;height:24px;background:var(--border);margin-top:4px}
+.activity-body{flex:1}
+.activity-text{font-size:13px;color:var(--text);line-height:1.45}
+.activity-text strong{font-weight:600}
+.activity-time{font-size:11px;color:var(--muted);margin-top:2px}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <svg class="brand-icon" viewBox="0 0 34 34" fill="none">
+      <polygon points="17,2 31,9.5 31,24.5 17,32 3,24.5 3,9.5" fill="var(--accent)" opacity=".9"/>
+      <rect x="10" y="13" width="14" height="9" rx="1.5" fill="white" opacity=".95"/>
+      <path d="M10 16h14" stroke="var(--accent)" stroke-width="1.2"/>
+      <rect x="13" y="11" width="8" height="4" rx="1" fill="white" opacity=".7"/>
+    </svg>
+    <div><div class="brand-name">VexCargo</div><div class="brand-sub">Fleet Ops</div></div>
+  </div>
+  <div class="entity-switcher">
+    <div><div class="switcher-label">Active Hub</div><div class="switcher-value">North Central</div></div>
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="color:var(--sidebar-text)"><path d="M3 4.5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <nav class="nav-group">
+    <div class="nav-group-label">Dispatch</div>
+    <div class="nav-item"><svg class="ni" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor" opacity=".6"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor" opacity=".6"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor" opacity=".6"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor" opacity=".6"/></svg>Overview</div>
+    <div class="nav-item active"><svg class="ni" viewBox="0 0 16 16" fill="none"><rect x="1" y="2" width="3" height="12" rx="1" fill="currentColor"/><rect x="6" y="5" width="3" height="9" rx="1" fill="currentColor"/><rect x="11" y="1" width="3" height="13" rx="1" fill="currentColor"/></svg>Status Board</div>
+  </nav>
+  <nav class="nav-group">
+    <div class="nav-group-label">Fleet</div>
+    <div class="nav-item"><svg class="ni" viewBox="0 0 16 16" fill="none"><rect x="1" y="6" width="10" height="6" rx="1" stroke="currentColor" stroke-width="1.4"/><path d="M11 8h2l2 2v2h-4V8z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="4" cy="13" r="1.5" fill="currentColor"/><circle cx="12" cy="13" r="1.5" fill="currentColor"/></svg>Vehicles</div>
+    <div class="nav-item"><svg class="ni" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Drivers</div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sa">RK</div>
+    <div><div class="sn">Reva Koltzen</div><div class="sr">Fleet Supervisor</div></div>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div><div class="tb-title">SHP-20440</div><div class="tb-crumb">Status Board &rsaquo; SHP-20440</div></div>
+    <div class="tb-space"></div>
+    <div class="bell"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a5 5 0 00-5 5c0 2.5-.8 3.5-1.5 4h13c-.7-.5-1.5-1.5-1.5-4a5 5 0 00-5-5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M6.5 13a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><div class="bell-dot"></div></div>
+    <div class="av-wrap"><div class="av">RK</div><span class="av-name">Reva K.</span></div>
+  </header>
+
+  <div class="page-body">
+
+    <!-- Header band -->
+    <div class="detail-header">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+          <span class="detail-id">SHP-20440</span>
+          <span class="status-pill pill-transit">In Transit</span>
+        </div>
+        <div class="detail-header-sub">Omdra &rarr; Gorfen &bull; Orex Trans &bull; Vehicle VXC-2205 &bull; ETA Jun 2, 08:45</div>
+      </div>
+      <div class="detail-header-actions">
+        <button class="btn-danger">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 10.5l9-9M11 10.5l-9-9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Cancel
+        </button>
+        <button class="btn-ghost">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2H4a2 2 0 00-2 2v7a2 2 0 002 2h5a2 2 0 002-2V4a2 2 0 00-2-2z" stroke="currentColor" stroke-width="1.3"/><path d="M5 5h3M5 7.5h3M5 10h1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          View Invoice
+        </button>
+        <button class="btn-primary">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5l3 3 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Edit
+        </button>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      <!-- Meta card -->
+      <div>
+        <div class="meta-card">
+          <div class="card-header"><span class="card-title">Shipment Info</span></div>
+          <div class="meta-grid">
+            <div class="meta-item">
+              <div class="meta-label">Shipment ID</div>
+              <div class="meta-value mono accent">SHP-20440</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Status</div>
+              <div class="meta-value"><span class="status-pill pill-transit" style="padding:2px 10px;font-size:11px">In Transit</span></div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Origin</div>
+              <div class="meta-value">Omdra</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Destination</div>
+              <div class="meta-value">Gorfen</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Carrier</div>
+              <div class="meta-value">Orex Trans</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Vehicle</div>
+              <div class="meta-value mono">VXC-2205</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">ETA</div>
+              <div class="meta-value">Jun 2, 08:45</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Priority</div>
+              <div class="meta-value">Standard</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Cargo Type</div>
+              <div class="meta-value">General Freight</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Weight</div>
+              <div class="meta-value" style="font-variant-numeric:tabular-nums">3,840 kg</div>
+            </div>
+            <div class="meta-item" style="grid-column:span 2">
+              <div class="meta-label">Capacity Used</div>
+              <div class="meta-value" style="font-variant-numeric:tabular-nums">78%</div>
+              <div class="progress-wrap"><div class="progress-fill" style="width:78%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-panels -->
+      <div>
+        <!-- Route log table -->
+        <div class="sub-panel">
+          <div class="card-header"><span class="card-title">Route Log</span></div>
+          <div class="route-row" style="background:var(--bg);font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding:8px 20px">
+            <span>Stop</span><span>State</span><span>Notes</span><span>Time</span>
+          </div>
+          <div class="route-row">
+            <div><div class="rr-label">Omdra Hub</div><div class="rr-sub">Pickup point</div></div>
+            <span class="rr-state state-done">Departed</span>
+            <span style="font-size:12px;color:var(--muted)">Loaded 3,840 kg general freight</span>
+            <span class="rr-time">Jun 1 &bull; 21:00</span>
+          </div>
+          <div class="route-row">
+            <div><div class="rr-label">Checkpoint R-4</div><div class="rr-sub">Regional gate</div></div>
+            <span class="rr-state state-done">Cleared</span>
+            <span style="font-size:12px;color:var(--muted)">Docs verified</span>
+            <span class="rr-time">Jun 1 &bull; 23:30</span>
+          </div>
+          <div class="route-row">
+            <div><div class="rr-label">Highway S-7</div><div class="rr-sub">En route</div></div>
+            <span class="rr-state state-active">In Transit</span>
+            <span style="font-size:12px;color:var(--muted)">On schedule</span>
+            <span class="rr-time">Now</span>
+          </div>
+          <div class="route-row">
+            <div><div class="rr-label">Gorfen Hub</div><div class="rr-sub">Delivery point</div></div>
+            <span class="rr-state state-pending">Pending</span>
+            <span style="font-size:12px;color:var(--muted)">&mdash;</span>
+            <span class="rr-eta">Jun 2 &bull; 08:45</span>
+          </div>
+        </div>
+
+        <!-- Activity feed -->
+        <div class="sub-panel">
+          <div class="card-header"><span class="card-title">Activity</span></div>
+          <div class="activity-feed">
+            <div class="activity-item">
+              <div class="activity-dot-wrap"><div class="activity-dot dot-accent"></div><div class="activity-line"></div></div>
+              <div class="activity-body">
+                <div class="activity-text"><strong>Checkpoint R-4 cleared</strong> — documents verified, no issues</div>
+                <div class="activity-time">Jun 1 &bull; 23:30 &bull; Auto</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot-wrap"><div class="activity-dot dot-success"></div><div class="activity-line"></div></div>
+              <div class="activity-body">
+                <div class="activity-text"><strong>Departed Omdra Hub</strong> — loaded 3,840 kg general freight</div>
+                <div class="activity-time">Jun 1 &bull; 21:00 &bull; Driver check-in</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot-wrap"><div class="activity-dot dot-amber"></div><div class="activity-line"></div></div>
+              <div class="activity-body">
+                <div class="activity-text"><strong>Vehicle assigned</strong> — VXC-2205 allocated from Omdra pool</div>
+                <div class="activity-time">Jun 1 &bull; 19:45 &bull; Reva Koltzen</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot-wrap"><div class="activity-dot dot-muted"></div></div>
+              <div class="activity-body">
+                <div class="activity-text"><strong>Shipment created</strong> — standard priority, general freight</div>
+                <div class="activity-time">Jun 1 &bull; 18:30 &bull; Reva Koltzen</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

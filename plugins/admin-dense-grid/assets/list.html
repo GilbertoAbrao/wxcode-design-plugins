@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dense Grid Admin — List</title>
+<style>
+:root {
+  --up:          #22c55e;
+  --dn:          #ef4444;
+  --accent-blue: #3b82f6;
+  --text-primary:#d7dde4;
+  --text-muted:  #7b8694;
+  --mono: ui-monospace, Menlo, 'Courier New', monospace;
+  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: #0c0f12;
+  color: var(--text-primary);
+  font-family: var(--sans);
+  font-size: 12px;
+  line-height: 1.4;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; }
+button { cursor: pointer; font-family: inherit; font-size: 11px; }
+input, select { font-family: inherit; font-size: 12px; }
+
+.mono  { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.up    { color: var(--up); }
+.dn    { color: var(--dn); }
+.muted { color: var(--text-muted); }
+
+/* ── Toolbar ──────────────────────────────────────────────────── */
+.toolbar {
+  height: 36px;
+  background: #12161b;
+  border-bottom: 1px solid #232a31;
+  display: flex; align-items: center;
+  padding: 0 12px; gap: 12px; flex-shrink: 0;
+}
+.brand { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.brand-mark {
+  width: 20px; height: 20px; background: var(--accent-blue);
+  border-radius: 3px; display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: #fff;
+}
+.brand-name { font-size: 13px; font-weight: 600; white-space: nowrap; }
+.tb-sep { width: 1px; height: 20px; background: #232a31; flex-shrink: 0; }
+.toolbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.avatar {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--accent-blue); color: #fff;
+  font-size: 10px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── Page layout ──────────────────────────────────────────────── */
+.page { flex: 1; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; overflow: auto; }
+
+/* ── Page header ──────────────────────────────────────────────── */
+.page-hdr {
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.page-title { font-size: 14px; font-weight: 700; }
+.page-sub   { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.btn-ghost {
+  height: 28px; padding: 0 12px; border-radius: 4px;
+  border: 1px solid #232a31; background: transparent;
+  color: var(--text-primary); font-size: 12px;
+  transition: border-color .15s;
+}
+.btn-ghost:hover { border-color: var(--accent-blue); }
+.btn-primary {
+  height: 28px; padding: 0 12px; border-radius: 4px;
+  border: none; background: var(--accent-blue);
+  color: #fff; font-size: 12px; font-weight: 600;
+}
+.btn-primary:hover { filter: brightness(1.1); }
+
+/* ── List toolbar (search + filter chips) ─────────────────────── */
+.list-toolbar {
+  background: #12161b; border: 1px solid #232a31; border-radius: 4px;
+  display: flex; align-items: center; padding: 0 10px; gap: 12px;
+  height: 36px; flex-shrink: 0;
+}
+.search-wrap { position: relative; flex: 1; max-width: 280px; }
+.search-wrap svg { position: absolute; left: 7px; top: 50%; transform: translateY(-50%); }
+.search-wrap input {
+  width: 100%; height: 24px; background: #0c0f12; border: 1px solid #232a31;
+  border-radius: 3px; color: var(--text-primary); padding: 0 8px 0 26px;
+  outline: none; transition: border-color .15s;
+}
+.search-wrap input:focus { border-color: var(--accent-blue); }
+.filter-sep { width: 1px; height: 20px; background: #232a31; }
+.filter-group { display: flex; gap: 4px; align-items: center; }
+.filter-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+.chip {
+  height: 22px; padding: 0 8px; border-radius: 3px; border: 1px solid #232a31;
+  background: transparent; color: var(--text-muted); font-size: 11px;
+  display: flex; align-items: center; gap: 4px;
+  transition: border-color .15s, color .15s; white-space: nowrap;
+}
+.chip.active, .chip:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+.chip-count {
+  font-family: var(--mono); font-size: 10px;
+  background: rgba(59,130,246,.15); border-radius: 2px; padding: 0 3px;
+}
+.chip.active .chip-count { background: rgba(59,130,246,.25); }
+.count-badge { margin-left: auto; font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+
+/* ── Data table ───────────────────────────────────────────────── */
+.panel { background: #12161b; border: 1px solid #232a31; border-radius: 4px; overflow: hidden; }
+.tbl th {
+  background: #0c0f12; font-size: 10px; font-weight: 600; color: var(--text-muted);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 4px 10px; border-bottom: 1px solid #232a31; white-space: nowrap;
+}
+.tbl td {
+  padding: 4px 10px; border-bottom: 1px solid rgba(35,42,49,.6);
+  font-size: 12px; white-space: nowrap;
+}
+.tbl tr:last-child td { border-bottom: none; }
+.tbl tr:hover td { background: #191e25; }
+.tbl tr.sel td { background: rgba(59,130,246,.08); border-left: 2px solid var(--accent-blue); }
+.sym-cell { font-weight: 600; }
+.sym-cell:hover { color: var(--accent-blue); cursor: pointer; }
+
+.tag-up   { background: rgba(34,197,94,.15);  color: var(--up); border-radius: 2px; padding: 1px 5px; font-size: 10px; font-weight: 700; }
+.tag-dn   { background: rgba(239,68,68,.15);  color: var(--dn); border-radius: 2px; padding: 1px 5px; font-size: 10px; font-weight: 700; }
+.tag-flat { background: rgba(123,134,148,.15); color: var(--text-muted); border-radius: 2px; padding: 1px 5px; font-size: 10px; font-weight: 700; }
+
+/* ── Table footer / pager ─────────────────────────────────────── */
+.tbl-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 10px; border-top: 1px solid #232a31;
+  background: #0c0f12;
+}
+.tbl-footer span { font-size: 10px; color: var(--text-muted); }
+.pagination { display: flex; gap: 3px; }
+.pg-btn {
+  height: 22px; min-width: 22px; padding: 0 6px;
+  background: none; border: 1px solid #232a31; border-radius: 2px;
+  color: var(--text-muted); font-size: 10px; font-family: var(--mono);
+}
+.pg-btn.active { border-color: var(--accent-blue); color: var(--accent-blue); background: rgba(59,130,246,.08); }
+.pg-btn:hover:not(.active) { border-color: #2e3640; color: var(--text-primary); }
+</style>
+</head>
+<body>
+
+<!-- TOOLBAR -->
+<header class="toolbar">
+  <div class="brand">
+    <div class="brand-mark">NO</div>
+    <span class="brand-name">NovexOps</span>
+  </div>
+  <div class="tb-sep"></div>
+  <span style="font-size:11px;color:var(--text-muted);">All Instruments</span>
+  <div class="toolbar-right">
+    <div class="avatar">RM</div>
+  </div>
+</header>
+
+<!-- PAGE -->
+<main class="page">
+
+  <!-- Page header -->
+  <div class="page-hdr">
+    <div>
+      <div class="page-title">Instruments</div>
+      <div class="page-sub">48 tracked · 36 active · updated 14:37 UTC</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-ghost">Export CSV</button>
+      <button class="btn-primary">+ Add Instrument</button>
+    </div>
+  </div>
+
+  <!-- List toolbar -->
+  <div class="list-toolbar">
+    <div class="search-wrap">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+        <circle cx="5" cy="5" r="3.5" stroke="#7b8694" stroke-width="1.2"/>
+        <line x1="8" y1="8" x2="11" y2="11" stroke="#7b8694" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      <input type="text" placeholder="Filter by symbol or name…" aria-label="Search instruments">
+    </div>
+    <div class="filter-sep"></div>
+    <div class="filter-group">
+      <span class="filter-label">Direction</span>
+      <button class="chip active">All <span class="chip-count">48</span></button>
+      <button class="chip">Up <span class="chip-count">26</span></button>
+      <button class="chip">Down <span class="chip-count">19</span></button>
+      <button class="chip">Flat <span class="chip-count">3</span></button>
+    </div>
+    <div class="filter-sep"></div>
+    <div class="filter-group">
+      <span class="filter-label">Status</span>
+      <button class="chip active">Active <span class="chip-count">36</span></button>
+      <button class="chip">Flagged <span class="chip-count">7</span></button>
+      <button class="chip">Paused <span class="chip-count">5</span></button>
+    </div>
+    <span class="count-badge">48 results</span>
+  </div>
+
+  <!-- Data table -->
+  <div class="panel">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Symbol</th>
+          <th>Name</th>
+          <th class="mono">Last</th>
+          <th class="mono">Chg%</th>
+          <th class="mono">Volume</th>
+          <th class="mono">52W High</th>
+          <th class="mono">52W Low</th>
+          <th>Direction</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="sel">
+          <td class="sym-cell">NOVQ</td>
+          <td>Novex Corp</td>
+          <td class="mono">284.40</td>
+          <td class="mono up">+1.33%</td>
+          <td class="mono muted">4.1M</td>
+          <td class="mono muted">312.50</td>
+          <td class="mono muted">198.80</td>
+          <td><span class="tag-up">UP</span></td>
+          <td><span style="color:var(--up);font-size:10px;">ACTIVE</span></td>
+          <td><button class="btn-ghost" style="height:22px;padding:0 8px;font-size:10px;">View</button></td>
+        </tr>
+        <tr>
+          <td class="sym-cell">ELTX</td>
+          <td>Eltrex Systems</td>
+          <td class="mono">117.08</td>
+          <td class="mono dn">-1.21%</td>
+          <td class="mono muted">2.8M</td>
+          <td class="mono muted">145.00</td>
+          <td class="mono muted">98.40</td>
+          <td><span class="tag-dn">DOWN</span></td>
+          <td><span style="color:var(--up);font-size:10px;">ACTIVE</span></td>
+          <td><button class="btn-ghost" style="height:22px;padding:0 8px;font-size:10px;">View</button></td>
+        </tr>
+        <tr>
+          <td class="sym-cell">MRFA</td>
+          <td>Marfa Industries</td>
+          <td class="mono">52.16</td>
+          <td class="mono up">+1.74%</td>
+          <td class="mono muted">890K</td>
+          <td class="mono muted">68.20</td>
+          <td class="mono muted">39.10</td>
+          <td><span class="tag-up">UP</span></td>
+          <td><span style="color:var(--up);font-size:10px;">ACTIVE</span></td>
+          <td><button class="btn-ghost" style="height:22px;padding:0 8px;font-size:10px;">View</button></td>
+        </tr>
+        <tr>
+          <td class="sym-cell">ZYLK</td>
+          <td>Zylk Holdings</td>
+          <td class="mono">938.72</td>
+          <td class="mono dn">-1.19%</td>
+          <td class="mono muted">1.2M</td>
+          <td class="mono muted">1,020.00</td>
+          <td class="mono muted">780.00</td>
+          <td><span class="tag-dn">DOWN</span></td>
+          <td><span style="color:var(--text-muted);font-size:10px;">FLAGGED</span></td>
+          <td><button class="btn-ghost" style="height:22px;padding:0 8px;font-size:10px;">View</button></td>
+        </tr>
+        <tr>
+          <td class="sym-cell">ORBN</td>
+          <td>Orben Capital</td>
+          <td class="mono">73.55</td>
+          <td class="mono up">+2.94%</td>
+          <td class="mono muted">3.6M</td>
+          <td class="mono muted">80.00</td>
+          <td class="mono muted">54.30</td>
+          <td><span class="tag-up">UP</span></td>
+          <td><span style="color:var(--up);font-size:10px;">ACTIVE</span></td>
+          <td><button class="btn-ghost" style="height:22px;padding:0 8px;font-size:10px;">View</button></td>
+        </tr>
+        <tr>
+          <td class="sym-cell">FXDT</td>
+          <td>Fluxdata Networks</td>
+          <td class="mono">1,204.50</td>
+          <td class="mono dn">-0.72%</td>
+          <td class="mono muted">540K</td>
+          <td class="mono muted">1,380.00</td>
+          <td class="mono muted">960.00</td>
+          <td><span class="tag-dn">DOWN</span></td>
+          <td><span style="color:var(--up);font-size:10px;">ACTIVE</span></td>
+          <td><button class="btn-ghost" style="height:22px;padding:0 8px;font-size:10px;">View</button></td>
+        </tr>
+        <tr>
+          <td class="sym-cell">VELM</td>
+          <td>Velmar Group</td>
+          <td class="mono">29.84</td>
+          <td class="mono up">+1.43%</td>
+          <td class="mono muted">1.9M</td>
+          <td class="mono muted">34.50</td>
+          <td class="mono muted">21.10</td>
+          <td><span class="tag-up">UP</span></td>
+          <td><span style="color:var(--up);font-size:10px;">ACTIVE</span></td>
+          <td><button class="btn-ghost" style="height:22px;padding:0 8px;font-size:10px;">View</button></td>
+        </tr>
+        <tr>
+          <td class="sym-cell">KRUX</td>
+          <td>Krux Dynamics</td>
+          <td class="mono">481.00</td>
+          <td class="mono dn">-1.15%</td>
+          <td class="mono muted">670K</td>
+          <td class="mono muted">540.00</td>
+          <td class="mono muted">390.00</td>
+          <td><span class="tag-dn">DOWN</span></td>
+          <td><span style="color:var(--text-muted);font-size:10px;">FLAGGED</span></td>
+          <td><button class="btn-ghost" style="height:22px;padding:0 8px;font-size:10px;">View</button></td>
+        </tr>
+        <tr>
+          <td class="sym-cell">TAQL</td>
+          <td>Taquel Solutions</td>
+          <td class="mono">8.37</td>
+          <td class="mono up">+1.82%</td>
+          <td class="mono muted">7.2M</td>
+          <td class="mono muted">10.20</td>
+          <td class="mono muted">5.80</td>
+          <td><span class="tag-up">UP</span></td>
+          <td><span style="color:var(--up);font-size:10px;">ACTIVE</span></td>
+          <td><button class="btn-ghost" style="height:22px;padding:0 8px;font-size:10px;">View</button></td>
+        </tr>
+        <tr>
+          <td class="sym-cell">SNVX</td>
+          <td>Senvax Corp</td>
+          <td class="mono">155.30</td>
+          <td class="mono dn">-2.02%</td>
+          <td class="mono muted">2.1M</td>
+          <td class="mono muted">188.00</td>
+          <td class="mono muted">130.00</td>
+          <td><span class="tag-dn">DOWN</span></td>
+          <td><span style="color:var(--up);font-size:10px;">ACTIVE</span></td>
+          <td><button class="btn-ghost" style="height:22px;padding:0 8px;font-size:10px;">View</button></td>
+        </tr>
+        <tr>
+          <td class="sym-cell">BQRF</td>
+          <td>Baqraf Partners</td>
+          <td class="mono">340.12</td>
+          <td class="mono up">+2.07%</td>
+          <td class="mono muted">980K</td>
+          <td class="mono muted">365.00</td>
+          <td class="mono muted">260.00</td>
+          <td><span class="tag-up">UP</span></td>
+          <td><span style="color:var(--up);font-size:10px;">ACTIVE</span></td>
+          <td><button class="btn-ghost" style="height:22px;padding:0 8px;font-size:10px;">View</button></td>
+        </tr>
+        <tr>
+          <td class="sym-cell">LXPR</td>
+          <td>Luxpar Ventures</td>
+          <td class="mono">66.44</td>
+          <td class="mono dn">-1.37%</td>
+          <td class="mono muted">1.5M</td>
+          <td class="mono muted">78.00</td>
+          <td class="mono muted">50.00</td>
+          <td><span class="tag-flat">FLAT</span></td>
+          <td><span style="color:var(--text-muted);font-size:10px;">PAUSED</span></td>
+          <td><button class="btn-ghost" style="height:22px;padding:0 8px;font-size:10px;">View</button></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="tbl-footer">
+      <span>Showing 1–12 of 48</span>
+      <div class="pagination">
+        <button class="pg-btn">‹</button>
+        <button class="pg-btn active">1</button>
+        <button class="pg-btn">2</button>
+        <button class="pg-btn">3</button>
+        <button class="pg-btn">4</button>
+        <button class="pg-btn">›</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+</body>
+</html>

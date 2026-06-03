@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Record Detail</title>
+<style>
+:root {
+  --accent:        #9333ea;
+  --accent-light:  #a855f7;
+  --accent-deep:   #7e22ce;
+  --accent-dim:    #f3e8ff;
+  --accent-mid:    #e9d5ff;
+
+  --state-active-bg: #dcfce7; --state-active-fg: #15803d;
+  --state-draft-bg:  #fef3c7; --state-draft-fg:  #b45309;
+  --state-arch-bg:   #f1f5f9; --state-arch-fg:   #64748b;
+
+  --clr-cat-tech:       #4f46e5; --clr-cat-tech-bg:       #e0e7ff;
+
+  --surface:  #faf9fc; --card: #ffffff; --sidebar-bg: #ffffff;
+  --border:   #ebe7f1;
+  --text-900: #1e293b; --text-600: #475569; --text-400: #94a3b8;
+  --sidebar-w: 260px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--surface); color: var(--text-900); font-size: 14px; line-height: 1.5; min-height: 100vh; display: flex; }
+
+/* Sidebar (abbreviated) */
+.sidebar { width: var(--sidebar-w); min-width: var(--sidebar-w); background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; height: 100vh; position: sticky; top: 0; overflow-y: auto; }
+.sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 20px 20px 16px; border-bottom: 1px solid var(--border); }
+.brand-mark { width: 34px; height: 34px; flex-shrink: 0; }
+.brand-name { font-size: 16px; font-weight: 700; color: var(--text-900); }
+.brand-sub  { font-size: 10px; color: var(--text-400); text-transform: uppercase; letter-spacing: 0.6px; }
+.entity-switcher { margin: 14px 16px 8px; background: var(--accent-dim); border: 1px solid var(--accent-mid); border-radius: 8px; padding: 10px 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+.switcher-icon { width: 28px; height: 28px; flex-shrink: 0; }
+.switcher-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent); font-weight: 600; }
+.switcher-name  { font-size: 13px; font-weight: 600; color: var(--text-900); }
+.nav-section { padding: 16px 16px 4px; }
+.nav-section-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-400); font-weight: 700; padding: 0 6px; margin-bottom: 4px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; cursor: pointer; color: var(--text-600); font-size: 13.5px; font-weight: 500; transition: background .15s, color .15s; position: relative; margin-bottom: 1px; text-decoration: none; }
+.nav-item:hover { background: var(--accent-dim); color: var(--accent); }
+.nav-item.active { background: var(--accent-dim); color: var(--accent-deep); font-weight: 600; }
+.nav-item.active::before { content: ""; position: absolute; left: 0; top: 6px; bottom: 6px; width: 3px; background: var(--accent); border-radius: 0 3px 3px 0; }
+.nav-icon { width: 16px; height: 16px; flex-shrink: 0; }
+.sidebar-footer { margin-top: auto; border-top: 1px solid var(--border); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
+.sidebar-footer a { font-size: 12px; color: var(--text-400); text-decoration: none; }
+.version-tag { font-size: 11px; color: var(--text-400); background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; }
+
+.main { flex: 1; display: flex; flex-direction: column; min-height: 100vh; overflow: hidden; }
+
+/* Topbar */
+.topbar { height: 60px; background: var(--card); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; padding: 0 24px; position: sticky; top: 0; z-index: 100; }
+.topbar-title { font-size: 15px; font-weight: 700; color: var(--text-900); }
+.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-400); }
+.breadcrumb a { color: var(--text-400); text-decoration: none; }
+.breadcrumb a:hover { color: var(--accent); }
+.breadcrumb .crumb-cur { color: var(--accent); font-weight: 500; }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; cursor: pointer; }
+
+/* Page body */
+.page-body { padding: 24px; flex: 1; overflow-y: auto; }
+
+/* Card */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.04); margin-bottom: 16px; overflow: hidden; }
+.card-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border); }
+.card-title { font-size: 14px; font-weight: 700; color: var(--text-900); }
+.card-subtitle { font-size: 12px; color: var(--text-400); margin-top: 1px; }
+
+/* Detail header band */
+.detail-header-band {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04); padding: 20px 24px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  margin-bottom: 16px; flex-wrap: wrap;
+}
+.detail-id-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.detail-id { font-family: "Courier New", monospace; font-size: 12px; color: var(--text-400); background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; }
+.status-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
+.status-pill.active { background: var(--state-active-bg); color: var(--state-active-fg); }
+.status-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.detail-name { font-size: 20px; font-weight: 700; color: var(--text-900); letter-spacing: -0.3px; }
+.detail-sub  { font-size: 13px; color: var(--text-400); margin-top: 2px; }
+.cat-tag { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; padding: 1px 7px; border-radius: 20px; margin-left: 8px; }
+.cat-tag.tech { background: var(--clr-cat-tech-bg); color: var(--clr-cat-tech); }
+.detail-actions { display: flex; gap: 10px; flex-shrink: 0; }
+
+.btn-ghost { padding: 8px 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); color: var(--text-600); font-size: 13px; font-family: inherit; font-weight: 500; cursor: pointer; transition: border-color .15s, color .15s; }
+.btn-ghost:hover { border-color: var(--accent-light); color: var(--accent); }
+.btn-primary { padding: 8px 16px; border: none; border-radius: 8px; background: var(--accent); color: #fff; font-size: 13px; font-family: inherit; font-weight: 600; cursor: pointer; transition: background .15s; }
+.btn-primary:hover { background: var(--accent-deep); }
+
+/* Meta grid */
+.meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
+.meta-cell { padding: 16px 20px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.meta-cell:nth-child(3n) { border-right: none; }
+.meta-cell:nth-last-child(-n+3) { border-bottom: none; }
+.meta-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 700; color: var(--text-400); margin-bottom: 4px; }
+.meta-value { font-size: 13.5px; font-weight: 600; color: var(--text-900); }
+.meta-sub   { font-size: 11.5px; color: var(--text-400); margin-top: 2px; }
+.meta-avatar { display: inline-flex; align-items: center; gap: 8px; }
+.meta-av { width: 24px; height: 24px; border-radius: 50%; background: var(--clr-cat-tech); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: #fff; }
+.prog-wrap { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.prog-bg   { flex: 1; max-width: 100px; height: 5px; background: var(--border); border-radius: 20px; overflow: hidden; }
+.prog-fill { height: 100%; background: var(--accent-light); border-radius: 20px; }
+.prog-pct  { font-size: 12px; font-weight: 600; color: var(--text-600); font-variant-numeric: tabular-nums; }
+
+/* Two-column related panels */
+.two-col { display: grid; grid-template-columns: 7fr 5fr; gap: 16px; }
+
+/* Sub-table */
+.sub-table-wrap { overflow-x: auto; }
+.sub-table { width: 100%; border-collapse: collapse; }
+.sub-table thead th { text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 700; color: var(--text-400); padding: 10px 16px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.sub-table tbody tr { transition: background .1s; }
+.sub-table tbody tr:hover { background: var(--accent-dim); }
+.sub-table tbody td { padding: 11px 16px; font-size: 13px; color: var(--text-600); border-bottom: 1px solid var(--border); vertical-align: middle; }
+.sub-table tbody tr:last-child td { border-bottom: none; }
+.rec-name-sm { font-weight: 600; color: var(--text-900); }
+
+/* Activity feed */
+.activity-list { display: flex; flex-direction: column; }
+.activity-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 20px; border-bottom: 1px solid var(--border); }
+.activity-item:last-child { border-bottom: none; }
+.act-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--accent-mid); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--accent-deep); flex-shrink: 0; }
+.act-body { flex: 1; }
+.act-text { font-size: 13px; color: var(--text-900); }
+.act-text strong { font-weight: 600; }
+.act-time { font-size: 11.5px; color: var(--text-400); margin-top: 2px; }
+
+@media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } .meta-grid { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <svg class="brand-mark" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+      <rect width="34" height="34" rx="9" fill="var(--accent)"/>
+      <circle cx="17" cy="17" r="8" stroke="#fff" stroke-width="2"/>
+      <circle cx="17" cy="17" r="3.5" fill="#fff"/>
+    </svg>
+    <div>
+      <div class="brand-name">Orion Admin</div>
+      <div class="brand-sub">Management Portal</div>
+    </div>
+  </div>
+  <div class="entity-switcher" role="button" aria-label="Switch entity">
+    <svg class="switcher-icon" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+      <rect width="28" height="28" rx="7" fill="var(--accent-mid)"/>
+      <rect x="7" y="7" width="6" height="6" rx="1.5" fill="var(--accent)"/>
+      <rect x="15" y="7" width="6" height="6" rx="1.5" fill="var(--accent)" opacity=".6"/>
+      <rect x="7" y="15" width="6" height="6" rx="1.5" fill="var(--accent)" opacity=".6"/>
+      <rect x="15" y="15" width="6" height="6" rx="1.5" fill="var(--accent)" opacity=".3"/>
+    </svg>
+    <div>
+      <div class="switcher-label">Active Unit</div>
+      <div class="switcher-name">Northgate Branch</div>
+    </div>
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 4.5l3 3 3-3" stroke="var(--text-400)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">Records</div>
+    <a class="nav-item active" href="#">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="2" y="1" width="10" height="14" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 5h6M5 8h6M5 11h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      All Records
+    </a>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="5" cy="5" r="3" stroke="currentColor" stroke-width="1.4"/><circle cx="11" cy="5" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M1 14c0-2.21 1.79-4 4-4M15 14c0-2.21-1.79-4-4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Members
+    </a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">Settings</div>
+    <a class="nav-item" href="#">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Settings
+    </a>
+  </div>
+  <div class="sidebar-footer">
+    <a href="#">Help &amp; Support</a>
+    <span class="version-tag">v2.4.0</span>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div>
+      <div class="topbar-title">Record Detail</div>
+      <div class="breadcrumb">
+        <a href="#">Home</a>
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M3.5 2l3 3-3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <a href="#">Records</a>
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M3.5 2l3 3-3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="crumb-cur">REC-001</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="avatar" role="button" aria-label="User menu" tabindex="0">AK</div>
+    </div>
+  </header>
+
+  <main class="page-body">
+
+    <!-- Detail header band -->
+    <div class="detail-header-band">
+      <div>
+        <div class="detail-id-row">
+          <span class="detail-id">REC-001</span>
+          <span class="status-pill active"><span class="status-dot"></span>Active</span>
+        </div>
+        <div class="detail-name">
+          Software Architecture
+          <span class="cat-tag tech">Tech</span>
+        </div>
+        <div class="detail-sub">Northgate Branch · Q2 2026 · Owner: Maya Steinfeld</div>
+      </div>
+      <div class="detail-actions">
+        <button class="btn-ghost">Export</button>
+        <button class="btn-ghost">Archive</button>
+        <button class="btn-primary">Edit</button>
+      </div>
+    </div>
+
+    <!-- Meta grid -->
+    <div class="card">
+      <div class="meta-grid">
+        <div class="meta-cell">
+          <div class="meta-label">Short Code</div>
+          <div class="meta-value" style="font-family:'Courier New',monospace">SA-201</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Category</div>
+          <div class="meta-value"><span class="cat-tag tech" style="margin-left:0">Tech</span></div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Status</div>
+          <div class="meta-value"><span class="status-pill active" style="margin:0"><span class="status-dot"></span>Active</span></div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Owner</div>
+          <div class="meta-value">
+            <div class="meta-avatar"><div class="meta-av">MS</div>Maya Steinfeld</div>
+          </div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Members</div>
+          <div class="meta-value" style="font-variant-numeric:tabular-nums">94 / 100</div>
+          <div class="meta-sub">6 seats remaining</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Progress</div>
+          <div class="prog-wrap">
+            <div class="prog-bg"><div class="prog-fill" style="width:78%"></div></div>
+            <span class="prog-pct">78%</span>
+          </div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Start Date</div>
+          <div class="meta-value">25 Aug 2026</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">End Date</div>
+          <div class="meta-value">12 Dec 2026</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Created</div>
+          <div class="meta-value">2 Jun 2026</div>
+          <div class="meta-sub">by Amara Kwesi</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two-column related data -->
+    <div class="two-col">
+
+      <!-- Sub-records / modules table -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Modules &amp; Sub-Records</div>
+            <div class="card-subtitle">4 modules · Module 4 in progress</div>
+          </div>
+          <button class="btn-ghost" style="font-size:12px;padding:5px 12px;">+ Add Module</button>
+        </div>
+        <div class="sub-table-wrap">
+          <table class="sub-table">
+            <thead>
+              <tr>
+                <th>Module</th>
+                <th>Owner</th>
+                <th>Members</th>
+                <th>Progress</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="rec-name-sm">Module 1 — Fundamentals</span></td>
+                <td>Maya S.</td>
+                <td style="font-variant-numeric:tabular-nums">94</td>
+                <td><div class="prog-wrap" style="margin:0"><div class="prog-bg"><div class="prog-fill" style="width:100%"></div></div><span class="prog-pct">100%</span></div></td>
+                <td><span class="status-pill active"><span class="status-dot"></span>Active</span></td>
+              </tr>
+              <tr>
+                <td><span class="rec-name-sm">Module 2 — Patterns</span></td>
+                <td>Maya S.</td>
+                <td style="font-variant-numeric:tabular-nums">94</td>
+                <td><div class="prog-wrap" style="margin:0"><div class="prog-bg"><div class="prog-fill" style="width:100%"></div></div><span class="prog-pct">100%</span></div></td>
+                <td><span class="status-pill active"><span class="status-dot"></span>Active</span></td>
+              </tr>
+              <tr>
+                <td><span class="rec-name-sm">Module 3 — Systems</span></td>
+                <td>Maya S.</td>
+                <td style="font-variant-numeric:tabular-nums">94</td>
+                <td><div class="prog-wrap" style="margin:0"><div class="prog-bg"><div class="prog-fill" style="width:91%"></div></div><span class="prog-pct">91%</span></div></td>
+                <td><span class="status-pill active"><span class="status-dot"></span>Active</span></td>
+              </tr>
+              <tr>
+                <td><span class="rec-name-sm">Module 4 — Microservices</span></td>
+                <td>Maya S.</td>
+                <td style="font-variant-numeric:tabular-nums">94</td>
+                <td><div class="prog-wrap" style="margin:0"><div class="prog-bg"><div class="prog-fill" style="width:22%"></div></div><span class="prog-pct">22%</span></div></td>
+                <td><span class="status-pill draft"><span class="status-dot"></span>Draft</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Activity feed -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Recent Activity</div>
+            <div class="card-subtitle">Last 7 days</div>
+          </div>
+        </div>
+        <div class="activity-list">
+          <div class="activity-item">
+            <div class="act-avatar">MS</div>
+            <div class="act-body">
+              <div class="act-text"><strong>Maya Steinfeld</strong> published Module 4 materials</div>
+              <div class="act-time">2 hours ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-avatar">AK</div>
+            <div class="act-body">
+              <div class="act-text"><strong>Amara Kwesi</strong> updated capacity to 100</div>
+              <div class="act-time">Yesterday at 14:32</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-avatar">JR</div>
+            <div class="act-body">
+              <div class="act-text"><strong>Joel Reyes</strong> enrolled (member #94)</div>
+              <div class="act-time">Yesterday at 09:15</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-avatar">MS</div>
+            <div class="act-body">
+              <div class="act-text"><strong>Maya Steinfeld</strong> marked Module 3 complete</div>
+              <div class="act-time">3 days ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-avatar">AK</div>
+            <div class="act-body">
+              <div class="act-text"><strong>Amara Kwesi</strong> created this record</div>
+              <div class="act-time">Jun 2, 2026</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

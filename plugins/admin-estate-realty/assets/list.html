@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin — List</title>
+<style>
+:root {
+  --color-accent:        #0d9488;
+  --color-accent-mid:    #14b8a6;
+  --color-accent-hover:  #0b7a70;
+  --color-accent-light:  #ccfbf1;
+  --color-accent-faint:  #f0fdfa;
+  --color-success:       #16a34a;
+  --color-success-bg:    #dcfce7;
+  --color-warning:       #d97706;
+  --color-warning-bg:    #fef3c7;
+  --color-danger:        #dc2626;
+  --color-danger-bg:     #fee2e2;
+  --color-text:          #1e2d2b;
+  --color-muted:         #64748b;
+  --color-border:        #e3e9e9;
+  --color-surface:       #ffffff;
+  --color-bg:            #f7f9f9;
+  --color-bg-subtle:     #fafcfc;
+  --color-sidebar:       #0f2623;
+  --color-sidebar-item:  rgba(255,255,255,0.07);
+  --color-sidebar-text:  #a8c5c2;
+  --color-sidebar-active:#e2f0ef;
+  --color-sidebar-head:  rgba(255,255,255,0.30);
+  --color-pill-blue:     #1d4ed8;
+  --color-pill-blue-bg:  #dbeafe;
+  --color-pill-violet:   #6d28d9;
+  --color-pill-violet-bg:#ede9fe;
+  --color-pill-amber:    #854d0e;
+  --color-pill-amber-bg: #fef9c3;
+  --radius-card:         12px;
+  --shadow-card:         0 2px 10px rgba(13,148,136,0.07);
+  --font-sans:           "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); background: var(--color-bg); color: var(--color-text); font-size: 14px; line-height: 1.5; min-height: 100vh; display: flex; }
+
+.sidebar { width: 240px; min-height: 100vh; background: var(--color-sidebar); display: flex; flex-direction: column; flex-shrink: 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+.sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 22px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+.brand-mark { width: 36px; height: 36px; background: var(--color-accent); border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.brand-name { color: #fff; font-size: 15px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.2; }
+.brand-name span { display: block; font-size: 10px; font-weight: 400; color: var(--color-sidebar-text); letter-spacing: 0.03em; }
+.office-switcher { margin: 14px 14px 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.09); border-radius: 8px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; gap: 6px; }
+.office-switcher-label { font-size: 12px; color: var(--color-sidebar-text); flex: 1; min-width: 0; }
+.office-switcher-name { color: #e2f0ef; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav-section { padding: 10px 14px 2px; }
+.nav-section-label { font-size: 9.5px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--color-sidebar-head); padding: 0 6px; margin-bottom: 4px; }
+.nav-item { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 7px; color: var(--color-sidebar-text); font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s, color 0.15s; margin-bottom: 1px; position: relative; text-decoration: none; }
+.nav-item:hover { background: var(--color-sidebar-item); color: #e2f0ef; }
+.nav-item.active { background: rgba(20,184,166,0.18); color: var(--color-sidebar-active); }
+.nav-item.active::before { content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 3px; background: var(--color-accent-mid); border-radius: 0 3px 3px 0; }
+.nav-badge { margin-left: auto; background: var(--color-accent); color: #fff; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 20px; line-height: 1.6; }
+.sidebar-footer { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.07); padding: 14px 16px; display: flex; align-items: center; gap: 10px; }
+.sidebar-footer-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--color-accent); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+.sidebar-footer-info { flex: 1; min-width: 0; }
+.sidebar-footer-name { color: #e2f0ef; font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar-footer-role { color: var(--color-sidebar-text); font-size: 10.5px; }
+
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.topbar { height: 60px; background: var(--color-surface); border-bottom: 1px solid var(--color-border); display: flex; align-items: center; padding: 0 24px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+.topbar-title { font-size: 16px; font-weight: 700; color: var(--color-text); white-space: nowrap; letter-spacing: -0.01em; }
+.topbar-search { flex: 1; max-width: 380px; margin: 0 auto; position: relative; }
+.topbar-search input { width: 100%; padding: 7px 14px 7px 34px; border: 1px solid var(--color-border); border-radius: 8px; font-family: var(--font-sans); font-size: 13px; color: var(--color-text); background: var(--color-bg); outline: none; transition: border-color 0.15s; }
+.topbar-search input::placeholder { color: var(--color-muted); }
+.topbar-search input:focus { border-color: var(--color-accent-mid); }
+.topbar-search-icon { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); color: var(--color-muted); pointer-events: none; }
+.topbar-avatar { display: flex; align-items: center; gap: 8px; cursor: pointer; flex-shrink: 0; }
+.topbar-avatar-circle { width: 34px; height: 34px; border-radius: 50%; background: var(--color-accent); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 700; }
+.topbar-avatar-name { font-size: 13px; font-weight: 600; color: var(--color-text); }
+
+.page-body { padding: 24px; display: flex; flex-direction: column; gap: 18px; }
+.page-header { display: flex; align-items: center; justify-content: space-between; }
+.page-header h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; color: var(--color-text); }
+.page-header p { font-size: 13px; color: var(--color-muted); margin-top: 2px; }
+.btn-primary { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--color-accent); color: #fff; font-family: var(--font-sans); font-size: 13px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; transition: background 0.15s; }
+.btn-primary:hover { background: var(--color-accent-hover); }
+.btn-ghost { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: transparent; color: var(--color-muted); font-family: var(--font-sans); font-size: 13px; font-weight: 500; border: 1px solid var(--color-border); border-radius: 8px; cursor: pointer; margin-right: 8px; transition: border-color 0.15s; }
+.btn-ghost:hover { border-color: var(--color-accent-mid); color: var(--color-accent); }
+
+/* TOOLBAR */
+.toolbar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.toolbar-search { display: flex; align-items: center; gap: 8px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 8px; padding: 7px 12px; flex: 1; max-width: 340px; }
+.toolbar-search svg { color: var(--color-muted); flex-shrink: 0; }
+.toolbar-search input { background: transparent; border: none; outline: none; font-family: var(--font-sans); font-size: 13px; color: var(--color-text); width: 100%; }
+.toolbar-search input::placeholder { color: var(--color-muted); }
+.filter-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.filter-label { font-size: 12px; color: var(--color-muted); font-weight: 500; }
+.chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border: 1px solid var(--color-border); border-radius: 20px; font-size: 12px; font-weight: 500; color: var(--color-muted); cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s; }
+.chip:hover { border-color: var(--color-accent-mid); color: var(--color-accent); }
+.chip.active { background: var(--color-accent-light); border-color: var(--color-accent-mid); color: var(--color-accent); font-weight: 600; }
+.chip-count { font-size: 10px; font-weight: 700; background: var(--color-accent); color: #fff; padding: 1px 5px; border-radius: 20px; }
+.chip.active .chip-count { background: var(--color-accent); }
+
+/* TABLE CARD */
+.card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-card); box-shadow: var(--shadow-card); overflow: hidden; }
+.card-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--color-border); }
+.card-title { font-size: 14px; font-weight: 700; color: var(--color-text); }
+.card-sub { font-size: 12px; color: var(--color-muted); margin-top: 1px; }
+
+table { width: 100%; border-collapse: collapse; }
+thead th { font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-muted); padding: 10px 16px; text-align: left; background: var(--color-bg); border-bottom: 1px solid var(--color-border); }
+tbody tr { border-bottom: 1px solid var(--color-border); transition: background 0.12s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:nth-child(even) { background: var(--color-bg-subtle); }
+tbody tr:hover { background: var(--color-accent-faint); }
+tbody td { padding: 11px 16px; font-size: 13px; color: var(--color-text); font-variant-numeric: tabular-nums; }
+.record-cell { display: flex; align-items: center; gap: 10px; }
+.record-thumb { width: 40px; height: 32px; border-radius: 5px; background: var(--color-accent-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--color-accent); }
+.record-primary { font-weight: 600; font-size: 12.5px; color: var(--color-text); }
+.record-secondary { font-size: 10.5px; color: var(--color-muted); }
+.value-cell { font-weight: 700; color: var(--color-text); }
+.member-cell { display: flex; align-items: center; gap: 7px; }
+.member-initials { width: 26px; height: 26px; border-radius: 50%; background: var(--color-accent-light); color: var(--color-accent); font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+.pill { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: 0.02em; }
+.pill-type-a { background: var(--color-pill-blue-bg);   color: var(--color-pill-blue); }
+.pill-type-b { background: var(--color-pill-violet-bg); color: var(--color-pill-violet); }
+.pill-type-c { background: var(--color-pill-amber-bg);  color: var(--color-pill-amber); }
+.pill-active   { background: var(--color-success-bg); color: var(--color-success); }
+.pill-pending  { background: var(--color-warning-bg); color: var(--color-warning); }
+.pill-progress { background: var(--color-pill-blue-bg); color: var(--color-pill-blue); }
+.pill-done     { background: #f1f5f9; color: var(--color-muted); }
+
+.table-footer { padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--color-border); font-size: 12px; color: var(--color-muted); }
+.pagination { display: flex; gap: 4px; }
+.page-btn { width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--color-border); background: var(--color-surface); font-family: var(--font-sans); font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--color-muted); }
+.page-btn.active { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-mark">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" fill="currentColor" fill-opacity=".3" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/><rect x="7.5" y="11.5" width="5" height="6.5" rx="1" fill="#fff"/></svg>
+    </div>
+    <div class="brand-name">Meridian Group<span>Back Office</span></div>
+  </div>
+  <div class="office-switcher">
+    <div><div class="office-switcher-label">Branch</div><div class="office-switcher-name">Downtown SF</div></div>
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:var(--color-sidebar-text);flex-shrink:0"><path d="M3.5 5.5L7 9l3.5-3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">Overview</div>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" fill="currentColor"/><rect x="9" y="2" width="5" height="5" rx="1" fill="currentColor" fill-opacity=".5"/><rect x="2" y="9" width="5" height="5" rx="1" fill="currentColor" fill-opacity=".5"/><rect x="9" y="9" width="5" height="5" rx="1" fill="currentColor"/></svg>Dashboard</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">Records</div>
+    <a class="nav-item active" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8.5L8 2l6 6.5V14a.5.5 0 01-.5.5h-11A.5.5 0 012 14V8.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><rect x="6" y="10" width="4" height="4.5" rx=".6" fill="currentColor" fill-opacity=".35"/></svg>Active Listings<span class="nav-badge">47</span></a>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 5.5v2.75l1.75 1.75" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Pending Review<span class="nav-badge">9</span></a>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 3h10v10H3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6 7l1.5 1.5L10 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Archived</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">Pipeline</div>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 13l3.5-4.5L8 11l2.5-5L14 13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Pipeline</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">Team</div>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 13c0-2.485 2.015-4.5 4.5-4.5s4.5 2.015 4.5 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Members</a>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v3.5h2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Settings</a>
+  </div>
+  <div class="sidebar-footer">
+    <div class="sidebar-footer-avatar">PR</div>
+    <div class="sidebar-footer-info"><div class="sidebar-footer-name">Patricia Ruiz</div><div class="sidebar-footer-role">Broker of Record</div></div>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-title">All Records</div>
+    <div class="topbar-search">
+      <svg class="topbar-search-icon" width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 10.5L13 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <input type="text" placeholder="Search records, references…">
+    </div>
+    <div class="topbar-avatar">
+      <div class="topbar-avatar-circle">PR</div>
+      <span class="topbar-avatar-name">Patricia R.</span>
+    </div>
+  </header>
+
+  <div class="page-body">
+    <div class="page-header">
+      <div>
+        <h1>Active Listings</h1>
+        <p>47 records · Downtown SF Branch</p>
+      </div>
+      <div>
+        <button class="btn-ghost">Export</button>
+        <button class="btn-primary">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+          New Listing
+        </button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="toolbar-search">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.4"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <input type="text" placeholder="Filter by name, reference, or member…">
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Type:</span>
+        <span class="chip active">All <span class="chip-count">47</span></span>
+        <span class="chip">Type A <span class="chip-count">28</span></span>
+        <span class="chip">Type B <span class="chip-count">12</span></span>
+        <span class="chip">Type C <span class="chip-count">7</span></span>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Status:</span>
+        <span class="chip active">All</span>
+        <span class="chip">Active</span>
+        <span class="chip">Pending</span>
+        <span class="chip">In Progress</span>
+        <span class="chip">Closed</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div><div class="card-title">Listings</div><div class="card-sub">Showing 1–10 of 47</div></div>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Record</th><th>Value</th><th>Type</th><th>Status</th><th>Member</th><th>Listed</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="record-cell"><div class="record-thumb"><svg width="20" height="16" viewBox="0 0 20 16" fill="none"><path d="M2 8L10 1l8 7v7a.5.5 0 01-.5.5h-15A.5.5 0 012 15V8z" fill="currentColor" fill-opacity=".4" stroke="currentColor" stroke-width="1.2"/><rect x="7" y="10" width="6" height="5.5" rx=".5" fill="currentColor" fill-opacity=".6"/></svg></div><div><div class="record-primary">1842 Lombard St #3</div><div class="record-secondary">REF# 2024-8831</div></div></div></td>
+            <td class="value-cell">$1,250,000</td>
+            <td><span class="pill pill-type-a">Type A</span></td>
+            <td><span class="pill pill-active">Active</span></td>
+            <td><div class="member-cell"><div class="member-initials">KL</div>Kara Lee</div></td>
+            <td style="color:var(--color-muted);font-size:12px">May 12, 2026</td>
+          </tr>
+          <tr>
+            <td><div class="record-cell"><div class="record-thumb"><svg width="20" height="16" viewBox="0 0 20 16" fill="none"><path d="M2 8L10 1l8 7v7a.5.5 0 01-.5.5h-15A.5.5 0 012 15V8z" fill="currentColor" fill-opacity=".4" stroke="currentColor" stroke-width="1.2"/><rect x="7" y="10" width="6" height="5.5" rx=".5" fill="currentColor" fill-opacity=".6"/></svg></div><div><div class="record-primary">500 California St, Fl 12</div><div class="record-secondary">REF# 2024-9042</div></div></div></td>
+            <td class="value-cell">$3,875,000</td>
+            <td><span class="pill pill-type-b">Type B</span></td>
+            <td><span class="pill pill-pending">Pending</span></td>
+            <td><div class="member-cell"><div class="member-initials">RM</div>Ryan Morales</div></td>
+            <td style="color:var(--color-muted);font-size:12px">Apr 28, 2026</td>
+          </tr>
+          <tr>
+            <td><div class="record-cell"><div class="record-thumb"><svg width="20" height="16" viewBox="0 0 20 16" fill="none"><path d="M2 8L10 1l8 7v7a.5.5 0 01-.5.5h-15A.5.5 0 012 15V8z" fill="currentColor" fill-opacity=".4" stroke="currentColor" stroke-width="1.2"/><rect x="7" y="10" width="6" height="5.5" rx=".5" fill="currentColor" fill-opacity=".6"/></svg></div><div><div class="record-primary">78 Belvedere Ave</div><div class="record-secondary">REF# 2024-7765</div></div></div></td>
+            <td class="value-cell">$892,500</td>
+            <td><span class="pill pill-type-a">Type A</span></td>
+            <td><span class="pill pill-progress">In Progress</span></td>
+            <td><div class="member-cell"><div class="member-initials">ST</div>Sofia Torres</div></td>
+            <td style="color:var(--color-muted);font-size:12px">May 3, 2026</td>
+          </tr>
+          <tr>
+            <td><div class="record-cell"><div class="record-thumb"><svg width="20" height="16" viewBox="0 0 20 16" fill="none"><path d="M2 8L10 1l8 7v7a.5.5 0 01-.5.5h-15A.5.5 0 012 15V8z" fill="currentColor" fill-opacity=".4" stroke="currentColor" stroke-width="1.2"/><rect x="7" y="10" width="6" height="5.5" rx=".5" fill="currentColor" fill-opacity=".6"/></svg></div><div><div class="record-primary">24.7 Acres — North Lot</div><div class="record-secondary">REF# 2024-6110</div></div></div></td>
+            <td class="value-cell">$560,000</td>
+            <td><span class="pill pill-type-c">Type C</span></td>
+            <td><span class="pill pill-active">Active</span></td>
+            <td><div class="member-cell"><div class="member-initials">JC</div>James Cho</div></td>
+            <td style="color:var(--color-muted);font-size:12px">Mar 17, 2026</td>
+          </tr>
+          <tr>
+            <td><div class="record-cell"><div class="record-thumb"><svg width="20" height="16" viewBox="0 0 20 16" fill="none"><path d="M2 8L10 1l8 7v7a.5.5 0 01-.5.5h-15A.5.5 0 012 15V8z" fill="currentColor" fill-opacity=".4" stroke="currentColor" stroke-width="1.2"/><rect x="7" y="10" width="6" height="5.5" rx=".5" fill="currentColor" fill-opacity=".6"/></svg></div><div><div class="record-primary">3301 Mission St #22B</div><div class="record-secondary">REF# 2024-9204</div></div></div></td>
+            <td class="value-cell">$748,000</td>
+            <td><span class="pill pill-type-a">Type A</span></td>
+            <td><span class="pill pill-active">Active</span></td>
+            <td><div class="member-cell"><div class="member-initials">KL</div>Kara Lee</div></td>
+            <td style="color:var(--color-muted);font-size:12px">May 20, 2026</td>
+          </tr>
+          <tr>
+            <td><div class="record-cell"><div class="record-thumb"><svg width="20" height="16" viewBox="0 0 20 16" fill="none"><path d="M2 8L10 1l8 7v7a.5.5 0 01-.5.5h-15A.5.5 0 012 15V8z" fill="currentColor" fill-opacity=".4" stroke="currentColor" stroke-width="1.2"/><rect x="7" y="10" width="6" height="5.5" rx=".5" fill="currentColor" fill-opacity=".6"/></svg></div><div><div class="record-primary">601 Van Ness Ave, Ste 800</div><div class="record-secondary">REF# 2024-8803</div></div></div></td>
+            <td class="value-cell">$2,100,000</td>
+            <td><span class="pill pill-type-b">Type B</span></td>
+            <td><span class="pill pill-pending">Pending</span></td>
+            <td><div class="member-cell"><div class="member-initials">AW</div>Aisha Whitfield</div></td>
+            <td style="color:var(--color-muted);font-size:12px">Apr 5, 2026</td>
+          </tr>
+          <tr>
+            <td><div class="record-cell"><div class="record-thumb"><svg width="20" height="16" viewBox="0 0 20 16" fill="none"><path d="M2 8L10 1l8 7v7a.5.5 0 01-.5.5h-15A.5.5 0 012 15V8z" fill="currentColor" fill-opacity=".4" stroke="currentColor" stroke-width="1.2"/><rect x="7" y="10" width="6" height="5.5" rx=".5" fill="currentColor" fill-opacity=".6"/></svg></div><div><div class="record-primary">115 Juniper Ln, North Bay</div><div class="record-secondary">REF# 2024-7488</div></div></div></td>
+            <td class="value-cell">$1,680,000</td>
+            <td><span class="pill pill-type-a">Type A</span></td>
+            <td><span class="pill pill-done">Closed</span></td>
+            <td><div class="member-cell"><div class="member-initials">RM</div>Ryan Morales</div></td>
+            <td style="color:var(--color-muted);font-size:12px">Feb 11, 2026</td>
+          </tr>
+          <tr>
+            <td><div class="record-cell"><div class="record-thumb"><svg width="20" height="16" viewBox="0 0 20 16" fill="none"><path d="M2 8L10 1l8 7v7a.5.5 0 01-.5.5h-15A.5.5 0 012 15V8z" fill="currentColor" fill-opacity=".4" stroke="currentColor" stroke-width="1.2"/><rect x="7" y="10" width="6" height="5.5" rx=".5" fill="currentColor" fill-opacity=".6"/></svg></div><div><div class="record-primary">88 Pacific Heights Blvd</div><div class="record-secondary">REF# 2024-9361</div></div></div></td>
+            <td class="value-cell">$4,500,000</td>
+            <td><span class="pill pill-type-a">Type A</span></td>
+            <td><span class="pill pill-active">Active</span></td>
+            <td><div class="member-cell"><div class="member-initials">ST</div>Sofia Torres</div></td>
+            <td style="color:var(--color-muted);font-size:12px">Jun 1, 2026</td>
+          </tr>
+          <tr>
+            <td><div class="record-cell"><div class="record-thumb"><svg width="20" height="16" viewBox="0 0 20 16" fill="none"><path d="M2 8L10 1l8 7v7a.5.5 0 01-.5.5h-15A.5.5 0 012 15V8z" fill="currentColor" fill-opacity=".4" stroke="currentColor" stroke-width="1.2"/><rect x="7" y="10" width="6" height="5.5" rx=".5" fill="currentColor" fill-opacity=".6"/></svg></div><div><div class="record-primary">42 Presidio Terrace</div><div class="record-secondary">REF# 2024-9512</div></div></div></td>
+            <td class="value-cell">$3,200,000</td>
+            <td><span class="pill pill-type-a">Type A</span></td>
+            <td><span class="pill pill-done">Closed</span></td>
+            <td><div class="member-cell"><div class="member-initials">KL</div>Kara Lee</div></td>
+            <td style="color:var(--color-muted);font-size:12px">Jan 22, 2026</td>
+          </tr>
+          <tr>
+            <td><div class="record-cell"><div class="record-thumb"><svg width="20" height="16" viewBox="0 0 20 16" fill="none"><path d="M2 8L10 1l8 7v7a.5.5 0 01-.5.5h-15A.5.5 0 012 15V8z" fill="currentColor" fill-opacity=".4" stroke="currentColor" stroke-width="1.2"/><rect x="7" y="10" width="6" height="5.5" rx=".5" fill="currentColor" fill-opacity=".6"/></svg></div><div><div class="record-primary">720 Market St, Fl 8</div><div class="record-secondary">REF# 2024-9603</div></div></div></td>
+            <td class="value-cell">$1,950,000</td>
+            <td><span class="pill pill-type-b">Type B</span></td>
+            <td><span class="pill pill-active">Active</span></td>
+            <td><div class="member-cell"><div class="member-initials">DV</div>Diana Vance</div></td>
+            <td style="color:var(--color-muted);font-size:12px">May 28, 2026</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="table-footer">
+        <span>Showing 1–10 of 47</span>
+        <div class="pagination">
+          <button class="page-btn">‹</button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">4</button>
+          <button class="page-btn">5</button>
+          <button class="page-btn">›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

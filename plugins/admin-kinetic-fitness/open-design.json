@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-kinetic-fitness",
-  "title": "Kinetic Fitness Admin",
-  "version": "0.1.0",
-  "description": "Dark-mode gym and fitness studio operations dashboard — active member KPIs, live class schedule with capacity bars, weekly attendance area chart, members table with plan/status, and coach panel. Original energetic dark-green palette with lime accent.",
+  "title": "Kinetic Admin",
+  "version": "0.2.0",
+  "description": "Energetic dark-green admin aesthetic: deep forest-green canvas (#0f1410), lime accent (#84cc16), Inter type with tabular figures, and dense hairline-bordered panels. Archetype = slim topbar (brand + search + entity-switcher + avatar) + icon rail + 4 KPI tiles + 2-column row (slot/schedule list with capacity bars + area-chart card) + full-width records table with status pills + 3-card personnel panel, plus matching list, form, and detail screens. Built for high-density operational consoles with an energetic, athletic character.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,14 +19,13 @@
     "operations",
     "web",
     "admin",
-    "fitness",
-    "gym",
     "dark-mode",
-    "energetic",
     "lime-accent",
-    "schedule",
-    "members",
-    "studio-management"
+    "dark-green",
+    "energetic",
+    "capacity-bar",
+    "data-dense",
+    "enterprise"
   ],
   "compat": {
     "agentSkills": [
@@ -47,13 +46,25 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a dark-mode fitness studio admin dashboard — slim topbar with location switch, icon rail sidebar, 4 KPI tiles (active members, check-ins, classes, retention), class schedule with capacity, weekly attendance chart, members table, and coach panel.",
-        "zh-CN": "使用这个插件完成以下任务：Build me a dark-mode fitness studio admin dashboard — slim topbar with location switch, icon rail sidebar, 4 KPI tiles, class schedule with capacity, weekly attendance chart, members table, coach panel."
+        "en": "Apply this energetic dark-green admin aesthetic to my domain — forest-green canvas, lime accent, slim topbar with entity switcher, icon rail, 4 KPI tiles, a slot/schedule panel with capacity bars, an area-chart card, and a dense records table with status pills, plus list / form / detail screens.",
+        "zh-CN": "将这个充满活力的深绿色管理界面风格应用到我的领域：深绿底色、石灰绿强调色、精巧顶栏（含实体切换器）、图标侧栏、4 个 KPI 卡片、带容量条的排班面板、区域图卡片，以及带状态标签的密集记录表格，并配套列表 / 表单 / 详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Kinetic Fitness Admin"
+          "title": "Kinetic Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Kinetic Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Kinetic Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Kinetic Admin — Detail"
         }
       ]
     },
@@ -71,7 +82,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {

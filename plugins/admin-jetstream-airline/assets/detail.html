@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jetstream Admin — Record Detail</title>
+<style>
+:root {
+  --accent-indigo:     #6366f1;
+  --accent-indigo-dim: rgba(99,102,241,.15);
+  --accent-sky:        #38bdf8;
+  --accent-sky-dim:    rgba(56,189,248,.15);
+  --state-active:      #22c55e;
+  --state-active-dim:  rgba(34,197,94,.10);
+  --state-warn:        #f59e0b;
+  --state-warn-dim:    rgba(245,158,11,.10);
+  --state-sky:         #38bdf8;
+  --state-sky-dim:     rgba(56,189,248,.10);
+  --state-muted:       #8a98ad;
+  --state-muted-dim:   rgba(138,152,173,.08);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#0a0f1a;color:#e4ecf6;font-size:14px;line-height:1.5}
+button,input{font-family:inherit;cursor:pointer}
+.shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+/* Navbar */
+.navbar{height:48px;background:#111a2b;border-bottom:1px solid #24314a;display:flex;align-items:center;padding:0 12px;gap:12px;flex-shrink:0;z-index:100}
+.entity-switcher{display:flex;align-items:center;gap:6px;padding:5px 10px;background:#18243a;border:1px solid #24314a;border-radius:7px;font-size:12px;font-weight:600;color:#e4ecf6;letter-spacing:.04em;cursor:pointer}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--state-active);flex-shrink:0;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.search-wrap{flex:1;max-width:340px;position:relative}
+.search-wrap svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:#8a98ad}
+.search-wrap input{width:100%;background:#18243a;border:1px solid #24314a;border-radius:7px;color:#e4ecf6;font-size:13px;padding:6px 10px 6px 32px;outline:none}
+.search-wrap input::placeholder{color:#8a98ad}
+.search-wrap input:focus{border-color:var(--accent-indigo)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.bell-btn{position:relative;background:none;border:none;padding:6px;color:#8a98ad;display:flex;align-items:center}
+.avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent-indigo),var(--accent-sky));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;cursor:pointer}
+.bell-badge{position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:var(--state-warn);border:2px solid #111a2b}
+.body-row{display:flex;flex:1;overflow:hidden}
+/* Icon rail */
+.icon-rail{width:48px;background:#111a2b;border-right:1px solid #24314a;display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:4px;flex-shrink:0;overflow-y:auto}
+.rail-btn{width:36px;height:36px;background:none;border:none;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#8a98ad;transition:background .15s,color .15s}
+.rail-btn:hover{background:#18243a;color:#e4ecf6}
+.rail-btn.active{background:var(--accent-indigo-dim);color:var(--accent-sky)}
+.rail-divider{width:24px;height:1px;background:#24314a;margin:4px 0}
+.rail-spacer{flex:1}
+/* Main */
+.main{flex:1;overflow-y:auto;padding:20px 24px 40px}
+.breadcrumb{font-size:12px;color:#8a98ad;margin-bottom:16px}
+.breadcrumb a{color:#8a98ad;text-decoration:none}
+.breadcrumb a:hover{color:var(--accent-sky)}
+.breadcrumb span{color:#e4ecf6}
+/* Detail header */
+.detail-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.detail-title-block{flex:1;min-width:0}
+.detail-id-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.detail-id{font-size:22px;font-weight:800;color:#e4ecf6;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.state-pill{display:inline-flex;align-items:center;gap:5px;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:600;white-space:nowrap}
+.state-pill.sky{background:var(--state-sky-dim);color:var(--state-sky);border:1px solid rgba(56,189,248,.2)}
+.state-pill.active{background:var(--state-active-dim);color:var(--state-active);border:1px solid rgba(34,197,94,.2)}
+.state-pill.warn{background:var(--state-warn-dim);color:var(--state-warn);border:1px solid rgba(245,158,11,.2)}
+.state-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.state-dot.sky{background:var(--state-sky)}
+.state-dot.active{background:var(--state-active)}
+.state-dot.warn{background:var(--state-warn)}
+.detail-sub{font-size:13px;color:#8a98ad;margin-top:4px}
+.detail-actions{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.btn-ghost{background:none;border:1px solid #24314a;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:500;color:#8a98ad;transition:border-color .15s,color .15s}
+.btn-ghost:hover{border-color:var(--accent-sky);color:var(--accent-sky)}
+.btn-primary{background:var(--accent-indigo);border:none;border-radius:7px;padding:6px 14px;font-size:12px;font-weight:600;color:#fff;transition:opacity .15s}
+.btn-primary:hover{opacity:.85}
+/* Card */
+.card{background:#18243a;border:1px solid #24314a;border-radius:10px;margin-bottom:18px}
+.card-hdr{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid #24314a}
+.card-title{font-size:13px;font-weight:700;color:#e4ecf6}
+.card-hdr-space{flex:1}
+/* Meta grid */
+.meta-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;padding:0}
+@media(max-width:680px){.meta-grid{grid-template-columns:repeat(2,1fr)}}
+.meta-cell{padding:16px 18px;border-right:1px solid #24314a;border-bottom:1px solid #24314a}
+.meta-cell:nth-child(3n){border-right:none}
+.meta-cell:nth-last-child(-n+3){border-bottom:none}
+@media(max-width:680px){
+  .meta-cell:nth-child(2n){border-right:none}
+  .meta-cell:nth-child(3n){border-right:1px solid #24314a}
+  .meta-cell:nth-child(2n+1):nth-last-child(-n+2),.meta-cell:nth-child(2n):nth-last-child(-n+2){border-bottom:none}
+}
+.meta-label{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#8a98ad;margin-bottom:4px}
+.meta-value{font-size:14px;font-weight:600;color:#e4ecf6;font-variant-numeric:tabular-nums}
+.meta-sub{font-size:11px;color:#8a98ad;margin-top:2px}
+/* Two-col grid */
+.two-col{display:grid;grid-template-columns:7fr 5fr;gap:18px;align-items:start}
+@media(max-width:900px){.two-col{grid-template-columns:1fr}}
+/* Route/stops table */
+.route-table{width:100%;border-collapse:collapse}
+.route-table th{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#8a98ad;padding:10px 18px;text-align:left;border-bottom:1px solid #24314a}
+.route-table td{padding:11px 18px;font-size:12px;color:#e4ecf6;border-bottom:1px solid rgba(36,49,74,.5);font-variant-numeric:tabular-nums;vertical-align:middle}
+.route-table tr:last-child td{border-bottom:none}
+.route-table tbody tr:hover td{background:rgba(99,102,241,.04)}
+.stop-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--accent-indigo-dim);color:var(--accent-indigo);font-size:10px;font-weight:700}
+.stop-badge.origin{background:var(--state-sky-dim);color:var(--accent-sky)}
+.stop-badge.dest{background:var(--state-active-dim);color:var(--state-active)}
+/* Activity feed */
+.activity-list{padding:4px 0}
+.activity-item{display:flex;gap:12px;padding:10px 18px;border-bottom:1px solid rgba(36,49,74,.4)}
+.activity-item:last-child{border-bottom:none}
+.act-timeline{display:flex;flex-direction:column;align-items:center;flex-shrink:0;padding-top:2px}
+.act-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.act-dot.system{background:var(--accent-indigo)}
+.act-dot.user{background:var(--accent-sky)}
+.act-dot.warn{background:var(--state-warn)}
+.act-line{width:1px;flex:1;background:#24314a;margin:4px 0}
+.activity-item:last-child .act-line{display:none}
+.act-body{flex:1;min-width:0}
+.act-text{font-size:12px;color:#e4ecf6;line-height:1.5}
+.act-time{font-size:10px;color:#8a98ad;margin-top:2px;font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <nav class="navbar">
+    <div class="entity-switcher">
+      <span class="live-dot"></span>
+      <span>KVX HUB</span>
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>
+    </div>
+    <div class="search-wrap">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>
+      <input type="text" placeholder="Search records, locations, resources…">
+    </div>
+    <div class="nav-right">
+      <button class="bell-btn" aria-label="Alerts">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="bell-badge"></span>
+      </button>
+      <div class="avatar">OP</div>
+    </div>
+  </nav>
+
+  <div class="body-row">
+    <aside class="icon-rail" aria-label="Navigation">
+      <button class="rail-btn" title="Dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      </button>
+      <button class="rail-btn active" title="Records">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      </button>
+      <button class="rail-btn" title="Routes">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <button class="rail-btn" title="Locations">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 7v14M21 7v14M5 7a7 7 0 0 1 14 0M10 21v-4a2 2 0 0 1 4 0v4"/></svg>
+      </button>
+      <button class="rail-btn" title="Resources">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      </button>
+      <div class="rail-divider"></div>
+      <button class="rail-btn" title="Reports">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg>
+      </button>
+      <div class="rail-spacer"></div>
+      <button class="rail-btn" title="Settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </aside>
+
+    <main class="main">
+      <div class="breadcrumb">
+        <a href="#">Records</a> › <span>REC-401</span>
+      </div>
+
+      <!-- Detail header -->
+      <div class="detail-header">
+        <div class="detail-title-block">
+          <div class="detail-id-row">
+            <span class="detail-id">REC-401</span>
+            <span class="state-pill sky"><span class="state-dot sky"></span>Active</span>
+          </div>
+          <div class="detail-sub">UNIT-KVX-04 · Type A-Large · KVX → ORD · Bay A12</div>
+        </div>
+        <div class="detail-actions">
+          <button class="btn-ghost">Delay</button>
+          <button class="btn-ghost">Cancel</button>
+          <button class="btn-primary">Edit</button>
+        </div>
+      </div>
+
+      <!-- Meta grid -->
+      <div class="card">
+        <div class="meta-grid">
+          <div class="meta-cell">
+            <div class="meta-label">Unit</div>
+            <div class="meta-value">UNIT-KVX-04</div>
+            <div class="meta-sub">Type A-Large</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Origin</div>
+            <div class="meta-value">KVX</div>
+            <div class="meta-sub">Kelverton Hub</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Destination</div>
+            <div class="meta-value">ORD</div>
+            <div class="meta-sub">Ordway Terminal</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Capacity</div>
+            <div class="meta-value" style="font-variant-numeric:tabular-nums">152 / 180</div>
+            <div class="meta-sub">84.4% utilized</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Scheduled</div>
+            <div class="meta-value" style="font-variant-numeric:tabular-nums">14:35 UTC</div>
+            <div class="meta-sub">Mon 02 Jun 2026</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Assigned Location</div>
+            <div class="meta-value">Bay A12</div>
+            <div class="meta-sub">Terminal North</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Priority</div>
+            <div class="meta-value">Standard</div>
+            <div class="meta-sub">No override</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Created By</div>
+            <div class="meta-value">M. Reyes</div>
+            <div class="meta-sub">02 Jun 2026 · 09:14 UTC</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-label">Last Updated</div>
+            <div class="meta-value" style="font-variant-numeric:tabular-nums">14:22 UTC</div>
+            <div class="meta-sub">Status changed to Active</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Two-column: stops table + activity feed -->
+      <div class="two-col">
+
+        <!-- Route & Stops -->
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">Route &amp; Stops</div>
+            <div class="card-hdr-space"></div>
+            <span style="font-size:11px;color:#8a98ad">3 stops</span>
+          </div>
+          <table class="route-table">
+            <thead>
+              <tr>
+                <th>Stop</th>
+                <th>Location</th>
+                <th>Arrival</th>
+                <th>Departure</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="stop-badge origin">O</span></td>
+                <td>KVX — Bay A12</td>
+                <td>—</td>
+                <td>14:35</td>
+                <td><span class="state-pill sky"><span class="state-dot sky"></span>Active</span></td>
+              </tr>
+              <tr>
+                <td><span class="stop-badge">1</span></td>
+                <td>MDW — Terminal 3</td>
+                <td>16:10</td>
+                <td>16:45</td>
+                <td><span class="state-pill" style="background:var(--state-muted-dim);color:var(--state-muted);border:1px solid rgba(138,152,173,.18)">Pending</span></td>
+              </tr>
+              <tr>
+                <td><span class="stop-badge dest">D</span></td>
+                <td>ORD — Gate B22</td>
+                <td>17:30</td>
+                <td>—</td>
+                <td><span class="state-pill" style="background:var(--state-muted-dim);color:var(--state-muted);border:1px solid rgba(138,152,173,.18)">Pending</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Activity feed -->
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">Recent Activity</div>
+          </div>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="act-timeline">
+                <span class="act-dot sky"></span>
+                <span class="act-line"></span>
+              </div>
+              <div class="act-body">
+                <div class="act-text">Status changed to <strong>Active</strong> — boarding commenced at Bay A12</div>
+                <div class="act-time">14:22 UTC · System</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="act-timeline">
+                <span class="act-dot user"></span>
+                <span class="act-line"></span>
+              </div>
+              <div class="act-body">
+                <div class="act-text">Location updated from Bay A08 to Bay A12 by M. Reyes</div>
+                <div class="act-time">13:55 UTC · M. Reyes</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="act-timeline">
+                <span class="act-dot warn"></span>
+                <span class="act-line"></span>
+              </div>
+              <div class="act-body">
+                <div class="act-text">Capacity updated: 139 → 152 (13 additional bookings)</div>
+                <div class="act-time">12:40 UTC · T. Nakamura</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="act-timeline">
+                <span class="act-dot system"></span>
+              </div>
+              <div class="act-body">
+                <div class="act-text">Record created and queued for 14:35 UTC departure</div>
+                <div class="act-time">09:14 UTC · M. Reyes</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

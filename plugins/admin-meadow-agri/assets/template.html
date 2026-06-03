@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meadow Admin — Screen Template</title>
+<style>
+/* ─────────────────────────────────────────────────────────────
+   MEADOW ADMIN — TOKEN SHELL
+   Copy this file and drop screen regions into <main class="main">.
+   Replace every {placeholder} with real domain content.
+   Never copy domain labels from the example screens — use the
+   real domain's entities, metrics, and states from the KB.
+   ───────────────────────────────────────────────────────────── */
+:root {
+  /* Core palette */
+  --accent: #16a34a;
+  --accent-hover: #22c55e;
+  --accent-muted: rgba(22,163,74,0.10);
+  --accent-border: rgba(22,163,74,0.30);
+  --earth: #a16207;
+  --earth-light: #fef3c7;
+  --earth-border: #fde68a;
+
+  /* Status tokens */
+  --state-healthy: #16a34a;    --state-healthy-bg: #dcfce7;
+  --state-moderate: #d97706;   --state-moderate-bg: #fef3c7;
+  --state-attention: #dc2626;  --state-attention-bg: #fee2e2;
+  --state-online: #16a34a;     --state-online-bg: #dcfce7;
+  --state-warning: #d97706;    --state-warning-bg: #fef3c7;
+  --state-offline: #64748b;    --state-offline-bg: #f1f5f9;
+
+  /* Delta chips */
+  --delta-up-color: #16a34a;   --delta-up-bg: #dcfce7;
+  --delta-down-color: #dc2626; --delta-down-bg: #fee2e2;
+  --delta-neutral-color: #64748b; --delta-neutral-bg: #f1f5f9;
+
+  /* Chart */
+  --chart-primary: #16a34a;
+  --chart-primary-fill: rgba(22,163,74,0.15);
+  --chart-secondary: #a16207;
+}
+
+/* Reset */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+/* Base */
+body{
+  font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:14px;line-height:1.5;color:#1e293b;background:#f7faf5;
+  min-height:100vh;display:flex;
+}
+
+/* ── SIDEBAR ─────────────────────────────────────────────── */
+.sidebar{
+  width:240px;min-height:100vh;background:#fff;
+  border-right:1px solid #e6ece1;display:flex;flex-direction:column;flex-shrink:0;
+}
+.sidebar-brand{
+  display:flex;align-items:center;gap:10px;
+  padding:20px 18px 16px;border-bottom:1px solid #e6ece1;
+}
+.brand-icon{color:var(--accent);flex-shrink:0;}
+.brand-name{font-size:15px;font-weight:700;color:#1e293b;letter-spacing:-0.02em;}
+.brand-sub{font-size:11px;color:#64748b;}
+.entity-switcher{
+  margin:12px 14px;padding:8px 12px;background:#f7faf5;
+  border:1px solid #e6ece1;border-radius:8px;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.entity-switcher-name{font-size:13px;font-weight:600;color:#1e293b;}
+.entity-switcher-sub{font-size:11px;color:#64748b;}
+.entity-switcher svg{color:#94a3b8;}
+.nav-section{padding:14px 14px 4px;}
+.nav-section-label{
+  font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:#94a3b8;padding:0 4px;margin-bottom:4px;
+}
+.nav-item{
+  display:flex;align-items:center;gap:9px;padding:7px 10px;
+  border-radius:7px;cursor:pointer;color:#475569;font-size:13.5px;
+  font-weight:500;margin-bottom:1px;position:relative;transition:background .14s;
+}
+.nav-item:hover{background:#f1f5f9;color:#1e293b;}
+.nav-item.active{background:var(--accent-muted);color:var(--accent);font-weight:600;}
+.nav-item.active::before{
+  content:"";position:absolute;left:0;top:4px;bottom:4px;
+  width:3px;border-radius:0 3px 3px 0;background:var(--accent);
+}
+.nav-item svg{flex-shrink:0;}
+.nav-badge{
+  margin-left:auto;background:var(--state-attention);color:#fff;
+  font-size:10px;font-weight:700;border-radius:99px;padding:1px 6px;line-height:1.4;
+}
+.sidebar-footer{
+  margin-top:auto;padding:14px;border-top:1px solid #e6ece1;
+  display:flex;align-items:center;gap:9px;
+}
+.avatar-sm{
+  width:32px;height:32px;border-radius:99px;background:var(--accent-muted);
+  border:1px solid var(--accent-border);display:flex;align-items:center;
+  justify-content:center;font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0;
+}
+.sidebar-user-name{font-size:13px;font-weight:600;color:#1e293b;}
+.sidebar-user-role{font-size:11px;color:#64748b;}
+
+/* ── MAIN SHELL ─────────────────────────────────────────── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+
+/* ── TOPBAR ─────────────────────────────────────────────── */
+.topbar{
+  height:56px;background:#fff;border-bottom:1px solid #e6ece1;
+  display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0;
+}
+.topbar-title{font-size:15px;font-weight:700;color:#1e293b;white-space:nowrap;}
+.topbar-search{
+  flex:1;max-width:340px;margin-left:16px;display:flex;align-items:center;gap:8px;
+  background:#f7faf5;border:1px solid #e6ece1;border-radius:7px;padding:6px 12px;color:#94a3b8;
+}
+.topbar-search input{border:none;background:transparent;font-size:13px;color:#1e293b;outline:none;width:100%;}
+.topbar-search input::placeholder{color:#94a3b8;}
+.topbar-spacer{flex:1;}
+.context-badge{
+  background:var(--earth-light);border:1px solid var(--earth-border);color:var(--earth);
+  font-size:11.5px;font-weight:700;border-radius:6px;padding:4px 10px;white-space:nowrap;
+}
+.topbar-bell{
+  position:relative;width:34px;height:34px;border-radius:7px;border:1px solid #e6ece1;
+  background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#64748b;
+}
+.bell-dot{position:absolute;top:6px;right:7px;width:7px;height:7px;border-radius:99px;background:var(--state-attention);border:1.5px solid #fff;}
+.topbar-avatar{
+  width:34px;height:34px;border-radius:99px;background:var(--accent-muted);
+  border:1.5px solid var(--accent-border);display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:var(--accent);cursor:pointer;
+}
+
+/* ── CONTENT AREA ───────────────────────────────────────── */
+.content{padding:24px;display:flex;flex-direction:column;gap:20px;flex:1;}
+
+/* ── PAGE HEADER ───────────────────────────────────────── */
+.page-header{display:flex;align-items:center;justify-content:space-between;}
+.page-title-text{font-size:20px;font-weight:700;color:#1e293b;}
+.page-sub{font-size:13px;color:#64748b;margin-top:2px;}
+.header-actions{display:flex;gap:8px;align-items:center;}
+
+/* ── BUTTONS ────────────────────────────────────────────── */
+.btn-ghost{border:1px solid #e6ece1;background:#fff;color:#475569;font-size:13px;font-weight:600;border-radius:7px;padding:7px 14px;cursor:pointer;display:flex;align-items:center;gap:6px;}
+.btn-primary{border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;border-radius:7px;padding:7px 14px;cursor:pointer;display:flex;align-items:center;gap:6px;}
+.btn-primary:disabled{background:#94a3b8;cursor:not-allowed;}
+
+/* ── KPI GRID ───────────────────────────────────────────── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.kpi-card{background:#fff;border:1px solid #e6ece1;border-radius:12px;padding:18px 18px 16px;box-shadow:0 1px 4px rgba(0,0,0,.04);position:relative;}
+.kpi-icon-wrap{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--accent-muted);color:var(--accent);}
+.kpi-icon-earth{background:var(--earth-light);color:var(--earth);}
+.kpi-label{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#94a3b8;margin-bottom:6px;}
+.kpi-value{font-size:28px;font-weight:800;color:#1e293b;line-height:1;letter-spacing:-0.03em;font-variant-numeric:tabular-nums;}
+.kpi-sub{font-size:11px;color:#64748b;margin-top:5px;}
+.delta-up{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--delta-up-color);background:var(--delta-up-bg);border-radius:5px;padding:2px 6px;margin-top:8px;}
+.delta-down{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--delta-down-color);background:var(--delta-down-bg);border-radius:5px;padding:2px 6px;margin-top:8px;}
+.delta-neutral{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--delta-neutral-color);background:var(--delta-neutral-bg);border-radius:5px;padding:2px 6px;margin-top:8px;}
+
+/* ── TWO-COLUMN LAYOUT ──────────────────────────────────── */
+.main-grid{display:grid;grid-template-columns:1fr 300px;gap:16px;}
+.left-col{display:flex;flex-direction:column;gap:16px;}
+.right-panel{display:flex;flex-direction:column;gap:14px;}
+.two-col{display:grid;grid-template-columns:1fr 300px;gap:16px;align-items:start;}
+
+/* ── CARD ───────────────────────────────────────────────── */
+.card{background:#fff;border:1px solid #e6ece1;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 14px;border-bottom:1px solid #e6ece1;}
+.card-title{font-size:14px;font-weight:700;color:#1e293b;}
+.card-link{font-size:12px;font-weight:600;color:var(--accent);cursor:pointer;text-decoration:none;}
+
+/* ── DATA TABLE ─────────────────────────────────────────── */
+.data-table{width:100%;border-collapse:collapse;font-size:13px;}
+.data-table th{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8;padding:10px 18px;text-align:left;border-bottom:1px solid #e6ece1;background:#f7faf5;}
+.data-table th.num{text-align:right;}
+.data-table td{padding:11px 18px;border-bottom:1px solid #f0f4ee;color:#334155;vertical-align:middle;}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:#f7faf5;}
+.row-name{font-weight:600;color:#1e293b;}
+.muted-text{font-size:12px;color:#64748b;}
+.num-cell{text-align:right;font-size:12px;color:#64748b;font-variant-numeric:tabular-nums;}
+.mono-id{font-size:12px;font-weight:700;color:#1e293b;font-variant-numeric:tabular-nums;letter-spacing:.03em;font-family:"Courier New",monospace;}
+
+/* ── PILLS ──────────────────────────────────────────────── */
+.pill{display:inline-block;border-radius:99px;font-size:11px;font-weight:700;padding:2px 9px;white-space:nowrap;}
+.pill-healthy{background:var(--state-healthy-bg);color:var(--state-healthy);}
+.pill-moderate{background:var(--state-moderate-bg);color:var(--state-moderate);}
+.pill-attention{background:var(--state-attention-bg);color:var(--state-attention);}
+.pill-online{background:var(--state-online-bg);color:var(--state-online);}
+.pill-warning{background:var(--state-warning-bg);color:var(--state-warning);}
+.pill-offline{background:var(--state-offline-bg);color:var(--state-offline);}
+
+/* ── FOOTER / PAGER ─────────────────────────────────────── */
+.rec-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-top:1px solid #e6ece1;}
+.footer-count{font-size:12px;color:#94a3b8;}
+.pagination{display:flex;gap:4px;}
+.page-btn{border:1px solid #e6ece1;background:#fff;color:#475569;font-size:12px;font-weight:600;border-radius:6px;padding:4px 9px;cursor:pointer;min-width:30px;text-align:center;}
+.page-btn:hover{background:#f1f5f9;}
+.page-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+/* ── FORM FIELD ─────────────────────────────────────────── */
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px 20px;}
+.field{display:flex;flex-direction:column;gap:4px;}
+.field.full{grid-column:1/-1;}
+.field-label{font-size:12.5px;font-weight:600;color:#334155;}
+.req{color:var(--state-attention);margin-left:2px;}
+.control{font-family:inherit;font-size:13.5px;color:#1e293b;background:#fff;border:1px solid #d4dde6;border-radius:7px;padding:8px 11px;outline:none;transition:border-color .12s,box-shadow .12s;width:100%;}
+.control:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-muted);}
+.control::placeholder{color:#94a3b8;}
+.helper{font-size:11.5px;color:#64748b;}
+.field.invalid .control{border-color:var(--state-attention);background:#fffafa;}
+.error-msg{display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:var(--state-attention);}
+
+/* ── BREADCRUMB ─────────────────────────────────────────── */
+.breadcrumb{font-size:12.5px;color:#94a3b8;display:flex;align-items:center;gap:6px;}
+.breadcrumb a{color:var(--accent);text-decoration:none;font-weight:500;}
+.breadcrumb a:hover{text-decoration:underline;}
+
+/* ── META GRID ──────────────────────────────────────────── */
+.meta-grid{display:grid;grid-template-columns:repeat(3,1fr);padding:20px;gap:18px 24px;}
+.meta-cell{display:flex;flex-direction:column;gap:2px;}
+.meta-label{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8;}
+.meta-value{font-size:14px;font-weight:600;color:#1e293b;font-variant-numeric:tabular-nums;}
+.meta-sub{font-size:11.5px;color:#64748b;}
+</style>
+</head>
+<body>
+<!-- SIDEBAR — replace placeholder labels with real domain content -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <span class="brand-icon">
+      <!-- Replace with domain-appropriate logo SVG -->
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <rect width="28" height="28" rx="8" fill="currentColor" opacity="0.12"/>
+        <circle cx="14" cy="14" r="6" stroke="currentColor" stroke-width="2"/>
+        <path d="M14 10v4l3 2" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <div>
+      <div class="brand-name">{App Name}</div>
+      <div class="brand-sub">{Sub-label}</div>
+    </div>
+  </div>
+  <div class="entity-switcher">
+    <div>
+      <div class="entity-switcher-name">{Primary entity}</div>
+      <div class="entity-switcher-sub">{Region / context}</div>
+    </div>
+    <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <nav>
+    <!-- Add nav sections matching domain nav groups -->
+    <div class="nav-section">
+      <div class="nav-section-label">{Section label}</div>
+      <div class="nav-item active">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="5" rx="1.5" fill="currentColor" opacity=".85"/><rect x="9" y="2" width="5" height="5" rx="1.5" fill="currentColor" opacity=".85"/><rect x="2" y="9" width="5" height="5" rx="1.5" fill="currentColor" opacity=".85"/><rect x="9" y="9" width="5" height="5" rx="1.5" fill="currentColor" opacity=".85"/></svg>
+        {Nav item}
+      </div>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="avatar-sm">{XX}</div>
+    <div>
+      <div class="sidebar-user-name">{User name}</div>
+      <div class="sidebar-user-role">{Role}</div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-title">{Screen title}</div>
+    <div class="topbar-search">
+      <svg width="15" height="15" fill="none" viewBox="0 0 15 15"><circle cx="6.5" cy="6.5" r="4" stroke="currentColor" stroke-width="1.4"/><path d="M10 10l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <input type="text" placeholder="Search {entities}…">
+    </div>
+    <div class="topbar-spacer"></div>
+    <div class="context-badge">{Context badge — period, status, etc.}</div>
+    <div class="topbar-bell">
+      <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M8 2a4 4 0 0 1 4 4v2.5l1 2H3l1-2V6a4 4 0 0 1 4-4Z" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 13a1.5 1.5 0 0 0 3 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <span class="bell-dot"></span>
+    </div>
+    <div class="topbar-avatar">{XX}</div>
+  </header>
+
+  <!-- CONTENT — drop the screen skeleton here -->
+  <div class="content">
+    <div class="page-header">
+      <div>
+        <div class="page-title-text">{Page title}</div>
+        <div class="page-sub">{Scope · context}</div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-ghost">{Secondary action}</button>
+        <button class="btn-primary">+ {Primary action}</button>
+      </div>
+    </div>
+
+    <!--
+      ═══════════════════════════════════════════════════
+      SCREEN REGION — paste a skeleton from references/layouts.md
+      ═══════════════════════════════════════════════════
+    -->
+
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Record Detail</title>
+<style>
+:root {
+  --color-accent:       #e11d48;
+  --color-accent-soft:  #ec4899;
+  --color-accent-bg:    #fff1f5;
+  --color-indigo:       #4f46e5;
+  --color-indigo-soft:  #6366f1;
+  --color-indigo-bg:    #eef2ff;
+  --color-sky:          #0ea5e9;
+  --color-sky-bg:       #f0f9ff;
+  --color-amber:        #d97706;
+  --color-amber-bg:     #fffbeb;
+  --color-success:      #16a34a;
+  --color-success-bg:   #f0fdf4;
+  --color-warning:      #d97706;
+  --color-warning-bg:   #fffbeb;
+  --color-danger:       #dc2626;
+  --color-danger-bg:    #fef2f2;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px; line-height: 1.5; color: #0f172a;
+  background: #fafafa; display: flex;
+}
+
+/* Sidebar */
+.sidebar { width: 240px; min-height: 100vh; background: #ffffff; border-right: 1px solid #ececf0; display: flex; flex-direction: column; flex-shrink: 0; position: sticky; top: 0; }
+.sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 20px 18px 16px; border-bottom: 1px solid #ececf0; }
+.brand-icon { width: 34px; height: 34px; border-radius: 9px; background: linear-gradient(135deg, var(--color-accent), var(--color-accent-soft)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.brand-name { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; color: #0f172a; }
+.brand-tagline { font-size: 10px; color: #94a3b8; letter-spacing: 0.4px; text-transform: uppercase; }
+.sidebar-nav { flex: 1; padding: 14px 0; }
+.nav-section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.7px; text-transform: uppercase; color: #94a3b8; padding: 14px 18px 6px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 18px; cursor: pointer; border-left: 3px solid transparent; color: #475569; font-size: 13.5px; font-weight: 500; transition: background 0.15s, color 0.15s; text-decoration: none; }
+.nav-item:hover { background: #fafafa; color: #0f172a; }
+.nav-item.active { border-left-color: var(--color-accent); background: var(--color-accent-bg); color: var(--color-accent); font-weight: 600; }
+.nav-item svg { flex-shrink: 0; }
+.sidebar-footer { border-top: 1px solid #ececf0; padding: 14px 18px; }
+.sidebar-user { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.user-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--color-indigo), var(--color-indigo-soft)); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+.user-name { font-size: 13px; font-weight: 600; color: #0f172a; }
+.user-role { font-size: 11px; color: #94a3b8; }
+.upgrade-btn { display: block; width: 100%; padding: 8px; background: linear-gradient(135deg, var(--color-accent), var(--color-accent-soft)); color: #fff; border: none; border-radius: 8px; font-size: 12.5px; font-weight: 600; cursor: pointer; text-align: center; }
+
+/* Main */
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; min-height: 100vh; }
+
+/* Topbar */
+.topbar { height: 60px; background: #ffffff; border-bottom: 1px solid #ececf0; display: flex; align-items: center; padding: 0 24px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+.topbar-title { font-size: 17px; font-weight: 700; color: #0f172a; white-space: nowrap; }
+.topbar-breadcrumb { font-size: 12px; color: #94a3b8; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.topbar-sep { flex: 1; }
+.topbar-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--color-accent), var(--color-accent-soft)); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
+
+/* Content */
+.content { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+.btn-ghost { padding: 8px 16px; border: 1px solid #ececf0; border-radius: 8px; background: #fff; font-size: 13px; font-weight: 500; color: #334155; cursor: pointer; }
+.btn-ghost:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.btn-primary { padding: 8px 16px; border: none; border-radius: 8px; background: linear-gradient(135deg, var(--color-accent), var(--color-accent-soft)); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+.btn-danger { padding: 8px 16px; border: 1px solid var(--color-danger-bg); border-radius: 8px; background: var(--color-danger-bg); color: var(--color-danger); font-size: 13px; font-weight: 600; cursor: pointer; }
+
+/* Breadcrumb */
+.breadcrumb { font-size: 12px; color: #94a3b8; display: flex; align-items: center; gap: 6px; }
+.breadcrumb a { color: var(--color-accent); text-decoration: none; font-weight: 500; }
+
+/* Detail header */
+.detail-header {
+  background: #fff; border: 1px solid #ececf0; border-radius: 12px;
+  padding: 20px 24px; box-shadow: 0 2px 8px rgba(0,0,0,.04);
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+}
+.detail-id-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.detail-id { font-size: 12px; font-weight: 600; color: #94a3b8; font-family: "Courier New", monospace; letter-spacing: 0.4px; }
+.detail-name { font-size: 22px; font-weight: 800; color: #0f172a; letter-spacing: -0.3px; }
+.detail-sub { font-size: 13px; color: #64748b; margin-top: 4px; }
+.detail-actions { display: flex; gap: 10px; flex-shrink: 0; }
+
+.status-pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.status-live   { background: var(--color-success-bg); color: var(--color-success); }
+.status-paused { background: var(--color-warning-bg); color: var(--color-warning); }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.channel-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.channel-a { background: var(--color-indigo-bg); color: var(--color-indigo); }
+
+/* Card */
+.card { background: #fff; border: 1px solid #ececf0; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.04); overflow: hidden; }
+.card-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid #ececf0; }
+.card-title { font-size: 14px; font-weight: 700; color: #0f172a; }
+
+/* Meta grid */
+.meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); padding: 20px; gap: 20px 16px; }
+.meta-cell {}
+.meta-label { font-size: 10.5px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: #94a3b8; margin-bottom: 4px; }
+.meta-value { font-size: 14px; font-weight: 600; color: #0f172a; font-variant-numeric: tabular-nums; }
+.meta-sub { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+
+/* Two-col panels */
+.two-col { display: grid; grid-template-columns: 7fr 5fr; gap: 16px; }
+
+/* Mini performance chart */
+.perf-rows { padding: 0 20px 16px; display: flex; flex-direction: column; gap: 12px; }
+.perf-row { display: flex; align-items: center; gap: 12px; }
+.perf-label { font-size: 12.5px; color: #334155; font-weight: 500; width: 90px; flex-shrink: 0; }
+.perf-bar-track { flex: 1; height: 8px; background: #f1f5f9; border-radius: 4px; overflow: hidden; }
+.perf-bar-fill { height: 100%; border-radius: 4px; }
+.perf-value { font-size: 12.5px; font-weight: 600; color: #0f172a; text-align: right; width: 70px; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+
+/* Activity feed */
+.activity-list { padding: 0 20px 16px; display: flex; flex-direction: column; gap: 14px; }
+.activity-item { display: flex; gap: 12px; }
+.act-dot-col { display: flex; flex-direction: column; align-items: center; gap: 0; }
+.act-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--color-accent-bg); border: 2px solid var(--color-accent); flex-shrink: 0; margin-top: 2px; }
+.act-line { flex: 1; width: 1px; background: #ececf0; margin-top: 4px; }
+.act-body {}
+.act-event { font-size: 13px; font-weight: 500; color: #0f172a; }
+.act-meta { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">
+      <svg width="18" height="20" viewBox="0 0 18 20" fill="none">
+        <path d="M9 0C9 0 3 5.5 3 10.5C3 13.538 5.686 16 9 16C12.314 16 15 13.538 15 10.5C15 8.2 13.5 6.3 13.5 6.3C13.5 6.3 13 9 11 10C11 10 12 7.5 10.5 5.5C10.5 5.5 10.2 8.5 8 9.5C8 9.5 9.5 6 9 0Z" fill="#ffffff"/>
+        <path d="M9 13C7.9 13 7 13.9 7 15C7 16.1 7.9 17 9 17C10.1 17 11 16.1 11 15C11 13.9 10.1 13 9 13Z" fill="#ffffff" opacity="0.7"/>
+      </svg>
+    </div>
+    <div><div class="brand-name">Ember</div><div class="brand-tagline">Analytics</div></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Records</div>
+    <a class="nav-item active" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h9M2 12h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      All Records
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="3" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M2 14c0-3 2.7-5.5 6-5.5s6 2.5 6 5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/></svg>
+      Segments
+    </a>
+    <div class="nav-section-label">Reports</div>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M5 9.5V11M8 7V11M11 4.5V11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      Performance
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="user-avatar">SM</div>
+      <div><div class="user-name">Sofia Morales</div><div class="user-role">Lead Analyst</div></div>
+    </div>
+    <button class="upgrade-btn">Upgrade to Pro →</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <header class="topbar">
+    <div>
+      <div class="topbar-title">Record Detail</div>
+      <div class="topbar-breadcrumb">
+        <span>Records</span>
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3.5 2l3 3-3 3" stroke="#94a3b8" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span style="color:#0f172a;font-weight:600;">REC-0042</span>
+      </div>
+    </div>
+    <div class="topbar-sep"></div>
+    <div class="topbar-avatar" title="Sofia Morales">SM</div>
+  </header>
+
+  <main class="content">
+
+    <div class="breadcrumb">
+      <a href="#">Records</a>
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3.5 2l3 3-3 3" stroke="#94a3b8" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>REC-0042</span>
+    </div>
+
+    <!-- Detail header -->
+    <div class="detail-header">
+      <div>
+        <div class="detail-id-row">
+          <span class="detail-id">REC-0042</span>
+          <span class="status-pill status-live"><span class="status-dot"></span>Live</span>
+          <span class="channel-chip channel-a">Type A</span>
+        </div>
+        <div class="detail-name">Spring Launch — Search</div>
+        <div class="detail-sub">Branded + non-branded · Started May 1, 2026</div>
+      </div>
+      <div class="detail-actions">
+        <button class="btn-ghost">Pause</button>
+        <button class="btn-ghost">Duplicate</button>
+        <button class="btn-primary">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 10l1.5-1.5 6-6L11 4l-6 6L3.5 11.5 2 10z" stroke="#fff" stroke-width="1.4" fill="none"/></svg>
+          Edit
+        </button>
+      </div>
+    </div>
+
+    <!-- Meta grid -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Details</div>
+      </div>
+      <div class="meta-grid">
+        <div class="meta-cell">
+          <div class="meta-label">Channel</div>
+          <div class="meta-value">Type A</div>
+          <div class="meta-sub">Primary distribution</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Objective</div>
+          <div class="meta-value">Conversion</div>
+          <div class="meta-sub">Primary goal</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Status</div>
+          <div class="meta-value">Live</div>
+          <div class="meta-sub">Since May 1, 2026</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Budget</div>
+          <div class="meta-value">$25,000</div>
+          <div class="meta-sub">$21,340 spent (85.4%)</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Schedule</div>
+          <div class="meta-value">May 1 – May 31</div>
+          <div class="meta-sub">30 days total</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Owner</div>
+          <div class="meta-value">Sofia Morales</div>
+          <div class="meta-sub">Lead Analyst</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Volume</div>
+          <div class="meta-value">982,410</div>
+          <div class="meta-sub">Total impressions</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Engagement</div>
+          <div class="meta-value">42,180</div>
+          <div class="meta-sub">4.29% rate</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Conversions</div>
+          <div class="meta-value">1,842</div>
+          <div class="meta-sub">4.37% of engaged</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two-column: performance + activity -->
+    <div class="two-col">
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Weekly Performance</div>
+        </div>
+        <div class="perf-rows" style="margin-top:12px;">
+          <div class="perf-row">
+            <span class="perf-label">Week 1</span>
+            <div class="perf-bar-track"><div class="perf-bar-fill" style="width:54%;background:linear-gradient(90deg,var(--color-accent),var(--color-accent-soft))"></div></div>
+            <span class="perf-value">$4,120</span>
+          </div>
+          <div class="perf-row">
+            <span class="perf-label">Week 2</span>
+            <div class="perf-bar-track"><div class="perf-bar-fill" style="width:71%;background:linear-gradient(90deg,var(--color-accent),var(--color-accent-soft))"></div></div>
+            <span class="perf-value">$5,380</span>
+          </div>
+          <div class="perf-row">
+            <span class="perf-label">Week 3</span>
+            <div class="perf-bar-track"><div class="perf-bar-fill" style="width:86%;background:linear-gradient(90deg,var(--color-accent),var(--color-accent-soft))"></div></div>
+            <span class="perf-value">$6,510</span>
+          </div>
+          <div class="perf-row">
+            <span class="perf-label">Week 4</span>
+            <div class="perf-bar-track"><div class="perf-bar-fill" style="width:70%;background:linear-gradient(90deg,var(--color-accent),var(--color-accent-soft))"></div></div>
+            <span class="perf-value">$5,330</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Recent Activity</div>
+        </div>
+        <div class="activity-list" style="margin-top:12px;">
+          <div class="activity-item">
+            <div class="act-dot-col">
+              <div class="act-dot"></div>
+              <div class="act-line"></div>
+            </div>
+            <div class="act-body">
+              <div class="act-event">Budget threshold reached 85%</div>
+              <div class="act-meta">May 28, 2026 · 14:22</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-dot-col">
+              <div class="act-dot" style="background:var(--color-indigo-bg);border-color:var(--color-indigo)"></div>
+              <div class="act-line"></div>
+            </div>
+            <div class="act-body">
+              <div class="act-event">Audience segment updated</div>
+              <div class="act-meta">May 20, 2026 · 09:05</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-dot-col">
+              <div class="act-dot" style="background:var(--color-sky-bg);border-color:var(--color-sky)"></div>
+              <div class="act-line"></div>
+            </div>
+            <div class="act-body">
+              <div class="act-event">Creative assets approved</div>
+              <div class="act-meta">May 10, 2026 · 11:30</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-dot-col">
+              <div class="act-dot" style="background:var(--color-success-bg);border-color:var(--color-success)"></div>
+            </div>
+            <div class="act-body">
+              <div class="act-event">Record activated</div>
+              <div class="act-meta">May 1, 2026 · 00:00</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>

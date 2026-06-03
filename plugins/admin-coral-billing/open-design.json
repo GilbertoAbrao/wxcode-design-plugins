@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-coral-billing",
-  "title": "Coral Billing Admin",
-  "version": "0.1.0",
-  "description": "Clean-fintech billing operations dashboard — left sidebar, topbar with period picker, 4 KPI cards (MRR / active subscriptions / churn / ARPU), inline SVG trend chart, plan breakdown bars, invoices table, and a dunning side panel. Coral accent on white surfaces.",
+  "title": "Coral Admin",
+  "version": "0.2.0",
+  "description": "Clean light-mode SaaS admin aesthetic: white/near-white canvas (#f8f9fb), coral accent (#f43f5e / #fb7185), slate-blue navigation (#475569), soft-shadow cards with 1px borders, and tabular-nums on every figure. Archetype = fixed sidebar (logo + workspace switcher + grouped nav) + sticky topbar (search + period tabs + avatar) + 4 KPI cards + trend-chart card + breakdown bar card + records table + items-at-risk side panel, plus list / form / detail screens.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,14 +19,12 @@
     "operations",
     "web",
     "admin",
-    "saas",
-    "billing",
     "light-mode",
-    "clean-fintech",
-    "coral",
-    "subscriptions",
-    "invoices",
-    "dunning"
+    "coral-accent",
+    "soft-shadow",
+    "sidebar-layout",
+    "data-dense",
+    "enterprise"
   ],
   "compat": {
     "agentSkills": [
@@ -47,13 +45,29 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a billing admin dashboard for a SaaS product — left sidebar, topbar with period picker, MRR and subscription KPIs, revenue trend chart, plan breakdown, invoices table with status pills, failed-payment dunning panel.",
-        "zh-CN": "使用这个插件完成以下任务：Build me a billing admin dashboard for a SaaS product — left sidebar, topbar with period picker, MRR and subscription KPIs, revenue trend chart, plan breakdown, invoices table with status pills, failed-payment dunning panel."
+        "en": "Apply this clean coral-accent light-mode admin aesthetic to my domain — fixed sidebar with workspace switcher, sticky topbar with search and period tabs, 4 KPI cards with sparklines, a trend chart, a breakdown bar chart, a records table with status pills, and an items-at-risk side panel, plus list / form / detail screens.",
+        "zh-CN": "将这个珊瑚强调色浅色管理风格应用到我的领域：带工作区切换器的固定侧边栏、带搜索和周期标签的顶栏、4 个带迷你折线图的 KPI 卡片、趋势图、细分条形图、带状态标签的记录表格和风险项侧面板，以及列表、表单和详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Coral Billing Admin"
+          "title": "Coral Admin — Dashboard"
+        },
+        {
+          "path": "./assets/dashboard.html",
+          "title": "Coral Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Coral Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Coral Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Coral Admin — Detail"
         }
       ]
     },
@@ -71,7 +85,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {

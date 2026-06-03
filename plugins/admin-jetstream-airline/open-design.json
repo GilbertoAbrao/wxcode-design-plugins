@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-jetstream-airline",
-  "title": "Jetstream Airline Admin",
-  "version": "0.1.0",
-  "description": "Airline operations control center — dark-mode admin dashboard with slim navbar, icon rail, KPI tiles (on-time performance, flights today, load factor, delayed), live flights board, departures-by-hour SVG chart, flights table, and crew/aircraft side panel. Original archetype for aviation and transport operations.",
+  "title": "Jetstream Admin",
+  "version": "0.2.0",
+  "description": "Dark navy precision-control admin aesthetic: near-black canvas (#0a0f1a), indigo + sky-blue dual-accent on a cool-blue neutral ramp, slim 48px navbar with entity-switcher pill, icon-only rail, 4 KPI tiles, live-status board with state pills, inline SVG bar chart, full-width records table with filter chips, and a resource side panel. Built for high-density operational consoles with a cool, precision-control feel.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,14 +19,13 @@
     "operations",
     "web",
     "admin",
-    "airline",
-    "aviation",
     "dark-mode",
-    "control-center",
-    "transport",
-    "operations-center",
-    "flights",
-    "indigo-sky"
+    "dark-navy",
+    "indigo-sky",
+    "dual-accent",
+    "status-board",
+    "control-console",
+    "dense-data"
   ],
   "compat": {
     "agentSkills": [
@@ -47,13 +46,33 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a dark-mode airline operations control center — navbar with hub switcher, icon rail sidebar, 4 KPI tiles (on-time %, flights today, load factor, delayed), a live flights status board, departures-by-hour chart, flights detail table, and a crew/aircraft side panel.",
-        "zh-CN": "使用这个插件完成以下任务：Build me a dark-mode airline operations control center — navbar with hub switcher, icon rail sidebar, 4 KPI tiles (on-time %, flights today, load factor, delayed), a live flights status board, departures-by-hour chart, flights detail table, and a crew/aircraft side panel."
+        "en": "Apply this dark navy precision-control admin aesthetic to my domain",
+        "zh-CN": "使用这个插件：Apply this dark navy precision-control admin aesthetic to my domain"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Jetstream Airline Admin"
+          "title": "Dashboard"
+        },
+        {
+          "path": "./assets/dashboard.html",
+          "title": "Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Records List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "New Record Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Record Detail"
+        },
+        {
+          "path": "./assets/template.html",
+          "title": "Screen Template"
         }
       ]
     },
@@ -71,7 +90,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {

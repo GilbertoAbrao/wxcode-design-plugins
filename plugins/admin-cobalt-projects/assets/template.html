@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cobalt Admin — Shell Seed</title>
+<!--
+  SEED SKELETON — copy this file as the starting point for a new screen in the
+  Cobalt light-mode admin skin. It carries the :root token block and the app
+  shell (sidebar + topbar + main content slot). Replace the brand text, sidebar
+  entity list, nav items, breadcrumb, and main content with the real domain's
+  equivalents. Keep the token block intact.
+-->
+<style>
+:root {
+  /* Cobalt accent */
+  --cobalt-700: #1d4ed8;
+  --cobalt-600: #2563eb;   /* primary CTA, active nav, links */
+  --cobalt-500: #3b82f6;   /* chart strokes, lighter fills */
+  --cobalt-100: #dbeafe;
+  --cobalt-50:  #eff6ff;
+
+  /* Category / semantic chips — add or remove to match the domain */
+  --cat-violet:     #7c3aed;  --cat-violet-bg:  #ede9fe;
+  --cat-emerald:    #059669;  --cat-emerald-bg: #d1fae5;
+  --cat-amber:      #d97706;  --cat-amber-bg:   #fef3c7;
+  --cat-rose:       #e11d48;  --cat-rose-bg:    #ffe4e6;
+  --cat-sky:        #0284c7;  --cat-sky-bg:     #e0f2fe;
+
+  /* Status ramp — adapt states to the domain */
+  --status-progress:    #2563eb;  --status-progress-bg: #eff6ff;
+  --status-review:      #7c3aed;  --status-review-bg:   #ede9fe;
+  --status-done:        #059669;  --status-done-bg:     #d1fae5;
+  --status-blocked:     #e11d48;  --status-blocked-bg:  #ffe4e6;
+
+  /* Priority ramp */
+  --prio-critical: #e11d48;  --prio-critical-bg: #ffe4e6;
+  --prio-high:     #d97706;  --prio-high-bg:     #fef3c7;
+  --prio-medium:   #2563eb;  --prio-medium-bg:   #eff6ff;
+  --prio-low:      #64748b;  --prio-low-bg:      #f1f5f9;
+
+  /* Delta chips */
+  --delta-up-bg:   #d1fae5;  --delta-up-text:   #065f46;
+  --delta-down-bg: #ffe4e6;  --delta-down-text: #9f1239;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px; line-height: 1.5;
+  color: #0f172a; background: #f1f5f9;
+  min-height: 100vh; display: flex;
+}
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; font: inherit; background: none; border: none; }
+ul, ol { list-style: none; }
+
+/* ── SHELL ───────────────────────────────────────────── */
+.shell { display: flex; width: 100%; min-height: 100vh; }
+
+/* ── SIDEBAR ─────────────────────────────────────────── */
+.sidebar {
+  width: 240px; min-width: 240px;
+  background: #fff; border-right: 1px solid #e2e8f0;
+  display: flex; flex-direction: column; overflow-y: auto;
+}
+.sidebar-brand {
+  display: flex; align-items: center; gap: 10px;
+  padding: 20px 18px 16px; border-bottom: 1px solid #e2e8f0;
+}
+.brand-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--cobalt-600);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+/* .brand-name / .brand-sub: set font-size 15px/11px, weight 700/400 */
+
+.sidebar-section { padding: 16px 12px 4px; }
+.sidebar-section-label {
+  font-size: 10px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: #94a3b8; padding: 0 6px; margin-bottom: 4px;
+}
+/* Entity list item: flex row, 7px vert padding, 7px radius, .active = cobalt-50 bg + inset 3px cobalt-600 */
+/* Nav item: flex row, 7px vert padding, 7px radius, .active = cobalt-50 bg, cobalt-700 text, 600 weight */
+
+.sidebar-footer {
+  margin-top: auto; padding: 14px 12px;
+  border-top: 1px solid #e2e8f0;
+  display: flex; align-items: center; gap: 10px;
+}
+
+/* ── MAIN COLUMN ─────────────────────────────────────── */
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+/* ── TOPBAR ──────────────────────────────────────────── */
+.topbar {
+  height: 56px; background: #fff; border-bottom: 1px solid #e2e8f0;
+  display: flex; align-items: center; padding: 0 24px; gap: 16px; flex-shrink: 0;
+}
+/* Breadcrumb: 13px, color #64748b; .current = #0f172a weight 600 */
+/* Search input: max-width 320px, height 34px, border #e2e8f0, radius 8px, bg #f8fafc, focus border cobalt-500 */
+/* View toggle: border 1px #e2e8f0, radius 7px, .active = cobalt-600 bg white text */
+/* Bell: 34×34px, radius 7px, dot = rose */
+/* Avatar group: 28px circles, -8px margin-left overlap, border 2px white */
+
+/* ── CONTENT SLOT ────────────────────────────────────── */
+.content {
+  flex: 1; padding: 24px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 20px;
+}
+
+/* ── REUSABLE PRIMITIVES ─────────────────────────────── */
+/* Page header: flex space-between, title 18px/700/#0f172a, sub 13px/#64748b */
+.card { background: #fff; border: 1px solid #e9ecf0; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); overflow: hidden; }
+.card-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid #f1f5f9; }
+.card-title { font-size: 14px; font-weight: 700; color: #0f172a; }
+
+.btn-ghost { padding: 7px 14px; border: 1px solid #e2e8f0; border-radius: 7px; font-size: 13px; font-weight: 500; color: #475569; background: #fff; }
+.btn-primary { padding: 7px 14px; border-radius: 7px; font-size: 13px; font-weight: 600; color: #fff; background: var(--cobalt-600); }
+
+/* KPI card pattern: kpi-head (label + icon chip), kpi-number (26px/800/tabular-nums), kpi-footer (delta chip + context text) */
+/* pill: 2px 9px padding, 12px radius, 11px/600 */
+/* delta: 11px/600, 1px 6px padding, 6px radius, .delta-up/.delta-down */
+/* sparkline SVG: width 100%, height 28px, area-fill gradient + polyline stroke */
+
+/* Inline field validation (form screens only):
+   .field.invalid .control → border-color #fca5a5, bg #fef2f2
+   .error-msg → 11px, color #dc2626, flex row with alert icon
+   submit[disabled] → bg #94a3b8, cursor not-allowed */
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- SIDEBAR: brand → entity list (with colored dots + count badges) → nav items → footer user -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon" aria-hidden="true">
+        <!-- Replace with domain brand mark or cobalt icon -->
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <rect x="2" y="2" width="6" height="6" rx="1.5" fill="#fff" opacity=".9"/>
+          <rect x="10" y="2" width="6" height="6" rx="1.5" fill="#fff" opacity=".6"/>
+          <rect x="2" y="10" width="6" height="6" rx="1.5" fill="#fff" opacity=".6"/>
+          <rect x="10" y="10" width="6" height="6" rx="1.5" fill="#fff" opacity=".3"/>
+        </svg>
+      </div>
+      <div>
+        <div style="font-size:15px;font-weight:700;color:#0f172a;letter-spacing:-.02em;">Brand Name</div>
+        <div style="font-size:11px;color:#64748b;margin-top:1px;">Workspace Label</div>
+      </div>
+    </div>
+
+    <!-- ENTITY LIST SECTION — relabel to domain's primary scope -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Entity Group</div>
+      <ul>
+        <!-- .active item gets cobalt-50 bg + inset 3px 0 0 cobalt-600 box-shadow -->
+        <li style="display:flex;align-items:center;gap:9px;padding:7px 6px;border-radius:7px;background:var(--cobalt-50);box-shadow:inset 3px 0 0 var(--cobalt-600);">
+          <span style="width:9px;height:9px;border-radius:50%;background:var(--cobalt-500);flex-shrink:0;"></span>
+          <span style="flex:1;font-size:13px;font-weight:600;color:var(--cobalt-700);">Active Entity</span>
+          <span style="font-size:10px;font-weight:600;background:var(--cobalt-100);color:var(--cobalt-700);padding:1px 6px;border-radius:10px;">0</span>
+        </li>
+        <li style="display:flex;align-items:center;gap:9px;padding:7px 6px;border-radius:7px;cursor:pointer;">
+          <span style="width:9px;height:9px;border-radius:50%;background:var(--cat-violet);flex-shrink:0;"></span>
+          <span style="flex:1;font-size:13px;font-weight:500;color:#1e293b;">Entity B</span>
+          <span style="font-size:10px;font-weight:600;background:#f1f5f9;color:#64748b;padding:1px 6px;border-radius:10px;">0</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- NAV SECTION — relabel items to domain destinations -->
+    <div class="sidebar-section" style="padding-top:8px;">
+      <div class="sidebar-section-label">Navigation</div>
+      <ul>
+        <li style="display:flex;align-items:center;gap:9px;padding:7px 6px;border-radius:7px;color:#475569;font-size:13px;font-weight:500;cursor:pointer;">
+          <svg style="width:16px;height:16px;flex-shrink:0;color:#94a3b8;" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="1" y="1" width="5.5" height="5.5" rx="1"/><rect x="9.5" y="1" width="5.5" height="5.5" rx="1"/>
+            <rect x="1" y="9.5" width="5.5" height="5.5" rx="1"/><rect x="9.5" y="9.5" width="5.5" height="5.5" rx="1"/>
+          </svg>
+          Destination
+        </li>
+        <!-- Add 3–5 nav items. .active = cobalt-50 bg, cobalt-700 text. -->
+      </ul>
+    </div>
+
+    <div class="sidebar-footer">
+      <div style="width:30px;height:30px;border-radius:50%;background:var(--cobalt-100);color:var(--cobalt-700);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">··</div>
+      <div>
+        <div style="font-size:12px;font-weight:600;color:#1e293b;">User Name</div>
+        <div style="font-size:11px;color:#94a3b8;">Role / Workspace</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR: breadcrumb → search (optional) → spacer → view toggle (optional) → bell → avatars -->
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#64748b;">
+        <span>Home</span>
+        <span style="color:#cbd5e1;font-size:15px;">/</span>
+        <span style="color:#0f172a;font-weight:600;">Current Screen</span>
+      </div>
+      <div style="flex:1;"></div>
+      <!-- Bell, view toggle, avatar group go here -->
+    </header>
+
+    <!-- CONTENT SLOT — drop page header, KPI row, timeline strip, table, form, or detail here -->
+    <main class="content">
+      <!-- content goes here -->
+    </main>
+
+  </div><!-- /main -->
+</div><!-- /shell -->
+</body>
+</html>

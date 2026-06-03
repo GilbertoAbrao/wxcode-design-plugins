@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Relay Admin — Record Detail</title>
+<style>
+:root {
+  --accent:          #7c3aed;
+  --accent-light:    #8b5cf6;
+  --accent-tint:     #ede9fe;
+  --status-green:    #16a34a;
+  --status-green-bg: #dcfce7;
+  --status-amber:    #d97706;
+  --status-amber-bg: #fef3c7;
+  --status-red:      #dc2626;
+  --status-red-bg:   #fee2e2;
+  --status-slate:    #475569;
+  --status-slate-bg: #f1f5f9;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 13px; color: #334155; background: #f1f5f9;
+  height: 100vh; display: flex; overflow: hidden;
+}
+
+/* ── Sidebar ─────────────────────────────────── */
+.sidebar { width: 240px; min-width: 240px; background: #fff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; overflow-y: auto; }
+.sidebar-logo { display: flex; align-items: center; gap: 10px; padding: 18px 20px 16px; border-bottom: 1px solid #e2e8f0; }
+.sidebar-logo-text { font-size: 15px; font-weight: 700; color: #1e293b; letter-spacing: -0.01em; }
+.sidebar-section { padding: 16px 12px 4px; }
+.sidebar-section-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: #94a3b8; padding: 0 8px 6px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 7px; cursor: pointer; color: #475569; font-size: 13px; font-weight: 500; margin-bottom: 1px; position: relative; text-decoration: none; }
+.nav-item:hover { background: #f8fafc; color: #1e293b; }
+.nav-item.active { background: var(--accent-tint); color: var(--accent); }
+.nav-item.active::before { content: ""; position: absolute; left: -12px; top: 4px; bottom: 4px; width: 3px; border-radius: 0 2px 2px 0; background: var(--accent); }
+.nav-item svg { flex-shrink: 0; opacity: 0.75; }
+.nav-item.active svg { opacity: 1; color: var(--accent); }
+.nav-badge { margin-left: auto; background: var(--accent); color: #fff; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; min-width: 20px; text-align: center; }
+.sidebar-footer { margin-top: auto; padding: 12px 16px; border-top: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px; }
+.footer-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--accent-tint); color: var(--accent); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.footer-name { font-size: 13px; font-weight: 600; color: #1e293b; line-height: 1.2; }
+.footer-role { font-size: 11px; color: #94a3b8; }
+.presence-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--status-green); margin-left: auto; flex-shrink: 0; border: 1.5px solid #fff; }
+
+/* ── Main shell ──────────────────────────────── */
+.main-shell { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.topbar { height: 56px; background: #fff; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; padding: 0 24px; gap: 16px; flex-shrink: 0; }
+.topbar-title { font-size: 15px; font-weight: 700; color: #1e293b; }
+.topbar-breadcrumb { font-size: 12px; color: #94a3b8; margin-top: 1px; }
+.topbar-title-block { display: flex; flex-direction: column; }
+.topbar-actions { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+.icon-btn { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #475569; background: transparent; border: none; position: relative; }
+.icon-btn:hover { background: #f1f5f9; }
+.notif-dot { position: absolute; top: 5px; right: 5px; width: 7px; height: 7px; background: var(--status-amber); border-radius: 50%; border: 1.5px solid #fff; }
+.topbar-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-tint); color: var(--accent); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid var(--accent-light); }
+
+.content { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+
+/* ── Buttons ─────────────────────────────────── */
+.btn-ghost { padding: 8px 16px; background: transparent; border: 1px solid #e2e8f0; border-radius: 7px; color: #475569; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; white-space: nowrap; }
+.btn-ghost:hover { border-color: #cbd5e1; color: #1e293b; }
+.btn-primary { padding: 8px 16px; background: var(--accent); border: 1px solid var(--accent); border-radius: 7px; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; white-space: nowrap; }
+.btn-primary:hover { background: var(--accent-light); }
+
+/* ── Breadcrumb ──────────────────────────────── */
+.breadcrumb { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #94a3b8; }
+.breadcrumb a { color: #475569; text-decoration: none; }
+.breadcrumb a:hover { color: var(--accent-light); }
+.breadcrumb svg { color: #cbd5e1; }
+
+/* ── Detail header ───────────────────────────── */
+.detail-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.detail-id-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.detail-id { font-family: "SF Mono","Fira Code",monospace; font-size: 15px; color: var(--accent); font-weight: 700; }
+.pill { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.pill-open     { color: var(--status-slate); background: var(--status-slate-bg); }
+.pill-pending  { color: var(--status-amber); background: var(--status-amber-bg); }
+.pill-resolved { color: var(--status-green); background: var(--status-green-bg); }
+.pill-breached { color: var(--status-red);   background: var(--status-red-bg);   }
+.pill-t1 { color: var(--status-red);   background: var(--status-red-bg);   }
+.pill-t2 { color: var(--status-amber); background: var(--status-amber-bg); }
+.pill-t3 { color: var(--accent);       background: var(--accent-tint);     }
+.detail-subject { font-size: 17px; font-weight: 700; color: #1e293b; }
+.detail-category { font-size: 13px; color: #94a3b8; margin-top: 2px; }
+.detail-actions { display: flex; gap: 8px; align-items: flex-start; flex-shrink: 0; }
+
+/* ── Cards ───────────────────────────────────── */
+.card { background: #fff; border-radius: 10px; border: 1px solid #e9ecf3; box-shadow: 0 1px 4px rgba(0,0,0,.04); }
+.card-title { font-size: 14px; font-weight: 700; color: #1e293b; }
+.card-section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; padding: 13px 20px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 7px; }
+.card-section-title svg { color: var(--accent); }
+
+/* Meta grid */
+.meta-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 0; }
+.meta-cell { padding: 16px 20px; border-right: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; }
+.meta-cell:nth-child(3n) { border-right: none; }
+.meta-cell:nth-last-child(-n+3) { border-bottom: none; }
+.meta-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: #94a3b8; margin-bottom: 5px; }
+.meta-value { font-size: 13px; font-weight: 600; color: #1e293b; }
+.meta-sub   { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+.meta-avatar { display: flex; align-items: center; gap: 8px; }
+.m-av { width: 22px; height: 22px; border-radius: 50%; background: var(--accent-tint); color: var(--accent); font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+/* Two-col grid */
+.two-col { display: grid; grid-template-columns: 7fr 5fr; gap: 16px; align-items: start; }
+
+/* Related sub-table */
+.sub-table-wrap { overflow: hidden; }
+table { width: 100%; border-collapse: collapse; }
+thead th { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; text-align: left; padding: 10px 12px; border-bottom: 1px solid #f1f5f9; }
+thead th:first-child { padding-left: 20px; }
+thead th:last-child  { padding-right: 20px; }
+tbody tr { border-bottom: 1px solid #f8fafc; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #fafbfe; }
+tbody td { padding: 9px 12px; font-size: 12px; color: #334155; vertical-align: middle; }
+tbody td:first-child { padding-left: 20px; }
+tbody td:last-child  { padding-right: 20px; }
+.cell-muted { color: #94a3b8; }
+.cell-mono  { font-family: "SF Mono","Fira Code",monospace; font-size: 11px; color: var(--accent); font-weight: 600; }
+
+/* Activity feed */
+.activity-list { padding: 0 20px; }
+.activity-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f8fafc; }
+.activity-item:last-child { border-bottom: none; }
+.act-dot-col { display: flex; flex-direction: column; align-items: center; gap: 4px; padding-top: 2px; }
+.act-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.act-line { width: 1px; flex: 1; background: #f1f5f9; }
+.activity-item:last-child .act-line { display: none; }
+.act-av { width: 26px; height: 26px; border-radius: 50%; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.av-violet { background: var(--accent-tint); color: var(--accent); }
+.av-teal   { background: #ccfbf1; color: #0f766e; }
+.av-rose   { background: #ffe4e6; color: #be123c; }
+.av-slate  { background: #f1f5f9; color: #475569; }
+.act-body  { flex: 1; min-width: 0; }
+.act-who   { font-size: 12px; font-weight: 600; color: #1e293b; }
+.act-what  { font-size: 12px; color: #475569; margin-top: 1px; }
+.act-time  { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="7" fill="var(--accent)"/><path d="M7 10.5C7 9.12 8.12 8 9.5 8h9C19.88 8 21 9.12 21 10.5v5c0 1.38-1.12 2.5-2.5 2.5H15l-3 3v-3H9.5C8.12 16 7 14.88 7 13.5v-3z" fill="white"/><circle cx="10.5" cy="12" r="1" fill="var(--accent)"/><circle cx="14" cy="12" r="1" fill="var(--accent)"/><circle cx="17.5" cy="12" r="1" fill="var(--accent)"/></svg>
+    <span class="sidebar-logo-text">Relay Support</span>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Inbox</div>
+    <a class="nav-item active" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4.5C2 3.67 2.67 3 3.5 3h9c.83 0 1.5.67 1.5 1.5v7c0 .83-.67 1.5-1.5 1.5h-9C2.67 12 2 11.33 2 10.5v-7z" stroke="currentColor" stroke-width="1.25"/><path d="M2 5.5l6 4 6-4" stroke="currentColor" stroke-width="1.25"/></svg>
+      All Open
+      <span class="nav-badge">47</span>
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="2.5" stroke="currentColor" stroke-width="1.25"/><path d="M3 13c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>
+      My Tickets
+      <span class="nav-badge">8</span>
+    </a>
+  </div>
+  <div class="sidebar-footer">
+    <div class="footer-avatar">SL</div>
+    <div><div class="footer-name">Sara Lindqvist</div><div class="footer-role">Support Lead</div></div>
+    <div class="presence-dot"></div>
+  </div>
+</aside>
+
+<!-- MAIN SHELL -->
+<div class="main-shell">
+  <header class="topbar">
+    <div class="topbar-title-block">
+      <span class="topbar-title">Record Detail</span>
+      <span class="topbar-breadcrumb">Support / All Records / #4820</span>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2.25C6.38 2.25 4.25 4.38 4.25 7v.5L3 10h12l-1.25-2.5V7c0-2.62-2.13-4.75-4.75-4.75z" stroke="currentColor" stroke-width="1.3"/><path d="M7.5 13.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <span class="notif-dot"></span>
+      </button>
+      <div class="topbar-avatar">SL</div>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <a href="#">All Records</a>
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>#4820</span>
+    </div>
+
+    <!-- Header -->
+    <div class="detail-header">
+      <div>
+        <div class="detail-id-row">
+          <span class="detail-id">#4820</span>
+          <span class="pill pill-open">Open</span>
+          <span class="pill pill-t1">P1</span>
+        </div>
+        <div class="detail-subject">SSO login failing for enterprise org</div>
+        <div class="detail-category">Authentication · Halcyon Labs</div>
+      </div>
+      <div class="detail-actions">
+        <button class="btn-ghost">Assign</button>
+        <button class="btn-primary">Edit</button>
+      </div>
+    </div>
+
+    <!-- Meta grid -->
+    <div class="card">
+      <div class="meta-grid">
+        <div class="meta-cell">
+          <div class="meta-label">Requester</div>
+          <div class="meta-value meta-avatar"><div class="m-av">AP</div>Ana Pereira</div>
+          <div class="meta-sub">ana.pereira@halcyon.io</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Category</div>
+          <div class="meta-value">Authentication</div>
+          <div class="meta-sub">SSO / SAML</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Priority</div>
+          <div class="meta-value"><span class="pill pill-t1">P1 — Critical</span></div>
+          <div class="meta-sub">4h SLA breach window</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Assignee</div>
+          <div class="meta-value meta-avatar"><div class="m-av">SL</div>Sara Lindqvist</div>
+          <div class="meta-sub">Support Lead</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Opened</div>
+          <div class="meta-value">Jun 3, 2026</div>
+          <div class="meta-sub">2h 48m ago</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">SLA deadline</div>
+          <div class="meta-value" style="color:var(--status-red)">Jun 3 · 16:30</div>
+          <div class="meta-sub">1h 12m remaining</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two-column: related sub-table + activity -->
+    <div class="two-col">
+
+      <!-- Related sub-table -->
+      <div class="card">
+        <div class="card-section-title">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="1.5" width="10" height="11" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 4.5h6M4 7h6M4 9.5h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Related Items
+        </div>
+        <div class="sub-table-wrap">
+          <table>
+            <thead>
+              <tr><th>#</th><th>Subject</th><th>Status</th><th>Age</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="cell-mono">#4811</span></td>
+                <td>SAML metadata URL returned 404</td>
+                <td><span class="pill pill-resolved">Resolved</span></td>
+                <td class="cell-muted">3d ago</td>
+              </tr>
+              <tr>
+                <td><span class="cell-mono">#4754</span></td>
+                <td>IdP certificate about to expire — warning</td>
+                <td><span class="pill pill-resolved">Resolved</span></td>
+                <td class="cell-muted">8d ago</td>
+              </tr>
+              <tr>
+                <td><span class="cell-mono">#4612</span></td>
+                <td>SSO provisioning delay for new users</td>
+                <td><span class="pill pill-resolved">Resolved</span></td>
+                <td class="cell-muted">22d ago</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Activity feed -->
+      <div class="card">
+        <div class="card-section-title">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M7 4v3l2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Activity
+        </div>
+        <div class="activity-list">
+          <div class="activity-item">
+            <div class="act-dot-col">
+              <div class="act-dot" style="background:var(--accent)"></div>
+              <div class="act-line"></div>
+            </div>
+            <div class="act-av av-violet">SL</div>
+            <div class="act-body">
+              <div class="act-who">Sara Lindqvist</div>
+              <div class="act-what">Assigned to herself and set priority to P1.</div>
+              <div class="act-time">2h 48m ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-dot-col">
+              <div class="act-dot" style="background:var(--status-amber)"></div>
+              <div class="act-line"></div>
+            </div>
+            <div class="act-av av-rose">AP</div>
+            <div class="act-body">
+              <div class="act-who">Ana Pereira</div>
+              <div class="act-what">Submitted: "All 140 users are locked out since 13:22."</div>
+              <div class="act-time">2h 51m ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-dot-col">
+              <div class="act-dot" style="background:var(--status-slate-bg)"></div>
+              <div class="act-line"></div>
+            </div>
+            <div class="act-av av-teal">JK</div>
+            <div class="act-body">
+              <div class="act-who">Jin Kim</div>
+              <div class="act-what">Confirmed SAML cert rotation as root cause. Escalated.</div>
+              <div class="act-time">2h 20m ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-dot-col">
+              <div class="act-dot" style="background:#f1f5f9"></div>
+            </div>
+            <div class="act-av av-slate">SL</div>
+            <div class="act-body">
+              <div class="act-who">Sara Lindqvist</div>
+              <div class="act-what">Requested new SAML metadata from requester.</div>
+              <div class="act-time">1h 55m ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /two-col -->
+
+  </div><!-- /content -->
+</div><!-- /main-shell -->
+
+</body>
+</html>

@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dense Grid Admin — Template</title>
+<style>
+/* ── Design tokens (non-negotiable) ──────────────────────────── */
+:root {
+  --up:          #22c55e;   /* positive / bid */
+  --dn:          #ef4444;   /* negative / ask */
+  --accent-blue: #3b82f6;   /* primary action, selected, active */
+  --text-primary:#d7dde4;
+  --text-muted:  #7b8694;
+  --mono: ui-monospace, Menlo, 'Courier New', monospace;
+  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ── Reset ────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: #0c0f12;
+  color: var(--text-primary);
+  font-family: var(--sans);
+  font-size: 12px;
+  line-height: 1.4;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; }
+button { cursor: pointer; font-family: inherit; font-size: 11px; }
+input, select, textarea { font-family: inherit; font-size: 12px; }
+
+/* ── Utilities ────────────────────────────────────────────────── */
+.mono  { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.up    { color: var(--up); }
+.dn    { color: var(--dn); }
+.muted { color: var(--text-muted); }
+.caps  { text-transform: uppercase; letter-spacing: 0.08em; font-size: 10px; }
+
+/* ── Toolbar (36px, panel bg, 1px bottom border) ─────────────── */
+.toolbar {
+  height: 36px; background: #12161b; border-bottom: 1px solid #232a31;
+  display: flex; align-items: center; padding: 0 12px; gap: 12px; flex-shrink: 0;
+}
+.brand { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.brand-mark {
+  width: 20px; height: 20px; background: var(--accent-blue); border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: #fff;
+}
+.brand-name { font-size: 13px; font-weight: 600; white-space: nowrap; }
+.tb-sep { width: 1px; height: 20px; background: #232a31; flex-shrink: 0; }
+
+/* Filter chip pills */
+.filter-chips { display: flex; gap: 4px; align-items: center; }
+.chip {
+  height: 22px; padding: 0 8px; border-radius: 3px; border: 1px solid #232a31;
+  background: transparent; color: var(--text-muted); font-size: 11px;
+  transition: border-color .15s, color .15s;
+}
+.chip.active, .chip:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+
+/* Search input */
+.tb-search { flex: 1; min-width: 0; max-width: 260px; position: relative; }
+.tb-search input {
+  width: 100%; height: 22px; background: #0c0f12; border: 1px solid #232a31;
+  border-radius: 3px; color: var(--text-primary); padding: 0 8px 0 26px;
+  outline: none; transition: border-color .15s, width .2s cubic-bezier(0.23,1,0.32,1);
+}
+.tb-search input:focus { border-color: var(--accent-blue); }
+.tb-search svg { position: absolute; left: 7px; top: 50%; transform: translateY(-50%); }
+
+/* Right cluster */
+.toolbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.live-clock { font-family: var(--mono); font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+.conn-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--up); box-shadow: 0 0 0 2px rgba(34,197,94,.25); }
+.avatar {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--accent-blue); color: #fff;
+  font-size: 10px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── Main layout slot ─────────────────────────────────────────── */
+/* Dashboard: use .main-grid (flex, left 62%, right 38%)          */
+/* List/Form/Detail: use .page (flex column, padding 16px 20px)   */
+
+.main-grid { flex: 1; display: flex; gap: 0; min-height: 0; overflow: hidden; }
+.col-left  { flex: 0 0 62%; display: flex; flex-direction: column; border-right: 1px solid #232a31; overflow: auto; }
+.col-right { flex: 0 0 38%; display: flex; flex-direction: column; overflow: auto; }
+
+.page { flex: 1; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; overflow: auto; }
+
+/* ── Panel (raised surface) ───────────────────────────────────── */
+.panel { background: #12161b; border-bottom: 1px solid #232a31; }
+.card  { background: #12161b; border: 1px solid #232a31; border-radius: 4px; overflow: hidden; }
+
+/* Panel / card header */
+.panel-hdr, .card-hdr {
+  height: 28px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 10px; border-bottom: 1px solid #232a31;
+}
+.panel-title, .card-title {
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.panel-action { font-size: 11px; color: var(--accent-blue); background: none; border: none; padding: 0; }
+.panel-action:hover { text-decoration: underline; }
+
+/* ── Data table rows (28px compact) ──────────────────────────── */
+.dt th {
+  background: #0c0f12; font-size: 10px; font-weight: 600; color: var(--text-muted);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 4px 8px; border-bottom: 1px solid #232a31; white-space: nowrap;
+}
+.dt td { padding: 3px 8px; border-bottom: 1px solid rgba(35,42,49,.6); font-size: 12px; white-space: nowrap; }
+.dt tr:hover td { background: #191e25; }
+.dt tr.sel td   { background: rgba(59,130,246,.08); border-left: 2px solid var(--accent-blue); }
+
+/* ── Value tags ───────────────────────────────────────────────── */
+.tag-a { background: rgba(34,197,94,.15); color: var(--up); border-radius: 2px; padding: 1px 5px; font-size: 10px; font-weight: 700; }
+.tag-b { background: rgba(239,68,68,.15); color: var(--dn); border-radius: 2px; padding: 1px 5px; font-size: 10px; font-weight: 700; }
+.tag-n { background: rgba(123,134,148,.15); color: var(--text-muted); border-radius: 2px; padding: 1px 5px; font-size: 10px; font-weight: 700; }
+
+/* ── Buttons ──────────────────────────────────────────────────── */
+.btn-ghost {
+  height: 28px; padding: 0 12px; border-radius: 4px;
+  border: 1px solid #232a31; background: transparent;
+  color: var(--text-primary); font-size: 12px;
+  transition: border-color .15s;
+}
+.btn-ghost:hover { border-color: var(--accent-blue); }
+.btn-primary {
+  height: 28px; padding: 0 12px; border-radius: 4px;
+  border: none; background: var(--accent-blue); color: #fff;
+  font-size: 12px; font-weight: 600;
+}
+.btn-primary:hover:not(:disabled) { filter: brightness(1.1); }
+.btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ── Form fields (inline validation) ─────────────────────────── */
+.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; }
+.field.full { grid-column: 1 / -1; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.req { color: var(--dn); margin-left: 2px; }
+.control {
+  height: 30px; background: #0c0f12; border: 1px solid #232a31; border-radius: 3px;
+  color: var(--text-primary); padding: 0 10px; outline: none;
+  transition: border-color .15s; width: 100%;
+}
+.control:focus { border-color: var(--accent-blue); }
+.field.invalid .control { border-color: var(--dn); background: rgba(239,68,68,.04); }
+.helper    { font-size: 10px; color: var(--text-muted); }
+.error-msg { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--dn); }
+
+/* ── Sparkline card ───────────────────────────────────────────── */
+.spark-card {
+  background: #0c0f12; border: 1px solid #232a31; border-radius: 3px;
+  padding: 6px 8px 4px; display: flex; flex-direction: column;
+}
+.spark-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+.spark-sym  { font-size: 10px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+.spark-last { font-family: var(--mono); font-size: 11px; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.spark-delta{ font-family: var(--mono); font-size: 10px; font-variant-numeric: tabular-nums; }
+
+/* ── Stats strip tile ─────────────────────────────────────────── */
+.stat-tile { padding: 8px 10px 6px; border-right: 1px solid #232a31; display: flex; flex-direction: column; gap: 3px; }
+.stat-tile:last-child { border-right: none; }
+.stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.stat-val   { font-family: var(--mono); font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stat-chip  { font-family: var(--mono); font-size: 10px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<!-- TOOLBAR — replace {XX} monogram and workspace name -->
+<header class="toolbar">
+  <div class="brand">
+    <div class="brand-mark">{XX}</div>
+    <span class="brand-name">{Workspace}</span>
+  </div>
+  <div class="tb-sep"></div>
+  <!-- Filter chips: replace label set with domain states/facets -->
+  <div class="filter-chips">
+    <button class="chip active">{All}</button>
+    <button class="chip">{State A}</button>
+    <button class="chip">{State B}</button>
+  </div>
+  <!-- Search -->
+  <div class="tb-search">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+      <circle cx="5" cy="5" r="3.5" stroke="#7b8694" stroke-width="1.2"/>
+      <line x1="8" y1="8" x2="11" y2="11" stroke="#7b8694" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>
+    <input type="text" placeholder="Search…" aria-label="Search">
+  </div>
+  <div class="toolbar-right">
+    <span class="live-clock mono">{HH:MM:SS}</span>
+    <div class="conn-dot" title="Live"></div>
+    <div class="avatar">{RM}</div>
+  </div>
+</header>
+
+<!-- MAIN SLOT — swap between .main-grid (dashboard) and .page (list/form/detail) -->
+<div class="main-grid">
+
+  <div class="col-left">
+    <!-- Primary data table -->
+    <div class="panel">
+      <div class="panel-hdr">
+        <span class="panel-title">{Primary entities}</span>
+        <span style="font-size:11px;color:var(--text-muted);">{N items}</span>
+      </div>
+      <table class="dt">
+        <thead>
+          <tr>
+            <th>{Identifier}</th>
+            <th class="mono">{Value}</th>
+            <th class="mono">{Change}</th>
+            <th class="mono">{Pct}</th>
+            <th class="mono">{Vol / Count}</th>
+            <th>{State}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="sel">
+            <td style="font-weight:600;">{entity-1}</td>
+            <td class="mono">{val}</td>
+            <td class="mono up">▲ {delta}</td>
+            <td class="mono up">+{pct}%</td>
+            <td class="mono muted">{count}</td>
+            <td><span class="tag-a">{State}</span></td>
+          </tr>
+          <!-- more rows -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Secondary mini-table -->
+    <div class="panel" style="flex:1;">
+      <div class="panel-hdr">
+        <span class="panel-title">{Secondary entities}</span>
+        <span style="font-size:11px;color:var(--accent-blue);">{N open}</span>
+      </div>
+      <table class="dt">
+        <thead>
+          <tr>
+            <th>{ID}</th>
+            <th>{Type}</th>
+            <th class="mono">{Qty}</th>
+            <th class="mono">{Ref value}</th>
+            <th class="mono">{Current}</th>
+            <th class="mono">{Delta P&amp;L}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:600;">{id}</td>
+            <td><span class="tag-a">{A}</span></td>
+            <td class="mono">{qty}</td>
+            <td class="mono">{ref}</td>
+            <td class="mono">{cur}</td>
+            <td class="mono up">+{delta}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="col-right">
+    <!-- Sparkline strip: 2×3 grid of .spark-card -->
+    <div class="panel" style="flex:0 0 auto;">
+      <div style="height:26px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;border-bottom:1px solid #232a31;background:#0c0f12;">
+        <span style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;">Sparklines</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:8px;">
+        <!-- Replace with domain entity symbols and SVG polylines -->
+        <div class="spark-card">
+          <div class="spark-top"><span class="spark-sym">{SYM}</span><span class="spark-last">{val}</span></div>
+          <svg width="100%" height="32" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true">
+            <polyline points="0,24 25,18 50,14 75,10 100,6" fill="none" stroke="#22c55e" stroke-width="1.2"/>
+          </svg>
+          <div style="display:flex;justify-content:flex-end;margin-top:3px;"><span class="spark-delta up">{+pct}%</span></div>
+        </div>
+        <!-- 5 more cards -->
+      </div>
+    </div>
+
+    <!-- Depth / book panel -->
+    <div class="panel" style="flex:0 0 auto;">
+      <div style="height:26px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;border-bottom:1px solid #232a31;background:#0c0f12;">
+        <span style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;">{Depth/Book title}</span>
+        <span style="font-size:11px;color:var(--accent-blue);font-weight:600;">{selected entity}</span>
+      </div>
+      <!-- Two-column bid/ask depth rows here — see layouts.md -->
+    </div>
+
+    <!-- Stats strip: 5 tiles in 1-row grid -->
+    <div class="panel" style="flex:0 0 auto;">
+      <div style="height:26px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;border-bottom:1px solid #232a31;background:#0c0f12;">
+        <span style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;">{Stats strip title}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);">
+        <div class="stat-tile">
+          <span class="stat-label">{METRIC 1}</span>
+          <span class="stat-val">{val}</span>
+          <span class="stat-chip muted">{delta}</span>
+        </div>
+        <!-- 4 more tiles -->
+      </div>
+    </div>
+
+    <div style="flex:1;background:#0c0f12;"></div>
+  </div>
+
+</div><!-- /main-grid -->
+
+</body>
+</html>

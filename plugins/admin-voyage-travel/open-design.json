@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-voyage-travel",
-  "title": "Voyage Travel Admin",
-  "version": "0.1.0",
-  "description": "Airy light-mode operations dashboard for travel agencies — region/agency switcher sidebar, topbar with date-range picker, 4 KPI cards, itinerary board, destinations breakdown, recent bookings table, and occupancy side panel. Sky-and-coral accent palette; original copy and invented data.",
+  "title": "Voyage Admin",
+  "version": "0.2.0",
+  "description": "Airy light-mode admin aesthetic: white-and-pale-blue canvas (#f6fafc), sky-blue accent (#0ea5e9), coral secondary accent (#fb7185), grouped sidebar navigation with entity-switcher pill, 60px topbar with centered search and date-range chip, 4 KPI cards with sparklines and delta badges, a two-column content grid (entity board + breakdown chart), a dense records table, and a donut side panel. Archetype = sidebar nav + 4 KPI cards + two-column board/chart grid + records table + donut panel, plus matching list, form, and detail screens.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,15 +19,13 @@
     "operations",
     "web",
     "admin",
-    "travel",
-    "booking",
     "light-mode",
     "airy",
     "sky-accent",
     "coral-accent",
-    "travel-agency",
-    "itinerary",
-    "occupancy"
+    "sidebar-nav",
+    "data-dense",
+    "enterprise"
   ],
   "compat": {
     "agentSkills": [
@@ -48,13 +46,29 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me an airy travel agency admin dashboard — agency/region switcher sidebar, topbar with date range, 4 KPI cards (bookings, occupancy, revenue, avg lead time), itinerary board, destinations chart, recent bookings table, occupancy panel.",
-        "zh-CN": "使用这个插件完成以下任务：Build me an airy travel agency admin dashboard — agency/region switcher sidebar, topbar with date range, 4 KPI cards (bookings, occupancy, revenue, avg lead time), itinerary board, destinations chart, recent bookings table, occupancy panel."
+        "en": "Apply this airy light-mode admin aesthetic to my domain — white-and-sky canvas, coral accent, sidebar navigation with entity switcher, 4 KPI cards with sparklines, a two-column board and breakdown chart, a dense records table with status pills, and a donut side panel, plus list, form, and detail screens.",
+        "zh-CN": "将这个通透亮色管理后台风格应用到我的领域：白色/天蓝底色、珊瑚色辅助色、带实体切换器的侧边导航、4 个 KPI 卡片（含迷你折线图）、双列面板（主看板 + 分类图表）、带状态标签的密集记录表格，以及甜甜圈侧栏，配套列表 / 表单 / 详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Voyage Travel Admin"
+          "title": "Voyage Admin — Dashboard"
+        },
+        {
+          "path": "./assets/dashboard.html",
+          "title": "Voyage Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Voyage Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Voyage Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Voyage Admin — Detail"
         }
       ]
     },
@@ -72,7 +86,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {

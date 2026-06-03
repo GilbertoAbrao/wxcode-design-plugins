@@ -1,160 +1,197 @@
 ---
 name: admin-dense-grid
 description: |
-  High-density dark-mode operations dashboard in the trading-desk style.
-  Distinctive feature is DENSITY: compact rows (24–28px), small type
-  (11–13px), monospace tabular figures, color-coded up/down deltas.
-  Panels: slim toolbar → watchlist instruments table → positions/orders
-  mini-table → sparkline strip → order-book depth panel → stats row.
-  Use when the brief asks for a trading terminal, ops console, data-grid
-  dashboard, or any layout where maximum information per pixel matters
-  more than whitespace and aesthetics.
+  Maximum-information-density dark-mode admin aesthetic: near-black canvas
+  (#0c0f12), raised panels (#12161b), blue accent (#3b82f6), green/red
+  directional signals, all-monospace tabular figures on a 4-px grid, 11–12px
+  type with uppercase 10px section labels. Archetype = slim 36px toolbar
+  (brand mark + filter chips + search + live clock + status dot + avatar) +
+  2-column main grid: left ~60% = primary data table (10–12 compact 28px rows,
+  status-colored deltas) + secondary mini-table; right ~40% = sparkline strip
+  (2×3 mini cards) + depth/book panel (two-column bid/ask with depth-bar fills)
+  + 5-tile stats strip. Built for maximum data density: every pixel earns its
+  place, whitespace separates data groups only.
 triggers:
-  - "dense admin"
-  - "trading dashboard"
-  - "trading terminal"
-  - "ops console"
-  - "data grid admin"
-  - "watchlist dashboard"
-  - "order book"
-  - "dark ops admin"
-  - "compact dashboard"
-  - "high density dashboard"
-  - "painel denso"
-  - "terminal de operações"
-  - "高密度仪表盘"
-  - "交易台"
+  - "dense data terminal"
+  - "maximum density admin"
+  - "compact data grid admin"
+  - "dark compact console"
+  - "blue accent dense admin"
+  - "monospace tabular admin"
+  - "high-density dark admin"
+  - "operations console dark"
+  - "painel denso escuro"
+  - "terminal de dados compacto"
+example_prompt: "Apply this high-density dark-mode terminal aesthetic to my domain"
 od:
   mode: prototype
   surface: web
   scenario: operations
   preview:
     type: html
-    entry: index.html
+    entry: example.html
   design_system:
     requires: true
     sections: [color, typography, layout, components]
   craft:
     requires: [pixel-discipline, laws-of-ux]
-  example_prompt: "Build a high-density dark-mode operations dashboard — trading-desk style with compact watchlist, positions table, order book, sparkline strip, and monospace tabular figures."
 ---
 
-# Dense Grid Admin Skill
+# Dense Grid Admin — Visual Archetype
 
-Produce a maximum-information-density admin layout in the style of a
-professional trading terminal or operations console. Every pixel earns
-its place; whitespace is used only to separate data groups, not for
-breathing room.
+This plugin contributes a **look** (near-black canvas, blue accent, monospace
+tabular data, ultra-compact rows) and a **structure** (slim toolbar + 2-column
+main grid: primary data table + secondary mini-table on the left, sparkline
+strip + depth panel + stats strip on the right, plus list / form / detail
+screens). It does **not** contribute a domain — the subject matter comes from
+the Knowledge Base and the user's prompt. Treat the example below as
+illustration only.
 
-## Core design tokens
+## Visual language        (AUTHORITATIVE)
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| `--bg-base` | `#0c0f12` | Page background |
-| `--bg-panel` | `#12161b` | Panel/card background |
-| `--bg-row-hover` | `#191e25` | Table row hover |
-| `--border` | `#232a31` | All borders and dividers |
-| `--text-primary` | `#d7dde4` | Body and label text |
-| `--text-muted` | `#7b8694` | Secondary labels, timestamps |
-| `--accent-green` | `#22c55e` | Up delta, positive P&L, bid |
-| `--accent-red` | `#ef4444` | Down delta, negative P&L, ask |
-| `--accent-blue` | `#3b82f6` | Primary action, links, selected row |
-| `--mono` | `ui-monospace, Menlo, monospace` | All numeric figures |
+The non-negotiable look. Declare every chromatic value as a `:root` CSS custom
+property; hardcode the neutral dark ramp.
 
-Spacing follows a 4-px grid: `4 / 8 / 12 / 16 / 20 / 24 / 32px`.
-Font sizes: labels 11px, values 12px, headers 13px, section titles 13px bold.
+- **Canvas / surfaces:** page `#0c0f12`; raised panel `#12161b`; row hover
+  `#191e25`; hairline border `#232a31`; stronger border `#2e3640`.
+- **Text ramp:** primary `#d7dde4`, muted `#7b8694`, faint `#4b5563`.
+- **Accent:** `--accent-blue: #3b82f6`. Primary actions, selected-row markers,
+  active nav, links. Hover tint `rgba(59,130,246,.08)`.
+- **Directional signals:** `--up: #22c55e` (positive / bid side), `--dn: #ef4444`
+  (negative / ask side), each with dim tints at ~10–15% alpha for cell
+  backgrounds and depth-bar fills.
+- **Typography:** body `-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+  all numeric figures `ui-monospace, Menlo, "Courier New", monospace` +
+  `font-variant-numeric: tabular-nums`. Font sizes: section labels 10px
+  (uppercase, letter-spacing 0.08em), body labels 11px, data values 12px, panel
+  titles 13px bold. Stat tile values 14px bold.
+- **Density & spacing:** 4-px grid throughout — `4 / 8 / 12 / 16 / 20 / 24px`
+  spacings. Table rows 28px tall (3px vertical padding per cell). Toolbar 36px.
+  Panel headers 26–28px.
+- **Borders:** 1px hairlines at `#232a31` do all separation; no drop shadows
+  (flat terminal feel). Row dividers `rgba(35,42,49,.6)`.
+- **Motion:** `.15s` background/border hover transitions; search input
+  width-expand on focus (`200ms cubic-bezier(0.23,1,0.32,1)`). Never bouncy.
+
+## Layout archetype       (AUTHORITATIVE, domain-neutral)
+
+Regions and component patterns, described by shape and behavior — not meaning.
+
+- **Slim toolbar** (36px, panel bg, 1px bottom border, flex-row): brand mark
+  (20×20 blue square with 2-letter monogram) + workspace label → separator →
+  filter chips (3–4 pill toggles, active = blue border + text) → search input
+  (icon + placeholder, expands on focus, 260px max) → right-anchored cluster:
+  live clock (monospace 11px), connection status dot (green), notification bell
+  with badge, avatar circle.
+- **2-column main grid** (flex, left ~62%, right ~38%, 1px divider):
+  - **Left column** (flex column, scrollable):
+    - **Primary data table:** panel with header (title + count + one action),
+      sticky uppercase 10px column headers, 10–12 compact rows (28px), first
+      column bold with hover-blue text, numeric columns in monospace with
+      `--up`/`--dn` color for directional values, selected row = blue 2px left
+      border + blue tint, compact pagination footer (range label + prev/next).
+    - **Secondary mini-table:** below the primary table, separated by 1px border;
+      panel header (uppercase label + count chip), 5–6 compact rows with a
+      two-value tag column (green/red colored tags), numeric monospace columns,
+      one directional P&L-style column.
+  - **Right column** (flex column, scrollable):
+    - **Sparkline strip:** panel with a 2×3 grid of mini-cards (each: symbol
+      label top-left + last value top-right, inline SVG polyline + area-fill
+      gradient in `--up`/`--dn` color, delta % bottom-right). Thin border, dark
+      bg.
+    - **Depth / book panel:** panel with title + selected-symbol label; two
+      sub-columns side-by-side (left = bid rows in `--up` color; right = ask
+      rows in `--dn` color); each row shows 2 values in monospace; background
+      depth-bar fills by percentage; spread/mid row between the two sides.
+    - **Stats strip:** panel with header; a 5-tile horizontal grid — each tile:
+      uppercase label (10px muted) + large monospace value (14px bold, colored
+      when directional) + tiny delta chip below.
+- **List screen:** same primary-data-table archetype as its own page — toolbar
+  (search + filter chips + count badge) + the same dense table + pager.
+- **Form screen:** sectioned cards of labelled fields; **rules appear as inline
+  validation** — required marks (`*`), helper text under the field, and inline
+  error messages on invalid fields; primary submit disabled-until-valid. No
+  rules/checklist/validation-status panel.
+- **Detail screen:** breadcrumb + header band (title + status tag + key
+  actions), a meta grid (label/value pairs, 3 columns, monospace values), and
+  one or more related-data sub-panels (the mini-table row pattern or a stats
+  strip) below.
+
+## Applying to a domain   (the contract)
+
+The domain comes from the Knowledge Base + the user's prompt. Extract THIS
+domain's equivalent of the archetype slots — its primary entities, key metrics,
+directional states, record columns, form fields and their rules, and detail
+fields — and map them onto the archetype above. If no KB/domain is supplied
+(standalone), use the Example instantiation below.
+
+Do NOT invent a "rules" / "checklist" / "validation-status" panel; domain rules
+become inline field validation. Do NOT render build/implementation notes or
+designer controls — every screen is a finished product screen.
+
+## Example instantiation (illustrative only — NOT the domain)
+
+> One concrete example so standalone Open Design has a complete brief. In WXCode
+> this is IGNORED — replace every label with the real domain's equivalent
+> (entities, metrics, directional states, columns, fields) drawn from the KB + prompt.
+
+```
+Domain (illustrative): a financial instrument monitoring console.
+
+Toolbar workspace label → "NovexOps".
+Filter chips → All / Active / Flagged / Alerts (with count badge).
+Connection dot → green "Live".
+
+Primary data table     → "Watchlist" — columns: SYMBOL | LAST | CHG | CHG% |
+  VOL | OPEN | HIGH | LOW. 12 compact rows with invented symbols (NOVQ, ELTX,
+  MRFA, ZYLK, ORBN, FXDT, VELM, KRUX, TAQL, SNVX, BQRF, LXPR); CHG/CHG%
+  green (▲) or red (▼); VOL/OPEN/HIGH/LOW muted monospace; selected row tinted
+  blue; footer shows "1–12 of 48".
+
+Secondary mini-table   → "Positions" — columns: SYM | SIDE | QTY | AVG PRICE |
+  MARK | UNRL P&L | STATUS. 6 rows; SIDE tag green "BUY" or red "SELL"; UNRL
+  P&L green (positive) or red (negative); STATUS "OPEN" in matching color.
+
+Sparkline strip        → 6 cards in 2×3 grid: NOVQ (+1.33% green), ELTX
+  (-1.21% red), MRFA (+1.74% green), ORBN (+2.94% green), ZYLK (-1.19% red),
+  VELM (+1.43% green).
+
+Depth/book panel       → "Order Book · NOVQ": 8 bid levels (green, left) and
+  8 ask levels (red, right), spread row: "Spread: 0.02 · Mid: 284.40".
+
+Stats strip            → "Session Stats · Today · UTC": TOTAL VOL 24.8M |
+  DAY TRADES 142 | WIN RATE 64.1% (green) | DRAWDOWN -1.8% (red) |
+  NET P&L +3,389 (green).
+
+List screen            → all watchlist instruments, search + filter chips
+  (direction, status), paginated dense table.
+
+Form screen            → "New Instrument": symbol (required, format: 2–6 caps),
+  name (required), category (required select), target price (required, > 0),
+  alert threshold % (required, 0–100). Rules: required marks + helper text +
+  inline errors; "Add Instrument" disabled until valid.
+
+Detail screen          → one instrument: breadcrumb + header (symbol + status
+  tag + actions), meta grid (name, category, exchange, added date, last updated,
+  alert), related panels: recent price history mini-table + activity log.
+```
 
 ## Workflow
 
-1. Read the active DESIGN.md (if present); otherwise use the token
-   defaults above. Dark palette is non-negotiable for this archetype.
-
-2. Extract from the brief:
-   - Domain name and product/workspace label for the toolbar.
-   - Instrument type (equities, FX, crypto, commodities, custom ops
-     entities) — determines column names and symbol conventions.
-   - Main entity set: 8–12 invented symbols/tickers with plausible
-     figures (do NOT reproduce real market data; invent original symbols
-     such as NOVQ, ELTX, MRFA, etc.).
-
-3. Layout — assemble these panels top-to-bottom then side-by-side:
-
-   ### Slim toolbar (36px height)
-   - LEFT: product mark (small inline SVG or 2-letter monogram in a
-     4×4 blue square) + workspace name in 13px bold.
-   - MIDDLE: compact filter chips (All / Active / Flagged / Alerts) as
-     toggle pills + a small search input (icon + placeholder, 240px max).
-   - RIGHT: live clock (HH:MM:SS, monospace), connection-status dot
-     (green = live), notification bell with count badge, avatar circle
-     with initials.
-
-   ### Main content grid — two columns (flex or CSS grid)
-
-   #### LEFT column (~60% width)
-
-   **Watchlist / instruments table**
-   - Table header row: SYMBOL | LAST | CHG | CHG% | VOL | OPEN | HIGH | LOW
-   - 10–12 compact rows (28px each), alternating subtle background.
-   - SYMBOL: bold 12px, blue on hover.
-   - LAST: monospace 12px.
-   - CHG and CHG%: colored green (positive) or red (negative); include
-     a tiny ▲/▼ glyph before the number.
-   - VOL: monospace muted, abbreviated (K / M).
-   - OPEN / HIGH / LOW: monospace muted gray.
-   - Clicking a row marks it selected (blue left border + tinted row).
-   - Compact pagination or "1–12 of 48" label below.
-
-   **Positions / open orders mini-table**
-   - Sits below watchlist, separated by a 1px `--border` divider.
-   - Header: "POSITIONS" label (uppercase 11px muted) + "8 open" count.
-   - Columns: SYM | SIDE (BUY tag green / SELL tag red) | QTY | AVG PRICE | MARK | UNRL P&L
-   - 5–6 rows, same compact style.
-
-   #### RIGHT column (~40% width, stacked panels)
-
-   **Sparkline strip**
-   - 2×2 or 2×3 grid of mini sparkline cards (each ~100px wide, 56px tall).
-   - Each card: symbol label top-left (11px muted) + last price top-right
-     (monospace 12px) + inline SVG polyline sparkline with a subtle fill,
-     green or red based on direction + delta % bottom-right (colored).
-   - Thin border, dark background.
-
-   **Order book / depth panel**
-   - Title "ORDER BOOK" + selected symbol name.
-   - TWO columns side by side: BID (left, green text) | ASK (right, red text).
-   - 8 price levels each, with SIZE column. Depth bars shown as background
-     width percentage fills (green on bid side, red on ask side, opacity 0.12).
-   - Spread row in the center (muted, small).
-
-   **Stats row / ticker strip**
-   - A bottom strip inside the right column with 4–5 compact stat tiles:
-     TOTAL VOL / DAY TRADES / WIN RATE / DRAWDOWN / NET P&L
-   - Each tile: label (11px muted uppercase) + value (monospace 14px bold,
-     colored when directional) + tiny delta chip below.
-
-4. Typography rules:
-   - Body/labels: system font stack (`-apple-system, BlinkMacSystemFont,
-     'Segoe UI', sans-serif`), no external load.
-   - All numeric figures: `font-family: ui-monospace, Menlo, monospace;
-     font-variant-numeric: tabular-nums;`
-   - Use letter-spacing 0.06em on ALL-CAPS section labels.
-
-5. Interactivity hints (CSS-only):
-   - Row hover: `--bg-row-hover` background.
-   - Selected row: blue left 2px border + tinted background.
-   - Filter chips: toggle via `:focus-within` or a checked state; show
-     pressed chip with `--accent-blue` border and subtle tint.
-   - Toolbar search: expand on focus (120px → 240px, transition 200ms).
-
-6. Palette-ready contract:
-   - Every chromatic color (greens, reds, blue, text-primary, text-muted)
-     must be a `:root` CSS custom property.
-   - SVG fill/stroke must use `var(--token)` or `currentColor`.
-   - Neutral backgrounds and border (#0c0f12, #12161b, #232a31) may be
-     hardcoded.
-
-7. One inline `<style>`, semantic HTML, no external assets, no CDNs,
-   no lorem ipsum, no real market data. Invent all symbols and figures.
+1. Read the active DESIGN.md (if present); otherwise use this plugin's Visual
+   language tokens.
+2. Extract THIS domain's equivalent of the archetype slots — primary entities,
+   key metrics, directional states, record columns, form fields + rules, detail
+   fields — from the KB + prompt. Standalone: use the Example instantiation above.
+3. Build each screen in the Visual language + Layout archetype above, imitating
+   the example set in `assets/` (dashboard, list, form, detail) and the
+   `assets/template.html` seed — with fresh content for the real domain, NOT the
+   example labels.
+4. Express domain rules as INLINE field validation (required marks, helper text,
+   inline errors, disabled-until-valid submit). Never render
+   rules/checklist/validation-status/build-note panels or designer/demo controls.
+5. One inline `<style>`, semantic HTML5, `tabular-nums` on all numeric figures,
+   no external assets, no CDNs — self-contained.
 
 ## Output contract
 

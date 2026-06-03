@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bloom Admin — List</title>
+<style>
+:root {
+  --accent:         #10b981;
+  --accent-light:   #d1fae5;
+  --accent-dark:    #059669;
+  --accent-mid:     #34d399;
+  --coral:          #fb7185;
+  --coral-light:    #ffe4e8;
+  --coral-dark:     #e11d48;
+  --amber:          #f59e0b;
+  --amber-light:    #fef3c7;
+  --amber-dark:     #92400e;
+  --surface:        #f7fbf9;
+  --card:           #ffffff;
+  --border:         #e4ede9;
+  --text-primary:   #1e293b;
+  --text-secondary: #64748b;
+  --text-muted:     #94a3b8;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px; color: var(--text-primary);
+  background: var(--surface); display: flex; min-height: 100vh; line-height: 1.5;
+}
+
+/* ── SIDEBAR ─────────────────────────────────────── */
+.sidebar {
+  width: 260px; flex-shrink: 0; background: var(--card);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  height: 100vh; position: sticky; top: 0; overflow-y: auto;
+}
+.org-switcher { padding: 20px 16px 14px; border-bottom: 1px solid var(--border); }
+.org-row { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 6px 8px; border-radius: 8px; }
+.org-avatar { width: 34px; height: 34px; border-radius: 9px; background: var(--accent); color: #fff; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.org-name { font-size: 13px; font-weight: 600; flex: 1; }
+.org-caret { color: var(--text-muted); }
+.program-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; padding: 0 8px; }
+.program-chip { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px; background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); cursor: pointer; }
+.program-chip.active { background: var(--accent-light); color: var(--accent-dark); border-color: var(--accent-light); }
+.nav { flex: 1; padding: 12px 10px; overflow-y: auto; }
+.nav-section-label { font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); padding: 10px 8px 4px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 7px; cursor: pointer; color: var(--text-secondary); font-size: 13px; font-weight: 500; position: relative; transition: all .15s; text-decoration: none; }
+.nav-item:hover { background: var(--surface); color: var(--text-primary); }
+.nav-item.active { background: var(--accent-light); color: var(--accent-dark); font-weight: 600; }
+.nav-item.active::before { content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 3px; border-radius: 0 3px 3px 0; background: var(--accent); }
+.nav-item svg { flex-shrink: 0; }
+.nav-item.active svg { color: var(--accent); }
+.nav-badge { margin-left: auto; font-size: 10px; font-weight: 700; background: var(--coral-light); color: var(--coral-dark); border-radius: 10px; padding: 1px 6px; }
+.sidebar-footer { padding: 14px 16px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+.user-avatar-sm { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-light); color: var(--accent-dark); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.user-info { flex: 1; }
+.user-name { font-size: 13px; font-weight: 600; }
+.user-role { font-size: 11px; color: var(--text-muted); }
+
+/* ── MAIN ────────────────────────────────────────── */
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+/* ── TOPBAR ──────────────────────────────────────── */
+.topbar { height: 60px; background: var(--card); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 16px; padding: 0 24px; position: sticky; top: 0; z-index: 10; }
+.topbar-left { flex: 0 0 auto; }
+.page-title { font-size: 16px; font-weight: 700; }
+.page-subtitle { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+.topbar-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+.btn-primary { padding: 7px 14px; background: var(--accent); border: 1px solid var(--accent); border-radius: 8px; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background .15s; }
+.btn-primary:hover { background: var(--accent-dark); }
+.btn-ghost { padding: 7px 14px; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; transition: all .15s; }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent-dark); }
+
+/* ── CONTENT ─────────────────────────────────────── */
+.content { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+
+/* ── TOOLBAR ─────────────────────────────────────── */
+.toolbar { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.toolbar-search { position: relative; flex: 1; max-width: 360px; }
+.toolbar-search svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+.toolbar-search input { width: 100%; height: 36px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); padding: 0 12px 0 34px; font-size: 13px; color: var(--text-primary); outline: none; transition: border-color .15s; }
+.toolbar-search input:focus { border-color: var(--accent); }
+.toolbar-search input::placeholder { color: var(--text-muted); }
+.filter-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.filter-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; }
+.chip { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); color: var(--text-secondary); cursor: pointer; background: var(--card); transition: all .15s; white-space: nowrap; }
+.chip:hover { border-color: var(--accent); color: var(--accent-dark); }
+.chip.active { background: var(--accent-light); border-color: var(--accent-light); color: var(--accent-dark); }
+.chip-count { font-size: 10px; font-weight: 700; margin-left: 4px; }
+.toolbar-count { margin-left: auto; font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+
+/* ── TABLE CARD ──────────────────────────────────── */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.card-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 12px; border-bottom: 1px solid var(--border); }
+.card-title { font-size: 14px; font-weight: 700; }
+
+.list-table { width: 100%; border-collapse: collapse; }
+.list-table th { font-size: 10px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--text-muted); padding: 9px 20px; text-align: left; background: var(--surface); border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; white-space: nowrap; }
+.list-table th:hover { color: var(--text-secondary); }
+.sort-hint { color: var(--text-muted); font-size: 9px; margin-left: 3px; }
+.list-table td { padding: 11px 20px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+.list-table tr:last-child td { border-bottom: none; }
+.list-table tr:hover td { background: #f9fdfb; }
+
+.item-cell { display: flex; flex-direction: column; gap: 2px; }
+.item-name { font-weight: 600; }
+.item-sub { font-size: 11px; color: var(--text-muted); }
+
+.progress-wrap { display: flex; flex-direction: column; gap: 4px; min-width: 120px; }
+.progress-bar-bg { height: 6px; border-radius: 3px; background: var(--border); overflow: hidden; }
+.progress-bar-fill { height: 100%; border-radius: 3px; background: var(--accent); transition: width .4s; }
+.progress-bar-fill.near { background: var(--amber); }
+.progress-pct { font-size: 10px; color: var(--text-muted); }
+
+.amount-cell { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.status-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; border-radius: 20px; padding: 2px 7px; }
+.status-badge.active  { background: var(--accent-light); color: var(--accent-dark); }
+.status-badge.ending  { background: var(--amber-light);  color: var(--amber-dark);  }
+.status-badge.paused  { background: #f1f5f9;              color: #64748b;            }
+.status-badge.complete { background: #eff6ff;             color: #1d4ed8;            }
+
+.deadline { font-size: 12px; color: var(--text-secondary); }
+.deadline.urgent { color: var(--amber); font-weight: 700; }
+
+.action-cell { display: flex; align-items: center; gap: 8px; }
+.action-link { font-size: 12px; font-weight: 600; color: var(--accent-dark); cursor: pointer; background: none; border: none; padding: 0; text-decoration: none; }
+.action-link:hover { text-decoration: underline; }
+
+/* ── FOOTER ──────────────────────────────────────── */
+.table-footer { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-top: 1px solid var(--border); background: var(--surface); }
+.footer-count { font-size: 12px; color: var(--text-muted); }
+.pagination { display: flex; align-items: center; gap: 4px; }
+.page-btn { width: 30px; height: 30px; border: 1px solid var(--border); border-radius: 7px; background: var(--card); color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+.page-btn:hover { border-color: var(--accent); color: var(--accent-dark); }
+.page-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="org-switcher">
+    <div class="org-row">
+      <div class="org-avatar">G</div>
+      <span class="org-name">GreenPath Alliance</span>
+      <span class="org-caret"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+    </div>
+    <div class="program-chips">
+      <span class="program-chip active">All Programs</span>
+      <span class="program-chip">Environment</span>
+      <span class="program-chip">Education</span>
+    </div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section-label">Overview</div>
+    <a class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a class="nav-item active">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      Initiatives
+      <span class="nav-badge">9</span>
+    </a>
+    <div class="nav-section-label">Members</div>
+    <a class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Member List
+    </a>
+    <a class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      Segments
+    </a>
+    <div class="nav-section-label">Finance</div>
+    <a class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Reports
+    </a>
+    <div class="nav-section-label">Settings</div>
+    <a class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      Team
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-avatar-sm">CL</div>
+    <div class="user-info"><div class="user-name">Carmen López</div><div class="user-role">Programs Director</div></div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="page-title">Initiatives</div>
+      <div class="page-subtitle">All active and past initiatives</div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn-ghost">Export CSV</button>
+      <button class="btn-primary">+ New Initiative</button>
+    </div>
+  </header>
+
+  <div class="content">
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="toolbar-search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search initiatives…" aria-label="Search">
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Status</span>
+        <span class="chip active">All <span class="chip-count">14</span></span>
+        <span class="chip">Active <span class="chip-count">9</span></span>
+        <span class="chip">Ending Soon <span class="chip-count">2</span></span>
+        <span class="chip">Paused <span class="chip-count">2</span></span>
+        <span class="chip">Complete <span class="chip-count">1</span></span>
+      </div>
+      <span class="toolbar-count">14 initiatives</span>
+    </div>
+
+    <!-- TABLE -->
+    <div class="card">
+      <table class="list-table">
+        <thead>
+          <tr>
+            <th>Initiative<span class="sort-hint">↕</span></th>
+            <th>Status</th>
+            <th>Progress</th>
+            <th>Raised<span class="sort-hint">↕</span></th>
+            <th>Goal<span class="sort-hint">↕</span></th>
+            <th>Deadline<span class="sort-hint">↕</span></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="item-cell"><span class="item-name">Reforestation Drive</span><span class="item-sub">Environment · Q2 2026</span></div></td>
+            <td><span class="status-badge active"><svg width="7" height="7" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg> Active</span></td>
+            <td><div class="progress-wrap"><div class="progress-bar-bg"><div class="progress-bar-fill" style="width:74%"></div></div><span class="progress-pct">74% of goal</span></div></td>
+            <td class="amount-cell">$74,200</td>
+            <td>$100,000</td>
+            <td><span class="deadline">Jun 24, 2026</span></td>
+            <td class="action-cell"><a class="action-link">View →</a></td>
+          </tr>
+          <tr>
+            <td><div class="item-cell"><span class="item-name">Ocean Cleanup Fund</span><span class="item-sub">Environment · Q2 2026</span></div></td>
+            <td><span class="status-badge ending"><svg width="7" height="7" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg> Ending Soon</span></td>
+            <td><div class="progress-wrap"><div class="progress-bar-bg"><div class="progress-bar-fill near" style="width:96%"></div></div><span class="progress-pct">96% of goal</span></div></td>
+            <td class="amount-cell">$192,000</td>
+            <td>$200,000</td>
+            <td><span class="deadline urgent">Jun 7, 2026</span></td>
+            <td class="action-cell"><a class="action-link">View →</a></td>
+          </tr>
+          <tr>
+            <td><div class="item-cell"><span class="item-name">Rural Education Access</span><span class="item-sub">Education · Q3 2026</span></div></td>
+            <td><span class="status-badge active"><svg width="7" height="7" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg> Active</span></td>
+            <td><div class="progress-wrap"><div class="progress-bar-bg"><div class="progress-bar-fill" style="width:48%"></div></div><span class="progress-pct">48% of goal</span></div></td>
+            <td class="amount-cell">$38,400</td>
+            <td>$80,000</td>
+            <td><span class="deadline">Jul 16, 2026</span></td>
+            <td class="action-cell"><a class="action-link">View →</a></td>
+          </tr>
+          <tr>
+            <td><div class="item-cell"><span class="item-name">Community Health Hub</span><span class="item-sub">Health · Q3 2026</span></div></td>
+            <td><span class="status-badge active"><svg width="7" height="7" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg> Active</span></td>
+            <td><div class="progress-wrap"><div class="progress-bar-bg"><div class="progress-bar-fill" style="width:33%"></div></div><span class="progress-pct">33% of goal</span></div></td>
+            <td class="amount-cell">$23,100</td>
+            <td>$70,000</td>
+            <td><span class="deadline">Jul 30, 2026</span></td>
+            <td class="action-cell"><a class="action-link">View →</a></td>
+          </tr>
+          <tr>
+            <td><div class="item-cell"><span class="item-name">Clean Energy Pilot</span><span class="item-sub">Environment · Q4 2026</span></div></td>
+            <td><span class="status-badge paused"><svg width="7" height="7" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg> Paused</span></td>
+            <td><div class="progress-wrap"><div class="progress-bar-bg"><div class="progress-bar-fill" style="width:61%"></div></div><span class="progress-pct">61% of goal</span></div></td>
+            <td class="amount-cell">$305,000</td>
+            <td>$500,000</td>
+            <td><span class="deadline" style="color:var(--text-muted)">—</span></td>
+            <td class="action-cell"><a class="action-link">View →</a></td>
+          </tr>
+          <tr>
+            <td><div class="item-cell"><span class="item-name">Wetlands Restoration</span><span class="item-sub">Environment · Q2 2026</span></div></td>
+            <td><span class="status-badge active"><svg width="7" height="7" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg> Active</span></td>
+            <td><div class="progress-wrap"><div class="progress-bar-bg"><div class="progress-bar-fill" style="width:57%"></div></div><span class="progress-pct">57% of goal</span></div></td>
+            <td class="amount-cell">$28,500</td>
+            <td>$50,000</td>
+            <td><span class="deadline">Jun 30, 2026</span></td>
+            <td class="action-cell"><a class="action-link">View →</a></td>
+          </tr>
+          <tr>
+            <td><div class="item-cell"><span class="item-name">Digital Skills Workshop</span><span class="item-sub">Education · Q2 2026</span></div></td>
+            <td><span class="status-badge ending"><svg width="7" height="7" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg> Ending Soon</span></td>
+            <td><div class="progress-wrap"><div class="progress-bar-bg"><div class="progress-bar-fill near" style="width:88%"></div></div><span class="progress-pct">88% of goal</span></div></td>
+            <td class="amount-cell">$13,200</td>
+            <td>$15,000</td>
+            <td><span class="deadline urgent">Jun 10, 2026</span></td>
+            <td class="action-cell"><a class="action-link">View →</a></td>
+          </tr>
+          <tr>
+            <td><div class="item-cell"><span class="item-name">Winter Food Relief</span><span class="item-sub">Food Security · Q1 2026</span></div></td>
+            <td><span class="status-badge complete"><svg width="7" height="7" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg> Complete</span></td>
+            <td><div class="progress-wrap"><div class="progress-bar-bg"><div class="progress-bar-fill" style="width:100%"></div></div><span class="progress-pct">100% of goal</span></div></td>
+            <td class="amount-cell">$42,000</td>
+            <td>$40,000</td>
+            <td><span class="deadline" style="color:var(--text-muted)">Mar 31, 2026</span></td>
+            <td class="action-cell"><a class="action-link">View →</a></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="table-footer">
+        <span class="footer-count">Showing 1–8 of 14 initiatives</span>
+        <div class="pagination">
+          <button class="page-btn">‹</button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

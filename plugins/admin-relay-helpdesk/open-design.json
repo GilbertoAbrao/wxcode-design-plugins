@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-relay-helpdesk",
-  "title": "Relay Helpdesk Admin",
-  "version": "0.1.0",
-  "description": "Friendly light-mode helpdesk operations dashboard \u2014 left inbox sidebar, topbar with search and assignee filter, 4 KPI cards (open tickets, avg first response, SLA compliance, CSAT), SLA-by-priority bar set, ticket queue table, and team load panel. Accent violet with green/amber/red status semantics.",
+  "title": "Relay Admin",
+  "version": "0.2.0",
+  "description": "Friendly light-mode ops admin aesthetic: near-white slate canvas (#f8fafc), violet accent (#7c3aed / #8b5cf6), status-semantic palette (green / amber / red), Inter type, soft-shadow white cards at 10px radius, fine hairline borders. Archetype = left categorised sidebar + 56px topbar with search and filter dropdown + 4 KPI cards with sparklines + priority-tier bar strip + full-width records table with dual status pills + right load panel with presence indicators. Plus matching list, form, and detail screens.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,14 +19,13 @@
     "operations",
     "web",
     "admin",
-    "helpdesk",
-    "support",
     "light-mode",
     "violet-accent",
-    "friendly",
-    "ticket-queue",
-    "sla",
-    "csat"
+    "status-semantic",
+    "soft-shadow",
+    "dual-pill",
+    "presence-indicator",
+    "sidebar-admin"
   ],
   "compat": {
     "agentSkills": [
@@ -47,13 +46,25 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a helpdesk admin dashboard \u2014 left inbox sidebar, topbar with search and assignee filter, 4 KPI cards (open tickets, first response time, SLA compliance, CSAT), SLA priority bars, ticket queue table with priority and status pills, and a team load panel.",
-        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me a helpdesk admin dashboard \u2014 left inbox sidebar, topbar with search and assignee filter, 4 KPI cards (open tickets, first response time, SLA compliance, CSAT), SLA priority bars, ticket queue table with priority and status pills, and a team load panel."
+        "en": "Apply this friendly violet-accent light-mode admin aesthetic to my domain — categorised sidebar, topbar with search and filter dropdown, 4 KPI cards with sparklines, priority-tier bar strip, full-width records table with dual status pills, right load panel with presence indicators, plus list, form, and detail screens.",
+        "zh-CN": "将这个友好的浅色模式紫罗兰强调色管理界面应用到我的领域：分类侧边栏、带搜索和筛选下拉的顶栏、4 个带迷你图的 KPI 卡片、优先级条形条、带双状态标签的全宽记录表格、带在线状态指示器的右侧负载面板，以及配套的列表、表单和详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Relay Helpdesk Admin"
+          "title": "Relay Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Relay Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Relay Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Relay Admin — Detail"
         }
       ]
     },
@@ -71,7 +82,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {
@@ -90,8 +107,8 @@
       "fs:write"
     ],
     "provenance": {
-      "category": "themeforest-admin-templates",
-      "note": "category design-language reference only; original implementation"
+      "category": "admin-dashboards",
+      "note": "original archetype; no third-party template reproduced"
     }
   }
 }

@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-quartz-lms",
-  "title": "Quartz LMS Admin",
-  "version": "0.1.0",
-  "description": "Friendly-academic LMS administration dashboard \u2014 purple accent, left sidebar with school/program switcher, topbar with term selector, 4 KPI tiles (active students, courses, completion rate, avg score), enrollment/completion chart, courses table with progress bars, and upcoming assignments panel.",
+  "title": "Quartz Admin",
+  "version": "0.2.0",
+  "description": "Friendly light-mode admin aesthetic: near-white canvas (#faf9fc), purple accent (#9333ea), white cards with soft shadow, left sidebar with entity switcher and grouped nav, top bar with search and period selector, 4 KPI tiles, dual-line area chart, upcoming-items side panel, and records table with category tag pills and progress bars.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,12 +19,11 @@
     "operations",
     "web",
     "admin",
-    "education",
-    "lms",
     "light-mode",
-    "friendly-academic",
-    "purple",
-    "learning-management"
+    "purple-accent",
+    "soft-card",
+    "category-tags",
+    "friendly-admin"
   ],
   "compat": {
     "agentSkills": [
@@ -45,13 +44,29 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a friendly academic LMS admin dashboard \u2014 left sidebar with school switcher, topbar with term selector, 4 KPI tiles (active students, courses, completion rate, avg score), enrollment/completion chart, courses table, and upcoming assignments panel.",
-        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me a friendly academic LMS admin dashboard \u2014 left sidebar with school switcher, topbar with term selector, 4 KPI tiles (active students, courses, completion rate, avg score), enrollment/completion chart, courses table, and upcoming assignments panel."
+        "en": "Apply this friendly light-mode purple admin aesthetic to my domain",
+        "zh-CN": "将这个友好的浅色模式紫色管理界面风格应用到我的领域"
       },
       "exampleOutputs": [
         {
-          "path": "./example.html",
-          "title": "Quartz LMS Admin"
+          "path": "./assets/dashboard.html",
+          "title": "Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Records List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "New Record Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Record Detail"
+        },
+        {
+          "path": "./assets/template.html",
+          "title": "Template Seed"
         }
       ]
     },
@@ -69,7 +84,12 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {

@@ -3,8 +3,8 @@
   "specVersion": "1.0.0",
   "name": "wxcode-admin-cargo-fleet",
   "title": "Cargo Fleet Admin",
-  "version": "0.1.0",
-  "description": "Industrial-clean logistics admin for fleet & shipment operations \u2014 left hub/region sidebar, topbar with region filter, 4 KPI cards (in-transit / on-time rate / active fleet / warehouse utilization), a Kanban-style shipment status board, an original abstract route/region SVG visualization, and a live active-shipments table. Orange-amber accent on white/slate canvas.",
+  "version": "0.2.0",
+  "description": "Industrial-clean light-mode admin aesthetic: white/slate canvas, dark-navy sidebar, orange-amber accent family, crisp status pills, and compact bordered cards. Archetype = branded sidebar with entity switcher and grouped nav + topbar with search and context filter + 4 KPI cards + 2-column middle (Kanban status board + abstract network visualization) + full-width records table with status pills, plus matching list, form, and detail screens.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,14 +19,14 @@
     "operations",
     "web",
     "admin",
-    "logistics",
-    "fleet",
-    "shipments",
     "light-mode",
     "industrial-clean",
     "orange-accent",
     "kanban",
-    "status-board"
+    "status-board",
+    "network-visualization",
+    "data-table",
+    "enterprise"
   ],
   "compat": {
     "agentSkills": [
@@ -47,13 +47,25 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me an industrial-clean cargo fleet admin dashboard \u2014 left sidebar with hub/region switcher, topbar with search and region filter, 4 KPI cards (in transit, on-time rate, active fleet, warehouse utilization), a shipment status board (Pending / Loading / In Transit / Delivered), a route/region visualization, and an active shipments table.",
-        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me an industrial-clean cargo fleet admin dashboard \u2014 left sidebar with hub/region switcher, topbar with search and region filter, 4 KPI cards (in transit, on-time rate, active fleet, warehouse utilization), a shipment status board, a route visualization, and an active shipments table."
+        "en": "Apply this industrial-clean light admin aesthetic to my domain — white/slate canvas, dark-navy sidebar with entity switcher and grouped nav, topbar with search and context filter, 4 KPI cards, a Kanban status board, an abstract network visualization, and a full-width records table with status pills, plus list, form, and detail screens.",
+        "zh-CN": "将这个工业清洁风格浅色管理后台应用到我的领域：白色/石板色画布、深海军蓝侧边栏（带实体切换器和分组导航）、顶部栏（搜索 + 上下文筛选器）、4 个 KPI 卡片、看板状态面板、抽象网络可视化图，以及带状态标签的全宽记录表格，并配套列表、表单、详情页面。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Cargo Fleet Admin"
+          "title": "Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Records List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "New Record Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Record Detail"
         }
       ]
     },
@@ -71,7 +83,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {
@@ -90,8 +108,8 @@
       "fs:write"
     ],
     "provenance": {
-      "category": "themeforest-admin-templates",
-      "note": "category design-language reference only; original implementation"
+      "category": "admin-dashboards",
+      "note": "original archetype; no third-party template reproduced"
     }
   }
 }

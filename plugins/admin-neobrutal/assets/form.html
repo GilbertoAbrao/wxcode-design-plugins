@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio OS — New Project</title>
+<style>
+  :root {
+    --ink:   #000000;
+    --coral: #F5A86E;
+    --lime:  #8FD14F;
+    --cream: #FFF5E6;
+    --paper: #ffffff;
+    --lav:   #B8A4FF;
+    --yell:  #FDE74C;
+    --font-mono: ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --font-ui:   system-ui,-apple-system,sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-ui); background: var(--paper); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
+  .shell { display: flex; flex: 1; min-height: 0; }
+
+  /* SIDEBAR */
+  .sidebar { width: 220px; min-width: 220px; border-right: 3px solid var(--ink); display: flex; flex-direction: column; }
+  .sidebar-brand { background: var(--coral); border-bottom: 3px solid var(--ink); padding: 18px 16px; }
+  .brand-eyebrow { font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7; }
+  .brand-name { font-family: var(--font-mono); font-size: 18px; font-weight: 700; letter-spacing: -0.02em; margin-top: 2px; }
+  .sidebar-nav { list-style: none; padding: 12px 0; flex: 1; }
+  .sidebar-nav li a { display: flex; align-items: center; gap: 10px; padding: 10px 16px; font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; color: var(--ink); border-left: 3px solid transparent; }
+  .sidebar-nav li a .glyph { font-size: 14px; width: 16px; text-align: center; flex-shrink: 0; }
+  .sidebar-nav li.active a { background: var(--lime); border-left-color: var(--ink); }
+  .sidebar-nav li a:hover { background: var(--cream); }
+  .sidebar-footer { border-top: 2px solid var(--ink); padding: 12px 16px; }
+  .user-block { display: flex; align-items: center; gap: 10px; }
+  .avatar-sm { width: 32px; height: 32px; background: var(--coral); border: 2px solid var(--ink); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .user-name { font-family: var(--font-mono); font-size: 12px; font-weight: 700; }
+  .user-role { font-family: var(--font-mono); font-size: 10px; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* MAIN */
+  .main-col { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar { border-bottom: 3px solid var(--ink); padding: 12px 24px; display: flex; align-items: center; gap: 12px; }
+  .topbar-title { font-family: var(--font-mono); font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; flex-shrink: 0; }
+  .topbar-actions { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+  .topbar-avatar { width: 36px; height: 36px; background: var(--coral); border: 2px solid var(--ink); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 13px; font-weight: 700; }
+
+  .content { flex: 1; overflow-y: auto; padding: 24px; }
+
+  /* BREADCRUMB */
+  .breadcrumb { font-family: var(--font-mono); font-size: 11px; opacity: 0.55; margin-bottom: 16px; }
+  .breadcrumb a { color: var(--ink); text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+
+  /* PAGE HEADER */
+  .page-header { margin-bottom: 24px; }
+  .page-title { font-family: var(--font-mono); font-size: 20px; font-weight: 700; }
+  .page-sub { font-family: var(--font-mono); font-size: 11px; opacity: 0.55; margin-top: 4px; }
+
+  /* FORM CARD */
+  .form-card { border: 3px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); margin-bottom: 16px; }
+  .form-card-header { background: var(--ink); color: var(--paper); padding: 10px 16px; }
+  .form-section-title { font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+  .form-card-body { padding: 20px 16px; }
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 20px; }
+  .field.full { grid-column: 1 / -1; }
+
+  /* FIELDS */
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field-label { font-family: var(--font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 4px; }
+  .req { color: #c00; }
+  .control { font-family: var(--font-mono); font-size: 13px; color: var(--ink); background: var(--cream); border: 2px solid var(--ink); padding: 8px 10px; outline: none; width: 100%; }
+  .control:focus { background: var(--paper); box-shadow: 2px 2px 0 var(--ink); }
+  select.control { cursor: pointer; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='0,0 5,6 10,0' stroke='%23000' stroke-width='1.5' stroke-linecap='square'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; }
+  textarea.control { resize: vertical; min-height: 80px; }
+  .helper { font-family: var(--font-mono); font-size: 10px; opacity: 0.55; line-height: 1.5; }
+
+  /* INVALID FIELD */
+  .field.invalid .control { border-color: #c00; background: #fff0f0; }
+  .field.invalid .control:focus { box-shadow: 2px 2px 0 #c00; }
+  .error-msg { font-family: var(--font-mono); font-size: 10px; color: #c00; font-weight: 700; display: flex; align-items: center; gap: 4px; }
+
+  /* FORM FOOTER */
+  .form-footer { display: flex; align-items: center; justify-content: space-between; padding: 12px 0 0; }
+  .form-hint { font-family: var(--font-mono); font-size: 11px; opacity: 0.55; }
+  .footer-actions { display: flex; align-items: center; gap: 10px; }
+  .btn-cancel { background: var(--paper); border: 2px solid var(--ink); font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 8px 16px; cursor: pointer; color: var(--ink); }
+  .btn-cancel:hover { background: var(--cream); }
+  .btn-submit { background: var(--lime); border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 8px 20px; cursor: pointer; color: var(--ink); }
+  .btn-submit:disabled { background: #D0D0D0; box-shadow: none; cursor: not-allowed; opacity: 0.6; }
+
+  /* FOOTER */
+  .footer { border-top: 3px solid var(--ink); background: var(--ink); color: var(--paper); padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .footer-meta { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; opacity: 0.7; display: flex; gap: 20px; }
+  .footer-link { background: var(--coral); color: var(--ink); border: 2px solid var(--paper); font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 10px; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-eyebrow">Atelier Mosaic</div>
+      <div class="brand-name">Studio OS</div>
+    </div>
+    <ul class="sidebar-nav">
+      <li><a href="#"><span class="glyph">&gt;</span>Dashboard</a></li>
+      <li class="active"><a href="#"><span class="glyph">#</span>Projects</a></li>
+      <li><a href="#"><span class="glyph">*</span>Clients</a></li>
+      <li><a href="#"><span class="glyph">+</span>Invoices</a></li>
+      <li><a href="#"><span class="glyph">%</span>Time Logs</a></li>
+      <li><a href="#"><span class="glyph">@</span>Settings</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <div class="user-block">
+        <div class="avatar-sm">LC</div>
+        <div>
+          <div class="user-name">Lena Chai</div>
+          <div class="user-role">Studio Lead</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-col">
+    <header class="topbar">
+      <span class="topbar-title">New Project</span>
+      <div class="topbar-actions">
+        <div class="topbar-avatar">LC</div>
+      </div>
+    </header>
+
+    <main class="content">
+      <div class="breadcrumb"><a href="#">Projects</a> › New Project</div>
+      <div class="page-header">
+        <div class="page-title">New Project</div>
+        <div class="page-sub">All fields marked <span style="color:#c00;font-family:var(--font-mono);">*</span> are required.</div>
+      </div>
+
+      <form novalidate>
+        <!-- SECTION: Details -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <div class="form-section-title">Project Details</div>
+          </div>
+          <div class="form-card-body">
+            <div class="field-grid">
+
+              <!-- Client — required select -->
+              <div class="field">
+                <label class="field-label" for="client">Client <span class="req">*</span></label>
+                <select id="client" class="control">
+                  <option value="">Select a client…</option>
+                  <option>Vanta Supply Co.</option>
+                  <option>Helix Foundation</option>
+                  <option>Maru Sportswear</option>
+                  <option>Crest Architecture</option>
+                </select>
+                <span class="helper">The billing client for this project.</span>
+              </div>
+
+              <!-- Title — required, invalid example -->
+              <div class="field invalid">
+                <label class="field-label" for="title">Project Title <span class="req">*</span></label>
+                <input id="title" class="control" type="text" value="" aria-invalid="true" placeholder="e.g. Brand Identity Relaunch">
+                <span class="error-msg">
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4.5" stroke="#c00" stroke-width="1"/><line x1="5" y1="2.5" x2="5" y2="5.5" stroke="#c00" stroke-width="1.5" stroke-linecap="square"/><circle cx="5" cy="7.5" r="0.75" fill="#c00"/></svg>
+                  Title is required.
+                </span>
+              </div>
+
+              <!-- Owner — required select -->
+              <div class="field">
+                <label class="field-label" for="owner">Owner <span class="req">*</span></label>
+                <select id="owner" class="control">
+                  <option value="">Assign an owner…</option>
+                  <option selected>Lena Chai (LC)</option>
+                  <option>Marcus Obi (MO)</option>
+                  <option>Rosa Birch (RB)</option>
+                  <option>Pita Kua (PK)</option>
+                </select>
+                <span class="helper">Responsible for delivery and client communication.</span>
+              </div>
+
+              <!-- Due Date — required, not in the past -->
+              <div class="field">
+                <label class="field-label" for="due">Due Date <span class="req">*</span></label>
+                <input id="due" class="control" type="date" value="2024-07-15">
+                <span class="helper">Must be today or a future date.</span>
+              </div>
+
+              <!-- Priority -->
+              <div class="field">
+                <label class="field-label" for="priority">Priority</label>
+                <select id="priority" class="control">
+                  <option value="">Select priority…</option>
+                  <option selected>Normal</option>
+                  <option>High</option>
+                  <option>Urgent</option>
+                </select>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION: Brief -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <div class="form-section-title">Brief</div>
+          </div>
+          <div class="form-card-body">
+            <div class="field-grid">
+              <div class="field full">
+                <label class="field-label" for="brief">Project Brief</label>
+                <textarea id="brief" class="control" placeholder="Describe the scope, goals, and deliverables…"></textarea>
+                <span class="helper">Optional. Visible to the project team and client.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <span class="form-hint">Fields marked <span class="req">*</span> are required.</span>
+          <div class="footer-actions">
+            <button type="button" class="btn-cancel">Cancel</button>
+            <button type="submit" class="btn-submit" disabled>Create Project</button>
+          </div>
+        </div>
+      </form>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-meta">
+        <span>Studio OS v1.4.2</span>
+        <span>Build #20240527</span>
+        <span>ENV: production</span>
+      </div>
+      <a href="#" class="footer-link">Support</a>
+    </footer>
+  </div>
+</div>
+</body>
+</html>

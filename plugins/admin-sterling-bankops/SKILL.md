@@ -1,25 +1,25 @@
 ---
 name: admin-sterling-bankops
 description: |
-  Retail banking back-office operations dashboard archetype:
-  sober light-mode, slate-blue (#475569 / #334155) + emerald (#10b981)
-  accent palette. Left sidebar with branch/unit switcher and grouped
-  nav, topbar with global search + period selector + avatar, 4 KPI
-  cards (pending approvals, transactions today, flagged items, SLA met %),
-  an approvals queue with Approve / Reject inline actions, a transactions
-  table with status pills, a risk/exceptions side panel, and an inline
-  SVG throughput chart. Use when the brief involves banking operations,
-  back-office workflows, compliance queues, or treasury/clearing rooms.
+  Sober light-mode admin aesthetic: white card surfaces on a cool-grey page
+  (#f7f8fa), slate-blue (#475569 / #334155) structural chrome with an emerald
+  (#10b981) positive accent, Inter type with tabular-nums on every figure,
+  comfortable 14px density, 10px card radii, 1px #e4e7ec borders, and crisp
+  status pills. Archetype = grouped-nav sidebar (entity switcher + section
+  labels) + white topbar (search + period tabs + avatar) + 4 KPI cards + 2-column
+  grid: an action-queue panel (inline approve / reject per row) + a severity-feed
+  side panel, a full-width records table with status pills, and an inline bar
+  chart. Built for clarity and institutional trust.
 triggers:
-  - "banking operations dashboard"
-  - "bank back-office admin"
-  - "approvals queue dashboard"
-  - "retail banking admin"
-  - "transaction operations"
-  - "clearing operations"
-  - "compliance dashboard"
-  - "painel operações bancárias"
-  - "银行运营后台"
+  - "sober light-mode admin"
+  - "slate-blue sidebar admin"
+  - "institutional trust dashboard"
+  - "emerald accent light admin"
+  - "approval queue admin panel"
+  - "light-mode operations console"
+  - "white card dense table admin"
+  - "grouped sidebar admin"
+example_prompt: "Apply this sober light-mode admin aesthetic to my domain"
 od:
   mode: prototype
   surface: web
@@ -32,124 +32,169 @@ od:
     sections: [color, typography, layout, components]
   craft:
     requires: [pixel-discipline, laws-of-ux]
-  example_prompt: "Build me a retail banking back-office operations admin dashboard — left sidebar with branch switcher, topbar with period picker, 4 KPI cards (pending approvals, transactions today, flagged items, SLA met %), an approvals queue with Approve/Reject actions, a transactions table, a risk/exceptions side panel, and a throughput chart."
 ---
 
-# Sterling Bank Ops Admin Skill
+# Sterling Admin — Visual Archetype
 
-Produce the canonical retail banking back-office operations layout —
-the kind of interface used by operations staff at regional and national
-banks to manage daily transaction flow, approvals, risk flags, and SLA
-compliance.
+This plugin contributes a **look** (sober light-mode, slate-blue chrome, emerald
+positive accent, white cards, dense tabular data) and a **structure** (grouped-nav
+sidebar + white topbar + 4 KPI cards + action-queue panel + severity-feed side
+panel + records table + bar chart). It does **not** contribute a domain — the
+subject matter comes from the Knowledge Base and the user's prompt. Treat the
+example below as illustration only.
 
-## Palette contract
+## Visual language        (AUTHORITATIVE)
 
-All chromatic tokens live on `:root` as CSS custom properties.
-No chromatic hex literals appear in rules or inline SVG.
+The non-negotiable look. Declare every chromatic value as a `:root` CSS custom
+property; keep the neutral light ramp hardcoded.
 
-| Token | Value | Use |
-|---|---|---|
-| `--accent` | `#475569` | Sidebar, nav active, primary buttons |
-| `--accent-deep` | `#334155` | Sidebar bg, pressed states |
-| `--accent-tint` | `#f1f5f9` | Nav item hover, tile bg tint |
-| `--emerald` | `#10b981` | Positive status pills, Approve button |
-| `--emerald-tint` | `#d1fae5` | Approved pill bg |
-| `--amber` | `#f59e0b` | Warning flags |
-| `--amber-tint` | `#fef3c7` | Warning pill bg |
-| `--red` | `#ef4444` | Rejected, flagged, SLA-breach |
-| `--red-tint` | `#fee2e2` | Flagged pill bg |
+- **Canvas / surfaces:** page `#f7f8fa`; card / sidebar top `#ffffff`; sidebar
+  chrome `var(--accent-deep)` = `#334155`; sidebar item hover `var(--accent-tint)`
+  = `#f1f5f9`; hairline border `#e4e7ec`; row divider `#f7f8fa`.
+- **Text ramp:** primary `#1e293b`; secondary `#475569`; muted `#64748b`; faint
+  `#94a3b8`.
+- **Accent:** `--accent: #475569` (slate-blue), `--accent-deep: #334155` (pressed /
+  sidebar bg). Sidebar active bar, primary buttons, focus rings, table row hover.
+- **Positive / approve:** `--emerald: #10b981`, `--emerald-tint: #d1fae5`. Settled
+  pills, approve button, positive delta chips, peak chart bar.
+- **Warning:** `--amber: #f59e0b`, `--amber-tint: #fef3c7`. Warning flags, delta
+  chips on increases that are undesirable (e.g. pending count up).
+- **Critical / reject:** `--red: #ef4444`, `--red-tint: #fee2e2`. Flagged pills,
+  reject button, critical severity dots, negative delta chips.
+- **Typography:** `"Inter", system-ui, -apple-system, "Segoe UI", Roboto,
+  sans-serif`. Base 14px / line-height 1.5. `font-variant-numeric: tabular-nums`
+  on **every** numeric cell and KPI figure. Section labels 10px / uppercase /
+  `letter-spacing: .08em` / weight 600 / muted. KPI figures 30–32px / weight 700.
+  Mono IDs and codes: inherit Inter with `font-variant-numeric: tabular-nums`.
+- **Density & radius:** comfortable — 18–20px card padding, 11px vertical row
+  padding, 16px gaps; card radius 10px, button radius 6–8px, pill radius 20px,
+  badge radius 10px. Subtle `0 1px 4px rgba(0,0,0,.05)` card shadows.
+- **Borders & shadows:** 1px `#e4e7ec` lines do the separation work; 1px
+  `#f7f8fa` row dividers inside tables. Cards have the single 1px shadow above;
+  modals would use a stronger shadow, but no modals in this archetype.
+- **Motion:** `.15s` background/border/opacity hover transitions. Period tab active
+  state: white bg + box-shadow. No bouncy or entrance animations.
 
-Neutrals are hardcoded (never overridden by palette swap):
-`#ffffff` cards, `#f7f8fa` page bg, `#e4e7ec` borders,
-`#1e293b` primary text, `#64748b` secondary text, `#94a3b8` muted.
+## Layout archetype       (AUTHORITATIVE, domain-neutral)
+
+Regions and component patterns described by shape and behavior — not meaning.
+
+- **Left sidebar** (240px, fixed, `var(--accent-deep)` bg): brand mark (inline SVG
+  + wordmark, white) → **entity / scope switcher** (rounded pill with label + value
+  + chevron, white/translucent) → **grouped nav** (2–4 named sections, each with
+  icon-label items; active item has a 3px left bar in `--emerald` + translucent bg;
+  badge counts float right on affected items) → footer strip (avatar initials
+  bubble + name + role + settings icon).
+- **Top bar** (56px, `#ffffff`, 1px `#e4e7ec` bottom border): page title +
+  breadcrumb → flexible **search** input (icon prefix, `#f7f8fa` bg, focus
+  border-color `--accent`) → **period selector** tabs (Today / Week / Month /
+  Quarter, pill group, active tab gets white bg + shadow) → notification bell with
+  amber badge dot → avatar chip.
+- **KPI card row** (4 cards, equal grid): each card = white 10px-radius panel with
+  1px shadow. Top: `[uppercase label + large figure]` left, `[icon chip colored by
+  state]` right. Bottom: delta chip (`.up` / `.down` / `.warn`) + "vs …" sub-text.
+- **2-column grid (2/3 left + 1/3 right):**
+  - **Left — action-queue card:** titled panel with "View all →" link; dense table
+    rows of `[mono ID] [person] [type] [right-aligned amount] [time] [inline
+    Approve + Reject buttons]`. Followed below by a **records table card** with
+    filter tabs (All / sub-types) and status pills.
+  - **Right — severity-feed card:** titled panel; list rows of `[severity dot] +
+    [description + entity ref + timestamp + acknowledge link]`. Below it: an
+    **inline bar chart card** with hourly/periodic bars (`--accent` color, peak bar
+    `--emerald`), x-axis labels, y-axis range.
+- **Full-width records table** (list screen): search + filter chip toolbar; dense
+  table with sticky uppercase header, status pills, mono ID column, right-aligned
+  numerics, footer with result count + pager.
+- **Record form screen:** sectioned cards of labelled fields; **rules appear as
+  inline validation** — required marks (`*`), helper text under the field, and
+  inline error messages on invalid fields, submit disabled until valid. No
+  rules/checklist/validation-status panel.
+- **Record detail screen:** breadcrumb → header band (mono ID + status pill + action
+  buttons) → meta grid (label/value pairs, 3-col) → one or more related sub-panels
+  (a table or list of related records + an activity feed/timeline).
+
+## Applying to a domain   (the contract)
+
+The domain comes from the Knowledge Base + the user's prompt. Extract THIS
+domain's equivalent of the archetype slots — its primary entities, key metrics,
+status states, queue columns, form fields and their rules, and detail fields —
+and map them onto the archetype above. If no KB/domain is supplied (standalone),
+use the Example instantiation below.
+
+Do NOT invent a "rules" / "checklist" / "validation-status" panel; domain rules
+become inline field validation. Do NOT render build/implementation notes or
+designer controls — every screen is a finished product screen.
+
+## Example instantiation (illustrative only — NOT the domain)
+
+> One concrete example so standalone Open Design has a complete brief. In WXCode
+> this is IGNORED — replace every label with the real domain's equivalent
+> (entities, metrics, states, columns, fields) drawn from the KB + prompt.
+
+```
+Domain (illustrative): a retail banking back-office operations centre.
+
+Entity switcher  → branch scope: "Main Branch · All Units".
+Period selector  → Today / Week / Month / Quarter.
+Sidebar sections → MAIN (Operations Center), OPERATIONS (Today's Transactions,
+                   Clearing Room), COMPLIANCE (Approvals Queue, Wire Transfers,
+                   Loan Disbursements, FX & Trade, Risk & AML, Audit Trail),
+                   SETTINGS (Preferences).
+
+KPI cards (4):
+  • Pending Approvals — amber icon, ~38, warn delta "↑ 14% vs yesterday".
+  • Transactions Today — emerald icon, ~1,247, up delta "↑ 8.3%".
+  • Flagged Items — red icon, ~12, down delta "↓ 2 vs yesterday".
+  • SLA Met — accent icon, ~96.4%, up delta "↑ 0.4 pp vs last week".
+
+Action-queue card → "Pending Approvals" — table columns:
+  Request ID (mono) / Requestor / Type / Amount (right-aligned) / Submitted /
+  Actions (Approve + Reject inline). Types: Wire Transfer, Loan Disbursement,
+  Account Override, Limit Increase, FX Trade.
+
+Records table card → "Today's Transactions" with filter tabs (All / Credit /
+  Debit / Pending / Flagged). Columns: Txn ID (mono) / Account / Type /
+  Amount / Time / Status pill (Settled, Pending, Flagged, Reversed).
+
+Severity-feed card → "Risk & Exceptions" — rows: severity dot (red/amber/emerald)
+  + description + entity ref + timestamp + Acknowledge link.
+
+Bar chart card     → "Transaction Throughput" — 12 hourly bars (08–19),
+  --accent bars, peak bar --emerald. Y-axis settlements per hour.
+
+List screen        → all records, search + filter chips (by status, by type),
+  paginated.
+
+Form screen        → "New Request": entity reference (required), type (required
+  select), amount (required, > 0), counterparty name (required), requested date
+  (required, not in the past), notes. Rules as required marks + helper text +
+  inline errors; submit disabled until valid.
+
+Detail screen      → one record: breadcrumb → header (mono ID + status pill +
+  Edit/Approve/Reject actions) → meta grid (type, amount, counterparty, date,
+  requestor, created) → related sub-table (linked transactions) + activity feed.
+```
 
 ## Workflow
 
-1. Read the active DESIGN.md (if present); if a brand color is defined,
-   map it onto `--accent` and `--accent-deep`. Otherwise use the
-   sterling defaults above.
-2. Extract from the brief: institution name, branch list (default:
-   "Main Branch · All Units"), operator name for the avatar.
-3. Invent plausible banking data: account refs (format `SB-XXXXX`),
-   transaction amounts in local currency, staff names, queue depths.
-   Never use Lorem Ipsum. All copy must read as real bank-ops content.
-
-## Layout
-
-### Left sidebar (240px, fixed)
-
-- **Top**: bank logo mark (inline SVG shield/column motif) + institution
-  name in `--accent-deep`. Below: branch/unit dropdown switcher with
-  a chevron icon.
-- **Nav sections** (MAIN, OPERATIONS, COMPLIANCE, SETTINGS), each item:
-  inline SVG icon (16 px, `currentColor`) + label. Active item gets a
-  3px `--accent` left bar and `--accent-tint` background. Hover uses
-  `--accent-tint`.
-- **Bottom**: operator avatar initials bubble + name + role label +
-  gear/settings icon.
-
-### Top bar (56px, white, 1px border-bottom `#e4e7ec`)
-
-Left: page title "Operations Center" + breadcrumb (Home / Operations).
-Center: search input (`placeholder="Search accounts, refs, staff…"`).
-Right: period selector tabs (Today / Week / Month / Quarter), then
-notification bell with amber badge, then avatar.
-
-### KPI cards strip (4 cards, equal width)
-
-Each card: white, 10px radius, subtle shadow. Contents:
-- Tiny inline SVG icon (24 px, `currentColor`, colored via icon wrapper).
-- Small uppercase label (`font-size:11px; letter-spacing:.06em`).
-- Large figure (`font-size:32px; font-weight:700; font-variant-numeric:tabular-nums`).
-- Delta chip: green ↑ or amber/red ↓ + percent.
-- Tiny label "vs yesterday" or "vs last week".
-
-Cards (in order):
-1. **Pending Approvals** — accent icon, figure ~38, amber delta chip.
-2. **Transactions Today** — emerald icon, figure ~1,247, green chip.
-3. **Flagged Items** — red icon, figure ~12, red delta chip.
-4. **SLA Met** — emerald icon, figure ~96.4 %, green chip.
-
-### Main grid (2/3 left + 1/3 right)
-
-**Left column (2/3)**:
-
-*Approvals Queue card* — title "Pending Approvals" + "View all →" link.
-Table: Request ID / Requestor / Type / Amount / Submitted / Actions.
-5–6 rows. Types: Wire Transfer, Loan Disbursement, Account Override,
-Limit Increase, FX Trade. Actions: `<button>Approve</button>` (emerald,
-small) + `<button>Reject</button>` (red-tinted, small).
-
-*Transactions card* (below approvals) — title "Today's Transactions" +
-filter tabs (All / Credit / Debit / Pending / Flagged).
-Table columns: Txn ID / Account / Type / Amount / Time / Status.
-6–8 rows with status pills: Settled (emerald), Pending (amber),
-Flagged (red), Reversed (muted). Amounts use `tabular-nums`.
-
-**Right column (1/3)**:
-
-*Risk & Exceptions panel* — title "Risk & Exceptions". List of 5–6
-exception items, each: severity dot (red/amber/emerald) + short
-description + account ref + timestamp. "Acknowledge" text-link per item.
-
-*Throughput chart card* — title "Transaction Throughput" + subtitle
-"Settlements per hour — today". Inline SVG bar chart (12 hourly bars,
-8 AM–7 PM). Bars colored `--accent`, tallest bar highlighted
-`--emerald`. X-axis hour labels, Y-axis count. No external libraries.
-
-## Type rules
-
-- Font stack inline only: `"Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`.
-- No `@import` or `<link>` for fonts.
-- `font-variant-numeric: tabular-nums` on all numeric cells and KPI figures.
-- Uppercase section labels: `font-size:10px; letter-spacing:.08em; font-weight:600`.
+1. Read the active DESIGN.md (if present); otherwise use this plugin's Visual
+   language tokens.
+2. Extract THIS domain's equivalent of the archetype slots — primary entities,
+   key metrics, status states, queue/table columns, form fields + rules, detail
+   fields — from the KB + prompt. Standalone: use the Example instantiation above.
+3. Build each screen in the Visual language + Layout archetype above, imitating
+   the example set in `assets/` (dashboard, list, form, detail) and the
+   `assets/template.html` seed — with fresh content for the real domain, NOT the
+   example labels.
+4. Express domain rules as INLINE field validation (required marks, helper text,
+   inline errors, disabled-until-valid submit). Never render
+   rules/checklist/validation-status/build-note panels or designer/demo controls.
+5. One inline `<style>`, semantic HTML5, `tabular-nums` on figures, no external
+   assets, no CDNs — self-contained.
 
 ## Output contract
 
 ```
-<artifact identifier="admin-sterling-bankops" type="text/html" title="Sterling Bank Ops Admin">
+<artifact identifier="admin-sterling-bankops" type="text/html" title="Sterling Admin">
 <!doctype html>...</artifact>
 ```
-
-Single `<style>` block, semantic HTML5, all CSS inline in `<style>`,
-all SVG inline, no external assets, no CDNs, 10–30 KB target.

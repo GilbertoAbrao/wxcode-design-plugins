@@ -3,8 +3,8 @@
   "specVersion": "1.0.0",
   "name": "wxcode-admin-saas-bestseller",
   "title": "SaaS Admin Bestseller",
-  "version": "0.1.0",
-  "description": "The market-leading SaaS admin archetype \u2014 polished light-mode dashboard with collapsible sidebar, breadcrumb topbar, 4 stat tiles, primary chart, recent table, side activity. Modeled after the Metronic / Vuexy / Velzon family that dominates Themeforest's admin category.",
+  "version": "0.2.0",
+  "description": "Polished light-mode admin aesthetic: near-white canvas (#f5f7fa), white card surfaces, indigo accent (#5369f8), soft card shadows, 12px radius, system font stack. Archetype = collapsible 256px grouped-nav sidebar + breadcrumb topbar + greeting strip + 4 stat tiles with sparklines + 8/4 mid-grid (area chart / activity feed) + full-width records table, plus matching list, form, and detail screens.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,11 +19,11 @@
     "operations",
     "web",
     "admin",
-    "saas-admin",
-    "enterprise",
-    "best-seller",
     "light-mode",
     "clean-cards",
+    "indigo-accent",
+    "soft-shadow",
+    "sidebar-nav",
     "polished"
   ],
   "compat": {
@@ -45,13 +45,25 @@
     },
     "useCase": {
       "query": {
-        "en": "Build me a polished SaaS admin dashboard for a B2B product \u2014 left sidebar, breadcrumb topbar, 4 KPI tiles, revenue chart, recent customers table, activity feed.",
-        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aBuild me a polished SaaS admin dashboard for a B2B product \u2014 left sidebar, breadcrumb topbar, 4 KPI tiles, revenue chart, recent customers table, activity feed."
+        "en": "Apply this polished light-mode admin aesthetic to my domain — near-white canvas, indigo accent, grouped-nav sidebar, breadcrumb topbar, 4 stat tiles with sparklines, an area-chart card with an activity feed, and a dense records table, plus list, form, and detail screens.",
+        "zh-CN": "将这个精致的浅色管理界面风格应用到我的领域：近白色画布、靛蓝强调色、分组导航侧边栏、面包屑顶栏、4个带迷你图的统计卡片、带活动信息流的面积图卡片和密集的记录表格，以及列表、表单和详情页面。"
       },
       "exampleOutputs": [
         {
-          "path": "./example.html",
-          "title": "SaaS Admin Bestseller"
+          "path": "./assets/dashboard.html",
+          "title": "SaaS Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "SaaS Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "SaaS Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "SaaS Admin — Detail"
         }
       ]
     },
@@ -69,7 +81,13 @@
         "laws-of-ux"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {

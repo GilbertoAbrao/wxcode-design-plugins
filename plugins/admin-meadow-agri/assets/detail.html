@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meadow Admin — Record Detail</title>
+<style>
+:root {
+  --accent: #16a34a;
+  --accent-hover: #22c55e;
+  --accent-muted: rgba(22,163,74,0.10);
+  --accent-border: rgba(22,163,74,0.30);
+  --earth: #a16207;
+  --earth-light: #fef3c7;
+  --earth-border: #fde68a;
+  --state-healthy: #16a34a;
+  --state-healthy-bg: #dcfce7;
+  --state-moderate: #d97706;
+  --state-moderate-bg: #fef3c7;
+  --state-attention: #dc2626;
+  --state-attention-bg: #fee2e2;
+  --state-online: #16a34a;
+  --state-online-bg: #dcfce7;
+  --state-warning: #d97706;
+  --state-warning-bg: #fef3c7;
+  --state-offline: #64748b;
+  --state-offline-bg: #f1f5f9;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:14px;line-height:1.5;color:#1e293b;background:#f7faf5;min-height:100vh;display:flex;}
+.sidebar{width:240px;min-height:100vh;background:#fff;border-right:1px solid #e6ece1;display:flex;flex-direction:column;flex-shrink:0;}
+.sidebar-brand{display:flex;align-items:center;gap:10px;padding:20px 18px 16px;border-bottom:1px solid #e6ece1;}
+.brand-icon{color:var(--accent);flex-shrink:0;}
+.brand-name{font-size:15px;font-weight:700;color:#1e293b;letter-spacing:-0.02em;}
+.brand-sub{font-size:11px;color:#64748b;}
+.entity-switcher{margin:12px 14px;padding:8px 12px;background:#f7faf5;border:1px solid #e6ece1;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;}
+.entity-switcher-name{font-size:13px;font-weight:600;color:#1e293b;}
+.entity-switcher-sub{font-size:11px;color:#64748b;}
+.entity-switcher svg{color:#94a3b8;}
+.nav-section{padding:14px 14px 4px;}
+.nav-section-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94a3b8;padding:0 4px;margin-bottom:4px;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:7px;cursor:pointer;color:#475569;font-size:13.5px;font-weight:500;margin-bottom:1px;position:relative;transition:background .14s;}
+.nav-item:hover{background:#f1f5f9;color:#1e293b;}
+.nav-item.active{background:var(--accent-muted);color:var(--accent);font-weight:600;}
+.nav-item.active::before{content:"";position:absolute;left:0;top:4px;bottom:4px;width:3px;border-radius:0 3px 3px 0;background:var(--accent);}
+.nav-item svg{flex-shrink:0;}
+.nav-badge{margin-left:auto;background:var(--state-attention);color:#fff;font-size:10px;font-weight:700;border-radius:99px;padding:1px 6px;line-height:1.4;}
+.sidebar-footer{margin-top:auto;padding:14px;border-top:1px solid #e6ece1;display:flex;align-items:center;gap:9px;}
+.avatar-sm{width:32px;height:32px;border-radius:99px;background:var(--accent-muted);border:1px solid var(--accent-border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0;}
+.sidebar-user-name{font-size:13px;font-weight:600;color:#1e293b;}
+.sidebar-user-role{font-size:11px;color:#64748b;}
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.topbar{height:56px;background:#fff;border-bottom:1px solid #e6ece1;display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0;}
+.topbar-title{font-size:15px;font-weight:700;color:#1e293b;white-space:nowrap;}
+.topbar-spacer{flex:1;}
+.context-badge{background:var(--earth-light);border:1px solid var(--earth-border);color:var(--earth);font-size:11.5px;font-weight:700;border-radius:6px;padding:4px 10px;white-space:nowrap;}
+.topbar-bell{position:relative;width:34px;height:34px;border-radius:7px;border:1px solid #e6ece1;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#64748b;}
+.bell-dot{position:absolute;top:6px;right:7px;width:7px;height:7px;border-radius:99px;background:var(--state-attention);border:1.5px solid #fff;}
+.topbar-avatar{width:34px;height:34px;border-radius:99px;background:var(--accent-muted);border:1.5px solid var(--accent-border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--accent);cursor:pointer;}
+.content{padding:24px;display:flex;flex-direction:column;gap:16px;flex:1;}
+.breadcrumb{font-size:12.5px;color:#94a3b8;display:flex;align-items:center;gap:6px;}
+.breadcrumb a{color:var(--accent);text-decoration:none;font-weight:500;}
+.detail-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
+.detail-title-block{display:flex;flex-direction:column;gap:4px;}
+.detail-id-row{display:flex;align-items:center;gap:10px;}
+.detail-id{font-size:12.5px;font-weight:700;color:#94a3b8;letter-spacing:.04em;font-family:"Courier New",monospace;}
+.detail-name{font-size:22px;font-weight:800;color:#1e293b;letter-spacing:-0.02em;}
+.detail-sub{font-size:13px;color:#64748b;margin-top:2px;}
+.detail-actions{display:flex;gap:8px;flex-shrink:0;}
+.btn-ghost{border:1px solid #e6ece1;background:#fff;color:#475569;font-size:13px;font-weight:600;border-radius:7px;padding:7px 14px;cursor:pointer;display:flex;align-items:center;gap:6px;}
+.btn-primary{border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;border-radius:7px;padding:7px 14px;cursor:pointer;display:flex;align-items:center;gap:6px;}
+.pill{display:inline-block;border-radius:99px;font-size:11px;font-weight:700;padding:2px 9px;white-space:nowrap;}
+.pill-healthy{background:var(--state-healthy-bg);color:var(--state-healthy);}
+.pill-moderate{background:var(--state-moderate-bg);color:var(--state-moderate);}
+.pill-attention{background:var(--state-attention-bg);color:var(--state-attention);}
+.pill-online{background:var(--state-online-bg);color:var(--state-online);}
+.pill-warning{background:var(--state-warning-bg);color:var(--state-warning);}
+.pill-offline{background:var(--state-offline-bg);color:var(--state-offline);}
+.card{background:#fff;border:1px solid #e6ece1;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+.meta-grid{display:grid;grid-template-columns:repeat(3,1fr);padding:20px;gap:18px 24px;}
+.meta-cell{display:flex;flex-direction:column;gap:2px;}
+.meta-label{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8;}
+.meta-value{font-size:14px;font-weight:600;color:#1e293b;font-variant-numeric:tabular-nums;}
+.meta-sub{font-size:11.5px;color:#64748b;}
+.two-col{display:grid;grid-template-columns:1fr 300px;gap:16px;align-items:start;}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 14px;border-bottom:1px solid #e6ece1;}
+.card-title{font-size:14px;font-weight:700;color:#1e293b;}
+.card-link{font-size:12px;font-weight:600;color:var(--accent);cursor:pointer;text-decoration:none;}
+.data-table{width:100%;border-collapse:collapse;font-size:13px;}
+.data-table th{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8;padding:10px 18px;text-align:left;border-bottom:1px solid #e6ece1;background:#f7faf5;}
+.data-table th.num{text-align:right;}
+.data-table td{padding:10px 18px;border-bottom:1px solid #f0f4ee;color:#334155;vertical-align:middle;}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:#f7faf5;}
+.mono-id{font-size:11.5px;font-weight:700;color:#64748b;font-variant-numeric:tabular-nums;letter-spacing:.04em;font-family:"Courier New",monospace;}
+.reading-val{font-size:13px;font-weight:600;color:#1e293b;font-variant-numeric:tabular-nums;}
+.num-cell{text-align:right;font-variant-numeric:tabular-nums;}
+.activity-list{padding:8px 0;}
+.activity-item{display:flex;align-items:flex-start;gap:10px;padding:10px 18px;border-bottom:1px solid #f0f4ee;}
+.activity-item:last-child{border-bottom:none;}
+.activity-dot{width:8px;height:8px;border-radius:99px;background:var(--accent);flex-shrink:0;margin-top:5px;}
+.activity-dot.earth{background:var(--earth);}
+.activity-dot.muted{background:#94a3b8;}
+.activity-dot.alert{background:var(--state-attention);}
+.activity-body{flex:1;}
+.activity-text{font-size:13px;color:#334155;line-height:1.4;}
+.activity-time{font-size:11px;color:#94a3b8;margin-top:2px;}
+.activity-user{font-size:11px;font-weight:600;color:#64748b;}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <span class="brand-icon">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <rect width="28" height="28" rx="8" fill="currentColor" opacity="0.12"/>
+        <path d="M14 5C14 5 8 9 8 15.5C8 19.09 10.69 22 14 22C17.31 22 20 19.09 20 15.5C20 9 14 5 14 5Z" fill="currentColor"/>
+        <path d="M14 12V22" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M11 15C12.1 14.3 13.1 13.5 14 12" stroke="white" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <div>
+      <div class="brand-name">Meadow Admin</div>
+      <div class="brand-sub">Operations Console</div>
+    </div>
+  </div>
+  <div class="entity-switcher">
+    <div>
+      <div class="entity-switcher-name">Greenfield Station</div>
+      <div class="entity-switcher-sub">Northern Valley Region</div>
+    </div>
+    <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <nav>
+    <div class="nav-section">
+      <div class="nav-section-label">Overview</div>
+      <div class="nav-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="5" rx="1.5" fill="currentColor" opacity=".85"/><rect x="9" y="2" width="5" height="5" rx="1.5" fill="currentColor" opacity=".85"/><rect x="2" y="9" width="5" height="5" rx="1.5" fill="currentColor" opacity=".85"/><rect x="9" y="9" width="5" height="5" rx="1.5" fill="currentColor" opacity=".85"/></svg>
+        Dashboard
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Records</div>
+      <div class="nav-item active">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M8 2C8 2 4 5 4 9.5C4 11.99 5.79 14 8 14s4-2.01 4-4.5C12 5 8 2 8 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 7v7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        All Entities
+      </div>
+      <div class="nav-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M3 13l3-4 3 2 4-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Forecast Plan
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Monitoring</div>
+      <div class="nav-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 5a4.2 4.2 0 0 0 0 6M11 11a4.2 4.2 0 0 0 0-6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Live Readings
+      </div>
+      <div class="nav-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M8 3v1M8 12v1M3 8H2M14 8h-1M4.93 4.93l-.7-.7M11.77 11.77l-.7-.7M4.93 11.07l-.7.7M11.77 4.23l-.7.7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.4"/></svg>
+        Alerts
+        <span class="nav-badge">3</span>
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Operations</div>
+      <div class="nav-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><rect x="3" y="2" width="10" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M6 6h4M6 9h2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Tasks
+        <span class="nav-badge">7</span>
+      </div>
+      <div class="nav-item">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 13h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Reports
+      </div>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="avatar-sm">RL</div>
+    <div>
+      <div class="sidebar-user-name">Rosa Larkins</div>
+      <div class="sidebar-user-role">Head of Operations</div>
+    </div>
+  </div>
+</aside>
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-title">Record Detail</div>
+    <div class="topbar-spacer"></div>
+    <div class="context-badge">Growing Season 2026</div>
+    <div class="topbar-bell">
+      <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M8 2a4 4 0 0 1 4 4v2.5l1 2H3l1-2V6a4 4 0 0 1 4-4Z" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 13a1.5 1.5 0 0 0 3 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <span class="bell-dot"></span>
+    </div>
+    <div class="topbar-avatar">RL</div>
+  </header>
+  <div class="content">
+    <div class="breadcrumb">
+      <a href="#">All Entities</a>
+      <svg width="12" height="12" fill="none" viewBox="0 0 12 12"><path d="M4 3l4 3-4 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>ENT-001</span>
+    </div>
+    <div class="detail-header">
+      <div class="detail-title-block">
+        <div class="detail-id-row">
+          <span class="detail-id">ENT-001</span>
+          <span class="pill pill-healthy">Healthy</span>
+        </div>
+        <div class="detail-name">North Paddock</div>
+        <div class="detail-sub">Wheat · Grain Fill · Greenfield Station</div>
+      </div>
+      <div class="detail-actions">
+        <button class="btn-ghost">
+          <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M2 10l4-5 3 3 3-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Export
+        </button>
+        <button class="btn-primary">
+          <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M9.5 2.5l2 2L5 11H3V9L9.5 2.5Z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Edit
+        </button>
+      </div>
+    </div>
+    <!-- Meta grid -->
+    <div class="card">
+      <div class="meta-grid">
+        <div class="meta-cell">
+          <div class="meta-label">Type</div>
+          <div class="meta-value">Wheat</div>
+          <div class="meta-sub">Winter variety</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Area</div>
+          <div class="meta-value">48.2 ha</div>
+          <div class="meta-sub">Target 16,000 rows</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Current Stage</div>
+          <div class="meta-value">Grain Fill</div>
+          <div class="meta-sub">Entered 12 days ago</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Target Output</div>
+          <div class="meta-value">312 t</div>
+          <div class="meta-sub">6.5 t/ha projected</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Assigned Operator</div>
+          <div class="meta-value">Rosa Larkins</div>
+          <div class="meta-sub">Head of Operations</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Est. Harvest</div>
+          <div class="meta-value">18 Nov 2026</div>
+          <div class="meta-sub">In 169 days</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Avg Soil Moisture</div>
+          <div class="meta-value">63%</div>
+          <div class="meta-sub">5 active sensors</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Last Inspection</div>
+          <div class="meta-value">29 May 2026</div>
+          <div class="meta-sub">4 days ago</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Registered</div>
+          <div class="meta-value">04 Mar 2026</div>
+          <div class="meta-sub">This season</div>
+        </div>
+      </div>
+    </div>
+    <!-- Related data -->
+    <div class="two-col">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Sensor Readings</div>
+          <a class="card-link" href="#">All sensors →</a>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr><th>Sensor ID</th><th>Metric</th><th>Reading</th><th>Status</th><th>Updated</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="mono-id">SNS-0041</span></td><td>Moisture</td><td><span class="reading-val">63%</span></td><td><span class="pill pill-online">Online</span></td><td style="font-size:12px;color:#94a3b8;">2 min ago</td></tr>
+            <tr><td><span class="mono-id">SNS-0042</span></td><td>Temperature</td><td><span class="reading-val">13.8 °C</span></td><td><span class="pill pill-online">Online</span></td><td style="font-size:12px;color:#94a3b8;">2 min ago</td></tr>
+            <tr><td><span class="mono-id">SNS-0043</span></td><td>pH Level</td><td><span class="reading-val">6.8</span></td><td><span class="pill pill-online">Online</span></td><td style="font-size:12px;color:#94a3b8;">5 min ago</td></tr>
+            <tr><td><span class="mono-id">SNS-0044</span></td><td>N-Level</td><td><span class="reading-val">52 mg/kg</span></td><td><span class="pill pill-online">Online</span></td><td style="font-size:12px;color:#94a3b8;">5 min ago</td></tr>
+            <tr><td><span class="mono-id">SNS-0045</span></td><td>Humidity</td><td><span class="reading-val">— — —</span></td><td><span class="pill pill-offline">Offline</span></td><td style="font-size:12px;color:#94a3b8;">3 hrs ago</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Recent Activity</div>
+          <a class="card-link" href="#">Full log →</a>
+        </div>
+        <div class="activity-list">
+          <div class="activity-item">
+            <div class="activity-dot"></div>
+            <div class="activity-body">
+              <div class="activity-text">Health status updated to <strong>Healthy</strong></div>
+              <div class="activity-time">Today, 5:34 AM</div>
+              <div class="activity-user">System · Sensor aggregate</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot earth"></div>
+            <div class="activity-body">
+              <div class="activity-text">Stage changed from <strong>Flowering</strong> to <strong>Grain Fill</strong></div>
+              <div class="activity-time">21 May 2026, 9:11 AM</div>
+              <div class="activity-user">Rosa Larkins</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot muted"></div>
+            <div class="activity-body">
+              <div class="activity-text">Inspection note added — "Canopy closure strong, no pest pressure observed."</div>
+              <div class="activity-time">29 May 2026, 2:45 PM</div>
+              <div class="activity-user">Rosa Larkins</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot alert"></div>
+            <div class="activity-body">
+              <div class="activity-text">Sensor SNS-0045 went offline — battery replacement scheduled</div>
+              <div class="activity-time">2 Jun 2026, 3:10 AM</div>
+              <div class="activity-user">System · Alert</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot muted"></div>
+            <div class="activity-body">
+              <div class="activity-text">Target output revised from 290 t to 312 t based on yield forecast update</div>
+              <div class="activity-time">1 Jun 2026, 11:20 AM</div>
+              <div class="activity-user">Rosa Larkins</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

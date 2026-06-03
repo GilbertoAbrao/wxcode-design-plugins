@@ -2,9 +2,9 @@
   "$schema": "https://open-design.ai/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "wxcode-admin-finance-terminal",
-  "title": "Finance Terminal Admin",
-  "version": "0.1.0",
-  "description": "Bloomberg-Terminal-style institutional admin: pure-black canvas, amber accents, dense monospace data tables, multi-panel grid for scanning 50+ data points without scrolling. Use for trading desks, treasury, risk, ops control rooms.",
+  "title": "Terminal Admin",
+  "version": "0.2.0",
+  "description": "Pure-black monospace terminal aesthetic: page canvas #0E0E0E, raised panels #1A1A1A, amber accent (#FFB800), monospace type throughout, zero-radius sharp edges, and 1px grid-line borders. Archetype = 32px status bar + 24px ticker strip + 200px F-key module rail + 3-column body (rail | center 2-row | right 2-row) + 36px command-line footer. Built for high-density real-time consoles that must scan 50+ data points without scrolling.",
   "license": "MIT",
   "author": {
     "name": "WXCode",
@@ -19,11 +19,14 @@
     "operations",
     "web",
     "admin",
-    "dense-data",
-    "finance",
     "dark-mode",
     "monospace",
-    "trading-terminal"
+    "amber-accent",
+    "dense-data",
+    "zero-radius",
+    "ticker-strip",
+    "terminal-aesthetic",
+    "enterprise"
   ],
   "compat": {
     "agentSkills": [
@@ -44,13 +47,25 @@
     },
     "useCase": {
       "query": {
-        "en": "Give me a Bloomberg-Terminal-style admin for a treasury desk \u2014 black background, amber accents, monospace, dense tables, ticker, P&L panel, risk gauges.",
-        "zh-CN": "\u4f7f\u7528\u8fd9\u4e2a\u63d2\u4ef6\u5b8c\u6210\u4ee5\u4e0b\u4efb\u52a1\uff1aGive me a Bloomberg-Terminal-style admin for a treasury desk \u2014 black background, amber accents, monospace, dense tables, ticker, P&L panel, risk gauges."
+        "en": "Apply this black monospace terminal aesthetic to my domain — pure-black canvas, amber accent, monospace type throughout, ticker strip, F-key module rail, dense data table, summary block with sparkline, gauge constraints, and a command-line footer.",
+        "zh-CN": "将这个黑色等宽终端风格应用到我的领域：纯黑底色、琥珀强调色、全等宽字体、行情滚动条、F 键模块侧栏、密集数据表格、带折线图的摘要区块、约束仪表盘，以及命令行底栏。"
       },
       "exampleOutputs": [
         {
           "path": "./example.html",
-          "title": "Finance Terminal Admin"
+          "title": "Terminal Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Terminal Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Terminal Admin — Form"
+        },
+        {
+          "path": "./assets/detail.html",
+          "title": "Terminal Admin — Detail"
         }
       ]
     },
@@ -68,7 +83,13 @@
         "state-coverage"
       ],
       "assets": [
-        "./example.html"
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/detail.html",
+        "./assets/template.html",
+        "./references/layouts.md"
       ]
     },
     "pipeline": {
@@ -85,6 +106,10 @@
     "capabilities": [
       "prompt:inject",
       "fs:write"
-    ]
+    ],
+    "provenance": {
+      "category": "admin-dashboards",
+      "note": "original archetype; no third-party template reproduced"
+    }
   }
 }

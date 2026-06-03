@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lumex Ops — Shipments</title>
+<style>
+  :root {
+    --c-indigo:    #6366f1;
+    --c-indigo-d:  #4f46e5;
+    --c-indigo-lt: #eef2ff;
+    --c-teal:      #14b8a6;
+    --c-teal-d:    #0d9488;
+    --c-teal-lt:   #f0fdfa;
+    --c-amber:     #f59e0b;
+    --c-amber-d:   #d97706;
+    --c-amber-lt:  #fffbeb;
+    --c-rose:      #f43f5e;
+    --c-rose-d:    #e11d48;
+    --c-rose-lt:   #fff1f2;
+    --c-green:     #22c55e;
+    --c-green-lt:  #f0fdf4;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #f6f7f9; color: #1e293b;
+    min-height: 100vh; font-size: 14px; line-height: 1.5;
+  }
+
+  /* ── Header ────────────────────────────────────────────────── */
+  .header {
+    display: flex; align-items: center; gap: 12px;
+    height: 52px; padding: 0 24px;
+    background: #ffffff; border-bottom: 1px solid #e8eaee;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .header-brand {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 700; font-size: 15px; letter-spacing: -0.02em;
+    color: #1e293b; flex-shrink: 0;
+  }
+  .header-spacer { flex: 1; }
+  .header-right { display: flex; align-items: center; gap: 16px; }
+  .icon-btn {
+    width: 34px; height: 34px; border-radius: 8px;
+    border: 1px solid #e8eaee; background: #ffffff;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; position: relative; color: #64748b;
+  }
+  .notif-dot {
+    position: absolute; top: 6px; right: 6px;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--c-rose); border: 2px solid #fff;
+  }
+  .avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--c-indigo);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: #fff;
+    cursor: pointer; flex-shrink: 0;
+  }
+
+  /* ── Page ──────────────────────────────────────────────────── */
+  .page { max-width: 1280px; margin: 0 auto; padding: 24px; }
+  .page-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .page-title { font-size: 20px; font-weight: 700; color: #1e293b; letter-spacing: -0.02em; }
+  .page-subtitle { font-size: 13px; color: #64748b; margin-top: 2px; }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 8px;
+    background: var(--c-indigo); color: #fff;
+    font-size: 13px; font-weight: 600; cursor: pointer; border: none;
+    letter-spacing: 0.01em; transition: background 0.15s;
+  }
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 8px;
+    background: #ffffff; color: #334155;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    border: 1px solid #e8eaee; transition: background 0.15s;
+  }
+
+  /* ── Toolbar ─────────────────────────────────────────────────── */
+  .toolbar {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .toolbar-search {
+    display: flex; align-items: center; gap: 8px;
+    background: #ffffff; border: 1px solid #e8eaee;
+    border-radius: 8px; padding: 7px 12px;
+    color: #64748b; min-width: 240px;
+  }
+  .toolbar-search input {
+    border: none; outline: none; font-size: 13px;
+    color: #1e293b; background: transparent;
+    font-family: inherit; width: 100%;
+  }
+  .toolbar-search input::placeholder { color: #94a3b8; }
+  .filter-group { display: flex; align-items: center; gap: 6px; }
+  .filter-label { font-size: 12px; color: #94a3b8; font-weight: 500; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px; border-radius: 20px;
+    font-size: 12px; font-weight: 500;
+    border: 1px solid #e8eaee; background: #ffffff;
+    color: #64748b; cursor: pointer; transition: background 0.15s;
+  }
+  .chip.active {
+    background: var(--c-indigo-lt); border-color: var(--c-indigo);
+    color: var(--c-indigo-d);
+  }
+  .chip-count {
+    font-size: 11px; font-weight: 700;
+    background: #e8eaee; color: #64748b;
+    padding: 0 5px; border-radius: 10px;
+    font-variant-numeric: tabular-nums;
+  }
+  .chip.active .chip-count { background: var(--c-indigo); color: #fff; }
+
+  /* ── Card / Table ────────────────────────────────────────────── */
+  .card {
+    background: #ffffff; border: 1px solid #e8eaee;
+    border-radius: 14px; overflow: hidden;
+  }
+  .rec-table-wrap { overflow-x: auto; }
+  .rec-table { width: 100%; border-collapse: collapse; }
+  .rec-table thead tr { background: #f8fafc; }
+  .rec-table th {
+    font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em;
+    text-transform: uppercase; color: #94a3b8; text-align: left;
+    padding: 10px 16px; border-bottom: 1px solid #e8eaee; white-space: nowrap;
+  }
+  .rec-table td {
+    padding: 11px 16px; font-size: 13px; color: #334155;
+    border-bottom: 1px solid #f1f5f9; vertical-align: middle;
+  }
+  .rec-table tr:last-child td { border-bottom: none; }
+  .rec-table tr:hover td { background: #f8fafc; }
+  .rec-id {
+    font-family: "Courier New", monospace; font-size: 12px;
+    color: #64748b; font-weight: 600;
+  }
+  .entity-name { font-weight: 600; color: #1e293b; }
+  .entity-sub { font-size: 12px; color: #94a3b8; }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+  .pill-ok     { background: #f0fdf4; color: #16a34a; }
+  .pill-warn   { background: var(--c-amber-lt); color: var(--c-amber-d); }
+  .pill-error  { background: var(--c-rose-lt);  color: var(--c-rose-d); }
+  .pill-blue   { background: var(--c-indigo-lt); color: var(--c-indigo-d); }
+  .pill-teal   { background: var(--c-teal-lt);   color: var(--c-teal-d); }
+  .num { font-variant-numeric: tabular-nums; text-align: right; }
+
+  /* ── Footer ──────────────────────────────────────────────────── */
+  .rec-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; border-top: 1px solid #e8eaee;
+    font-size: 12px; color: #94a3b8;
+  }
+  .pagination { display: flex; gap: 4px; }
+  .page-btn {
+    width: 30px; height: 30px; border-radius: 6px;
+    border: 1px solid #e8eaee; background: #fff;
+    font-size: 12px; color: #64748b; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .page-btn.active {
+    background: var(--c-indigo); border-color: var(--c-indigo); color: #fff; font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-brand">
+    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+      <rect width="30" height="30" rx="8" fill="var(--c-indigo)"/>
+      <path d="M7 10l4 10 4-6 4 6 4-10" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Lumex Ops
+  </div>
+  <div class="header-spacer"></div>
+  <div class="header-right">
+    <div class="icon-btn" aria-label="Notifications">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="notif-dot"></span>
+    </div>
+    <div class="avatar" title="Priya Nair">PN</div>
+  </div>
+</header>
+
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Shipments</div>
+      <div class="page-subtitle">All active and completed shipments</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-ghost">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export
+      </button>
+      <button class="btn-primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Shipment
+      </button>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="toolbar-search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search by ID, carrier, origin…">
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">Status</span>
+      <span class="chip active">All <span class="chip-count">284</span></span>
+      <span class="chip">In Transit <span class="chip-count">142</span></span>
+      <span class="chip">Delivered <span class="chip-count">97</span></span>
+      <span class="chip">Exception <span class="chip-count">45</span></span>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">Carrier</span>
+      <span class="chip">APEX-3 <span class="chip-count">38</span></span>
+      <span class="chip">Brightline <span class="chip-count">22</span></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="rec-table-wrap">
+      <table class="rec-table">
+        <thead>
+          <tr>
+            <th>Shipment ID</th>
+            <th>Carrier</th>
+            <th>Origin</th>
+            <th>Destination</th>
+            <th>ETA</th>
+            <th style="text-align:right">Weight (kg)</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="rec-id">LX-00842</span></td>
+            <td>APEX-3</td>
+            <td>São Paulo, BR</td>
+            <td>Miami, US</td>
+            <td>04 Jun 2025</td>
+            <td class="num">1,840</td>
+            <td><span class="pill pill-teal">In Transit</span></td>
+          </tr>
+          <tr>
+            <td><span class="rec-id">LX-00841</span></td>
+            <td>Brightline</td>
+            <td>Singapore, SG</td>
+            <td>Sydney, AU</td>
+            <td>03 Jun 2025</td>
+            <td class="num">920</td>
+            <td><span class="pill pill-teal">In Transit</span></td>
+          </tr>
+          <tr>
+            <td><span class="rec-id">LX-00840</span></td>
+            <td>APEX-3</td>
+            <td>Dubai, AE</td>
+            <td>Frankfurt, DE</td>
+            <td>05 Jun 2025</td>
+            <td class="num">3,210</td>
+            <td><span class="pill pill-warn">Delayed</span></td>
+          </tr>
+          <tr>
+            <td><span class="rec-id">LX-00839</span></td>
+            <td>SwiftCargo</td>
+            <td>Los Angeles, US</td>
+            <td>Tokyo, JP</td>
+            <td>02 Jun 2025</td>
+            <td class="num">660</td>
+            <td><span class="pill pill-ok">Delivered</span></td>
+          </tr>
+          <tr>
+            <td><span class="rec-id">LX-00838</span></td>
+            <td>NorthStar</td>
+            <td>Hamburg, DE</td>
+            <td>New York, US</td>
+            <td>08 Jun 2025</td>
+            <td class="num">5,740</td>
+            <td><span class="pill pill-teal">In Transit</span></td>
+          </tr>
+          <tr>
+            <td><span class="rec-id">LX-00837</span></td>
+            <td>APEX-3</td>
+            <td>Nairobi, KE</td>
+            <td>London, GB</td>
+            <td>01 Jun 2025</td>
+            <td class="num">480</td>
+            <td><span class="pill pill-error">Exception</span></td>
+          </tr>
+          <tr>
+            <td><span class="rec-id">LX-00836</span></td>
+            <td>Brightline</td>
+            <td>Seoul, KR</td>
+            <td>Amsterdam, NL</td>
+            <td>07 Jun 2025</td>
+            <td class="num">2,100</td>
+            <td><span class="pill pill-teal">In Transit</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="rec-footer">
+      <span>Showing 1–7 of 284 shipments</span>
+      <div class="pagination">
+        <button class="page-btn">‹</button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">›</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

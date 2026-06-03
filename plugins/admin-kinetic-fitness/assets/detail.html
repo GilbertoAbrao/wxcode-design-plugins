@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Member Detail</title>
+<style>
+  :root {
+    --accent:          #84cc16;
+    --accent-bright:   #a3e635;
+    --accent-dim:      rgba(132,204,22,.18);
+    --accent-muted:    rgba(132,204,22,.08);
+    --state-active:    #84cc16;
+    --state-active-bg: rgba(132,204,22,.13);
+    --state-frozen:    #60a5fa;
+    --state-frozen-bg: rgba(96,165,250,.13);
+    --state-overdue:   #f87171;
+    --state-overdue-bg:rgba(248,113,113,.13);
+    --star:            #84cc16;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 13px; background: #0f1410; color: #e6efe6;
+    min-height: 100vh; display: flex; flex-direction: column;
+  }
+
+  /* ── TOPBAR ──────────────────────────────────────────────────── */
+  .topbar { height: 48px; background: #19211a; border-bottom: 1px solid #2c3a2f; display: flex; align-items: center; padding: 0 16px 0 12px; gap: 14px; position: sticky; top: 0; z-index: 100; flex-shrink: 0; }
+  .topbar-brand { display: flex; align-items: center; gap: 8px; text-decoration: none; flex-shrink: 0; }
+  .topbar-brand-icon { width: 28px; height: 28px; background: var(--accent-dim); border-radius: 7px; display: flex; align-items: center; justify-content: center; color: var(--accent); }
+  .topbar-brand-name { font-size: 14px; font-weight: 700; color: var(--accent); letter-spacing: -0.01em; white-space: nowrap; }
+  .topbar-search { flex: 1; max-width: 320px; position: relative; }
+  .topbar-search input { width: 100%; height: 32px; background: #232e25; border: 1px solid #2c3a2f; border-radius: 7px; color: #e6efe6; font-size: 12px; font-family: inherit; padding: 0 10px 0 30px; outline: none; transition: border-color .15s; }
+  .topbar-search input::placeholder { color: #93a392; }
+  .topbar-search input:focus { border-color: var(--accent); }
+  .topbar-search-icon { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); color: #93a392; pointer-events: none; }
+  .topbar-spacer { flex: 1; }
+  .topbar-location { display: flex; align-items: center; gap: 6px; background: #232e25; border: 1px solid #2c3a2f; border-radius: 7px; padding: 4px 10px; font-size: 12px; color: #e6efe6; cursor: pointer; white-space: nowrap; }
+  .topbar-location svg { color: var(--accent); }
+  .topbar-actions { display: flex; align-items: center; gap: 8px; }
+  .topbar-bell { position: relative; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; color: #93a392; cursor: pointer; }
+  .topbar-bell-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; background: var(--accent); border-radius: 50%; border: 1.5px solid #19211a; }
+  .topbar-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-dim); border: 1.5px solid var(--accent); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--accent); cursor: pointer; flex-shrink: 0; }
+  .topbar-avatar-name { font-size: 12px; color: #e6efe6; white-space: nowrap; cursor: pointer; }
+  .topbar-chevron { color: #93a392; }
+
+  /* ── SHELL + RAIL ────────────────────────────────────────────── */
+  .app-body { display: flex; flex: 1; overflow: hidden; }
+  .rail { width: 52px; background: #19211a; border-right: 1px solid #2c3a2f; display: flex; flex-direction: column; align-items: center; padding: 12px 0; gap: 4px; flex-shrink: 0; }
+  .rail-item { width: 40px; height: 40px; border-radius: 9px; display: flex; align-items: center; justify-content: center; color: #93a392; cursor: pointer; position: relative; transition: background .12s, color .12s; }
+  .rail-item:hover { background: #232e25; color: #e6efe6; }
+  .rail-item.active { background: #232e25; color: var(--accent); }
+  .rail-item.active::before { content: ""; position: absolute; left: 0; top: 8px; bottom: 8px; width: 3px; background: var(--accent); border-radius: 0 2px 2px 0; }
+  .rail-divider { width: 24px; height: 1px; background: #2c3a2f; margin: 4px 0; }
+
+  /* ── MAIN ────────────────────────────────────────────────────── */
+  .main { flex: 1; overflow-y: auto; padding: 20px 24px 32px; display: flex; flex-direction: column; gap: 16px; }
+  .main::-webkit-scrollbar { width: 4px; }
+  .main::-webkit-scrollbar-track { background: transparent; }
+  .main::-webkit-scrollbar-thumb { background: #2c3a2f; border-radius: 2px; }
+
+  .breadcrumb { font-size: 12px; color: #93a392; }
+  .breadcrumb a { color: var(--accent); text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+
+  .btn-ghost { height: 32px; padding: 0 12px; border: 1px solid #2c3a2f; border-radius: 7px; background: transparent; color: #93a392; font-family: inherit; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: border-color .12s, color .12s; }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-primary { height: 32px; padding: 0 14px; border: none; border-radius: 7px; background: var(--accent); color: #0f1410; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: background .12s; }
+  .btn-primary:hover { background: var(--accent-bright); }
+
+  /* ── DETAIL HEADER ───────────────────────────────────────────── */
+  .detail-header { display: flex; align-items: center; gap: 16px; }
+  .detail-avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; color: #0f1410; flex-shrink: 0; letter-spacing: .02em; }
+  .detail-title-block { flex: 1; }
+  .detail-name-row { display: flex; align-items: center; gap: 10px; }
+  .detail-name { font-size: 19px; font-weight: 700; color: #e6efe6; letter-spacing: -0.02em; }
+  .status-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; padding: 3px 8px; border-radius: 20px; }
+  .status-pill.active  { background: var(--state-active-bg);  color: var(--state-active); }
+  .status-pill.frozen  { background: var(--state-frozen-bg);  color: var(--state-frozen); }
+  .status-pill.overdue { background: var(--state-overdue-bg); color: var(--state-overdue); }
+  .status-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+  .detail-sub { font-size: 12px; color: #93a392; margin-top: 3px; }
+  .detail-actions { display: flex; align-items: center; gap: 8px; }
+
+  /* ── CARD ────────────────────────────────────────────────────── */
+  .card { background: #19211a; border: 1px solid #2c3a2f; border-radius: 10px; }
+  .card-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid #2c3a2f; }
+  .card-title { font-size: 13px; font-weight: 600; color: #e6efe6; letter-spacing: -0.01em; }
+  .card-link { font-size: 11px; color: var(--accent); text-decoration: none; opacity: .85; transition: opacity .12s; }
+  .card-link:hover { opacity: 1; }
+
+  /* ── META GRID ───────────────────────────────────────────────── */
+  .meta-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
+  .meta-cell { padding: 16px 18px; border-right: 1px solid #2c3a2f; }
+  .meta-cell:last-child { border-right: none; }
+  .meta-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: #93a392; margin-bottom: 5px; }
+  .meta-value { font-size: 14px; font-weight: 700; color: #e6efe6; font-variant-numeric: tabular-nums; }
+  .meta-sub { font-size: 11px; color: #93a392; margin-top: 2px; }
+
+  /* ── TWO-COLUMN LOWER ────────────────────────────────────────── */
+  .two-col { display: grid; grid-template-columns: 7fr 5fr; gap: 16px; align-items: start; }
+
+  /* ── SCHEDULE ROWS (reuse archetype) ─────────────────────────── */
+  .schedule-item { display: grid; grid-template-columns: 44px 1fr 120px 100px; align-items: center; gap: 10px; padding: 10px 18px; border-bottom: 1px solid #232e25; transition: background .1s; }
+  .schedule-item:last-child { border-bottom: none; }
+  .schedule-item:hover { background: #232e25; }
+  .sched-time { font-size: 12px; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .sched-class { font-size: 12px; font-weight: 600; color: #e6efe6; }
+  .sched-coach { font-size: 11px; color: #93a392; }
+  .cap-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-variant-numeric: tabular-nums; color: #93a392; }
+
+  /* ── ACTIVITY FEED ───────────────────────────────────────────── */
+  .activity-list { display: flex; flex-direction: column; }
+  .activity-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 18px; border-bottom: 1px solid #232e25; }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-dim); border: 2px solid var(--accent); flex-shrink: 0; margin-top: 3px; }
+  .activity-dot.checkin { border-color: var(--state-active); background: rgba(132,204,22,.1); }
+  .activity-dot.plan { border-color: #60a5fa; background: rgba(96,165,250,.1); }
+  .activity-dot.note { border-color: #f59e0b; background: rgba(245,158,11,.1); }
+  .activity-desc { font-size: 12px; color: #e6efe6; line-height: 1.4; }
+  .activity-time { font-size: 11px; color: #93a392; margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="topbar-brand" href="#">
+    <div class="topbar-brand-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="2" y="10" width="4" height="4" rx="1"/><rect x="18" y="10" width="4" height="4" rx="1"/>
+        <rect x="6" y="8" width="2" height="8" rx="1"/><rect x="16" y="8" width="2" height="8" rx="1"/>
+        <line x1="8" y1="12" x2="16" y2="12"/>
+      </svg>
+    </div>
+    <span class="topbar-brand-name">KINETIC</span>
+  </a>
+  <div class="topbar-search">
+    <svg class="topbar-search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input type="text" placeholder="Search members, classes…" aria-label="Search">
+  </div>
+  <div class="topbar-spacer"></div>
+  <div class="topbar-location">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+      <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/>
+    </svg>
+    Downtown Studio
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+  <div class="topbar-actions">
+    <div class="topbar-bell" aria-label="Notifications">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span class="topbar-bell-dot"></span>
+    </div>
+    <div class="topbar-avatar" aria-label="Account">AK</div>
+    <span class="topbar-avatar-name">Alex Kowalski</span>
+    <svg class="topbar-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+</header>
+
+<div class="app-body">
+  <nav class="rail" aria-label="Primary navigation">
+    <div class="rail-item" aria-label="Dashboard" title="Dashboard">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+      </svg>
+    </div>
+    <div class="rail-item active" aria-label="Members" title="Members">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+    </div>
+    <div class="rail-item" aria-label="Schedule" title="Schedule">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+        <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+        <line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+    </div>
+    <div class="rail-item" aria-label="Classes" title="Classes">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="2" y="9" width="3" height="6" rx="1"/><rect x="19" y="9" width="3" height="6" rx="1"/>
+        <rect x="5" y="7" width="2" height="10" rx="1"/><rect x="17" y="7" width="2" height="10" rx="1"/>
+        <line x1="7" y1="12" x2="17" y2="12"/>
+      </svg>
+    </div>
+    <div class="rail-divider"></div>
+    <div class="rail-item" aria-label="Analytics" title="Analytics">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+      </svg>
+    </div>
+    <div class="rail-item" aria-label="Settings" title="Settings">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </div>
+  </nav>
+
+  <main class="main">
+
+    <div class="breadcrumb"><a href="#">Members</a> › Jess Kamara</div>
+
+    <!-- Detail header -->
+    <div class="detail-header">
+      <div class="detail-avatar">JK</div>
+      <div class="detail-title-block">
+        <div class="detail-name-row">
+          <span class="detail-name">Jess Kamara</span>
+          <span class="status-pill active"><span class="status-dot"></span>Active</span>
+        </div>
+        <div class="detail-sub">jess.kamara@email.com · Elite Annual · Downtown Studio</div>
+      </div>
+      <div class="detail-actions">
+        <button class="btn-ghost">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          Flag
+        </button>
+        <button class="btn-ghost">Freeze Plan</button>
+        <button class="btn-primary">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Edit
+        </button>
+      </div>
+    </div>
+
+    <!-- Meta grid -->
+    <div class="card">
+      <div class="meta-grid">
+        <div class="meta-cell">
+          <div class="meta-label">Plan</div>
+          <div class="meta-value">Elite Annual</div>
+          <div class="meta-sub">Renews Jan 2027</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Joined</div>
+          <div class="meta-value">Jan 2024</div>
+          <div class="meta-sub">17 months active</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Check-ins This Month</div>
+          <div class="meta-value" style="font-variant-numeric:tabular-nums">21</div>
+          <div class="meta-sub">↑ 3 vs last month</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Retention Score</div>
+          <div class="meta-value" style="color:var(--accent)">96.2%</div>
+          <div class="meta-sub">30-day rolling</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lower two-column -->
+    <div class="two-col">
+
+      <!-- Upcoming classes slot-board -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Upcoming Classes</span>
+          <a class="card-link" href="#">Book a class →</a>
+        </div>
+        <div role="list">
+          <div class="schedule-item" role="listitem">
+            <div class="sched-time">07:30</div>
+            <div><div class="sched-class">Power Lift</div></div>
+            <div class="sched-coach">Coach Dom Vasquez</div>
+            <span class="cap-pill">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Tomorrow
+            </span>
+          </div>
+          <div class="schedule-item" role="listitem">
+            <div class="sched-time">09:00</div>
+            <div><div class="sched-class">Yoga Flow</div></div>
+            <div class="sched-coach">Coach Anika Torres</div>
+            <span class="cap-pill">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Wed, 4 Jun
+            </span>
+          </div>
+          <div class="schedule-item" role="listitem">
+            <div class="sched-time">06:00</div>
+            <div><div class="sched-class">HIIT Ignite</div></div>
+            <div class="sched-coach">Coach Priya Mehra</div>
+            <span class="cap-pill">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Thu, 5 Jun
+            </span>
+          </div>
+          <div class="schedule-item" role="listitem">
+            <div class="sched-time">17:00</div>
+            <div><div class="sched-class">Boxing Basics</div></div>
+            <div class="sched-coach">Coach Marcus Reid</div>
+            <span class="cap-pill">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Fri, 6 Jun
+            </span>
+          </div>
+          <div class="schedule-item" role="listitem">
+            <div class="sched-time">10:30</div>
+            <div><div class="sched-class">Spin Burn</div></div>
+            <div class="sched-coach">Coach Dev Okafor</div>
+            <span class="cap-pill">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Sat, 7 Jun
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity feed -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Recent Activity</span>
+        </div>
+        <div class="activity-list">
+          <div class="activity-item">
+            <div class="activity-dot checkin"></div>
+            <div>
+              <div class="activity-desc">Checked in — HIIT Ignite with Coach Priya Mehra</div>
+              <div class="activity-time">2 hrs ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot checkin"></div>
+            <div>
+              <div class="activity-desc">Checked in — Power Lift with Coach Dom Vasquez</div>
+              <div class="activity-time">Yesterday, 07:35</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot plan"></div>
+            <div>
+              <div class="activity-desc">Plan renewed — Elite Annual (auto-renew)</div>
+              <div class="activity-time">30 May 2026</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot checkin"></div>
+            <div>
+              <div class="activity-desc">Checked in — Yoga Flow with Coach Anika Torres</div>
+              <div class="activity-time">29 May 2026, 09:05</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot note"></div>
+            <div>
+              <div class="activity-desc">Staff note added by Alex Kowalski</div>
+              <div class="activity-time">25 May 2026</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot checkin"></div>
+            <div>
+              <div class="activity-desc">Checked in — Boxing Basics with Coach Marcus Reid</div>
+              <div class="activity-time">24 May 2026, 17:12</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>
