@@ -213,5 +213,105 @@ class RealCatalogRegressionTest(unittest.TestCase):
         self.assertIn("in sync", res.stdout)
 
 
+class DualCatalogTest(unittest.TestCase):
+    """The fork catalog (open-design/plugins/registry/wxcode/...) is what
+    tenants actually read. regen must sync it alongside this repo's catalog,
+    preserving the fork's own top-level metadata, and must NOT silently skip it.
+    """
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.repo = pathlib.Path(self._tmp.name)
+        plugins = self.repo / "plugins"
+        for slug, name, title, mode, tags in (
+            ("beta", "wxcode-beta", "Beta Plugin", "deck", ["wxcode-plugin", "b-tag"]),
+            ("alpha", "wxcode-alpha", "Alpha Plugin", "prototype", ["wxcode-plugin", "a-tag"]),
+        ):
+            d = plugins / slug
+            d.mkdir(parents=True)
+            (d / "open-design.json").write_text(
+                json.dumps(_manifest(name, title, mode, tags)), encoding="utf-8"
+            )
+        registry = self.repo / "registry"
+        registry.mkdir()
+        self.catalog_path = registry / "wxcode-marketplace.json"
+        self.catalog_path.write_text(json.dumps(_seed_catalog()), encoding="utf-8")
+
+        # Fork catalog with a DISTINCT top-level (object owner, no community
+        # trust) to prove regen preserves the fork's own metadata.
+        self.fork_path = self.repo / "fork" / "open-design-marketplace.json"
+        self.fork_path.parent.mkdir(parents=True)
+        self.fork_path.write_text(
+            json.dumps(
+                {
+                    "$schema": "https://open-design.ai/schemas/marketplace.v1.json",
+                    "specVersion": "1.0.0",
+                    "name": "wxcode-design-plugins",
+                    "version": "0.4.0",
+                    "owner": {"name": "WXCode", "url": "https://example.invalid"},
+                    "metadata": {"description": "fork seed", "version": "0.4.0",
+                                 "updatedAt": "2000-01-01T00:00:00Z"},
+                    "plugins": [],
+                }
+            ),
+            encoding="utf-8",
+        )
+
+    def tearDown(self) -> None:
+        self._tmp.cleanup()
+
+    def _run(self, *extra: str, now: str = FIXED_NOW) -> subprocess.CompletedProcess:
+        env = dict(os.environ)
+        env["OD_REGEN_NOW"] = now
+        return subprocess.run(
+            [sys.executable, str(SCRIPT), "--marketplace-repo", str(self.repo),
+             "--catalog", "registry/wxcode-marketplace.json", *extra],
+            env=env, capture_output=True, text=True,
+        )
+
+    def test_fork_catalog_gets_identical_entries_distinct_toplevel(self) -> None:
+        res = self._run("--fork-catalog", str(self.fork_path))
+        self.assertEqual(res.returncode, 0, res.stderr)
+        self.assertIn("open-design fork", res.stdout)
+
+        primary = json.loads(self.catalog_path.read_text(encoding="utf-8"))
+        fork = json.loads(self.fork_path.read_text(encoding="utf-8"))
+        # Same entries in both catalogs.
+        self.assertEqual(primary["plugins"], fork["plugins"])
+        self.assertEqual([p["name"] for p in fork["plugins"]],
+                         ["wxcode-alpha", "wxcode-beta"])
+        # Fork's own top-level metadata preserved (NOT overwritten by this repo's).
+        self.assertEqual(fork["owner"], {"name": "WXCode", "url": "https://example.invalid"})
+        self.assertNotIn("trust", fork)  # fork seed had none; not injected
+        self.assertEqual(fork["metadata"]["updatedAt"], FIXED_NOW)
+
+    def test_check_flags_stale_fork(self) -> None:
+        self._run("--fork-catalog", str(self.fork_path))  # sync both
+        ok = self._run("--check", "--fork-catalog", str(self.fork_path),
+                       now="2099-01-01T00:00:00Z")
+        self.assertEqual(ok.returncode, 0, ok.stdout + ok.stderr)
+
+        # Drop an entry from the fork only -> --check must flag it stale.
+        fork = json.loads(self.fork_path.read_text(encoding="utf-8"))
+        fork["plugins"] = fork["plugins"][:1]
+        self.fork_path.write_text(json.dumps(fork), encoding="utf-8")
+        stale = self._run("--check", "--fork-catalog", str(self.fork_path))
+        self.assertEqual(stale.returncode, 1, stale.stdout + stale.stderr)
+        self.assertIn("open-design fork", stale.stdout)
+
+    def test_missing_fork_warns_but_succeeds(self) -> None:
+        missing = self.repo / "nope" / "open-design-marketplace.json"
+        res = self._run("--fork-catalog", str(missing))
+        self.assertEqual(res.returncode, 0, res.stderr)  # primary still written
+        self.assertIn("WARNING", res.stderr)
+        self.assertIn("restricted", res.stderr)
+
+    def test_no_fork_catalog_is_silent(self) -> None:
+        res = self._run("--no-fork-catalog")
+        self.assertEqual(res.returncode, 0, res.stderr)
+        self.assertNotIn("WARNING", res.stderr)
+        self.assertNotIn("open-design fork", res.stdout)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

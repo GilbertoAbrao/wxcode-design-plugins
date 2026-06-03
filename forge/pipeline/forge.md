@@ -643,7 +643,8 @@ dir — this avoids drift when entries are added, renamed, or removed across run
 ```bash
 python3 forge/tools/regen-catalog.py \
   --marketplace-repo "<marketplace_repo>" \
-  --catalog "<marketplace_catalog>"
+  --catalog "<marketplace_catalog>" \
+  --fork-catalog "<open_design_repo>/plugins/registry/wxcode/open-design-marketplace.json"
 ```
 
 `regen-catalog.py` walks `<marketplace_repo>/plugins/*/open-design.json`, rebuilds
@@ -651,6 +652,32 @@ python3 forge/tools/regen-catalog.py \
 existing top-level metadata when present (seeds it otherwise), and stamps
 `metadata.updatedAt`. It is the single source of truth for catalog shape; consult
 that file (and its `--check` mode) for flags.
+
+### ⚠ Dual-catalog sync — the fork catalog tenants actually read
+
+This repo's `registry/wxcode-marketplace.json` is the **authoring** catalog, but
+**tenants never read it.** The Open Design daemon only trusts a marketplace source
+whose repo is on its allowlist — the OD official repo **or** `OD_MARKETPLACE_REPO`
+(WXCode tenants set `OD_MARKETPLACE_REPO=GilbertoAbrao/open-design`) — and the file
+must be `plugins/registry/<id>/open-design-marketplace.json`. So tenants consume the
+catalog from the **open-design fork** at
+`plugins/registry/wxcode/open-design-marketplace.json`. A plugin that lands only in
+THIS repo's catalog is installable only via a direct `github:` source, which defaults
+to the **`restricted`** trust tier (the Restricted-badge bug); installing via the
+fork-catalog marketplace yields **`trusted`**.
+
+Therefore regen syncs BOTH:
+
+- `--fork-catalog <path>` (or the auto-detected sibling `../open-design/...`) writes
+  the fork catalog too, with the SAME entries and the fork's own preserved top-level.
+- If the fork catalog can't be found, regen prints a loud WARNING — it is **never**
+  skipped silently. Pass `--no-fork-catalog` only when you deliberately want
+  authoring-repo-only output.
+- The fork catalog lives in a **separate repo** (`open-design`). The git-safety stage
+  (§6) commits this repo's plugin dirs + catalog; the fork-catalog change is a
+  SEPARATE working-tree change in the open-design repo that you must **commit + push
+  there too** (raw.githubusercontent serves it at `@main`; tenants pick it up on the
+  next Plugins → Sources → Refresh). Do not forget this second commit.
 
 ### Bump catalog version
 

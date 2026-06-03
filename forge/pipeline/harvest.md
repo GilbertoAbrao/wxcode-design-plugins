@@ -355,9 +355,14 @@ through to its report, with these harvest-specific bindings:
    <dir>` as the acceptance gate, with the same 2-retry / drop-as-needs-human policy.
    A harvested plugin is held to the identical lint bar as a forged one.
 
-4. **Catalog regen** — forge.md §4.5: `python3 forge/tools/regen-catalog.py
-   --marketplace-repo <marketplace_repo> --catalog <marketplace_catalog>`. Bump
-   handled per §4.5.
+4. **Catalog regen (BOTH catalogs)** — forge.md §4.5: `python3
+   forge/tools/regen-catalog.py --marketplace-repo <marketplace_repo> --catalog
+   <marketplace_catalog> --fork-catalog
+   <open_design_repo>/plugins/registry/wxcode/open-design-marketplace.json`. The
+   fork catalog is the one **tenants actually read** (allowlisted
+   `OD_MARKETPLACE_REPO`); skipping it leaves new plugins installable only via
+   direct `github:` → `restricted` trust. It lives in a separate repo, so commit +
+   push it in the open-design repo too. Bump + dual-sync handled per §4.5.
 
 5. **Trigger enrichment** — forge.md §5 (style-only phrasings; re-lint after).
 
