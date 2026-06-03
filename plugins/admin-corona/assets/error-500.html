@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Console — Server Error</title>
+<style>
+:root {
+  --canvas: #191c24;
+  --card: #1e2130;
+  --border: #2c2e33;
+  --text-primary: #e4e6ef;
+  --text-secondary: #b5b5c3;
+  --text-muted: #6c7293;
+  --accent: #8862e0;
+  --accent-end: #5b8ef0;
+  --accent-dim: rgba(136,98,224,.14);
+  --accent-gradient: linear-gradient(135deg, #8862e0 0%, #5b8ef0 100%);
+  --state-error: #ef4444;
+  --state-error-dim: rgba(239,68,68,.1);
+  --radius: 4px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--canvas); color: var(--text-primary);
+  font-family: "Rubik","Nunito Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size: 14px; line-height: 1.5; min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 32px; text-align: center;
+  background-image:
+    radial-gradient(circle at 30% 30%, rgba(239,68,68,.05) 0%, transparent 50%),
+    radial-gradient(circle at 70% 70%, rgba(136,98,224,.05) 0%, transparent 50%);
+}
+.navbar { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: var(--card); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; gap: 10px; z-index: 50; }
+.brand-icon { width: 32px; height: 32px; border-radius: var(--radius); background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; }
+.brand-icon svg { width: 18px; height: 18px; }
+.brand-name { font-size: 18px; font-weight: 700; }
+.error-wrap { max-width: 520px; display: flex; flex-direction: column; align-items: center; gap: 24px; margin-top: 60px; }
+.error-svg { width: 280px; height: 200px; }
+.error-code {
+  font-size: 80px; font-weight: 700; line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--state-error);
+  filter: drop-shadow(0 0 24px rgba(239,68,68,.25));
+}
+.error-title { font-size: 24px; font-weight: 500; }
+.error-desc { font-size: 14px; color: var(--text-muted); max-width: 380px; line-height: 1.7; }
+.error-detail {
+  background: var(--state-error-dim); border: 1px solid rgba(239,68,68,.2); border-radius: var(--radius);
+  padding: 12px 16px; font-family: "Courier New", monospace; font-size: 11px; color: var(--state-error);
+  text-align: left; width: 100%; max-width: 380px; word-break: break-all;
+}
+.btn-row { display: flex; gap: 12px; align-items: center; }
+.btn-primary {
+  padding: 10px 24px; border-radius: var(--radius); border: none;
+  background: var(--accent-gradient); color: #fff; font-family: inherit; font-size: 14px;
+  font-weight: 500; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+  transition: opacity .15s;
+}
+.btn-primary:hover { opacity: .88; }
+.btn-ghost {
+  padding: 10px 24px; border-radius: var(--radius); border: 1px solid var(--border);
+  background: transparent; color: var(--text-secondary); font-family: inherit; font-size: 14px;
+  cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+  transition: border-color .15s, color .15s;
+}
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="brand-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="7"/><path d="M9 5v4l3 2"/></svg></div>
+  <span class="brand-name">Nexus</span>
+</nav>
+
+<div class="error-wrap">
+  <!-- Geometric SVG illustration -->
+  <svg class="error-svg" viewBox="0 0 280 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background rings -->
+    <circle cx="140" cy="100" r="90" fill="rgba(239,68,68,.04)" stroke="#2c2e33" stroke-width="1"/>
+    <circle cx="140" cy="100" r="60" fill="rgba(239,68,68,.04)" stroke="#3d3f4a" stroke-width="1" stroke-dasharray="6 4"/>
+    <!-- Alert triangle -->
+    <polygon points="140,38 185,118 95,118" fill="#1e2130" stroke="#ef4444" stroke-width="2.5" stroke-linejoin="round"/>
+    <line x1="140" y1="58" x2="140" y2="92" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="140" cy="103" r="3" fill="#ef4444"/>
+    <!-- Floating fragments — "broken" feeling -->
+    <rect x="28" y="50" width="18" height="18" rx="3" fill="#1e2130" stroke="#ef4444" stroke-width="1" opacity=".4" transform="rotate(-20 37 59)"/>
+    <rect x="228" y="120" width="16" height="16" rx="3" fill="#1e2130" stroke="#2c2e33" stroke-width="1" transform="rotate(15 236 128)"/>
+    <circle cx="55" cy="155" r="9" fill="#1e2130" stroke="#2c2e33" stroke-width="1"/>
+    <circle cx="240" cy="55" r="7" fill="#1e2130" stroke="#ef4444" stroke-width="1" opacity=".35"/>
+    <!-- Jagged path to suggest disruption -->
+    <path d="M60 175 L80 160 L95 170 L115 155 L135 165 L155 148 L175 158 L195 145 L215 155 L230 145" stroke="#2c2e33" stroke-width="1" stroke-dasharray="3 3" fill="none"/>
+  </svg>
+
+  <div class="error-code">500</div>
+  <div class="error-title">Internal Server Error</div>
+  <div class="error-desc">Something went wrong on our end. Our team has been notified and is working to fix the issue.</div>
+
+  <div class="error-detail">Error: INTERNAL_SERVER_ERROR · ref#a8f2d91c · 2026-06-03T14:32:07Z</div>
+
+  <div class="btn-row">
+    <a href="#" class="btn-primary">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3"/></svg>
+      Retry
+    </a>
+    <a href="#" class="btn-ghost">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      Dashboard
+    </a>
+  </div>
+</div>
+</body>
+</html>

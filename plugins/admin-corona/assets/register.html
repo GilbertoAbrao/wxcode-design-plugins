@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Console — Create Account</title>
+<style>
+:root {
+  --canvas: #191c24;
+  --card: #1e2130;
+  --border: #2c2e33;
+  --text-primary: #e4e6ef;
+  --text-secondary: #b5b5c3;
+  --text-muted: #6c7293;
+  --accent: #8862e0;
+  --accent-end: #5b8ef0;
+  --accent-dim: rgba(136,98,224,.14);
+  --accent-gradient: linear-gradient(135deg, #8862e0 0%, #5b8ef0 100%);
+  --state-active: #22c55e;
+  --state-active-dim: rgba(34,197,94,.13);
+  --state-error: #ef4444;
+  --state-error-dim: rgba(239,68,68,.1);
+  --radius: 4px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--canvas); color: var(--text-primary);
+  font-family: "Rubik","Nunito Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size: 14px; line-height: 1.5; min-height: 100vh;
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(136,98,224,.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(91,142,240,.06) 0%, transparent 50%);
+}
+.auth-card {
+  width: 100%; max-width: 460px;
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(0,0,0,.35); padding: 40px;
+}
+.auth-logo { display: flex; align-items: center; gap: 10px; justify-content: center; margin-bottom: 24px; }
+.brand-icon { width: 40px; height: 40px; border-radius: var(--radius); background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; }
+.brand-icon svg { width: 22px; height: 22px; }
+.brand-name { font-size: 22px; font-weight: 700; }
+.auth-title { font-size: 20px; font-weight: 500; text-align: center; margin-bottom: 6px; }
+.auth-sub { font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 24px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+.form-group.full { grid-column: 1 / -1; }
+.form-label { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+.form-label .req { color: var(--state-error); margin-left: 2px; }
+.form-input {
+  width: 100%; background: var(--canvas); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 9px 12px; color: var(--text-primary);
+  font-family: inherit; font-size: 13px; outline: none; transition: border-color .15s;
+}
+.form-input::placeholder { color: var(--text-muted); }
+.form-input:focus { border-color: var(--accent); }
+.form-input.error { border-color: var(--state-error); background: var(--state-error-dim); }
+.form-input.valid { border-color: var(--state-active); }
+.input-wrap { position: relative; }
+.input-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; cursor: pointer; }
+.field-error { font-size: 11px; color: var(--state-error); display: flex; align-items: center; gap: 4px; margin-top: 3px; }
+.field-error svg { width: 11px; height: 11px; flex-shrink: 0; }
+.field-helper { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+/* Password strength meter */
+.strength-bar { display: flex; gap: 3px; margin-top: 5px; }
+.strength-seg { height: 3px; flex: 1; border-radius: 3px; background: var(--border); }
+.strength-seg.filled.weak { background: var(--state-error); }
+.strength-seg.filled.medium { background: var(--state-pending); }
+.strength-seg.filled.strong { background: var(--state-active); }
+.strength-label { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
+/* Terms checkbox */
+.form-check { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 18px; }
+.form-check input[type=checkbox] { accent-color: var(--accent); width: 15px; height: 15px; cursor: pointer; margin-top: 1px; flex-shrink: 0; }
+.form-check label { font-size: 13px; color: var(--text-secondary); cursor: pointer; }
+.form-check label a { color: var(--accent); text-decoration: none; }
+.form-check label a:hover { text-decoration: underline; }
+.field-error.terms { margin-top: 0; margin-bottom: 8px; }
+.btn-primary {
+  width: 100%; padding: 11px; border-radius: var(--radius); border: none;
+  background: var(--accent-gradient); color: #fff; font-family: inherit; font-size: 14px;
+  font-weight: 500; cursor: pointer; transition: opacity .15s;
+}
+.btn-primary:hover { opacity: .88; }
+.auth-footer { text-align: center; margin-top: 20px; font-size: 13px; color: var(--text-muted); }
+.link { color: var(--accent); text-decoration: none; }
+.link:hover { text-decoration: underline; }
+.icon-valid { color: var(--state-active); }
+.icon-error { color: var(--state-error); }
+</style>
+</head>
+<body>
+<div class="auth-card">
+  <div class="auth-logo">
+    <div class="brand-icon">
+      <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="7"/><path d="M9 5v4l3 2"/></svg>
+    </div>
+    <span class="brand-name">Nexus</span>
+  </div>
+
+  <div class="auth-title">Create your account</div>
+  <div class="auth-sub">Get started — it only takes a minute</div>
+
+  <form novalidate>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="first-name">First name <span class="req">*</span></label>
+        <input class="form-input valid" id="first-name" type="text" value="Alex" placeholder="Alex" autocomplete="given-name">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="last-name">Last name <span class="req">*</span></label>
+        <input class="form-input valid" id="last-name" type="text" value="Johnson" placeholder="Johnson" autocomplete="family-name">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="email">Work email <span class="req">*</span></label>
+      <input class="form-input valid" id="email" type="email" value="alex.johnson@company.com" placeholder="you@company.com" autocomplete="email">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="password">Password <span class="req">*</span></label>
+      <div class="input-wrap">
+        <input class="form-input" id="password" type="password" value="MyPass1!" placeholder="Minimum 8 characters" autocomplete="new-password">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="#6c7293" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="Show password"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </div>
+      <div class="strength-bar">
+        <div class="strength-seg filled strong"></div>
+        <div class="strength-seg filled strong"></div>
+        <div class="strength-seg filled strong"></div>
+        <div class="strength-seg"></div>
+      </div>
+      <div class="strength-label">Strength: <strong style="color:#22c55e;">Good</strong> — add a symbol to make it stronger</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="confirm">Confirm password <span class="req">*</span></label>
+      <div class="input-wrap">
+        <input class="form-input error" id="confirm" type="password" value="MyPass1" placeholder="Repeat your password" autocomplete="new-password">
+        <svg class="input-icon icon-error" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="Error"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+      </div>
+      <div class="field-error">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Passwords do not match.
+      </div>
+    </div>
+
+    <div class="form-check">
+      <input type="checkbox" id="terms" checked>
+      <label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+    </div>
+
+    <button class="btn-primary" type="submit">Create account</button>
+  </form>
+
+  <div class="auth-footer">
+    Already have an account? <a href="#" class="link">Sign in</a>
+  </div>
+</div>
+</body>
+</html>

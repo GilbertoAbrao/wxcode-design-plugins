@@ -1,0 +1,133 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "wxcode-admin-corona",
+  "title": "Violet Night Admin",
+  "version": "0.1.0",
+  "description": "Dark admin aesthetic: deep-charcoal canvas (#191c24), violet accent (#8862e0) on a violet-to-blue gradient for primary actions, Rubik type at weight 500 headings, 4px card radius, subdued #6c7293 body text, and #2c2e33 hairline borders. Archetype = top navbar with search + user controls, left icon sidebar, KPI card row (4 tiles), 2-column grid with a chart panel and a status list, plus a full-width data table — all balanced between density and breathing room.",
+  "license": "MIT",
+  "author": {
+    "name": "WXCode",
+    "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+  },
+  "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-corona",
+  "tags": [
+    "wxcode-plugin",
+    "wxcode",
+    "first-party",
+    "prototype",
+    "operations",
+    "web",
+    "admin",
+    "dark-mode",
+    "violet-accent",
+    "gradient-buttons",
+    "charcoal-canvas",
+    "enterprise",
+    "rubik"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "prototype",
+    "scenario": "operations",
+    "surface": "web",
+    "preview": {
+      "type": "html",
+      "entry": "./example.html"
+    },
+    "useCase": {
+      "query": {
+        "en": "Apply this dark charcoal admin aesthetic to my domain — deep-charcoal canvas, violet accent with gradient CTAs, Rubik type, 4px card radius, KPI tiles, chart panel, status list, and full-width data table.",
+        "zh-CN": "将这个深炭色管理面板风格应用到我的领域：深炭色底色、紫色渐变主按钮、Rubik 字体、4px 卡片圆角、KPI 卡片、图表面板、状态列表和完整数据表格。"
+      },
+      "exampleOutputs": [
+        {
+          "path": "./example.html",
+          "title": "Admin Console — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Admin Console — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Admin Console — Form"
+        },
+        {
+          "path": "./assets/charts.html",
+          "title": "Admin Console — Charts"
+        },
+        {
+          "path": "./assets/login.html",
+          "title": "Admin Console — Login"
+        },
+        {
+          "path": "./assets/register.html",
+          "title": "Admin Console — Register"
+        },
+        {
+          "path": "./assets/error-404.html",
+          "title": "Admin Console — 404"
+        },
+        {
+          "path": "./assets/error-500.html",
+          "title": "Admin Console — 500"
+        }
+      ]
+    },
+    "context": {
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ],
+      "designSystem": {
+        "primary": true
+      },
+      "craft": [
+        "pixel-discipline",
+        "typographic-rhythm"
+      ],
+      "assets": [
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/charts.html",
+        "./assets/login.html",
+        "./assets/register.html",
+        "./assets/error-404.html",
+        "./assets/error-500.html",
+        "./assets/template.html",
+        "./references/layouts.md"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ],
+    "provenance": {
+      "template": "Corona",
+      "url": "https://themewagon.github.io/corona-free-dark-bootstrap-admin-template/"
+    }
+  }
+}

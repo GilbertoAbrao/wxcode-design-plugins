@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Console — Sign In</title>
+<style>
+:root {
+  --canvas: #191c24;
+  --card: #1e2130;
+  --border: #2c2e33;
+  --text-primary: #e4e6ef;
+  --text-secondary: #b5b5c3;
+  --text-muted: #6c7293;
+  --accent: #8862e0;
+  --accent-end: #5b8ef0;
+  --accent-dim: rgba(136,98,224,.14);
+  --accent-gradient: linear-gradient(135deg, #8862e0 0%, #5b8ef0 100%);
+  --state-error: #ef4444;
+  --state-error-dim: rgba(239,68,68,.1);
+  --radius: 4px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--canvas); color: var(--text-primary);
+  font-family: "Rubik","Nunito Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size: 14px; line-height: 1.5; min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  /* decorative background pattern */
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(136,98,224,.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(91,142,240,.06) 0%, transparent 50%);
+}
+.auth-card {
+  width: 100%; max-width: 420px;
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(0,0,0,.35);
+  padding: 40px;
+}
+.auth-logo { display: flex; align-items: center; gap: 10px; justify-content: center; margin-bottom: 28px; }
+.brand-icon { width: 40px; height: 40px; border-radius: var(--radius); background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; }
+.brand-icon svg { width: 22px; height: 22px; }
+.brand-name { font-size: 22px; font-weight: 700; color: var(--text-primary); }
+.auth-title { font-size: 20px; font-weight: 500; text-align: center; margin-bottom: 6px; }
+.auth-sub { font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 28px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.form-label { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+.form-input {
+  width: 100%; background: var(--canvas); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 10px 12px; color: var(--text-primary);
+  font-family: inherit; font-size: 13px; outline: none; transition: border-color .15s;
+}
+.form-input::placeholder { color: var(--text-muted); }
+.form-input:focus { border-color: var(--accent); }
+.form-input.error { border-color: var(--state-error); background: var(--state-error-dim); }
+.input-wrap { position: relative; }
+.input-icon { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 16px; height: 16px; cursor: pointer; }
+.field-error { font-size: 11px; color: var(--state-error); display: flex; align-items: center; gap: 4px; margin-top: 4px; }
+.field-error svg { width: 11px; height: 11px; flex-shrink: 0; }
+.row-between { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.form-check { display: flex; align-items: center; gap: 7px; }
+.form-check input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; cursor: pointer; }
+.form-check label { font-size: 13px; color: var(--text-secondary); cursor: pointer; }
+.link { color: var(--accent); font-size: 13px; text-decoration: none; }
+.link:hover { text-decoration: underline; }
+.btn-primary {
+  width: 100%; padding: 11px; border-radius: var(--radius); border: none;
+  background: var(--accent-gradient); color: #fff; font-family: inherit; font-size: 14px;
+  font-weight: 500; cursor: pointer; transition: opacity .15s;
+}
+.btn-primary:hover { opacity: .88; }
+.divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+.divider-line { flex: 1; height: 1px; background: var(--border); }
+.divider-text { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+.btn-sso {
+  width: 100%; padding: 10px; border-radius: var(--radius); border: 1px solid var(--border);
+  background: transparent; color: var(--text-secondary); font-family: inherit; font-size: 13px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: border-color .15s, color .15s, background .15s;
+}
+.btn-sso:hover { border-color: var(--accent); color: var(--text-primary); background: var(--accent-dim); }
+.auth-footer { text-align: center; margin-top: 20px; font-size: 13px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<div class="auth-card">
+  <div class="auth-logo">
+    <div class="brand-icon">
+      <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="9" cy="9" r="7"/><path d="M9 5v4l3 2"/>
+      </svg>
+    </div>
+    <span class="brand-name">Nexus</span>
+  </div>
+
+  <div class="auth-title">Welcome back</div>
+  <div class="auth-sub">Sign in to your account to continue</div>
+
+  <form novalidate>
+    <div class="form-group">
+      <label class="form-label" for="email">Email address</label>
+      <input class="form-input error" id="email" type="email" value="alex@" placeholder="you@company.com" autocomplete="email">
+      <div class="field-error">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Enter a valid email address.
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="password">Password</label>
+      <div class="input-wrap">
+        <input class="form-input" id="password" type="password" placeholder="Enter your password" autocomplete="current-password">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="Show password"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </div>
+    </div>
+
+    <div class="row-between">
+      <label class="form-check">
+        <input type="checkbox" id="remember">
+        <span>Remember me</span>
+      </label>
+      <a href="#" class="link">Forgot password?</a>
+    </div>
+
+    <button class="btn-primary" type="submit">Sign in</button>
+  </form>
+
+  <div class="divider">
+    <span class="divider-line"></span>
+    <span class="divider-text">or continue with</span>
+    <span class="divider-line"></span>
+  </div>
+
+  <button class="btn-sso" type="button">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    Continue with SSO
+  </button>
+
+  <div class="auth-footer">
+    Don't have an account? <a href="#" class="link">Create one</a>
+  </div>
+</div>
+</body>
+</html>

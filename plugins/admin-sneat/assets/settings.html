@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Console — Settings</title>
+<style>
+:root {
+  --accent:        #696cff;
+  --accent-hover:  #5a5dd6;
+  --accent-dim:    rgba(105,108,255,.12);
+  --canvas:        #f5f5f9;
+  --surface:       #ffffff;
+  --border:        #e4e6e8;
+  --text-primary:  #333240;
+  --text-body:     #646e78;
+  --text-muted:    #8a9099;
+  --shadow-sm:     0 2px 6px rgba(67,89,113,.12);
+  --radius-card:   6px;
+  --radius-pill:   20px;
+  --radius-input:  6px;
+  --state-success: #71dd37;
+  --state-warning: #ffab00;
+  --state-danger:  #ff3e1d;
+  --state-info:    #03c3ec;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.5;background:var(--canvas);color:var(--text-body);display:flex;flex-direction:column;min-height:100vh}
+.navbar{position:fixed;top:0;left:0;right:0;height:60px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:100;box-shadow:var(--shadow-sm)}
+.navbar-brand{display:flex;align-items:center;gap:8px;width:236px}
+.navbar-brand span{font-weight:700;font-size:18px;color:var(--text-primary)}
+.navbar-search{flex:1;max-width:320px;position:relative}
+.navbar-search input{width:100%;padding:8px 12px 8px 36px;border:1px solid var(--border);border-radius:var(--radius-input);font-size:14px;color:var(--text-body);background:var(--canvas);outline:none}
+.navbar-search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted)}
+.navbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.icon-btn{width:38px;height:38px;border-radius:50%;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-body);position:relative}
+.badge-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--state-danger);border:2px solid var(--surface)}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;border:2px solid var(--accent)}
+.sidebar{position:fixed;top:60px;left:0;width:260px;bottom:0;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:16px 0}
+.nav-section-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);padding:16px 24px 6px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 20px;cursor:pointer;color:var(--text-body);text-decoration:none;border-radius:6px;margin:1px 12px;font-size:14px;font-weight:500;transition:.18s}
+.nav-item:hover{background:var(--canvas)}
+.nav-item.active{background:var(--accent-dim);color:var(--accent)}
+.main{margin-left:260px;margin-top:60px;padding:24px;min-height:calc(100vh - 60px)}
+.page-header{margin-bottom:24px}
+.page-title{font-size:20px;font-weight:700;color:var(--text-primary)}
+
+/* Settings layout */
+.settings-layout{display:grid;grid-template-columns:220px 1fr;gap:24px;align-items:start}
+
+/* Settings nav */
+.settings-nav{background:var(--surface);border-radius:var(--radius-card);border:1px solid var(--border);box-shadow:var(--shadow-sm);overflow:hidden}
+.settings-nav-item{display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;color:var(--text-body);font-size:14px;font-weight:500;text-decoration:none;transition:.18s;border-bottom:1px solid var(--border)}
+.settings-nav-item:last-child{border-bottom:none}
+.settings-nav-item:hover{background:var(--canvas)}
+.settings-nav-item.active{background:var(--accent-dim);color:var(--accent)}
+.settings-nav-item svg{flex-shrink:0}
+
+/* Content card */
+.card{background:var(--surface);border-radius:var(--radius-card);border:1px solid var(--border);box-shadow:var(--shadow-sm)}
+.section-title{font-size:16px;font-weight:700;color:var(--text-primary);padding:20px 24px;border-bottom:1px solid var(--border)}
+.section-body{padding:24px}
+.section-divider{margin:0 24px;height:1px;background:var(--border)}
+
+/* Profile section */
+.profile-row{display:flex;align-items:center;gap:20px;margin-bottom:24px}
+.profile-avatar{width:80px;height:80px;border-radius:50%;background:var(--accent-dim);color:var(--accent);font-size:28px;font-weight:700;display:flex;align-items:center;justify-content:center;border:3px solid var(--accent);flex-shrink:0}
+.profile-info{flex:1}
+.profile-name{font-size:18px;font-weight:700;color:var(--text-primary)}
+.profile-role{font-size:13px;color:var(--text-muted);margin-top:2px}
+.profile-actions{display:flex;gap:10px;margin-top:12px}
+
+/* Form fields */
+.field{margin-bottom:20px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.field-label{display:flex;align-items:center;gap:4px;font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:6px}
+.required-mark{color:var(--accent)}
+.field-input{width:100%;padding:9px 14px;border:1px solid var(--border);border-radius:var(--radius-input);font-size:14px;color:var(--text-primary);background:var(--surface);outline:none;transition:.18s;font-family:inherit}
+.field-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.field-select{appearance:none;padding-right:36px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a9099' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.helper-text{font-size:12px;color:var(--text-muted);margin-top:4px}
+.error-text{font-size:12px;color:var(--state-danger);margin-top:4px}
+.field-input.is-invalid{border-color:var(--state-danger)}
+
+/* Toggle rows */
+.toggle-row{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-label{font-size:13px;font-weight:600;color:var(--text-primary)}
+.toggle-desc{font-size:12px;color:var(--text-muted);margin-top:2px}
+.toggle{width:36px;height:20px;border-radius:10px;background:var(--border);position:relative;cursor:pointer;flex-shrink:0;transition:.18s;margin-top:2px}
+.toggle.on{background:var(--accent)}
+.toggle::after{content:'';width:14px;height:14px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;transition:.18s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle.on::after{left:19px}
+
+/* API key */
+.api-key-row{display:flex;align-items:center;gap:10px}
+.api-key-field{flex:1;font-family:"Courier New",monospace;font-size:13px;background:var(--canvas);color:var(--text-muted);padding:9px 14px;border:1px solid var(--border);border-radius:var(--radius-input);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Danger zone */
+.danger-zone{border:1px solid rgba(255,62,29,.25);border-radius:var(--radius-card);padding:20px}
+.danger-zone-title{font-size:14px;font-weight:700;color:var(--state-danger);margin-bottom:8px}
+.danger-zone-body{font-size:13px;color:var(--text-body);margin-bottom:16px}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:var(--radius-input);font-size:14px;font-weight:600;border:none;cursor:pointer;transition:.18s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-ghost{background:transparent;color:var(--text-body);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:transparent;color:var(--state-danger);border:1px solid rgba(255,62,29,.4)}
+.btn-danger:hover{background:rgba(255,62,29,.08)}
+.form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-brand">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="var(--accent)"/><rect x="6" y="6" width="7" height="7" rx="2" fill="#fff"/><rect x="15" y="6" width="7" height="7" rx="2" fill="rgba(255,255,255,.5)"/><rect x="6" y="15" width="7" height="7" rx="2" fill="rgba(255,255,255,.5)"/><rect x="15" y="15" width="7" height="7" rx="2" fill="#fff"/></svg>
+    <span>AppPanel</span>
+  </div>
+  <div class="navbar-search">
+    <svg class="navbar-search-icon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/></svg>
+    <input type="text" placeholder="Search…" aria-label="Search">
+  </div>
+  <div class="navbar-actions">
+    <button class="icon-btn" style="position:relative" title="Notifications">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="badge-dot"></span>
+    </button>
+    <div class="avatar">AS</div>
+  </div>
+</nav>
+
+<aside class="sidebar">
+  <div class="nav-section-label">Main</div>
+  <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+  <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Records</a>
+  <div class="nav-section-label">Account</div>
+  <a class="nav-item active" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</a>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <div class="page-title">Account Settings</div>
+  </div>
+
+  <div class="settings-layout">
+    <!-- Side nav -->
+    <div class="settings-nav">
+      <a class="settings-nav-item active" href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Profile
+      </a>
+      <a class="settings-nav-item" href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Security
+      </a>
+      <a class="settings-nav-item" href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        Notifications
+      </a>
+      <a class="settings-nav-item" href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Billing
+      </a>
+      <a class="settings-nav-item" href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+        API Keys
+      </a>
+      <a class="settings-nav-item" href="#" style="color:var(--state-danger)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        Danger Zone
+      </a>
+    </div>
+
+    <!-- Profile form -->
+    <div style="display:flex;flex-direction:column;gap:24px">
+      <div class="card">
+        <div class="section-title">Profile Information</div>
+        <div class="section-body">
+          <div class="profile-row">
+            <div class="profile-avatar">AS</div>
+            <div class="profile-info">
+              <div class="profile-name">Alex Simmons</div>
+              <div class="profile-role">Account Administrator</div>
+              <div class="profile-actions">
+                <button class="btn btn-ghost" style="padding:6px 14px;font-size:13px">Change Photo</button>
+                <button class="btn btn-ghost" style="padding:6px 14px;font-size:13px;color:var(--state-danger);border-color:rgba(255,62,29,.3)">Remove</button>
+              </div>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label" for="s-fname">First Name <span class="required-mark">*</span></label>
+              <input class="field-input" id="s-fname" type="text" value="Alex" aria-required="true">
+            </div>
+            <div class="field">
+              <label class="field-label" for="s-lname">Last Name <span class="required-mark">*</span></label>
+              <input class="field-input" id="s-lname" type="text" value="Simmons" aria-required="true">
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label" for="s-email">Email <span class="required-mark">*</span></label>
+            <input class="field-input" id="s-email" type="email" value="alex@company.io" aria-required="true">
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label" for="s-phone">Phone</label>
+              <input class="field-input" id="s-phone" type="tel" value="+1 (555) 234-5678">
+            </div>
+            <div class="field">
+              <label class="field-label" for="s-tz">Timezone</label>
+              <select class="field-input field-select" id="s-tz">
+                <option selected>UTC−05:00 Eastern Time</option>
+                <option>UTC−08:00 Pacific Time</option>
+                <option>UTC+00:00 London</option>
+                <option>UTC+01:00 Paris</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label" for="s-bio">Bio</label>
+            <textarea class="field-input" id="s-bio" style="resize:vertical;min-height:80px">Passionate about building great products and teams.</textarea>
+            <div class="helper-text">Brief description for your public profile.</div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-ghost">Discard</button>
+            <button class="btn btn-primary">Save Changes</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div class="card">
+        <div class="section-title">Notification Preferences</div>
+        <div class="section-body">
+          <div class="toggle-row">
+            <div><div class="toggle-label">New record alerts</div><div class="toggle-desc">Notify me when a new record is added.</div></div>
+            <div class="toggle on" role="switch" aria-checked="true" tabindex="0"></div>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Status changes</div><div class="toggle-desc">Notify when a record changes status.</div></div>
+            <div class="toggle on" role="switch" aria-checked="true" tabindex="0"></div>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Weekly digest</div><div class="toggle-desc">Receive a summary email every Monday.</div></div>
+            <div class="toggle" role="switch" aria-checked="false" tabindex="0"></div>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Security alerts</div><div class="toggle-desc">Sign-in from a new device or location.</div></div>
+            <div class="toggle on" role="switch" aria-checked="true" tabindex="0"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- API Key -->
+      <div class="card">
+        <div class="section-title">API Access</div>
+        <div class="section-body">
+          <div class="field">
+            <label class="field-label">Secret Key</label>
+            <div class="api-key-row">
+              <div class="api-key-field">sk_live_••••••••••••••••••••••••••••••••••••••••</div>
+              <button class="btn btn-ghost" style="white-space:nowrap;padding:9px 14px;font-size:13px">Reveal</button>
+              <button class="btn btn-ghost" style="white-space:nowrap;padding:9px 14px;font-size:13px">Regenerate</button>
+            </div>
+            <div class="helper-text">Keep this key secret. Regenerating invalidates the current key immediately.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Danger zone -->
+      <div class="danger-zone">
+        <div class="danger-zone-title">Danger Zone</div>
+        <div class="danger-zone-body">Once you delete your account, all data is permanently removed and cannot be recovered. This action is irreversible.</div>
+        <button class="btn btn-danger">Delete Account</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

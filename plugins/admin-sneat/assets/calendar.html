@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Console — Calendar</title>
+<style>
+:root {
+  --accent:        #696cff;
+  --accent-hover:  #5a5dd6;
+  --accent-dim:    rgba(105,108,255,.12);
+  --canvas:        #f5f5f9;
+  --surface:       #ffffff;
+  --border:        #e4e6e8;
+  --text-primary:  #333240;
+  --text-body:     #646e78;
+  --text-muted:    #8a9099;
+  --shadow-sm:     0 2px 6px rgba(67,89,113,.12);
+  --radius-card:   6px;
+  --radius-input:  6px;
+  --state-success: #71dd37;
+  --state-danger:  #ff3e1d;
+  --state-warning: #ffab00;
+  --state-info:    #03c3ec;
+  /* Calendar event colors */
+  --ev-meeting:    #696cff;
+  --ev-deadline:   #ff3e1d;
+  --ev-release:    #71dd37;
+  --ev-personal:   #ffab00;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.5;background:var(--canvas);color:var(--text-body);display:flex;flex-direction:column;min-height:100vh}
+.navbar{position:fixed;top:0;left:0;right:0;height:60px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:100;box-shadow:var(--shadow-sm)}
+.navbar-brand{display:flex;align-items:center;gap:8px;width:236px}
+.navbar-brand span{font-weight:700;font-size:18px;color:var(--text-primary)}
+.navbar-search{flex:1;max-width:320px;position:relative}
+.navbar-search input{width:100%;padding:8px 12px 8px 36px;border:1px solid var(--border);border-radius:var(--radius-input);font-size:14px;color:var(--text-body);background:var(--canvas);outline:none}
+.navbar-search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted)}
+.navbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.icon-btn{width:38px;height:38px;border-radius:50%;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-body);position:relative}
+.badge-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--state-danger);border:2px solid var(--surface)}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;border:2px solid var(--accent)}
+.sidebar{position:fixed;top:60px;left:0;width:260px;bottom:0;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:16px 0}
+.nav-section-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);padding:16px 24px 6px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 20px;cursor:pointer;color:var(--text-body);text-decoration:none;border-radius:6px;margin:1px 12px;font-size:14px;font-weight:500;transition:.18s}
+.nav-item:hover{background:var(--canvas)}
+.nav-item.active{background:var(--accent-dim);color:var(--accent)}
+
+/* Calendar layout */
+.cal-wrap{margin-left:260px;margin-top:60px;display:flex;height:calc(100vh - 60px);overflow:hidden}
+.cal-sidebar{width:260px;border-right:1px solid var(--border);background:var(--surface);padding:20px 16px;overflow-y:auto;flex-shrink:0}
+.add-event-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;border-radius:var(--radius-input);background:var(--accent);color:#fff;font-size:13px;font-weight:600;border:none;cursor:pointer;margin-bottom:24px;transition:.18s;font-family:inherit}
+.add-event-btn:hover{background:var(--accent-hover)}
+
+/* Mini calendar */
+.mini-cal{}
+.mini-cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.mini-cal-month{font-size:14px;font-weight:700;color:var(--text-primary)}
+.mini-cal-nav{background:none;border:none;cursor:pointer;color:var(--text-muted);padding:4px;display:flex;align-items:center;border-radius:4px;transition:.18s}
+.mini-cal-nav:hover{background:var(--canvas)}
+.mini-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.mini-day-label{font-size:11px;font-weight:600;color:var(--text-muted);text-align:center;padding:4px 0}
+.mini-day{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:12px;cursor:pointer;color:var(--text-body);transition:.18s;justify-self:center}
+.mini-day:hover{background:var(--canvas)}
+.mini-day.today{background:var(--accent);color:#fff;font-weight:700}
+.mini-day.other-month{color:var(--border)}
+.mini-day.has-event{position:relative}
+.mini-day.has-event::after{content:'';position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--accent)}
+
+/* Event types filter */
+.event-types{margin-top:24px}
+.event-type-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:10px}
+.event-type-row{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13px;color:var(--text-body);cursor:pointer}
+.event-type-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.event-type-count{margin-left:auto;font-size:11px;font-weight:600;color:var(--text-muted)}
+
+/* Main calendar grid */
+.cal-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.cal-header{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border);background:var(--surface)}
+.cal-title{font-size:16px;font-weight:700;color:var(--text-primary);margin-right:8px}
+.cal-nav-btn{padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius-input);background:var(--surface);cursor:pointer;font-size:13px;color:var(--text-body);font-family:inherit;transition:.18s}
+.cal-nav-btn:hover{border-color:var(--accent);color:var(--accent)}
+.cal-view-group{margin-left:auto;display:flex;border:1px solid var(--border);border-radius:var(--radius-input);overflow:hidden}
+.cal-view-btn{padding:6px 14px;border:none;background:var(--surface);cursor:pointer;font-size:13px;font-family:inherit;color:var(--text-body);transition:.18s;border-right:1px solid var(--border)}
+.cal-view-btn:last-child{border-right:none}
+.cal-view-btn.active{background:var(--accent);color:#fff}
+
+.cal-grid{display:flex;flex-direction:column;flex:1;overflow:auto}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--border)}
+.cal-weekday{padding:10px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);text-align:center}
+.cal-weeks{display:grid;grid-template-rows:repeat(5,1fr);flex:1}
+.cal-week{display:grid;grid-template-columns:repeat(7,1fr)}
+.cal-cell{border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:8px;min-height:100px;cursor:pointer;transition:.18s;position:relative}
+.cal-cell:last-child{border-right:none}
+.cal-week:last-child .cal-cell{border-bottom:none}
+.cal-cell:hover{background:#f8f8fb}
+.cal-day-num{font-size:13px;font-weight:500;color:var(--text-muted);margin-bottom:6px;display:inline-flex;width:26px;height:26px;align-items:center;justify-content:center;border-radius:50%}
+.cal-day-num.today{background:var(--accent);color:#fff;font-weight:700}
+.cal-cell.other-month .cal-day-num{color:var(--border)}
+.event-chip{display:flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:500;margin-bottom:3px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ev-meeting{background:rgba(105,108,255,.15);color:var(--ev-meeting)}
+.ev-deadline{background:rgba(255,62,29,.12);color:var(--ev-deadline)}
+.ev-release{background:rgba(113,221,55,.15);color:#4b9e22}
+.ev-personal{background:rgba(255,171,0,.12);color:#c48500}
+.ev-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-brand">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="var(--accent)"/><rect x="6" y="6" width="7" height="7" rx="2" fill="#fff"/><rect x="15" y="6" width="7" height="7" rx="2" fill="rgba(255,255,255,.5)"/><rect x="6" y="15" width="7" height="7" rx="2" fill="rgba(255,255,255,.5)"/><rect x="15" y="15" width="7" height="7" rx="2" fill="#fff"/></svg>
+    <span>AppPanel</span>
+  </div>
+  <div class="navbar-search">
+    <svg class="navbar-search-icon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/></svg>
+    <input type="text" placeholder="Search…" aria-label="Search">
+  </div>
+  <div class="navbar-actions">
+    <button class="icon-btn" style="position:relative" title="Notifications">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="badge-dot"></span>
+    </button>
+    <div class="avatar">AS</div>
+  </div>
+</nav>
+
+<aside class="sidebar">
+  <div class="nav-section-label">Main</div>
+  <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+  <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Records</a>
+  <a class="nav-item active" href="#">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Calendar
+  </a>
+  <div class="nav-section-label">Account</div>
+  <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg>Settings</a>
+</aside>
+
+<div class="cal-wrap">
+  <!-- Calendar sidebar -->
+  <div class="cal-sidebar">
+    <button class="add-event-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Event
+    </button>
+
+    <div class="mini-cal">
+      <div class="mini-cal-header">
+        <span class="mini-cal-month">June 2026</span>
+        <div style="display:flex;gap:2px">
+          <button class="mini-cal-nav" aria-label="Previous month"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <button class="mini-cal-nav" aria-label="Next month"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+        </div>
+      </div>
+      <div class="mini-cal-grid">
+        <div class="mini-day-label">S</div><div class="mini-day-label">M</div><div class="mini-day-label">T</div>
+        <div class="mini-day-label">W</div><div class="mini-day-label">T</div><div class="mini-day-label">F</div>
+        <div class="mini-day-label">S</div>
+        <!-- Row 1 -->
+        <div class="mini-day other-month">25</div><div class="mini-day other-month">26</div>
+        <div class="mini-day other-month">27</div><div class="mini-day other-month">28</div>
+        <div class="mini-day other-month">29</div><div class="mini-day other-month">30</div>
+        <div class="mini-day other-month">31</div>
+        <!-- Row 2 -->
+        <div class="mini-day">1</div><div class="mini-day has-event">2</div>
+        <div class="mini-day">3</div><div class="mini-day today">4</div>
+        <div class="mini-day has-event">5</div><div class="mini-day">6</div>
+        <div class="mini-day">7</div>
+        <!-- Row 3 -->
+        <div class="mini-day">8</div><div class="mini-day has-event">9</div>
+        <div class="mini-day">10</div><div class="mini-day">11</div>
+        <div class="mini-day has-event">12</div><div class="mini-day has-event">13</div>
+        <div class="mini-day">14</div>
+        <!-- Row 4 -->
+        <div class="mini-day">15</div><div class="mini-day">16</div>
+        <div class="mini-day has-event">17</div><div class="mini-day">18</div>
+        <div class="mini-day">19</div><div class="mini-day has-event">20</div>
+        <div class="mini-day">21</div>
+        <!-- Row 5 -->
+        <div class="mini-day">22</div><div class="mini-day has-event">23</div>
+        <div class="mini-day">24</div><div class="mini-day">25</div>
+        <div class="mini-day has-event">26</div><div class="mini-day">27</div>
+        <div class="mini-day">28</div>
+        <!-- Row 6 -->
+        <div class="mini-day">29</div><div class="mini-day">30</div>
+        <div class="mini-day other-month">1</div><div class="mini-day other-month">2</div>
+        <div class="mini-day other-month">3</div><div class="mini-day other-month">4</div>
+        <div class="mini-day other-month">5</div>
+      </div>
+    </div>
+
+    <div class="event-types">
+      <div class="event-type-label">Event Types</div>
+      <div class="event-type-row">
+        <div class="event-type-dot" style="background:var(--ev-meeting)"></div>
+        Meeting
+        <span class="event-type-count">8</span>
+      </div>
+      <div class="event-type-row">
+        <div class="event-type-dot" style="background:var(--ev-deadline)"></div>
+        Deadline
+        <span class="event-type-count">3</span>
+      </div>
+      <div class="event-type-row">
+        <div class="event-type-dot" style="background:var(--ev-release)"></div>
+        Release
+        <span class="event-type-count">2</span>
+      </div>
+      <div class="event-type-row">
+        <div class="event-type-dot" style="background:var(--ev-personal)"></div>
+        Personal
+        <span class="event-type-count">5</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main calendar -->
+  <div class="cal-main">
+    <div class="cal-header">
+      <button class="cal-nav-btn">‹</button>
+      <span class="cal-title">June 2026</span>
+      <button class="cal-nav-btn">›</button>
+      <button class="cal-nav-btn" style="margin-left:8px">Today</button>
+      <div class="cal-view-group">
+        <button class="cal-view-btn active">Month</button>
+        <button class="cal-view-btn">Week</button>
+        <button class="cal-view-btn">Day</button>
+        <button class="cal-view-btn">List</button>
+      </div>
+    </div>
+
+    <div class="cal-grid">
+      <div class="cal-weekdays">
+        <div class="cal-weekday">Sun</div>
+        <div class="cal-weekday">Mon</div>
+        <div class="cal-weekday">Tue</div>
+        <div class="cal-weekday">Wed</div>
+        <div class="cal-weekday">Thu</div>
+        <div class="cal-weekday">Fri</div>
+        <div class="cal-weekday">Sat</div>
+      </div>
+      <div class="cal-weeks">
+        <!-- Week 1 -->
+        <div class="cal-week">
+          <div class="cal-cell other-month"><div class="cal-day-num">25</div></div>
+          <div class="cal-cell other-month"><div class="cal-day-num">26</div></div>
+          <div class="cal-cell other-month"><div class="cal-day-num">27</div></div>
+          <div class="cal-cell other-month"><div class="cal-day-num">28</div></div>
+          <div class="cal-cell other-month"><div class="cal-day-num">29</div></div>
+          <div class="cal-cell other-month"><div class="cal-day-num">30</div></div>
+          <div class="cal-cell other-month"><div class="cal-day-num">31</div></div>
+        </div>
+        <!-- Week 2 -->
+        <div class="cal-week">
+          <div class="cal-cell"><div class="cal-day-num">1</div></div>
+          <div class="cal-cell"><div class="cal-day-num">2</div>
+            <div class="event-chip ev-meeting"><div class="ev-dot" style="background:var(--ev-meeting)"></div>Q2 Review Call</div>
+          </div>
+          <div class="cal-cell"><div class="cal-day-num">3</div></div>
+          <div class="cal-cell"><div class="cal-day-num today">4</div>
+            <div class="event-chip ev-deadline"><div class="ev-dot" style="background:var(--ev-deadline)"></div>Invoice Due</div>
+            <div class="event-chip ev-meeting"><div class="ev-dot" style="background:var(--ev-meeting)"></div>Team Standup</div>
+          </div>
+          <div class="cal-cell"><div class="cal-day-num">5</div>
+            <div class="event-chip ev-meeting"><div class="ev-dot" style="background:var(--ev-meeting)"></div>1:1 with Jordan</div>
+          </div>
+          <div class="cal-cell"><div class="cal-day-num">6</div></div>
+          <div class="cal-cell"><div class="cal-day-num">7</div>
+            <div class="event-chip ev-personal"><div class="ev-dot" style="background:var(--ev-personal)"></div>Team offsite</div>
+          </div>
+        </div>
+        <!-- Week 3 -->
+        <div class="cal-week">
+          <div class="cal-cell"><div class="cal-day-num">8</div></div>
+          <div class="cal-cell"><div class="cal-day-num">9</div>
+            <div class="event-chip ev-release"><div class="ev-dot" style="background:var(--ev-release)"></div>v2.4 Release</div>
+          </div>
+          <div class="cal-cell"><div class="cal-day-num">10</div></div>
+          <div class="cal-cell"><div class="cal-day-num">11</div></div>
+          <div class="cal-cell"><div class="cal-day-num">12</div>
+            <div class="event-chip ev-meeting"><div class="ev-dot" style="background:var(--ev-meeting)"></div>Board Meeting</div>
+          </div>
+          <div class="cal-cell"><div class="cal-day-num">13</div>
+            <div class="event-chip ev-deadline"><div class="ev-dot" style="background:var(--ev-deadline)"></div>Proposal Due</div>
+          </div>
+          <div class="cal-cell"><div class="cal-day-num">14</div></div>
+        </div>
+        <!-- Week 4 -->
+        <div class="cal-week">
+          <div class="cal-cell"><div class="cal-day-num">15</div></div>
+          <div class="cal-cell"><div class="cal-day-num">16</div></div>
+          <div class="cal-cell"><div class="cal-day-num">17</div>
+            <div class="event-chip ev-personal"><div class="ev-dot" style="background:var(--ev-personal)"></div>Birthday lunch</div>
+            <div class="event-chip ev-meeting"><div class="ev-dot" style="background:var(--ev-meeting)"></div>Product demo</div>
+          </div>
+          <div class="cal-cell"><div class="cal-day-num">18</div></div>
+          <div class="cal-cell"><div class="cal-day-num">19</div></div>
+          <div class="cal-cell"><div class="cal-day-num">20</div>
+            <div class="event-chip ev-release"><div class="ev-dot" style="background:var(--ev-release)"></div>Hotfix deploy</div>
+          </div>
+          <div class="cal-cell"><div class="cal-day-num">21</div></div>
+        </div>
+        <!-- Week 5 -->
+        <div class="cal-week">
+          <div class="cal-cell"><div class="cal-day-num">22</div></div>
+          <div class="cal-cell"><div class="cal-day-num">23</div>
+            <div class="event-chip ev-meeting"><div class="ev-dot" style="background:var(--ev-meeting)"></div>Renewal call</div>
+          </div>
+          <div class="cal-cell"><div class="cal-day-num">24</div></div>
+          <div class="cal-cell"><div class="cal-day-num">25</div></div>
+          <div class="cal-cell"><div class="cal-day-num">26</div>
+            <div class="event-chip ev-deadline"><div class="ev-dot" style="background:var(--ev-deadline)"></div>Sprint close</div>
+          </div>
+          <div class="cal-cell"><div class="cal-day-num">27</div></div>
+          <div class="cal-cell"><div class="cal-day-num">28</div>
+            <div class="event-chip ev-personal"><div class="ev-dot" style="background:var(--ev-personal)"></div>Weekend hackathon</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

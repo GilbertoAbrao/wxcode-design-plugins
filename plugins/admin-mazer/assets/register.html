@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Create Account — Admin Console</title>
+<style>
+:root{
+  --bg:#f2f7ff;--card:#fff;--input-bg:#f8faff;--border:#e0e6ed;
+  --text-body:#25396f;--text-secondary:#6b7ea8;--text-muted:#9daec8;
+  --primary:#435ebe;--primary-hover:#3a52aa;--primary-soft:#eef1fb;
+  --danger:#ea5455;--danger-soft:#fce8e8;
+  --success:#28c76f;--success-soft:#e6f9ef;
+  --radius-card:11px;--radius-btn:8px;
+  --shadow-card:0 4px 24px rgba(67,94,190,.08);
+  --transition:.18s ease;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Nunito","Segoe UI",system-ui,sans-serif;font-size:14px;
+  color:var(--text-body);background:var(--bg);
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+input{font-family:inherit}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+
+.auth-wrap{width:100%;max-width:440px}
+.brand-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:28px}
+.brand-icon{width:40px;height:40px;border-radius:10px;background:var(--primary);
+  display:flex;align-items:center;justify-content:center}
+.brand-name{font-size:20px;font-weight:700}
+.card{background:var(--card);border-radius:var(--radius-card);
+  box-shadow:var(--shadow-card);padding:36px 32px}
+.card-heading{font-size:22px;font-weight:700;margin-bottom:4px}
+.card-sub{font-size:13px;color:var(--text-secondary);margin-bottom:24px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.form-group:last-child{margin-bottom:0}
+label{font-size:13px;font-weight:700}
+.required-mark{color:var(--danger);margin-left:2px}
+.form-control{background:var(--input-bg);border:1.5px solid var(--border);
+  border-radius:var(--radius-btn);padding:10px 14px;font-size:14px;
+  color:var(--text-body);outline:none;transition:var(--transition);width:100%}
+.form-control:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(67,94,190,.18)}
+.form-control.error{border-color:var(--danger);background:#fff8f8}
+.form-control.valid{border-color:var(--success)}
+.helper-text{font-size:11px;color:var(--text-muted)}
+.error-msg{font-size:11px;color:var(--danger);display:flex;align-items:center;gap:4px}
+.valid-msg{font-size:11px;color:var(--success);display:flex;align-items:center;gap:4px}
+.password-wrap{position:relative}
+.password-wrap .form-control{padding-right:40px}
+.pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  color:var(--text-muted);cursor:pointer}
+
+/* Password strength bar */
+.strength-bar{display:flex;gap:4px;margin-top:6px}
+.strength-seg{height:4px;flex:1;border-radius:2px;background:var(--border);transition:var(--transition)}
+.strength-seg.weak{background:var(--danger)}
+.strength-seg.fair{background:var(--warn,#ff9f43)}
+.strength-seg.good{background:var(--success)}
+.strength-label{font-size:11px;margin-top:4px;font-weight:600}
+.strength-label.weak{color:var(--danger)}
+.strength-label.fair{color:#ff9f43}
+.strength-label.good{color:var(--success)}
+
+.terms-row{display:flex;align-items:flex-start;gap:10px;margin:14px 0;font-size:12px;color:var(--text-secondary)}
+.terms-row input[type=checkbox]{margin-top:2px;width:14px;height:14px;accent-color:var(--primary);flex-shrink:0;cursor:pointer}
+.terms-row a{color:var(--primary);font-weight:600}
+
+.btn-primary{width:100%;background:var(--primary);color:#fff;padding:11px;
+  border-radius:var(--radius-btn);font-size:15px;font-weight:700;
+  transition:var(--transition)}
+.btn-primary:hover:not(:disabled){background:var(--primary-hover)}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed}
+.login-row{text-align:center;margin-top:20px;font-size:13px;color:var(--text-secondary)}
+.login-row a{font-weight:700;color:var(--primary)}
+.login-row a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="brand-row">
+    <div class="brand-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+    </div>
+    <span class="brand-name">Vantage</span>
+  </div>
+
+  <div class="card">
+    <div class="card-heading">Create your account</div>
+    <div class="card-sub">Get started — it's free.</div>
+
+    <div class="form-row">
+      <div class="form-group" style="margin-bottom:0">
+        <label for="fname">First Name <span class="required-mark">*</span></label>
+        <input id="fname" type="text" class="form-control valid" value="Jordan" autocomplete="given-name">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label for="lname">Last Name <span class="required-mark">*</span></label>
+        <input id="lname" type="text" class="form-control" placeholder="Last name" autocomplete="family-name">
+        <span class="error-msg">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Last name is required.
+        </span>
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-top:14px">
+      <label for="email">Work Email <span class="required-mark">*</span></label>
+      <input id="email" type="email" class="form-control valid" value="jordan@company.io" autocomplete="email">
+      <span class="valid-msg">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Looks good.
+      </span>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password <span class="required-mark">*</span></label>
+      <div class="password-wrap">
+        <input id="password" type="password" class="form-control valid" value="••••••••" autocomplete="new-password">
+        <span class="pw-toggle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </span>
+      </div>
+      <div class="strength-bar">
+        <div class="strength-seg good"></div>
+        <div class="strength-seg good"></div>
+        <div class="strength-seg good"></div>
+        <div class="strength-seg"></div>
+      </div>
+      <span class="strength-label good">Good — add a symbol for Strong.</span>
+    </div>
+
+    <div class="form-group">
+      <label for="confirm">Confirm Password <span class="required-mark">*</span></label>
+      <div class="password-wrap">
+        <input id="confirm" type="password" class="form-control error" value="••••••" autocomplete="new-password">
+        <span class="pw-toggle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </span>
+      </div>
+      <span class="error-msg">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Passwords do not match.
+      </span>
+    </div>
+
+    <div class="terms-row">
+      <input type="checkbox" id="terms" checked>
+      <label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</label>
+    </div>
+
+    <button class="btn-primary" disabled>Create Account</button>
+    <p style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:10px">
+      Fix the errors above to continue.
+    </p>
+  </div>
+
+  <div class="login-row">
+    Already have an account? <a href="#">Sign in</a>
+  </div>
+</div>
+</body>
+</html>

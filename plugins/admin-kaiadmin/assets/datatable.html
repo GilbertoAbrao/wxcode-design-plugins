@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Advanced Datatable — Console</title>
+<style>
+:root {
+  --page-bg: #f5f7fd;
+  --sidebar-bg: #1a2035;
+  --sidebar-text: #a9b7d0;
+  --sidebar-active-bg: #1572e8;
+  --sidebar-active-text: #ffffff;
+  --sidebar-hover-bg: rgba(255,255,255,.08);
+  --card-bg: #ffffff;
+  --accent: #1572e8;
+  --accent-hover: #1260c4;
+  --accent-light: rgba(21,114,232,.12);
+  --text-primary: #444444;
+  --text-body: #5a5a5a;
+  --text-muted: #9daec5;
+  --border: #ebecec;
+  --header-bg: #ffffff;
+  --state-success: #31ce36;
+  --state-success-bg: rgba(49,206,54,.13);
+  --state-warning: #ffad46;
+  --state-warning-bg: rgba(255,173,70,.13);
+  --state-danger: #f25961;
+  --state-danger-bg: rgba(242,89,97,.13);
+  --state-info: #48abf7;
+  --state-info-bg: rgba(72,171,247,.13);
+  --state-secondary: #6c757d;
+  --state-secondary-bg: rgba(108,117,125,.13);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Public Sans","Segoe UI",system-ui,-apple-system,sans-serif;font-size:14px;color:var(--text-body);background:var(--page-bg);display:flex;min-height:100vh}
+.sidebar{width:260px;min-height:100vh;background:var(--sidebar-bg);display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:200}
+.sidebar-logo{height:60px;display:flex;align-items:center;padding:0 20px;border-bottom:1px solid rgba(255,255,255,.06)}
+.sidebar-logo-text{color:#fff;font-size:16px;font-weight:700;margin-left:10px}
+.nav{flex:1;padding:12px 0}
+.nav-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(169,183,208,.5);padding:16px 20px 6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;color:var(--sidebar-text);font-size:13.5px;font-weight:500;cursor:pointer;text-decoration:none;transition:background .15s,color .15s}
+.nav-item:hover{background:var(--sidebar-hover-bg);color:#fff}
+.nav-item.active{background:var(--sidebar-active-bg);color:var(--sidebar-active-text);border-radius:6px;margin:0 10px;padding:10px 10px}
+.sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.06)}
+.user-chip{display:flex;align-items:center;gap:10px}
+.user-avatar{width:34px;height:34px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700}
+.user-name{font-size:13px;font-weight:600;color:#fff}.user-role{font-size:11px;color:var(--sidebar-text)}
+.main-wrap{margin-left:260px;display:flex;flex-direction:column;min-height:100vh;flex:1}
+.header{height:60px;background:var(--header-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;position:sticky;top:0;z-index:100}
+.header-title{font-size:15px;font-weight:600;color:var(--text-primary);flex:1}
+.avatar-btn{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;font-weight:700;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.icon-btn{width:36px;height:36px;border-radius:5px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;cursor:pointer;color:var(--text-body);transition:background .15s}
+.icon-btn:hover{background:#f0f2fa}
+.content{padding:24px;flex:1}
+.page-title{font-size:20px;font-weight:700;color:var(--text-primary);margin-bottom:6px}
+.page-sub{font-size:13px;color:var(--text-muted);margin-bottom:20px}
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:5px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:background .15s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text-body)}
+.btn-ghost:hover{background:#f0f2fa}
+/* Toolbar */
+.dt-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.dt-search{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);border-radius:5px;padding:7px 12px;flex:1;min-width:200px;max-width:320px}
+.dt-search input{border:none;background:transparent;outline:none;font-size:13px;color:var(--text-body);width:100%}
+.dt-search svg{color:var(--text-muted);flex-shrink:0}
+.col-toggle{position:relative}
+.col-toggle-btn{display:flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:5px;padding:7px 12px;font-size:13px;color:var(--text-body);background:#fff;cursor:pointer}
+.col-toggle-btn:hover{background:#f0f2fa}
+.col-dropdown{position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.1);padding:8px;min-width:180px;z-index:50;display:flex;flex-direction:column;gap:2px}
+.col-option{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:5px;font-size:13px;color:var(--text-body);cursor:pointer}
+.col-option:hover{background:#f5f7fd}
+.col-option input[type=checkbox]{accent-color:var(--accent)}
+/* Bulk bar */
+.bulk-action-bar{display:flex;align-items:center;gap:10px;background:var(--accent-light);border:1px solid rgba(21,114,232,.2);border-radius:8px;padding:10px 16px;margin-bottom:12px}
+.bulk-count{font-size:13px;font-weight:600;color:var(--accent);flex:1}
+/* Table */
+.table-wrap{background:var(--card-bg);border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.04);overflow:hidden}
+.table-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+.card-title{font-size:15px;font-weight:600;color:var(--text-primary)}
+.card-count{font-size:12px;font-weight:600;background:var(--accent-light);color:var(--accent);border-radius:10px;padding:2px 8px;margin-left:10px}
+table{width:100%;border-collapse:collapse}
+thead th{padding:10px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);background:#f8f9fe;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
+tbody tr:hover{background:#f8f9fe}
+tbody tr.selected{background:rgba(21,114,232,.04)}
+tbody tr.expanded-parent{background:#f8f9fe}
+tbody tr:last-child{border-bottom:none}
+td{padding:11px 12px;font-size:13px;color:var(--text-body);vertical-align:middle}
+.td-mono{font-family:"Courier New",monospace;font-size:12px;color:var(--text-muted)}
+.td-edit{border:1px solid var(--accent);border-radius:5px;padding:4px 8px;font-size:13px;outline:none;width:120px;color:var(--text-primary)}
+.pill{display:inline-flex;align-items:center;border-radius:10px;padding:3px 10px;font-size:11px;font-weight:600;white-space:nowrap}
+.pill-success{background:var(--state-success-bg);color:var(--state-success)}
+.pill-warning{background:var(--state-warning-bg);color:var(--state-warning)}
+.pill-danger{background:var(--state-danger-bg);color:var(--state-danger)}
+.pill-info{background:var(--state-info-bg);color:var(--state-info)}
+.pill-secondary{background:var(--state-secondary-bg);color:var(--state-secondary)}
+.action-btns{display:flex;gap:5px}
+.action-btn{width:28px;height:28px;border-radius:5px;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);transition:all .12s}
+.action-btn:hover{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+.expand-btn{background:transparent;border:none;cursor:pointer;color:var(--text-muted);font-size:12px;padding:2px}
+.sub-row td{background:#fafbff;font-size:12px;border-bottom:1px solid var(--border);padding:10px 12px 10px 40px}
+.sub-table{width:100%;border-collapse:collapse}
+.sub-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-muted);padding:4px 8px;text-align:left}
+.sub-table td{font-size:12px;color:var(--text-body);padding:5px 8px;border-top:1px solid var(--border)}
+.table-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--border)}
+.table-info{font-size:12px;color:var(--text-muted)}
+.pager{display:flex;gap:4px}
+.page-btn{width:30px;height:30px;border-radius:5px;border:1px solid var(--border);background:transparent;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-body);transition:all .12s}
+.page-btn:hover,.page-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="var(--accent)"/><path d="M7 14h14M14 7v14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>
+    <div class="sidebar-logo-text" style="margin-left:10px">Console</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-label">Main</div>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a class="nav-item active" href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10H3M21 6H3M21 14H3M21 18H3"/></svg>Records</a>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Reports</a>
+    <a class="nav-item" href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M2 12h1M21 12h1M12 2v1M12 21v1"/></svg>Settings</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-chip"><div class="user-avatar">JD</div><div><div class="user-name">Jordan Daly</div><div class="user-role">Administrator</div></div></div>
+  </div>
+</aside>
+
+<div class="main-wrap">
+  <header class="header">
+    <div class="header-title">Advanced Datatable</div>
+    <button class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>
+    <button class="avatar-btn">JD</button>
+  </header>
+
+  <div class="content">
+    <div class="page-title">Entity Datatable</div>
+    <div class="page-sub">Full-featured table: column toggle, inline edit, bulk actions, expandable rows</div>
+
+    <div class="dt-toolbar">
+      <div class="dt-search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search all columns…">
+      </div>
+      <div class="col-toggle">
+        <button class="col-toggle-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          Columns
+        </button>
+        <div class="col-dropdown">
+          <label class="col-option"><input type="checkbox" checked> ID</label>
+          <label class="col-option"><input type="checkbox" checked> Reference</label>
+          <label class="col-option"><input type="checkbox" checked> Capacity</label>
+          <label class="col-option"><input type="checkbox" checked> Region</label>
+          <label class="col-option"><input type="checkbox" checked> Last activity</label>
+          <label class="col-option"><input type="checkbox"> Created by</label>
+          <label class="col-option"><input type="checkbox" checked> Status</label>
+        </div>
+      </div>
+      <button class="btn btn-ghost">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export CSV
+      </button>
+      <button class="btn btn-primary" style="margin-left:auto">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add entry
+      </button>
+    </div>
+
+    <!-- Bulk action bar (appears when rows selected) -->
+    <div class="bulk-action-bar">
+      <span class="bulk-count">3 entries selected</span>
+      <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px">Reassign</button>
+      <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px">Archive</button>
+      <button class="btn" style="padding:6px 12px;font-size:12px;background:var(--state-danger-bg);color:var(--state-danger);border:none">Delete</button>
+      <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px;margin-left:auto">Clear selection</button>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-header">
+        <div><span class="card-title">Entities</span><span class="card-count">248</span></div>
+        <div style="font-size:12px;color:var(--text-muted)">3 selected · Inline editing on row ↓</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th><input type="checkbox"></th>
+            <th></th>
+            <th>ID</th>
+            <th>Reference</th>
+            <th>Capacity</th>
+            <th>Region</th>
+            <th>Last Activity</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Normal row -->
+          <tr class="selected">
+            <td><input type="checkbox" checked></td>
+            <td><button class="expand-btn" title="Expand">▶</button></td>
+            <td class="td-mono">ENT-001</td>
+            <td><div style="font-weight:600;color:var(--text-primary)">Meridian Alpha</div><div style="font-size:11px;color:var(--text-muted)">Cluster A · Node 1</div></td>
+            <td style="font-variant-numeric:tabular-nums">4,200 u</td>
+            <td>North</td>
+            <td>2 h ago</td>
+            <td><span class="pill pill-success">Online</span></td>
+            <td><div class="action-btns">
+              <button class="action-btn" title="Edit inline"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="action-btn" title="Delete"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14H7L5 6"/></svg></button>
+            </div></td>
+          </tr>
+          <!-- Expanded sub-row -->
+          <tr class="sub-row">
+            <td colspan="9">
+              <div style="margin-bottom:6px;font-weight:600;color:var(--text-primary);font-size:12px">Activity log — Meridian Alpha</div>
+              <table class="sub-table">
+                <thead><tr><th>Event</th><th>User</th><th>Timestamp</th><th>Detail</th></tr></thead>
+                <tbody>
+                  <tr><td>Status change</td><td>Morgan Liu</td><td>2 h ago</td><td>Offline → Online</td></tr>
+                  <tr><td>Capacity update</td><td>System</td><td>1 day ago</td><td>3,800 → 4,200 u</td></tr>
+                  <tr><td>Assignment</td><td>Jordan Daly</td><td>3 days ago</td><td>Assigned to North region</td></tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+          <!-- Inline editing row -->
+          <tr class="selected" style="background:rgba(21,114,232,.03)">
+            <td><input type="checkbox" checked></td>
+            <td><button class="expand-btn">▶</button></td>
+            <td class="td-mono">ENT-002</td>
+            <td>
+              <div style="font-weight:600;color:var(--text-primary)">Vantage Beta</div>
+              <div style="font-size:11px;color:var(--text-muted)">Cluster B · Node 2</div>
+            </td>
+            <td><input class="td-edit" type="text" value="3,600 u"></td>
+            <td>East</td>
+            <td>Yesterday</td>
+            <td><span class="pill pill-warning">Degraded</span></td>
+            <td><div class="action-btns">
+              <button class="action-btn" title="Save" style="background:var(--state-success-bg);border-color:var(--state-success);color:var(--state-success)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></button>
+              <button class="action-btn" title="Cancel"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            </div></td>
+          </tr>
+          <tr class="selected">
+            <td><input type="checkbox" checked></td>
+            <td><button class="expand-btn">▶</button></td>
+            <td class="td-mono">ENT-003</td>
+            <td><div style="font-weight:600;color:var(--text-primary)">Apex Gamma</div><div style="font-size:11px;color:var(--text-muted)">Cluster A · Node 5</div></td>
+            <td style="font-variant-numeric:tabular-nums">2,900 u</td>
+            <td>South</td>
+            <td>3 h ago</td>
+            <td><span class="pill pill-success">Online</span></td>
+            <td><div class="action-btns">
+              <button class="action-btn" title="Edit"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="action-btn" title="Delete"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14H7L5 6"/></svg></button>
+            </div></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"></td>
+            <td><button class="expand-btn">▶</button></td>
+            <td class="td-mono">ENT-004</td>
+            <td><div style="font-weight:600;color:var(--text-primary)">Crest Delta</div><div style="font-size:11px;color:var(--text-muted)">Cluster C · Node 1</div></td>
+            <td style="font-variant-numeric:tabular-nums">1,100 u</td>
+            <td>West</td>
+            <td>2 days ago</td>
+            <td><span class="pill pill-danger">Offline</span></td>
+            <td><div class="action-btns">
+              <button class="action-btn" title="Edit"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="action-btn" title="Delete"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14H7L5 6"/></svg></button>
+            </div></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"></td>
+            <td><button class="expand-btn">▶</button></td>
+            <td class="td-mono">ENT-005</td>
+            <td><div style="font-weight:600;color:var(--text-primary)">Zenith Epsilon</div><div style="font-size:11px;color:var(--text-muted)">Cluster B · Node 4</div></td>
+            <td style="font-variant-numeric:tabular-nums">5,800 u</td>
+            <td>North</td>
+            <td>5 h ago</td>
+            <td><span class="pill pill-secondary">Maintenance</span></td>
+            <td><div class="action-btns">
+              <button class="action-btn" title="Edit"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="action-btn" title="Delete"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14H7L5 6"/></svg></button>
+            </div></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="table-footer">
+        <span class="table-info">Showing 1–5 of 248 entries</span>
+        <div class="pager">
+          <button class="page-btn">‹</button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

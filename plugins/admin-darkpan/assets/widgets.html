@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Widgets — Admin Console</title>
+<style>
+  :root {
+    --page:        #000000;
+    --panel:       #191c24;
+    --panel-hover: #212535;
+    --active-bg:   #2a2e38;
+    --border:      #2a2e38;
+    --divider:     #1e2130;
+    --text-1:      #ffffff;
+    --text-2:      #b1b7c1;
+    --text-3:      #6c7293;
+    --text-4:      #454865;
+    --accent:      #009688;
+    --accent-hov:  #00b09c;
+    --accent-dim:  rgba(0,150,136,.15);
+    --s-success:   #00c897;
+    --s-success-d: rgba(0,200,151,.14);
+    --s-warn:      #ffab00;
+    --s-warn-d:    rgba(255,171,0,.14);
+    --s-danger:    #ff4c61;
+    --s-danger-d:  rgba(255,76,97,.14);
+    --s-info:      #5b73e8;
+    --s-info-d:    rgba(91,115,232,.14);
+    --s-neutral:   #6c7293;
+    --font: "Open Sans","Helvetica Neue",Arial,sans-serif;
+    --radius: 0px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--page); color: var(--text-1); font-family: var(--font); font-size: 14px; line-height: 1.5; display: flex; height: 100vh; overflow: hidden; }
+
+  /* SIDEBAR */
+  .sidebar { width: 240px; flex-shrink: 0; background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; }
+  .sidebar-logo { height: 56px; display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border); }
+  .sidebar-logo svg { color: var(--accent); }
+  .sidebar-logo span { font-size: 16px; font-weight: 700; margin-left: 10px; }
+  .sidebar-section { padding: 20px 0 4px; }
+  .sidebar-label { font-size: 11px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: .7px; padding: 0 20px 6px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 20px; color: var(--text-2); font-size: 13.5px; cursor: pointer; transition: background .13s; border-left: 3px solid transparent; text-decoration: none; }
+  .nav-item:hover { background: var(--panel-hover); color: var(--text-1); }
+  .nav-item.active { background: var(--accent-dim); color: var(--accent); border-left-color: var(--accent); }
+  .nav-item .badge { margin-left: auto; background: var(--s-danger); color: #fff; font-size: 10px; font-weight: 700; padding: 1px 6px; }
+  .sidebar-spacer { flex: 1; }
+  .sidebar-bottom { padding: 12px 0; border-top: 1px solid var(--border); }
+
+  /* MAIN */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar { height: 56px; background: var(--panel); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 16px; flex-shrink: 0; }
+  .hamburger { background: none; border: none; cursor: pointer; color: var(--text-2); display: flex; align-items: center; }
+  .topbar-spacer { flex: 1; }
+  .topbar-actions { display: flex; align-items: center; gap: 8px; }
+  .icon-btn { background: none; border: 1px solid var(--border); color: var(--text-2); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
+  .notif-dot { position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; background: var(--s-danger); border-radius: 50%; border: 2px solid var(--panel); }
+  .avatar-chip { display: flex; align-items: center; gap: 8px; padding: 4px 10px; background: var(--active-bg); border: 1px solid var(--border); cursor: pointer; }
+  .avatar-circle { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; }
+  .avatar-info { display: flex; flex-direction: column; line-height: 1.2; }
+  .avatar-name { font-size: 12px; font-weight: 600; }
+  .avatar-role { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: .4px; }
+
+  /* CONTENT */
+  .content { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+  .page-header { display: flex; align-items: center; justify-content: space-between; }
+  .page-title { font-size: 20px; font-weight: 700; }
+  .breadcrumb { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+  .breadcrumb a { color: var(--accent); text-decoration: none; }
+
+  /* WIDGET GRID */
+  .widget-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .widget-grid.two-col { grid-template-columns: repeat(2, 1fr); }
+
+  /* WIDGET BASE */
+  .widget { background: var(--panel); border: 1px solid var(--border); display: flex; flex-direction: column; }
+  .widget-head { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .widget-title { font-size: 13px; font-weight: 700; color: var(--text-1); }
+  .widget-sub { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+  .widget-link { font-size: 11px; color: var(--accent); text-decoration: none; cursor: pointer; }
+  .widget-link:hover { color: var(--accent-hov); text-decoration: underline; }
+  .widget-body { padding: 16px; flex: 1; }
+  .widget-foot { padding: 10px 16px; border-top: 1px solid var(--border); }
+
+  /* STAT WIDGET */
+  .stat-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .stat-row:last-child { margin-bottom: 0; }
+  .stat-label { font-size: 12px; color: var(--text-3); display: flex; align-items: center; gap: 6px; }
+  .stat-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .stat-value { font-size: 13px; font-weight: 700; color: var(--text-1); font-variant-numeric: tabular-nums; }
+
+  /* PROGRESS WIDGET */
+  .progress-item { margin-bottom: 12px; }
+  .progress-item:last-child { margin-bottom: 0; }
+  .progress-header { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .progress-label { font-size: 12px; color: var(--text-2); }
+  .progress-pct { font-size: 12px; color: var(--text-1); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .progress-track { height: 4px; background: var(--active-bg); }
+  .progress-fill { height: 4px; }
+  .fill-accent  { background: var(--accent); }
+  .fill-info    { background: var(--s-info); }
+  .fill-warn    { background: var(--s-warn); }
+  .fill-danger  { background: var(--s-danger); }
+  .fill-success { background: var(--s-success); }
+
+  /* ALERT LIST WIDGET */
+  .alert-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--divider); }
+  .alert-item:last-child { border-bottom: none; }
+  .sev-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .sev-crit { background: var(--s-danger); }
+  .sev-warn { background: var(--s-warn); }
+  .sev-info { background: var(--s-info); }
+  .alert-text { font-size: 12px; color: var(--text-2); line-height: 1.4; }
+  .alert-meta { font-size: 10px; color: var(--text-4); margin-top: 2px; }
+
+  /* ACTIVITY FEED WIDGET */
+  .activity-item { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--divider); }
+  .activity-item:last-child { border-bottom: none; }
+  .act-icon { width: 28px; height: 28px; background: var(--active-bg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--text-3); }
+  .act-icon.teal { background: var(--accent-dim); color: var(--accent); }
+  .act-icon.warn { background: var(--s-warn-d); color: var(--s-warn); }
+  .act-icon.danger { background: var(--s-danger-d); color: var(--s-danger); }
+  .act-body { flex: 1; }
+  .act-text { font-size: 12px; color: var(--text-2); line-height: 1.4; }
+  .act-time { font-size: 10px; color: var(--text-4); margin-top: 2px; }
+
+  /* MINI TABLE WIDGET */
+  .mini-table { width: 100%; border-collapse: collapse; }
+  .mini-table th { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--text-4); padding: 4px 0 6px; border-bottom: 1px solid var(--border); text-align: left; }
+  .mini-table th.right { text-align: right; }
+  .mini-table td { padding: 6px 0; font-size: 12px; color: var(--text-2); border-bottom: 1px solid var(--divider); vertical-align: middle; }
+  .mini-table td.right { text-align: right; font-variant-numeric: tabular-nums; }
+  .mini-table td.primary { color: var(--text-1); font-weight: 600; }
+  .mini-table tr:last-child td { border-bottom: none; }
+
+  /* PILL */
+  .pill { display: inline-flex; align-items: center; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; padding: 2px 7px; }
+  .pill-success { background: var(--s-success-d); color: var(--s-success); }
+  .pill-warn    { background: var(--s-warn-d);    color: var(--s-warn); }
+  .pill-danger  { background: var(--s-danger-d);  color: var(--s-danger); }
+  .pill-info    { background: var(--s-info-d);    color: var(--s-info); }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar" aria-label="Primary navigation">
+  <div class="sidebar-logo">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 5h2v-2h2v2h2v2h-2v2h-2v-2h-2z"/></svg>
+    <span>Nexus</span>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Overview</div>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+      Dashboard
+    </a>
+    <a class="nav-item active" href="#">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+      Widgets
+    </a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Resources</div>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20 3H4v2l8 4 8-4V3zM4 7v2l8 4 8-4V7l-8 4z"/></svg>
+      Servers
+    </a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Observability</div>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+      Alerts
+      <span class="badge">7</span>
+    </a>
+  </div>
+  <div class="sidebar-spacer"></div>
+  <div class="sidebar-bottom">
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96a7.15 7.15 0 0 0-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.477.477 0 0 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+      Settings
+    </a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <header class="topbar">
+    <button class="hamburger" aria-label="Toggle sidebar">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+    </button>
+    <div class="topbar-spacer"></div>
+    <div class="topbar-actions">
+      <button class="icon-btn" aria-label="Notifications">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+        <span class="notif-dot"></span>
+      </button>
+      <div class="avatar-chip">
+        <div class="avatar-circle">AR</div>
+        <div class="avatar-info"><span class="avatar-name">A. Rivera</span><span class="avatar-role">Admin</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Widgets</div>
+        <div class="breadcrumb"><a href="#">Dashboard</a> / Widgets</div>
+      </div>
+    </div>
+
+    <!-- TOP STATS ROW -->
+    <div class="widget-grid">
+      <!-- QUICK STATS -->
+      <div class="widget">
+        <div class="widget-head">
+          <div><div class="widget-title">Service Health</div><div class="widget-sub">Current state · 6 services</div></div>
+          <a class="widget-link" href="#">View all</a>
+        </div>
+        <div class="widget-body">
+          <div class="stat-row"><span class="stat-label"><span class="stat-dot" style="background:var(--s-success)"></span>Running</span><span class="stat-value">3</span></div>
+          <div class="stat-row"><span class="stat-label"><span class="stat-dot" style="background:var(--s-warn)"></span>Degraded</span><span class="stat-value">1</span></div>
+          <div class="stat-row"><span class="stat-label"><span class="stat-dot" style="background:var(--s-danger)"></span>Offline</span><span class="stat-value">1</span></div>
+          <div class="stat-row"><span class="stat-label"><span class="stat-dot" style="background:var(--s-neutral)"></span>Maintenance</span><span class="stat-value">1</span></div>
+        </div>
+        <div class="widget-foot">
+          <a class="widget-link" href="#">View services →</a>
+        </div>
+      </div>
+
+      <!-- RESOURCE UTILISATION -->
+      <div class="widget">
+        <div class="widget-head">
+          <div><div class="widget-title">Resource Utilisation</div><div class="widget-sub">Cluster average · right now</div></div>
+        </div>
+        <div class="widget-body">
+          <div class="progress-item">
+            <div class="progress-header"><span class="progress-label">CPU</span><span class="progress-pct">61%</span></div>
+            <div class="progress-track"><div class="progress-fill fill-warn" style="width:61%"></div></div>
+          </div>
+          <div class="progress-item">
+            <div class="progress-header"><span class="progress-label">Memory</span><span class="progress-pct">72%</span></div>
+            <div class="progress-track"><div class="progress-fill fill-info" style="width:72%"></div></div>
+          </div>
+          <div class="progress-item">
+            <div class="progress-header"><span class="progress-label">Disk I/O</span><span class="progress-pct">38%</span></div>
+            <div class="progress-track"><div class="progress-fill fill-accent" style="width:38%"></div></div>
+          </div>
+          <div class="progress-item">
+            <div class="progress-header"><span class="progress-label">Network out</span><span class="progress-pct">84%</span></div>
+            <div class="progress-track"><div class="progress-fill fill-danger" style="width:84%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIVE ALERTS -->
+      <div class="widget">
+        <div class="widget-head">
+          <div><div class="widget-title">Active Alerts</div><div class="widget-sub">7 open · 2 critical</div></div>
+          <a class="widget-link" href="#">All alerts</a>
+        </div>
+        <div class="widget-body" style="padding:8px 16px">
+          <div class="alert-item">
+            <div class="sev-dot sev-crit"></div>
+            <div><div class="alert-text">Search Index unreachable</div><div class="alert-meta">us-west-2 · 8 min ago</div></div>
+          </div>
+          <div class="alert-item">
+            <div class="sev-dot sev-crit"></div>
+            <div><div class="alert-text">Node srv-074 disk at 97%</div><div class="alert-meta">us-east-1 · 22 min ago</div></div>
+          </div>
+          <div class="alert-item">
+            <div class="sev-dot sev-warn"></div>
+            <div><div class="alert-text">Data Pipeline below 70% throughput</div><div class="alert-meta">eu-west-1 · 35 min ago</div></div>
+          </div>
+          <div class="alert-item">
+            <div class="sev-dot sev-info"></div>
+            <div><div class="alert-text">Maintenance window in 2 h</div><div class="alert-meta">Scheduled · global</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM ROW -->
+    <div class="widget-grid two-col">
+      <!-- TOP CONSUMERS TABLE -->
+      <div class="widget">
+        <div class="widget-head">
+          <div><div class="widget-title">Top CPU Consumers</div><div class="widget-sub">Last 5 minutes · sorted by avg CPU</div></div>
+        </div>
+        <div class="widget-body" style="padding:0 16px 4px">
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Hostname</th>
+                <th>Region</th>
+                <th class="right">CPU %</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="primary">data-proc-03</td><td style="color:var(--text-3);font-size:11px">eu-west-1</td><td class="right" style="color:var(--s-warn)">78%</td><td><span class="pill pill-warn">Degraded</span></td></tr>
+              <tr><td class="primary">db-replica-04</td><td style="color:var(--text-3);font-size:11px">eu-central-1</td><td class="right">61%</td><td><span class="pill pill-success">Running</span></td></tr>
+              <tr><td class="primary">api-prod-01</td><td style="color:var(--text-3);font-size:11px">us-east-1</td><td class="right">42%</td><td><span class="pill pill-success">Running</span></td></tr>
+              <tr><td class="primary">auth-svc-02</td><td style="color:var(--text-3);font-size:11px">us-east-1</td><td class="right">29%</td><td><span class="pill pill-success">Running</span></td></tr>
+              <tr><td class="primary">cdn-edge-07</td><td style="color:var(--text-3);font-size:11px">ap-southeast-1</td><td class="right">11%</td><td><span class="pill pill-info">Provisioning</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="widget-foot"><a class="widget-link" href="#">View all servers →</a></div>
+      </div>
+
+      <!-- RECENT ACTIVITY -->
+      <div class="widget">
+        <div class="widget-head">
+          <div><div class="widget-title">Recent Activity</div><div class="widget-sub">Last 24 hours</div></div>
+        </div>
+        <div class="widget-body" style="padding:8px 16px">
+          <div class="activity-item">
+            <div class="act-icon danger"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
+            <div class="act-body"><div class="act-text">Search Index went offline — health check failed</div><div class="act-time">8 min ago · srv-033</div></div>
+          </div>
+          <div class="activity-item">
+            <div class="act-icon teal"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div>
+            <div class="act-body"><div class="act-text">cdn-edge-07 provisioned in ap-southeast-1</div><div class="act-time">3 min ago · A. Rivera</div></div>
+          </div>
+          <div class="activity-item">
+            <div class="act-icon warn"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
+            <div class="act-body"><div class="act-text">CPU threshold alert on data-proc-03</div><div class="act-time">35 min ago · automated</div></div>
+          </div>
+          <div class="activity-item">
+            <div class="act-icon teal"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <div class="act-body"><div class="act-text">3 alerts acknowledged by T. Chen</div><div class="act-time">1 hr ago · T. Chen</div></div>
+          </div>
+          <div class="activity-item">
+            <div class="act-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></div>
+            <div class="act-body"><div class="act-text">System report generated for eu-west-1</div><div class="act-time">2 hr ago · automated</div></div>
+          </div>
+        </div>
+        <div class="widget-foot"><a class="widget-link" href="#">View full activity log →</a></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

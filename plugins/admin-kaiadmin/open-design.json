@@ -1,0 +1,128 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "wxcode-admin-kaiadmin",
+  "title": "Azure Rail Admin",
+  "version": "0.1.0",
+  "description": "Light content-area + dark sidebar admin aesthetic: page canvas #f5f7fd, crisp white cards with 10px radius, deep navy sidebar (#1a2035), blue primary accent (#1572e8), body text #5a5a5a, Public Sans typography, bold 700 headings. Archetype = fixed dark vertical sidebar (icon + label nav) + sticky top header bar (page title + search + action icons + avatar) + 4-tile KPI row + 2-column dashboard grid (status overview panel + chart panel) + full-width records table with status pills. Complementary screens: list, form, charts, profile/settings, login.",
+  "license": "MIT",
+  "author": {
+    "name": "WXCode",
+    "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+  },
+  "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-kaiadmin",
+  "tags": [
+    "wxcode-plugin",
+    "wxcode",
+    "first-party",
+    "prototype",
+    "operations",
+    "web",
+    "admin",
+    "light-mode",
+    "dark-sidebar",
+    "blue-accent",
+    "clean-cards",
+    "enterprise",
+    "sidebar-nav"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "prototype",
+    "scenario": "operations",
+    "surface": "web",
+    "preview": {
+      "type": "html",
+      "entry": "./example.html"
+    },
+    "useCase": {
+      "query": {
+        "en": "Apply this light-canvas dark-sidebar admin aesthetic to my domain — white cards, navy sidebar, blue accent, bold headings, KPI tile row, dashboard grid, and a dense records table with status pills.",
+        "zh-CN": "将这个浅色画布深色侧边栏管理界面风格应用到我的领域：白色卡片、深海军蓝侧边栏、蓝色强调色、加粗标题、KPI 磁贴行、仪表板网格和带状态标签的密集记录表格。"
+      },
+      "exampleOutputs": [
+        {
+          "path": "./example.html",
+          "title": "Azure Rail Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Azure Rail Admin — List"
+        },
+        {
+          "path": "./assets/datatable.html",
+          "title": "Azure Rail Admin — Datatable"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Azure Rail Admin — Form"
+        },
+        {
+          "path": "./assets/charts.html",
+          "title": "Azure Rail Admin — Charts"
+        },
+        {
+          "path": "./assets/widgets.html",
+          "title": "Azure Rail Admin — Widgets"
+        },
+        {
+          "path": "./assets/profile.html",
+          "title": "Azure Rail Admin — Profile"
+        }
+      ]
+    },
+    "context": {
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ],
+      "designSystem": {
+        "primary": true
+      },
+      "craft": [
+        "typographic-rhythm",
+        "state-coverage"
+      ],
+      "assets": [
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/datatable.html",
+        "./assets/form.html",
+        "./assets/charts.html",
+        "./assets/widgets.html",
+        "./assets/profile.html",
+        "./assets/template.html",
+        "./references/layouts.md"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ],
+    "provenance": {
+      "template": "KaiAdmin",
+      "url": "https://themewagon.github.io/kaiadmin-lite/"
+    }
+  }
+}

@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Console — Dashboard CRM</title>
+<style>
+:root {
+  --accent:        #696cff;
+  --accent-hover:  #5a5dd6;
+  --accent-dim:    rgba(105,108,255,.12);
+  --canvas:        #f5f5f9;
+  --surface:       #ffffff;
+  --border:        #e4e6e8;
+  --text-primary:  #333240;
+  --text-body:     #646e78;
+  --text-muted:    #8a9099;
+  --shadow-sm:     0 2px 6px rgba(67,89,113,.12);
+  --shadow-md:     0 4px 16px rgba(67,89,113,.15);
+  --radius-card:   6px;
+  --radius-pill:   20px;
+  --radius-input:  6px;
+  --state-success: #71dd37;
+  --state-warning: #ffab00;
+  --state-danger:  #ff3e1d;
+  --state-info:    #03c3ec;
+  --state-secondary:#8592a3;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.5;background:var(--canvas);color:var(--text-body);display:flex;flex-direction:column;min-height:100vh}
+.navbar{position:fixed;top:0;left:0;right:0;height:60px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:100;box-shadow:var(--shadow-sm)}
+.navbar-brand{display:flex;align-items:center;gap:8px;width:236px}
+.navbar-brand span{font-weight:700;font-size:18px;color:var(--text-primary)}
+.navbar-search{flex:1;max-width:320px;position:relative}
+.navbar-search input{width:100%;padding:8px 12px 8px 36px;border:1px solid var(--border);border-radius:var(--radius-input);font-size:14px;color:var(--text-body);background:var(--canvas);outline:none}
+.navbar-search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted)}
+.navbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.icon-btn{width:38px;height:38px;border-radius:50%;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-body)}
+.badge-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--state-danger);border:2px solid var(--surface)}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;border:2px solid var(--accent)}
+.sidebar{position:fixed;top:60px;left:0;width:260px;bottom:0;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:16px 0}
+.nav-section-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);padding:16px 24px 6px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 20px;cursor:pointer;color:var(--text-body);text-decoration:none;border-radius:6px;margin:1px 12px;font-size:14px;font-weight:500;transition:.18s}
+.nav-item:hover{background:var(--canvas)}
+.nav-item.active{background:var(--accent-dim);color:var(--accent)}
+.main{margin-left:260px;margin-top:60px;padding:24px;min-height:calc(100vh - 60px)}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.page-title{font-size:20px;font-weight:700;color:var(--text-primary)}
+.page-subtitle{font-size:13px;color:var(--text-muted);margin-top:2px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:var(--radius-input);font-size:14px;font-weight:500;border:none;cursor:pointer;transition:.18s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+
+/* KPI row */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-bottom:24px}
+.kpi-card{background:var(--surface);border-radius:var(--radius-card);border:1px solid var(--border);box-shadow:var(--shadow-sm);padding:20px 24px;display:flex;align-items:flex-start;gap:16px}
+.kpi-icon{width:44px;height:44px;border-radius:var(--radius-card);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.kpi-value{font-size:24px;font-weight:700;color:var(--text-primary);font-variant-numeric:tabular-nums;line-height:1.2}
+.kpi-label{font-size:13px;color:var(--text-muted);margin-top:2px}
+.kpi-delta{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:var(--radius-pill);margin-top:6px}
+.kpi-delta.up{background:rgba(113,221,55,.12);color:#59b027}
+.kpi-delta.down{background:rgba(255,62,29,.12);color:#d63515}
+
+/* Pipeline */
+.pipeline-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:24px}
+.pipeline-col{background:var(--surface);border-radius:var(--radius-card);border:1px solid var(--border);box-shadow:var(--shadow-sm);overflow:hidden}
+.pipeline-col-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.pipeline-col-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted)}
+.pipeline-count{font-size:11px;font-weight:600;padding:2px 8px;border-radius:var(--radius-pill);background:var(--accent-dim);color:var(--accent)}
+.pipeline-cards{padding:12px;display:flex;flex-direction:column;gap:8px}
+.deal-card{background:var(--canvas);border-radius:var(--radius-card);padding:12px;border:1px solid var(--border)}
+.deal-name{font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:4px}
+.deal-company{font-size:12px;color:var(--text-muted);margin-bottom:8px}
+.deal-footer{display:flex;align-items:center;justify-content:space-between}
+.deal-value{font-size:12px;font-weight:700;color:var(--text-primary);font-variant-numeric:tabular-nums}
+.deal-avatar{width:24px;height:24px;border-radius:50%;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+
+/* Two-col layout */
+.grid-2-1{display:grid;grid-template-columns:2fr 1fr;gap:24px;margin-bottom:24px}
+.card{background:var(--surface);border-radius:var(--radius-card);border:1px solid var(--border);box-shadow:var(--shadow-sm)}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px 0}
+.card-title{font-size:14px;font-weight:600;color:var(--text-primary);text-transform:uppercase;letter-spacing:.05em}
+
+/* Activity list */
+.activity-list{padding:16px 24px}
+.activity-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.activity-item:last-child{border-bottom:none}
+.activity-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.act-accent{background:var(--accent-dim);color:var(--accent)}
+.act-success{background:rgba(113,221,55,.12);color:#4b9e22}
+.act-warning{background:rgba(255,171,0,.12);color:#b07a00}
+.activity-body{}
+.activity-text{font-size:13px;color:var(--text-primary);font-weight:500}
+.activity-meta{font-size:12px;color:var(--text-muted);margin-top:2px}
+
+/* Contact table */
+.pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:var(--radius-pill);font-size:12px;font-weight:600}
+.pill-success{background:rgba(113,221,55,.15);color:#4b9e22}
+.pill-warning{background:rgba(255,171,0,.15);color:#b07a00}
+.pill-danger{background:rgba(255,62,29,.12);color:#c02e14}
+.pill-info{background:rgba(3,195,236,.12);color:#0296b7}
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);padding:12px 16px;border-bottom:1px solid var(--border);text-align:left}
+.data-table td{padding:13px 16px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text-body);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:#f8f8fb}
+.cell-avatar{display:flex;align-items:center;gap:10px}
+.avatar-sm{width:32px;height:32px;border-radius:50%;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0}
+.av-green{background:rgba(113,221,55,.15);color:#59b027}
+.av-amber{background:rgba(255,171,0,.12);color:#c48500}
+.av-cyan{background:rgba(3,195,236,.12);color:var(--state-info)}
+.cell-name{font-weight:500;color:var(--text-primary);font-size:13px}
+.cell-sub{font-size:12px;color:var(--text-muted)}
+.table-header{display:flex;align-items:center;gap:12px;padding:18px 24px;border-bottom:1px solid var(--border)}
+.table-title{font-size:14px;font-weight:600;color:var(--text-primary);text-transform:uppercase;letter-spacing:.05em;margin-right:auto}
+.table-card{background:var(--surface);border-radius:var(--radius-card);border:1px solid var(--border);box-shadow:var(--shadow-sm)}
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="navbar-brand">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+      <rect width="28" height="28" rx="6" fill="var(--accent)"/>
+      <rect x="6" y="6" width="7" height="7" rx="2" fill="#fff"/>
+      <rect x="15" y="6" width="7" height="7" rx="2" fill="rgba(255,255,255,.5)"/>
+      <rect x="6" y="15" width="7" height="7" rx="2" fill="rgba(255,255,255,.5)"/>
+      <rect x="15" y="15" width="7" height="7" rx="2" fill="#fff"/>
+    </svg>
+    <span>AppPanel</span>
+  </div>
+  <div class="navbar-search">
+    <svg class="navbar-search-icon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+      <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/>
+    </svg>
+    <input type="text" placeholder="Search…" aria-label="Search">
+  </div>
+  <div class="navbar-actions">
+    <button class="icon-btn" style="position:relative" title="Notifications">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span class="badge-dot"></span>
+    </button>
+    <div class="avatar">AS</div>
+  </div>
+</nav>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="nav-section-label">CRM</div>
+  <a class="nav-item active" href="#">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    Dashboard
+  </a>
+  <a class="nav-item" href="#">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Contacts
+  </a>
+  <a class="nav-item" href="#">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+    Companies
+  </a>
+  <a class="nav-item" href="#">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Pipeline
+  </a>
+  <a class="nav-item" href="#">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    Activities
+  </a>
+  <div class="nav-section-label">Reports</div>
+  <a class="nav-item" href="#">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+    Analytics
+  </a>
+  <a class="nav-item" href="#">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    Settings
+  </a>
+</aside>
+
+<!-- Main -->
+<main class="main">
+  <div class="page-header">
+    <div>
+      <div class="page-title">CRM Overview</div>
+      <div class="page-subtitle">Pipeline · Contacts · Activity · Last 30 days</div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-ghost">Import</button>
+      <button class="btn btn-primary">+ New Deal</button>
+    </div>
+  </div>
+
+  <!-- KPI row -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon" style="background:var(--accent-dim)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <div>
+        <div class="kpi-value">$1.24M</div>
+        <div class="kpi-label">Pipeline Value</div>
+        <div class="kpi-delta up">▲ 12.3%</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon" style="background:rgba(113,221,55,.12)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--state-success)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      </div>
+      <div>
+        <div class="kpi-value">38</div>
+        <div class="kpi-label">Deals Won (MTD)</div>
+        <div class="kpi-delta up">▲ 5 vs last month</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon" style="background:rgba(3,195,236,.12)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--state-info)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      </div>
+      <div>
+        <div class="kpi-value">1,840</div>
+        <div class="kpi-label">Active Contacts</div>
+        <div class="kpi-delta up">▲ 3.1%</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon" style="background:rgba(255,171,0,.12)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--state-warning)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div>
+        <div class="kpi-value">24 days</div>
+        <div class="kpi-label">Avg Deal Cycle</div>
+        <div class="kpi-delta down">▼ 3 days</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pipeline board (5 stages) -->
+  <div class="pipeline-grid">
+    <div class="pipeline-col">
+      <div class="pipeline-col-head">
+        <span class="pipeline-col-title">Lead</span>
+        <span class="pipeline-count">8</span>
+      </div>
+      <div class="pipeline-cards">
+        <div class="deal-card">
+          <div class="deal-name">Website Redesign</div>
+          <div class="deal-company">Acme Corp</div>
+          <div class="deal-footer"><span class="deal-value">$12,000</span><div class="deal-avatar">JD</div></div>
+        </div>
+        <div class="deal-card">
+          <div class="deal-name">Mobile App MVP</div>
+          <div class="deal-company">Luma Tech</div>
+          <div class="deal-footer"><span class="deal-value">$28,500</span><div class="deal-avatar av-green" style="background:rgba(113,221,55,.15);color:#4b9e22">SR</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="pipeline-col">
+      <div class="pipeline-col-head">
+        <span class="pipeline-col-title">Qualified</span>
+        <span class="pipeline-count">5</span>
+      </div>
+      <div class="pipeline-cards">
+        <div class="deal-card">
+          <div class="deal-name">Data Platform</div>
+          <div class="deal-company">FlexSoft</div>
+          <div class="deal-footer"><span class="deal-value">$94,000</span><div class="deal-avatar av-amber" style="background:rgba(255,171,0,.12);color:#c48500">MK</div></div>
+        </div>
+        <div class="deal-card">
+          <div class="deal-name">ERP Integration</div>
+          <div class="deal-company">NovakLabs</div>
+          <div class="deal-footer"><span class="deal-value">$47,200</span><div class="deal-avatar">AB</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="pipeline-col">
+      <div class="pipeline-col-head">
+        <span class="pipeline-col-title">Proposal</span>
+        <span class="pipeline-count">7</span>
+      </div>
+      <div class="pipeline-cards">
+        <div class="deal-card">
+          <div class="deal-name">Cloud Migration</div>
+          <div class="deal-company">Bronto Inc</div>
+          <div class="deal-footer"><span class="deal-value">$132,000</span><div class="deal-avatar av-cyan" style="background:rgba(3,195,236,.12);color:var(--state-info)">CL</div></div>
+        </div>
+        <div class="deal-card">
+          <div class="deal-name">Analytics Suite</div>
+          <div class="deal-company">MegaCo</div>
+          <div class="deal-footer"><span class="deal-value">$68,000</span><div class="deal-avatar">PW</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="pipeline-col">
+      <div class="pipeline-col-head">
+        <span class="pipeline-col-title">Negotiation</span>
+        <span class="pipeline-count">4</span>
+      </div>
+      <div class="pipeline-cards">
+        <div class="deal-card">
+          <div class="deal-name">Enterprise Plan</div>
+          <div class="deal-company">Globex Corp</div>
+          <div class="deal-footer"><span class="deal-value">$240,000</span><div class="deal-avatar">HS</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="pipeline-col">
+      <div class="pipeline-col-head">
+        <span class="pipeline-col-title">Closed</span>
+        <span class="pipeline-count" style="background:rgba(113,221,55,.15);color:#4b9e22">11</span>
+      </div>
+      <div class="pipeline-cards">
+        <div class="deal-card" style="border-left:3px solid var(--state-success)">
+          <div class="deal-name">Growth Package</div>
+          <div class="deal-company">Apex Ltd</div>
+          <div class="deal-footer"><span class="deal-value" style="color:var(--state-success)">$58,000 ✓</span><div class="deal-avatar av-green" style="background:rgba(113,221,55,.15);color:#4b9e22">TK</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity + Contacts -->
+  <div class="grid-2-1">
+    <!-- Contacts table -->
+    <div class="table-card">
+      <div class="table-header">
+        <span class="table-title">Recent Contacts</span>
+        <button class="btn btn-primary" style="padding:7px 14px;font-size:13px">+ Contact</button>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Contact</th>
+            <th>Company</th>
+            <th>Stage</th>
+            <th>Last Touch</th>
+            <th>Owner</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="cell-avatar"><div class="avatar-sm">JD</div><div><div class="cell-name">Jordan Davis</div><div class="cell-sub">jordan@acme.com</div></div></div></td>
+            <td>Acme Corp</td>
+            <td><span class="pill pill-info">Qualified</span></td>
+            <td>2 hr ago</td>
+            <td>Alex S.</td>
+          </tr>
+          <tr>
+            <td><div class="cell-avatar"><div class="avatar-sm av-green">SR</div><div><div class="cell-name">Sam Rivera</div><div class="cell-sub">sam@luma.io</div></div></div></td>
+            <td>Luma Tech</td>
+            <td><span class="pill pill-warning">Proposal</span></td>
+            <td>Yesterday</td>
+            <td>Maria K.</td>
+          </tr>
+          <tr>
+            <td><div class="cell-avatar"><div class="avatar-sm av-amber">MK</div><div><div class="cell-name">Morgan Kim</div><div class="cell-sub">morgan@flex.co</div></div></div></td>
+            <td>FlexSoft</td>
+            <td><span class="pill pill-success">Closed Won</span></td>
+            <td>3 days ago</td>
+            <td>Alex S.</td>
+          </tr>
+          <tr>
+            <td><div class="cell-avatar"><div class="avatar-sm av-cyan">CL</div><div><div class="cell-name">Casey Lee</div><div class="cell-sub">casey@bronto.net</div></div></div></td>
+            <td>Bronto Inc</td>
+            <td><span class="pill pill-info">Lead</span></td>
+            <td>1 week ago</td>
+            <td>Priya W.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Activity feed -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Activity Feed</div>
+      </div>
+      <div class="activity-list">
+        <div class="activity-item">
+          <div class="activity-dot act-accent">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="activity-body">
+            <div class="activity-text">Note added to <strong>Acme Corp</strong></div>
+            <div class="activity-meta">Jordan Davis · 2 hr ago</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot act-success">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="activity-body">
+            <div class="activity-text">Deal <strong>Growth Package</strong> closed won</div>
+            <div class="activity-meta">Alex S. · Yesterday</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot act-warning">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="activity-body">
+            <div class="activity-text">Follow-up due for <strong>NovakLabs</strong></div>
+            <div class="activity-meta">Priya W. · 3 days ago</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot act-accent">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div class="activity-body">
+            <div class="activity-text">Email sent to <strong>Morgan Kim</strong></div>
+            <div class="activity-meta">Maria K. · 3 days ago</div>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-dot act-success">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          </div>
+          <div class="activity-body">
+            <div class="activity-text">New contact <strong>Sam Rivera</strong> created</div>
+            <div class="activity-meta">Alex S. · 4 days ago</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

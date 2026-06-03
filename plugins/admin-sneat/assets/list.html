@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Console — Records List</title>
+<style>
+:root {
+  --accent:        #696cff;
+  --accent-hover:  #5a5dd6;
+  --accent-dim:    rgba(105,108,255,.12);
+  --canvas:        #f5f5f9;
+  --surface:       #ffffff;
+  --border:        #e4e6e8;
+  --text-primary:  #333240;
+  --text-body:     #646e78;
+  --text-muted:    #8a9099;
+  --shadow-sm:     0 2px 6px rgba(67,89,113,.12);
+  --shadow-md:     0 4px 16px rgba(67,89,113,.15);
+  --radius-card:   6px;
+  --radius-pill:   20px;
+  --radius-input:  6px;
+  --state-success: #71dd37;
+  --state-warning: #ffab00;
+  --state-danger:  #ff3e1d;
+  --state-info:    #03c3ec;
+  --state-secondary:#8592a3;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.5;background:var(--canvas);color:var(--text-body);display:flex;flex-direction:column;min-height:100vh}
+.navbar{position:fixed;top:0;left:0;right:0;height:60px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:100;box-shadow:var(--shadow-sm)}
+.navbar-brand{display:flex;align-items:center;gap:8px;width:236px}
+.navbar-brand span{font-weight:700;font-size:18px;color:var(--text-primary)}
+.navbar-search{flex:1;max-width:320px;position:relative}
+.navbar-search input{width:100%;padding:8px 12px 8px 36px;border:1px solid var(--border);border-radius:var(--radius-input);font-size:14px;color:var(--text-body);background:var(--canvas);outline:none}
+.navbar-search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted)}
+.navbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.icon-btn{width:38px;height:38px;border-radius:50%;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-body);position:relative}
+.badge-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--state-danger);border:2px solid var(--surface)}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;border:2px solid var(--accent)}
+.sidebar{position:fixed;top:60px;left:0;width:260px;bottom:0;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:16px 0}
+.nav-section-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);padding:16px 24px 6px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 20px;cursor:pointer;color:var(--text-body);text-decoration:none;border-radius:6px;margin:1px 12px;font-size:14px;font-weight:500;transition:.18s}
+.nav-item:hover{background:var(--canvas)}
+.nav-item.active{background:var(--accent-dim);color:var(--accent)}
+.main{margin-left:260px;margin-top:60px;padding:24px;min-height:calc(100vh - 60px)}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.page-title{font-size:20px;font-weight:700;color:var(--text-primary)}
+.page-subtitle{font-size:13px;color:var(--text-muted);margin-top:2px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:var(--radius-input);font-size:14px;font-weight:500;border:none;cursor:pointer;transition:.18s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+
+/* Filter toolbar */
+.filter-bar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.search-box{position:relative;flex:0 0 280px}
+.search-box input{width:100%;padding:9px 12px 9px 36px;border:1px solid var(--border);border-radius:var(--radius-input);font-size:14px;color:var(--text-body);background:var(--surface);outline:none;transition:.18s}
+.search-box input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted)}
+.filter-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border:1px solid var(--border);border-radius:var(--radius-pill);font-size:13px;font-weight:500;cursor:pointer;background:var(--surface);color:var(--text-body);transition:.18s}
+.filter-chip:hover{border-color:var(--accent);color:var(--accent)}
+.filter-chip.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+.filter-chip svg{flex-shrink:0}
+.filter-sep{height:20px;width:1px;background:var(--border);margin:0 4px}
+.result-count{font-size:13px;color:var(--text-muted);margin-left:auto}
+
+/* Table card */
+.table-card{background:var(--surface);border-radius:var(--radius-card);border:1px solid var(--border);box-shadow:var(--shadow-sm);overflow:hidden}
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);padding:13px 16px;border-bottom:1px solid var(--border);text-align:left;background:var(--surface);white-space:nowrap;cursor:pointer;user-select:none}
+.data-table th:hover{color:var(--text-primary)}
+.data-table th.sorted{color:var(--accent)}
+.data-table td{padding:14px 16px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text-body);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:#f8f8fb}
+.mono{font-family:"Courier New",monospace;font-size:12px;color:var(--text-muted)}
+.pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:var(--radius-pill);font-size:12px;font-weight:600}
+.pill-success{background:rgba(113,221,55,.15);color:#4b9e22}
+.pill-warning{background:rgba(255,171,0,.15);color:#b07a00}
+.pill-danger{background:rgba(255,62,29,.12);color:#c02e14}
+.pill-info{background:rgba(3,195,236,.12);color:#0296b7}
+.pill-secondary{background:rgba(133,146,163,.12);color:var(--state-secondary)}
+.cell-avatar{display:flex;align-items:center;gap:10px}
+.avatar-sm{width:32px;height:32px;border-radius:50%;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0}
+.av-green{background:rgba(113,221,55,.15);color:#59b027}
+.av-amber{background:rgba(255,171,0,.12);color:#c48500}
+.av-cyan{background:rgba(3,195,236,.12);color:var(--state-info)}
+.av-pink{background:rgba(255,62,29,.1);color:var(--state-danger)}
+.cell-name{font-weight:500;color:var(--text-primary);font-size:13px}
+.cell-sub{font-size:12px;color:var(--text-muted)}
+.row-actions{display:flex;gap:4px;justify-content:flex-end}
+.action-btn{width:28px;height:28px;border-radius:4px;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);transition:.18s}
+.action-btn:hover{border-color:var(--accent);color:var(--accent)}
+.sort-icon{display:inline-block;margin-left:4px;opacity:.5;font-size:10px}
+.sorted .sort-icon{opacity:1;color:var(--accent)}
+
+/* Pagination */
+.table-footer{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-top:1px solid var(--border);font-size:13px;color:var(--text-muted)}
+.pager{display:flex;align-items:center;gap:4px}
+.pager-btn{width:32px;height:32px;border-radius:var(--radius-input);border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:var(--text-body);transition:.18s}
+.pager-btn:hover{border-color:var(--accent);color:var(--accent)}
+.pager-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.pager-btn:disabled{opacity:.4;cursor:default}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-brand">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="var(--accent)"/><rect x="6" y="6" width="7" height="7" rx="2" fill="#fff"/><rect x="15" y="6" width="7" height="7" rx="2" fill="rgba(255,255,255,.5)"/><rect x="6" y="15" width="7" height="7" rx="2" fill="rgba(255,255,255,.5)"/><rect x="15" y="15" width="7" height="7" rx="2" fill="#fff"/></svg>
+    <span>AppPanel</span>
+  </div>
+  <div class="navbar-search">
+    <svg class="navbar-search-icon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/></svg>
+    <input type="text" placeholder="Search…" aria-label="Search">
+  </div>
+  <div class="navbar-actions">
+    <button class="icon-btn" style="position:relative" title="Notifications">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="badge-dot"></span>
+    </button>
+    <div class="avatar">AS</div>
+  </div>
+</nav>
+
+<aside class="sidebar">
+  <div class="nav-section-label">Main</div>
+  <a class="nav-item" href="#">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    Dashboard
+  </a>
+  <a class="nav-item active" href="#">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Records
+  </a>
+  <a class="nav-item" href="#">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    Documents
+  </a>
+  <a class="nav-item" href="#">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+    Reports
+  </a>
+  <div class="nav-section-label">Account</div>
+  <a class="nav-item" href="#">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    Settings
+  </a>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Records</div>
+      <div class="page-subtitle">Manage all records · 248 total</div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-ghost">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+        Import
+      </button>
+      <button class="btn btn-primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Record
+      </button>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <div class="search-box">
+      <svg class="search-icon" width="14" height="14" viewBox="0 0 16 16" fill="var(--text-muted)"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/></svg>
+      <input type="text" placeholder="Search records…" aria-label="Search records">
+    </div>
+    <div class="filter-sep"></div>
+    <button class="filter-chip active">All <span style="font-weight:700">248</span></button>
+    <button class="filter-chip">Active <span style="font-weight:700">189</span></button>
+    <button class="filter-chip">Pending <span style="font-weight:700">14</span></button>
+    <button class="filter-chip">Paused <span style="font-weight:700">31</span></button>
+    <button class="filter-chip">Cancelled <span style="font-weight:700">14</span></button>
+    <div class="filter-sep"></div>
+    <button class="filter-chip">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+      Filter
+    </button>
+    <button class="filter-chip">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      Columns
+    </button>
+    <span class="result-count">Showing 1–20 of 248</span>
+  </div>
+
+  <!-- Table -->
+  <div class="table-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width:40px"><input type="checkbox" aria-label="Select all"></th>
+          <th class="sorted">ID <span class="sort-icon">↑</span></th>
+          <th>Account <span class="sort-icon">↕</span></th>
+          <th>Plan <span class="sort-icon">↕</span></th>
+          <th>Status <span class="sort-icon">↕</span></th>
+          <th style="text-align:right">MRR <span class="sort-icon">↕</span></th>
+          <th>Next Billing <span class="sort-icon">↕</span></th>
+          <th>Owner <span class="sort-icon">↕</span></th>
+          <th style="width:80px;text-align:right">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><input type="checkbox" aria-label="Select"></td>
+          <td><span class="mono">#5001</span></td>
+          <td><div class="cell-avatar"><div class="avatar-sm">AC</div><div><div class="cell-name">Acme Corp</div><div class="cell-sub">acme@example.com</div></div></div></td>
+          <td>Pro</td>
+          <td><span class="pill pill-success">Active</span></td>
+          <td style="text-align:right;font-variant-numeric:tabular-nums">$420</td>
+          <td>Jul 1, 2026</td>
+          <td>Alex S.</td>
+          <td><div class="row-actions">
+            <button class="action-btn" title="View"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+            <button class="action-btn" title="Edit"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
+          </div></td>
+        </tr>
+        <tr>
+          <td><input type="checkbox" aria-label="Select"></td>
+          <td><span class="mono">#5002</span></td>
+          <td><div class="cell-avatar"><div class="avatar-sm av-green">LT</div><div><div class="cell-name">Luma Tech</div><div class="cell-sub">hello@luma.io</div></div></div></td>
+          <td>Starter</td>
+          <td><span class="pill pill-info">Trialing</span></td>
+          <td style="text-align:right;font-variant-numeric:tabular-nums">$99</td>
+          <td>Jun 22, 2026</td>
+          <td>Maria K.</td>
+          <td><div class="row-actions">
+            <button class="action-btn" title="View"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+            <button class="action-btn" title="Edit"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
+          </div></td>
+        </tr>
+        <tr>
+          <td><input type="checkbox" aria-label="Select"></td>
+          <td><span class="mono">#5003</span></td>
+          <td><div class="cell-avatar"><div class="avatar-sm av-amber">FX</div><div><div class="cell-name">FlexSoft</div><div class="cell-sub">ops@flexsoft.co</div></div></div></td>
+          <td>Pro</td>
+          <td><span class="pill pill-warning">Paused</span></td>
+          <td style="text-align:right;font-variant-numeric:tabular-nums">$840</td>
+          <td>Jul 15, 2026</td>
+          <td>Alex S.</td>
+          <td><div class="row-actions">
+            <button class="action-btn" title="View"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+            <button class="action-btn" title="Edit"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
+          </div></td>
+        </tr>
+        <tr>
+          <td><input type="checkbox" aria-label="Select"></td>
+          <td><span class="mono">#5004</span></td>
+          <td><div class="cell-avatar"><div class="avatar-sm av-cyan">NK</div><div><div class="cell-name">NovakLabs</div><div class="cell-sub">team@novak.dev</div></div></div></td>
+          <td>Pro</td>
+          <td><span class="pill pill-success">Active</span></td>
+          <td style="text-align:right;font-variant-numeric:tabular-nums">$420</td>
+          <td>Aug 1, 2026</td>
+          <td>Priya W.</td>
+          <td><div class="row-actions">
+            <button class="action-btn" title="View"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+            <button class="action-btn" title="Edit"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
+          </div></td>
+        </tr>
+        <tr>
+          <td><input type="checkbox" aria-label="Select"></td>
+          <td><span class="mono">#5005</span></td>
+          <td><div class="cell-avatar"><div class="avatar-sm av-pink">BR</div><div><div class="cell-name">Bronto Inc</div><div class="cell-sub">billing@bronto.net</div></div></div></td>
+          <td>Free</td>
+          <td><span class="pill pill-danger">Cancelled</span></td>
+          <td style="text-align:right;font-variant-numeric:tabular-nums">$0</td>
+          <td>—</td>
+          <td>Maria K.</td>
+          <td><div class="row-actions">
+            <button class="action-btn" title="View"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+            <button class="action-btn" title="Edit"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
+          </div></td>
+        </tr>
+        <tr>
+          <td><input type="checkbox" aria-label="Select"></td>
+          <td><span class="mono">#5006</span></td>
+          <td><div class="cell-avatar"><div class="avatar-sm">GX</div><div><div class="cell-name">Globex Corp</div><div class="cell-sub">admin@globex.io</div></div></div></td>
+          <td>Enterprise</td>
+          <td><span class="pill pill-success">Active</span></td>
+          <td style="text-align:right;font-variant-numeric:tabular-nums">$2,400</td>
+          <td>Sep 1, 2026</td>
+          <td>Alex S.</td>
+          <td><div class="row-actions">
+            <button class="action-btn" title="View"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+            <button class="action-btn" title="Edit"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
+          </div></td>
+        </tr>
+        <tr>
+          <td><input type="checkbox" aria-label="Select"></td>
+          <td><span class="mono">#5007</span></td>
+          <td><div class="cell-avatar"><div class="avatar-sm av-green">MG</div><div><div class="cell-name">MegaCo</div><div class="cell-sub">info@mega.co</div></div></div></td>
+          <td>Pro</td>
+          <td><span class="pill pill-secondary">Inactive</span></td>
+          <td style="text-align:right;font-variant-numeric:tabular-nums">$420</td>
+          <td>—</td>
+          <td>Priya W.</td>
+          <td><div class="row-actions">
+            <button class="action-btn" title="View"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+            <button class="action-btn" title="Edit"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
+          </div></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="table-footer">
+      <span>Showing 1–7 of 248 records</span>
+      <div class="pager">
+        <button class="pager-btn" disabled>‹</button>
+        <button class="pager-btn active">1</button>
+        <button class="pager-btn">2</button>
+        <button class="pager-btn">3</button>
+        <span style="padding:0 6px;color:var(--text-muted);font-size:13px">…</span>
+        <button class="pager-btn">35</button>
+        <button class="pager-btn">›</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

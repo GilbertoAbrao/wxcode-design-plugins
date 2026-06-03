@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Email — Admin Console</title>
+<style>
+:root{
+  --bg:#f2f7ff;--card:#fff;--sidebar-hover:#f0f4ff;--input-bg:#f8faff;
+  --border:#e0e6ed;--divider:#eef1f6;
+  --text-body:#25396f;--text-secondary:#6b7ea8;--text-muted:#9daec8;
+  --primary:#435ebe;--primary-hover:#3a52aa;--primary-soft:#eef1fb;
+  --success:#28c76f;--success-soft:#e6f9ef;
+  --warn:#ff9f43;--warn-soft:#fff4e5;
+  --danger:#ea5455;--danger-soft:#fce8e8;
+  --neutral:#82868b;--neutral-soft:#f0f0f0;
+  --sidebar-w:200px;--topbar-h:60px;
+  --radius-card:11px;--radius-btn:8px;--radius-pill:20px;
+  --shadow-card:0 4px 24px rgba(67,94,190,.08);
+  --shadow-sidebar:2px 0 8px rgba(67,94,190,.06);
+  --transition:.18s ease;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Nunito","Segoe UI",system-ui,sans-serif;font-size:14px;
+  color:var(--text-body);background:var(--bg);display:flex;height:100vh;overflow:hidden}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+
+/* Left folder rail */
+.folder-rail{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--card);
+  border-right:1px solid var(--border);display:flex;flex-direction:column;height:100%}
+.rail-brand{height:var(--topbar-h);display:flex;align-items:center;gap:10px;
+  padding:0 18px;border-bottom:1px solid var(--border)}
+.brand-icon{width:30px;height:30px;border-radius:7px;background:var(--primary);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-name{font-size:15px;font-weight:700}
+.compose-btn{margin:16px 14px 8px;display:flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--primary);color:#fff;padding:9px 0;border-radius:var(--radius-btn);
+  font-size:13px;font-weight:700;transition:var(--transition)}
+.compose-btn:hover{background:var(--primary-hover)}
+.folder-nav{display:flex;flex-direction:column;padding:4px 0}
+.folder-item{display:flex;align-items:center;justify-content:space-between;padding:9px 18px;
+  font-size:13px;font-weight:600;color:var(--text-secondary);cursor:pointer;
+  transition:var(--transition);border-left:3px solid transparent}
+.folder-item:hover{background:var(--sidebar-hover);color:var(--text-body)}
+.folder-item.active{background:var(--primary-soft);color:var(--primary);border-left-color:var(--primary)}
+.folder-left{display:flex;align-items:center;gap:10px}
+.folder-icon{width:16px;height:16px;opacity:.7;flex-shrink:0}
+.folder-item.active .folder-icon{opacity:1}
+.unread-badge{background:var(--primary);color:#fff;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:700}
+.folder-divider{height:1px;background:var(--divider);margin:8px 0}
+
+/* Message list pane */
+.msg-list-pane{width:300px;min-width:300px;background:var(--card);
+  border-right:1px solid var(--border);display:flex;flex-direction:column;height:100%}
+.pane-topbar{height:var(--topbar-h);display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;border-bottom:1px solid var(--border)}
+.pane-title{font-size:15px;font-weight:700}
+.pane-actions{display:flex;gap:4px}
+.icon-btn{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;color:var(--text-secondary);transition:var(--transition)}
+.icon-btn:hover{background:var(--sidebar-hover)}
+.msg-search{display:flex;align-items:center;gap:8px;padding:10px 14px;
+  border-bottom:1px solid var(--divider)}
+.msg-search input{flex:1;border:1.5px solid var(--border);border-radius:6px;
+  padding:7px 10px;font-size:12px;color:var(--text-body);background:var(--input-bg);
+  outline:none;font-family:inherit}
+.msg-search input:focus{border-color:var(--primary)}
+.msg-items{overflow-y:auto;flex:1}
+.msg-item{padding:14px 16px;border-bottom:1px solid var(--divider);cursor:pointer;
+  transition:var(--transition);position:relative}
+.msg-item:hover{background:var(--sidebar-hover)}
+.msg-item.active{background:var(--primary-soft)}
+.msg-item.unread .msg-subject{font-weight:800;color:var(--text-body)}
+.msg-row1{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.msg-sender{font-size:13px;font-weight:700}
+.msg-item.unread .msg-sender{color:var(--text-body)}
+.msg-time{font-size:11px;color:var(--text-muted)}
+.msg-subject{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.msg-preview{font-size:12px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.unread-dot{width:8px;height:8px;border-radius:50%;background:var(--primary);
+  position:absolute;right:14px;bottom:14px}
+.msg-badge-row{display:flex;gap:5px;margin-top:5px}
+.msg-badge{font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px}
+.msg-badge.blue{background:var(--primary-soft);color:var(--primary)}
+.msg-badge.green{background:var(--success-soft);color:var(--success)}
+.msg-badge.warn{background:var(--warn-soft);color:var(--warn)}
+
+/* Reading pane */
+.reading-pane{flex:1;display:flex;flex-direction:column;height:100%;overflow:hidden}
+.reading-topbar{height:var(--topbar-h);display:flex;align-items:center;gap:8px;
+  padding:0 20px;border-bottom:1px solid var(--border);background:var(--card)}
+.read-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:6px;
+  font-size:12px;font-weight:600;color:var(--text-secondary);transition:var(--transition)}
+.read-btn:hover{background:var(--sidebar-hover);color:var(--text-body)}
+.read-btn svg{flex-shrink:0}
+.reading-spacer{flex:1}
+.reading-content{flex:1;overflow-y:auto;padding:28px 32px}
+.email-header{margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--divider)}
+.email-subject{font-size:20px;font-weight:700;margin-bottom:12px}
+.email-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.sender-avatar{width:38px;height:38px;border-radius:50%;background:var(--primary);
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;
+  color:#fff;flex-shrink:0}
+.sender-info{}
+.sender-name{font-size:13px;font-weight:700}
+.sender-email{font-size:11px;color:var(--text-muted)}
+.email-time-meta{margin-left:auto;font-size:12px;color:var(--text-muted);text-align:right}
+.email-body{line-height:1.7;color:var(--text-secondary);font-size:14px}
+.email-body p{margin-bottom:14px}
+.email-body strong{color:var(--text-body)}
+.email-attach{margin-top:24px;padding-top:18px;border-top:1px solid var(--divider)}
+.attach-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+  color:var(--text-muted);margin-bottom:10px}
+.attach-list{display:flex;gap:10px;flex-wrap:wrap}
+.attach-item{display:flex;align-items:center;gap:8px;background:var(--input-bg);
+  border:1px solid var(--border);border-radius:8px;padding:8px 14px;
+  font-size:12px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:var(--transition)}
+.attach-item:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-soft)}
+.reply-bar{padding:16px 32px;border-top:1px solid var(--border);background:var(--card)}
+.reply-input{width:100%;border:1.5px solid var(--border);border-radius:var(--radius-btn);
+  padding:10px 14px;font-size:13px;color:var(--text-body);outline:none;
+  resize:none;font-family:inherit;background:var(--input-bg)}
+.reply-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(67,94,190,.12)}
+.reply-actions{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+.reply-icons{display:flex;gap:6px}
+.btn-send{background:var(--primary);color:#fff;padding:7px 18px;
+  border-radius:var(--radius-btn);font-size:13px;font-weight:700;transition:var(--transition)}
+.btn-send:hover{background:var(--primary-hover)}
+</style>
+</head>
+<body>
+<!-- Folder rail -->
+<div class="folder-rail">
+  <div class="rail-brand">
+    <div class="brand-icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+    </div>
+    <span class="brand-name">Mail</span>
+  </div>
+  <button class="compose-btn">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    Compose
+  </button>
+  <div class="folder-nav">
+    <div class="folder-item active">
+      <div class="folder-left">
+        <svg class="folder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Inbox
+      </div>
+      <span class="unread-badge">12</span>
+    </div>
+    <div class="folder-item">
+      <div class="folder-left">
+        <svg class="folder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Sent
+      </div>
+    </div>
+    <div class="folder-item">
+      <div class="folder-left">
+        <svg class="folder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        Drafts
+      </div>
+      <span class="unread-badge" style="background:var(--neutral-soft);color:var(--neutral)">3</span>
+    </div>
+    <div class="folder-item">
+      <div class="folder-left">
+        <svg class="folder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+        Archive
+      </div>
+    </div>
+    <div class="folder-divider"></div>
+    <div class="folder-item">
+      <div class="folder-left">
+        <svg class="folder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        Trash
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Message list -->
+<div class="msg-list-pane">
+  <div class="pane-topbar">
+    <span class="pane-title">Inbox</span>
+    <div class="pane-actions">
+      <button class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg></button>
+      <button class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
+    </div>
+  </div>
+  <div class="msg-search">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" placeholder="Search inbox…">
+  </div>
+  <div class="msg-items">
+    <div class="msg-item active unread">
+      <div class="msg-row1">
+        <span class="msg-sender">Alex Chen</span>
+        <span class="msg-time">10:24 AM</span>
+      </div>
+      <div class="msg-subject">Sprint 14 retrospective notes</div>
+      <div class="msg-preview">Hi team, attaching the retrospective doc from today's session…</div>
+      <div class="msg-badge-row"><span class="msg-badge blue">Projects</span></div>
+      <div class="unread-dot"></div>
+    </div>
+    <div class="msg-item unread">
+      <div class="msg-row1">
+        <span class="msg-sender">Priya Nair</span>
+        <span class="msg-time">9:58 AM</span>
+      </div>
+      <div class="msg-subject">Annual Report — final PDF attached</div>
+      <div class="msg-preview">Please review before we send to the board by end of day…</div>
+      <div class="msg-badge-row"><span class="msg-badge green">Design</span></div>
+      <div class="unread-dot"></div>
+    </div>
+    <div class="msg-item">
+      <div class="msg-row1">
+        <span class="msg-sender" style="color:var(--text-secondary)">System Alerts</span>
+        <span class="msg-time">8:30 AM</span>
+      </div>
+      <div class="msg-subject">Budget threshold reached (72%)</div>
+      <div class="msg-preview">Your Q2 budget utilization has reached the 70% warning threshold…</div>
+      <div class="msg-badge-row"><span class="msg-badge warn">Alert</span></div>
+    </div>
+    <div class="msg-item">
+      <div class="msg-row1">
+        <span class="msg-sender" style="color:var(--text-secondary)">Maya Rodriguez</span>
+        <span class="msg-time">Yesterday</span>
+      </div>
+      <div class="msg-subject">Q3 Campaign kick-off agenda</div>
+      <div class="msg-preview">Here's the draft agenda for Thursday's kick-off meeting…</div>
+      <div class="msg-badge-row"><span class="msg-badge blue">Marketing</span></div>
+    </div>
+    <div class="msg-item">
+      <div class="msg-row1">
+        <span class="msg-sender" style="color:var(--text-secondary)">Jordan Kim</span>
+        <span class="msg-time">Yesterday</span>
+      </div>
+      <div class="msg-subject">3 new team members onboarded</div>
+      <div class="msg-preview">Welcome Elena, Marcus, and Jasmine to the platform. Their accounts…</div>
+      <div class="msg-badge-row"><span class="msg-badge blue">Team</span></div>
+    </div>
+    <div class="msg-item">
+      <div class="msg-row1">
+        <span class="msg-sender" style="color:var(--text-secondary)">Sam Lee</span>
+        <span class="msg-time">Mon</span>
+      </div>
+      <div class="msg-subject">Platform Migration — week 4 update</div>
+      <div class="msg-preview">Good news: the database sharding completed without incident…</div>
+    </div>
+  </div>
+</div>
+
+<!-- Reading pane -->
+<div class="reading-pane">
+  <div class="reading-topbar">
+    <button class="read-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      Back
+    </button>
+    <button class="read-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <div class="reading-spacer"></div>
+    <button class="read-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+      Delete
+    </button>
+    <button class="read-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/></svg>
+      Archive
+    </button>
+    <button class="read-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+    </button>
+  </div>
+
+  <div class="reading-content">
+    <div class="email-header">
+      <div class="email-subject">Sprint 14 retrospective notes</div>
+      <div class="email-meta">
+        <div class="sender-avatar">AC</div>
+        <div class="sender-info">
+          <div class="sender-name">Alex Chen</div>
+          <div class="sender-email">a.chen@vantage.io</div>
+        </div>
+        <div class="email-time-meta">
+          <div>Today, 10:24 AM</div>
+          <div>To: Jordan Davis, Design Team</div>
+        </div>
+      </div>
+    </div>
+    <div class="email-body">
+      <p>Hi team,</p>
+      <p>Attaching the retrospective doc from today's Sprint 14 wrap-up session. Key takeaways below:</p>
+      <p><strong>What went well:</strong> The brand assets were delivered two days ahead of schedule, and cross-team feedback loops improved significantly after we introduced the shared Kanban board.</p>
+      <p><strong>What to improve:</strong> Two tasks sat in "In Review" for more than five days due to unclear ownership. For Sprint 15, every task will have a designated reviewer assigned at creation time.</p>
+      <p><strong>Action items:</strong></p>
+      <p>1. Jordan — update the reviewer assignment policy in the team handbook by Friday.<br>
+         2. Priya — export the final design tokens and post them in the shared Documents folder.<br>
+         3. All — sprint 15 kick-off is Thursday at 10 AM in the main conference room.</p>
+      <p>Let me know if you have questions. Great work this sprint, everyone!</p>
+      <p>— Alex</p>
+    </div>
+    <div class="email-attach">
+      <div class="attach-title">Attachments (2)</div>
+      <div class="attach-list">
+        <div class="attach-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Sprint14_Retro.pdf <span style="color:var(--text-muted);font-weight:400">· 148 KB</span>
+        </div>
+        <div class="attach-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          ActionItems.xlsx <span style="color:var(--text-muted);font-weight:400">· 24 KB</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reply-bar">
+    <textarea class="reply-input" rows="3" placeholder="Reply to Alex Chen…"></textarea>
+    <div class="reply-actions">
+      <div class="reply-icons">
+        <button class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button>
+        <button class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></button>
+      </div>
+      <button class="btn-send">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;margin-right:6px"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Send Reply
+      </button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

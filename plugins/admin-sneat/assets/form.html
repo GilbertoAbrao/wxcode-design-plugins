@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Console — New Record Form</title>
+<style>
+:root {
+  --accent:        #696cff;
+  --accent-hover:  #5a5dd6;
+  --accent-dim:    rgba(105,108,255,.12);
+  --canvas:        #f5f5f9;
+  --surface:       #ffffff;
+  --border:        #e4e6e8;
+  --text-primary:  #333240;
+  --text-body:     #646e78;
+  --text-muted:    #8a9099;
+  --shadow-sm:     0 2px 6px rgba(67,89,113,.12);
+  --radius-card:   6px;
+  --radius-pill:   20px;
+  --radius-input:  6px;
+  --state-success: #71dd37;
+  --state-warning: #ffab00;
+  --state-danger:  #ff3e1d;
+  --state-info:    #03c3ec;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.5;background:var(--canvas);color:var(--text-body);display:flex;flex-direction:column;min-height:100vh}
+.navbar{position:fixed;top:0;left:0;right:0;height:60px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:100;box-shadow:var(--shadow-sm)}
+.navbar-brand{display:flex;align-items:center;gap:8px;width:236px}
+.navbar-brand span{font-weight:700;font-size:18px;color:var(--text-primary)}
+.navbar-search{flex:1;max-width:320px;position:relative}
+.navbar-search input{width:100%;padding:8px 12px 8px 36px;border:1px solid var(--border);border-radius:var(--radius-input);font-size:14px;color:var(--text-body);background:var(--canvas);outline:none}
+.navbar-search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted)}
+.navbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.icon-btn{width:38px;height:38px;border-radius:50%;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-body);position:relative}
+.badge-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--state-danger);border:2px solid var(--surface)}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;border:2px solid var(--accent)}
+.sidebar{position:fixed;top:60px;left:0;width:260px;bottom:0;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:16px 0}
+.nav-section-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);padding:16px 24px 6px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 20px;cursor:pointer;color:var(--text-body);text-decoration:none;border-radius:6px;margin:1px 12px;font-size:14px;font-weight:500;transition:.18s}
+.nav-item:hover{background:var(--canvas)}
+.nav-item.active{background:var(--accent-dim);color:var(--accent)}
+.main{margin-left:260px;margin-top:60px;padding:24px;min-height:calc(100vh - 60px)}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.page-title{font-size:20px;font-weight:700;color:var(--text-primary)}
+.breadcrumb{font-size:13px;color:var(--text-muted);margin-top:2px}
+.breadcrumb a{color:var(--accent);text-decoration:none}
+.breadcrumb a:hover{text-decoration:underline}
+
+/* Form layout: 2/3 + 1/3 */
+.form-layout{display:grid;grid-template-columns:2fr 1fr;gap:24px;align-items:start}
+.card{background:var(--surface);border-radius:var(--radius-card);border:1px solid var(--border);box-shadow:var(--shadow-sm);overflow:hidden}
+.card-title-bar{padding:18px 24px;border-bottom:1px solid var(--border);font-size:14px;font-weight:600;color:var(--text-primary);text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;justify-content:space-between}
+.card-body{padding:24px}
+
+/* Form fields */
+.field{margin-bottom:20px}
+.field:last-child{margin-bottom:0}
+.field-label{display:flex;align-items:center;gap:4px;font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:6px}
+.required-mark{color:var(--accent);font-size:14px}
+.field-input{width:100%;padding:9px 14px;border:1px solid var(--border);border-radius:var(--radius-input);font-size:14px;color:var(--text-primary);background:var(--surface);outline:none;transition:.18s;font-family:inherit}
+.field-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.field-input.is-invalid{border-color:var(--state-danger);box-shadow:0 0 0 3px rgba(255,62,29,.1)}
+.field-input.is-valid{border-color:var(--state-success)}
+.field-select{appearance:none;padding-right:36px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a9099' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.field-textarea{resize:vertical;min-height:90px}
+.helper-text{font-size:12px;color:var(--text-muted);margin-top:4px}
+.error-text{font-size:12px;color:var(--state-danger);margin-top:4px;display:flex;align-items:center;gap:4px}
+.valid-text{font-size:12px;color:#4b9e22;margin-top:4px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* Inline strength meter */
+.strength-bar{display:flex;gap:4px;margin-top:6px}
+.strength-seg{height:4px;border-radius:2px;flex:1;background:var(--border)}
+.strength-seg.filled-weak{background:var(--state-danger)}
+.strength-seg.filled-ok{background:var(--state-warning)}
+.strength-seg.filled-strong{background:var(--state-success)}
+
+/* Buttons */
+.form-actions{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-top:24px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 22px;border-radius:var(--radius-input);font-size:14px;font-weight:600;border:none;cursor:pointer;transition:.18s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--text-body);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Side panel */
+.side-card-body{padding:20px}
+.avatar-upload{width:80px;height:80px;border-radius:50%;background:var(--accent-dim);border:2px dashed var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;margin:0 auto 16px;color:var(--accent);font-size:11px;gap:4px}
+.tags-input{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-input);min-height:42px;cursor:text}
+.tag-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--radius-pill);background:var(--accent-dim);color:var(--accent);font-size:12px;font-weight:600}
+.tag-chip button{border:none;background:none;cursor:pointer;color:var(--accent);padding:0;line-height:1;font-size:14px}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text-body)}
+.toggle-row:last-child{border-bottom:none}
+.toggle{width:36px;height:20px;border-radius:10px;background:var(--border);position:relative;cursor:pointer;flex-shrink:0;transition:.18s}
+.toggle.on{background:var(--accent)}
+.toggle::after{content:'';width:14px;height:14px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;transition:.18s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle.on::after{left:19px}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-brand">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="var(--accent)"/><rect x="6" y="6" width="7" height="7" rx="2" fill="#fff"/><rect x="15" y="6" width="7" height="7" rx="2" fill="rgba(255,255,255,.5)"/><rect x="6" y="15" width="7" height="7" rx="2" fill="rgba(255,255,255,.5)"/><rect x="15" y="15" width="7" height="7" rx="2" fill="#fff"/></svg>
+    <span>AppPanel</span>
+  </div>
+  <div class="navbar-search">
+    <svg class="navbar-search-icon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/></svg>
+    <input type="text" placeholder="Search…" aria-label="Search">
+  </div>
+  <div class="navbar-actions">
+    <button class="icon-btn" style="position:relative" title="Notifications">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="badge-dot"></span>
+    </button>
+    <div class="avatar">AS</div>
+  </div>
+</nav>
+
+<aside class="sidebar">
+  <div class="nav-section-label">Main</div>
+  <a class="nav-item" href="#">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    Dashboard
+  </a>
+  <a class="nav-item active" href="#">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Records
+  </a>
+  <a class="nav-item" href="#">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    Documents
+  </a>
+  <div class="nav-section-label">Account</div>
+  <a class="nav-item" href="#">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    Settings
+  </a>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <div>
+      <div class="page-title">New Record</div>
+      <div class="breadcrumb"><a href="#">Records</a> / <a href="#">All Records</a> / New</div>
+    </div>
+  </div>
+
+  <div class="form-layout">
+    <!-- Main form -->
+    <div style="display:flex;flex-direction:column;gap:24px">
+
+      <!-- Account details section -->
+      <div class="card">
+        <div class="card-title-bar">Account Details</div>
+        <div class="card-body">
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label" for="f-name">Company Name <span class="required-mark">*</span></label>
+              <input class="field-input" id="f-name" type="text" placeholder="e.g. Acme Corp" value="Acme Corp" aria-required="true" aria-describedby="f-name-helper">
+              <div class="helper-text" id="f-name-helper">Official registered name of the account.</div>
+            </div>
+            <div class="field">
+              <label class="field-label" for="f-email">Email <span class="required-mark">*</span></label>
+              <input class="field-input is-invalid" id="f-email" type="email" placeholder="billing@company.com" value="notanemail" aria-required="true" aria-describedby="f-email-err" aria-invalid="true">
+              <div class="error-text" id="f-email-err">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Invalid email format. Use billing@company.com.
+              </div>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label" for="f-plan">Plan <span class="required-mark">*</span></label>
+              <select class="field-input field-select" id="f-plan" aria-required="true" aria-describedby="f-plan-helper">
+                <option value="">Choose a plan…</option>
+                <option value="free">Free</option>
+                <option value="starter">Starter — $99/mo</option>
+                <option selected value="pro">Pro — $420/mo</option>
+                <option value="enterprise">Enterprise — $2,400/mo</option>
+              </select>
+              <div class="helper-text" id="f-plan-helper">Billing plan for this account.</div>
+            </div>
+            <div class="field">
+              <label class="field-label" for="f-trial">Trial Days</label>
+              <input class="field-input" id="f-trial" type="number" placeholder="0" value="14" min="0" max="90" aria-describedby="f-trial-helper">
+              <div class="helper-text" id="f-trial-helper">Set to 0 for immediate billing on plan activation.</div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="f-coupon">Coupon Code</label>
+            <input class="field-input is-valid" id="f-coupon" type="text" placeholder="e.g. LAUNCH20" value="LAUNCH20" aria-describedby="f-coupon-helper">
+            <div class="valid-text">✓ Valid coupon — 20% off first 3 months.</div>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="f-notes">Notes</label>
+            <textarea class="field-input field-textarea" id="f-notes" placeholder="Internal notes about this account…" aria-describedby="f-notes-helper"></textarea>
+            <div class="helper-text" id="f-notes-helper">Not visible to the account holder.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Billing section -->
+      <div class="card">
+        <div class="card-title-bar">Billing Contact</div>
+        <div class="card-body">
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label" for="f-fname">First Name <span class="required-mark">*</span></label>
+              <input class="field-input" id="f-fname" type="text" placeholder="Jordan" value="Jordan" aria-required="true">
+            </div>
+            <div class="field">
+              <label class="field-label" for="f-lname">Last Name <span class="required-mark">*</span></label>
+              <input class="field-input" id="f-lname" type="text" placeholder="Davis" value="Davis" aria-required="true">
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label" for="f-phone">Phone</label>
+              <input class="field-input" id="f-phone" type="tel" placeholder="+1 (555) 000-0000" aria-describedby="f-phone-helper">
+              <div class="helper-text" id="f-phone-helper">Include country code for international numbers.</div>
+            </div>
+            <div class="field">
+              <label class="field-label" for="f-owner">Account Owner <span class="required-mark">*</span></label>
+              <select class="field-input field-select" id="f-owner" aria-required="true">
+                <option>Alex S.</option>
+                <option>Maria K.</option>
+                <option>Priya W.</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label" for="f-card">Payment Token <span class="required-mark">*</span></label>
+            <input class="field-input" id="f-card" type="text" placeholder="tok_xxxxxxxxxxxx" aria-required="true" aria-describedby="f-card-helper">
+            <div class="helper-text" id="f-card-helper">Tokenized card reference from the payment processor. Do not paste raw card numbers.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-ghost" type="button">Cancel</button>
+        <button class="btn btn-primary" type="submit" disabled title="Fix the errors above to continue">Create Record</button>
+      </div>
+    </div>
+
+    <!-- Side panel -->
+    <div style="display:flex;flex-direction:column;gap:24px">
+      <div class="card">
+        <div class="card-title-bar">Avatar</div>
+        <div class="side-card-body">
+          <div class="avatar-upload" role="button" tabindex="0" aria-label="Upload avatar">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <span>Upload</span>
+          </div>
+          <div class="helper-text" style="text-align:center">PNG or JPG, max 2MB, square preferred.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title-bar">Tags</div>
+        <div class="side-card-body">
+          <div class="field">
+            <div class="tags-input" role="group" aria-label="Tags">
+              <span class="tag-chip">enterprise<button aria-label="Remove enterprise">×</button></span>
+              <span class="tag-chip">q2-2026<button aria-label="Remove q2-2026">×</button></span>
+            </div>
+            <div class="helper-text" style="margin-top:8px">Press Enter to add a tag.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title-bar">Preferences</div>
+        <div class="side-card-body">
+          <div class="toggle-row">
+            <span>Email notifications</span>
+            <div class="toggle on" role="switch" aria-checked="true" tabindex="0"></div>
+          </div>
+          <div class="toggle-row">
+            <span>Invoice auto-send</span>
+            <div class="toggle on" role="switch" aria-checked="true" tabindex="0"></div>
+          </div>
+          <div class="toggle-row">
+            <span>Usage alerts</span>
+            <div class="toggle" role="switch" aria-checked="false" tabindex="0"></div>
+          </div>
+          <div class="toggle-row">
+            <span>Trial expiry reminder</span>
+            <div class="toggle on" role="switch" aria-checked="true" tabindex="0"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

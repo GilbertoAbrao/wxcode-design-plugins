@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Records List — Console</title>
+<style>
+:root {
+  --page-bg: #f5f7fd;
+  --sidebar-bg: #1a2035;
+  --sidebar-text: #a9b7d0;
+  --sidebar-active-bg: #1572e8;
+  --sidebar-active-text: #ffffff;
+  --sidebar-hover-bg: rgba(255,255,255,.08);
+  --card-bg: #ffffff;
+  --accent: #1572e8;
+  --accent-hover: #1260c4;
+  --accent-light: rgba(21,114,232,.12);
+  --text-primary: #444444;
+  --text-body: #5a5a5a;
+  --text-muted: #9daec5;
+  --border: #ebecec;
+  --header-bg: #ffffff;
+  --state-success: #31ce36;
+  --state-success-bg: rgba(49,206,54,.13);
+  --state-warning: #ffad46;
+  --state-warning-bg: rgba(255,173,70,.13);
+  --state-danger: #f25961;
+  --state-danger-bg: rgba(242,89,97,.13);
+  --state-info: #48abf7;
+  --state-info-bg: rgba(72,171,247,.13);
+  --state-secondary: #6c757d;
+  --state-secondary-bg: rgba(108,117,125,.13);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Public Sans","Segoe UI",system-ui,-apple-system,sans-serif;font-size:14px;color:var(--text-body);background:var(--page-bg);display:flex;min-height:100vh}
+.sidebar{width:260px;min-height:100vh;background:var(--sidebar-bg);display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:200}
+.sidebar-logo{height:60px;display:flex;align-items:center;padding:0 20px;border-bottom:1px solid rgba(255,255,255,.06)}
+.sidebar-logo svg{color:#fff;flex-shrink:0}
+.sidebar-logo-text{color:#fff;font-size:16px;font-weight:700;margin-left:10px}
+.sidebar-logo-sub{font-size:10px;color:var(--sidebar-text);margin-left:4px;margin-top:2px}
+.nav{flex:1;padding:12px 0}
+.nav-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(169,183,208,.5);padding:16px 20px 6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;color:var(--sidebar-text);font-size:13.5px;font-weight:500;cursor:pointer;transition:background .15s,color .15s;text-decoration:none}
+.nav-item:hover{background:var(--sidebar-hover-bg);color:#fff}
+.nav-item.active{background:var(--sidebar-active-bg);color:var(--sidebar-active-text);border-radius:6px;margin:0 10px;padding:10px 10px}
+.sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.06)}
+.user-chip{display:flex;align-items:center;gap:10px}
+.user-avatar{width:34px;height:34px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;flex-shrink:0}
+.user-name{font-size:13px;font-weight:600;color:#fff}
+.user-role{font-size:11px;color:var(--sidebar-text)}
+.main-wrap{margin-left:260px;display:flex;flex-direction:column;min-height:100vh;flex:1}
+.header{height:60px;background:var(--header-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;position:sticky;top:0;z-index:100}
+.header-title{font-size:15px;font-weight:600;color:var(--text-primary);flex:1}
+.header-search{display:flex;align-items:center;gap:8px;background:#f5f7fd;border:1px solid var(--border);border-radius:5px;padding:6px 12px;width:220px}
+.header-search input{border:none;background:transparent;outline:none;font-size:13px;color:var(--text-body);width:100%}
+.header-search svg{color:var(--text-muted);flex-shrink:0}
+.header-icons{display:flex;align-items:center;gap:6px}
+.icon-btn{width:36px;height:36px;border-radius:5px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;cursor:pointer;color:var(--text-body);transition:background .15s}
+.icon-btn:hover{background:#f0f2fa}
+.avatar-btn{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;font-weight:700;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.content{padding:24px;flex:1}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.page-title{font-size:20px;font-weight:700;color:var(--text-primary)}
+.page-sub{font-size:13px;color:var(--text-muted);margin-top:2px}
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:5px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:background .15s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text-body)}
+.btn-ghost:hover{background:#f0f2fa}
+/* Filter bar */
+.filter-bar{background:var(--card-bg);border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.08);padding:14px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.filter-search{display:flex;align-items:center;gap:8px;background:#f5f7fd;border:1px solid var(--border);border-radius:5px;padding:7px 12px;flex:1;min-width:180px}
+.filter-search input{border:none;background:transparent;outline:none;font-size:13px;color:var(--text-body);width:100%}
+.filter-search svg{color:var(--text-muted);flex-shrink:0}
+.filter-select{border:1px solid var(--border);border-radius:5px;padding:7px 10px;font-size:13px;color:var(--text-body);background:#fff;cursor:pointer;outline:none}
+.filter-select:focus{border-color:var(--accent)}
+.filter-date{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted)}
+.filter-date input{border:1px solid var(--border);border-radius:5px;padding:6px 10px;font-size:13px;color:var(--text-body);background:#fff;outline:none}
+.filter-date input:focus{border-color:var(--accent)}
+/* Table */
+.table-wrap{background:var(--card-bg);border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.04);overflow:hidden}
+.table-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+.card-title{font-size:15px;font-weight:600;color:var(--text-primary)}
+.card-count{font-size:12px;font-weight:600;background:var(--accent-light);color:var(--accent);border-radius:10px;padding:2px 8px;margin-left:10px}
+.bulk-bar{display:flex;align-items:center;gap:10px}
+.bulk-info{font-size:12px;color:var(--text-muted)}
+table{width:100%;border-collapse:collapse}
+thead th{padding:10px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);background:#f8f9fe;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+.th-sort{cursor:pointer;user-select:none}
+.th-sort:hover{color:var(--text-primary)}
+.sort-icon{margin-left:4px;color:var(--accent)}
+tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
+tbody tr:hover{background:#f8f9fe}
+tbody tr:last-child{border-bottom:none}
+td{padding:12px 16px;font-size:13.5px;color:var(--text-body);vertical-align:middle}
+.td-mono{font-family:"Courier New",monospace;font-size:12px;color:var(--text-muted)}
+.td-num{text-align:right;font-variant-numeric:tabular-nums}
+.pill{display:inline-flex;align-items:center;border-radius:10px;padding:3px 10px;font-size:11px;font-weight:600;white-space:nowrap}
+.pill-success{background:var(--state-success-bg);color:var(--state-success)}
+.pill-warning{background:var(--state-warning-bg);color:var(--state-warning)}
+.pill-danger{background:var(--state-danger-bg);color:var(--state-danger)}
+.pill-info{background:var(--state-info-bg);color:var(--state-info)}
+.pill-secondary{background:var(--state-secondary-bg);color:var(--state-secondary)}
+.action-btns{display:flex;gap:6px}
+.action-btn{width:28px;height:28px;border-radius:5px;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);transition:all .12s}
+.action-btn:hover{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+.table-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--border)}
+.table-info{font-size:12px;color:var(--text-muted)}
+.pager{display:flex;gap:4px}
+.page-btn{width:30px;height:30px;border-radius:5px;border:1px solid var(--border);background:transparent;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-body);transition:all .12s}
+.page-btn:hover,.page-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.page-size{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted)}
+.page-size select{border:1px solid var(--border);border-radius:5px;padding:4px 8px;font-size:12px;color:var(--text-body);background:#fff;cursor:pointer}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="var(--accent)"/><path d="M7 14h14M14 7v14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>
+    <div>
+      <div class="sidebar-logo-text">Console</div>
+      <div class="sidebar-logo-sub">Operations Hub</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <div class="nav-label">Main</div>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a class="nav-item active" href="#">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10H3M21 6H3M21 14H3M21 18H3"/></svg>
+      Records
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Accounts
+    </a>
+    <div class="nav-label">Analytics</div>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Reports
+    </a>
+    <div class="nav-label">System</div>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M2 12h1M21 12h1M12 2v1M12 21v1"/></svg>
+      Settings
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-chip">
+      <div class="user-avatar">JD</div>
+      <div><div class="user-name">Jordan Daly</div><div class="user-role">Administrator</div></div>
+    </div>
+  </div>
+</aside>
+
+<div class="main-wrap">
+  <header class="header">
+    <div class="header-title">Records</div>
+    <div class="header-search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search…">
+    </div>
+    <div class="header-icons">
+      <button class="icon-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </button>
+      <button class="avatar-btn">JD</button>
+    </div>
+  </header>
+
+  <div class="content">
+    <div class="page-header">
+      <div>
+        <div class="page-title">All Records</div>
+        <div class="page-sub">1,284 entries across all categories</div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-ghost">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export
+        </button>
+        <button class="btn btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New record
+        </button>
+      </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <div class="filter-search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search by name, ID, or assignee…">
+      </div>
+      <select class="filter-select">
+        <option>All statuses</option>
+        <option>Active</option>
+        <option>Completed</option>
+        <option>Pending</option>
+        <option>Flagged</option>
+        <option>Archived</option>
+      </select>
+      <select class="filter-select">
+        <option>All categories</option>
+        <option>Infrastructure</option>
+        <option>Compliance</option>
+        <option>Operations</option>
+        <option>Reporting</option>
+        <option>Licensing</option>
+      </select>
+      <div class="filter-date">
+        From <input type="date" value="2026-05-01">
+        to <input type="date" value="2026-06-03">
+      </div>
+      <button class="btn btn-ghost" style="padding:7px 14px;font-size:13px">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14H7L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        Clear
+      </button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <div class="table-header">
+        <div>
+          <span class="card-title">Records</span>
+          <span class="card-count">1,284</span>
+        </div>
+        <div class="bulk-bar">
+          <span class="bulk-info">2 selected</span>
+          <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px">Bulk assign</button>
+          <button class="btn" style="padding:6px 12px;font-size:12px;background:var(--state-danger-bg);color:var(--state-danger);border:none">Delete selected</button>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th><input type="checkbox"></th>
+            <th class="th-sort">ID <span class="sort-icon">↑</span></th>
+            <th class="th-sort">Name</th>
+            <th>Category</th>
+            <th>Assigned to</th>
+            <th class="th-sort">Due date</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="checkbox" checked></td>
+            <td class="td-mono">#REC-0041</td>
+            <td><div style="font-weight:600;color:var(--text-primary)">Riverside Project</div><div style="font-size:11px;color:var(--text-muted)">Phase 2 · Batch A</div></td>
+            <td>Infrastructure</td>
+            <td><div style="display:flex;align-items:center;gap:6px"><div style="width:26px;height:26px;border-radius:50%;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">ML</div>Morgan Liu</div></td>
+            <td>Jun 15</td>
+            <td><span style="font-size:11px;font-weight:600;color:var(--state-danger)">High</span></td>
+            <td><span class="pill pill-info">Active</span></td>
+            <td><div class="action-btns">
+              <button class="action-btn" title="View"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+              <button class="action-btn" title="Edit"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="action-btn" title="Delete"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14H7L5 6"/></svg></button>
+            </div></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" checked></td>
+            <td class="td-mono">#REC-0040</td>
+            <td><div style="font-weight:600;color:var(--text-primary)">Northgate Audit</div><div style="font-size:11px;color:var(--text-muted)">Q2 Review</div></td>
+            <td>Compliance</td>
+            <td><div style="display:flex;align-items:center;gap:6px"><div style="width:26px;height:26px;border-radius:50%;background:rgba(49,206,54,.13);color:var(--state-success);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">SO</div>Sara Okonkwo</div></td>
+            <td>Jun 1</td>
+            <td><span style="font-size:11px;font-weight:600;color:var(--state-warning)">Med</span></td>
+            <td><span class="pill pill-success">Completed</span></td>
+            <td><div class="action-btns">
+              <button class="action-btn" title="View"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+              <button class="action-btn" title="Edit"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="action-btn" title="Delete"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14H7L5 6"/></svg></button>
+            </div></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"></td>
+            <td class="td-mono">#REC-0039</td>
+            <td><div style="font-weight:600;color:var(--text-primary)">Summit Expansion</div><div style="font-size:11px;color:var(--text-muted)">Site B · Tower 3</div></td>
+            <td>Operations</td>
+            <td><div style="display:flex;align-items:center;gap:6px"><div style="width:26px;height:26px;border-radius:50%;background:rgba(255,173,70,.13);color:var(--state-warning);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">TR</div>Tyler Reeves</div></td>
+            <td>Jun 20</td>
+            <td><span style="font-size:11px;font-weight:600;color:var(--state-danger)">High</span></td>
+            <td><span class="pill pill-warning">Pending</span></td>
+            <td><div class="action-btns">
+              <button class="action-btn" title="View"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+              <button class="action-btn" title="Edit"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="action-btn" title="Delete"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14H7L5 6"/></svg></button>
+            </div></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"></td>
+            <td class="td-mono">#REC-0038</td>
+            <td><div style="font-weight:600;color:var(--text-primary)">Docklands Report</div><div style="font-size:11px;color:var(--text-muted)">Annual · Section 4</div></td>
+            <td>Reporting</td>
+            <td><div style="display:flex;align-items:center;gap:6px"><div style="width:26px;height:26px;border-radius:50%;background:rgba(242,89,97,.13);color:var(--state-danger);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">NP</div>Nina Patel</div></td>
+            <td>May 30</td>
+            <td><span style="font-size:11px;font-weight:600;color:var(--state-danger)">Critical</span></td>
+            <td><span class="pill pill-danger">Flagged</span></td>
+            <td><div class="action-btns">
+              <button class="action-btn" title="View"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+              <button class="action-btn" title="Edit"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="action-btn" title="Delete"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14H7L5 6"/></svg></button>
+            </div></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"></td>
+            <td class="td-mono">#REC-0037</td>
+            <td><div style="font-weight:600;color:var(--text-primary)">Clearwater Access</div><div style="font-size:11px;color:var(--text-muted)">Permit Zone C</div></td>
+            <td>Licensing</td>
+            <td><div style="display:flex;align-items:center;gap:6px"><div style="width:26px;height:26px;border-radius:50%;background:rgba(108,117,125,.13);color:var(--state-secondary);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">JT</div>James Thornton</div></td>
+            <td>Apr 22</td>
+            <td><span style="font-size:11px;font-weight:600;color:var(--text-muted)">Low</span></td>
+            <td><span class="pill pill-secondary">Archived</span></td>
+            <td><div class="action-btns">
+              <button class="action-btn" title="View"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+              <button class="action-btn" title="Edit"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="action-btn" title="Delete"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14H7L5 6"/></svg></button>
+            </div></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="table-footer">
+        <div class="page-size">
+          Show <select><option>25</option><option selected>50</option><option>100</option></select> per page
+        </div>
+        <span class="table-info">Showing 1–5 of 1,284 entries</span>
+        <div class="pager">
+          <button class="page-btn">«</button>
+          <button class="page-btn">‹</button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">…</button>
+          <button class="page-btn">26</button>
+          <button class="page-btn">›</button>
+          <button class="page-btn">»</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

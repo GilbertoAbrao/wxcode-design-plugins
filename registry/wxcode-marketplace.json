@@ -9,7 +9,7 @@
     "title": "WXCode Design Plugins",
     "description": "First-party admin / dashboard / cockpit plugins curated by WXCode for Open Design daemons. Tenant VMs register this catalog as a marketplace source to consume plugins without rebuild.",
     "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins",
-    "updatedAt": "2026-06-03T15:15:24Z"
+    "updatedAt": "2026-06-03T19:02:35Z"
   },
   "plugins": [
     {
@@ -364,6 +364,75 @@
       "mode": "prototype"
     },
     {
+      "name": "wxcode-admin-corona",
+      "title": "Violet Night Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-corona",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-corona",
+      "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Dark admin aesthetic: deep-charcoal canvas (#191c24), violet accent (#8862e0) on a violet-to-blue gradient for primary actions, Rubik type at weight 500 headings, 4px card radius, subdued #6c7293 body text, and #2c2e33 hairline borders. Archetype = top navbar with search + user controls, left icon sidebar, KPI card row (4 tiles), 2-column grid with a chart panel and a status list, plus a full-width data table \u2014 all balanced between density and breathing room.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "dark-mode",
+        "violet-accent",
+        "gradient-buttons",
+        "charcoal-canvas",
+        "enterprise",
+        "rubik"
+      ],
+      "mode": "prototype"
+    },
+    {
+      "name": "wxcode-admin-darkpan",
+      "title": "Onyx Sharp Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-darkpan",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-darkpan",
+      "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Midnight-black admin aesthetic: pure-black canvas (#000000), deep charcoal panels (#191c24), teal accent (#009688), muted slate body text (#6c7293), hairline borders (#2a2e38), Open Sans type, and zero-radius sharp corners throughout. Archetype = collapsible icon sidebar + top header bar + KPI metric tiles + data tables with teal status pills + form screens with inline validation. A crisp, zero-radius dark panel system suited for high-information operational dashboards.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "dark-mode",
+        "midnight-black",
+        "teal-accent",
+        "sharp-corners",
+        "data-dense",
+        "enterprise",
+        "zero-radius"
+      ],
+      "mode": "prototype"
+    },
+    {
       "name": "wxcode-admin-dense-grid",
       "title": "Dense Grid Admin",
       "version": "0.2.0",
@@ -684,6 +753,40 @@
       "mode": "prototype"
     },
     {
+      "name": "wxcode-admin-kaiadmin",
+      "title": "Azure Rail Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-kaiadmin",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-kaiadmin",
+      "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Light content-area + dark sidebar admin aesthetic: page canvas #f5f7fd, crisp white cards with 10px radius, deep navy sidebar (#1a2035), blue primary accent (#1572e8), body text #5a5a5a, Public Sans typography, bold 700 headings. Archetype = fixed dark vertical sidebar (icon + label nav) + sticky top header bar (page title + search + action icons + avatar) + 4-tile KPI row + 2-column dashboard grid (status overview panel + chart panel) + full-width records table with status pills. Complementary screens: list, form, charts, profile/settings, login.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "light-mode",
+        "dark-sidebar",
+        "blue-accent",
+        "clean-cards",
+        "enterprise",
+        "sidebar-nav"
+      ],
+      "mode": "prototype"
+    },
+    {
       "name": "wxcode-admin-kinetic-fitness",
       "title": "Kinetic Admin",
       "version": "0.2.0",
@@ -715,6 +818,40 @@
         "capacity-bar",
         "data-dense",
         "enterprise"
+      ],
+      "mode": "prototype"
+    },
+    {
+      "name": "wxcode-admin-mazer",
+      "title": "Soft Blue Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-mazer",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-mazer",
+      "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Light friendly admin aesthetic: soft cloud-blue page background (#f2f7ff), white card surfaces with 11px radius, deep navy body text (#25396f), indigo-blue primary accent (#435ebe), and Nunito type at 700 weight headings. Archetype = fixed sidebar with collapsible nav groups + top header bar + 4-tile KPI row + mixed content grid (charts panel + recent-activity list + status table) + full-width data table with badge-status pills, plus list, form, settings, auth, and error screens.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "light-mode",
+        "rounded",
+        "indigo-accent",
+        "friendly",
+        "sidebar-nav",
+        "card-grid"
       ],
       "mode": "prototype"
     },
@@ -1132,6 +1269,40 @@
         "sparklines",
         "data-dense",
         "enterprise"
+      ],
+      "mode": "prototype"
+    },
+    {
+      "name": "wxcode-admin-sneat",
+      "title": "Indigo SaaS Admin",
+      "version": "0.1.0",
+      "source": "github:GilbertoAbrao/wxcode-design-plugins@main/plugins/admin-sneat",
+      "publisher": {
+        "id": "wxcode",
+        "github": "GilbertoAbrao",
+        "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+      },
+      "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-sneat",
+      "license": "MIT",
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Clean light-mode SaaS admin aesthetic: #f5f5f9 page canvas, white (#fff) card surfaces, indigo accent (#696cff), Public Sans type, 6px card radius, soft shadows, and muted body text (#646e78). Archetype = sticky top navbar (app title + search + notification + avatar) + left sidebar (nav groups with icons) + KPI stat tiles + mixed-width grid of charts and tables + paginated records table with status pills, plus list, form, settings, auth, error, email, and calendar screens.",
+      "tags": [
+        "wxcode-plugin",
+        "wxcode",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "admin",
+        "light-mode",
+        "indigo-accent",
+        "soft-shadow",
+        "saas-admin",
+        "clean",
+        "sidebar-nav"
       ],
       "mode": "prototype"
     },

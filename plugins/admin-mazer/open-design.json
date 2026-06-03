@@ -1,0 +1,143 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "wxcode-admin-mazer",
+  "title": "Soft Blue Admin",
+  "version": "0.1.0",
+  "description": "Light friendly admin aesthetic: soft cloud-blue page background (#f2f7ff), white card surfaces with 11px radius, deep navy body text (#25396f), indigo-blue primary accent (#435ebe), and Nunito type at 700 weight headings. Archetype = fixed sidebar with collapsible nav groups + top header bar + 4-tile KPI row + mixed content grid (charts panel + recent-activity list + status table) + full-width data table with badge-status pills, plus list, form, settings, auth, and error screens.",
+  "license": "MIT",
+  "author": {
+    "name": "WXCode",
+    "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+  },
+  "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-mazer",
+  "tags": [
+    "wxcode-plugin",
+    "wxcode",
+    "first-party",
+    "prototype",
+    "operations",
+    "web",
+    "admin",
+    "light-mode",
+    "rounded",
+    "indigo-accent",
+    "friendly",
+    "sidebar-nav",
+    "card-grid"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "prototype",
+    "scenario": "operations",
+    "surface": "web",
+    "preview": {
+      "type": "html",
+      "entry": "./example.html"
+    },
+    "useCase": {
+      "query": {
+        "en": "Apply this light friendly admin aesthetic to my domain — soft blue page, white rounded cards, indigo accent, fixed sidebar with nav groups, KPI tiles, charts panel, activity list, and a dense status table.",
+        "zh-CN": "将这个明亮友好的管理界面风格应用到我的领域：柔和蓝色页面、白色圆角卡片、靛蓝强调色、固定侧边栏导航、KPI 磁贴、图表面板、活动列表和状态数据表。"
+      },
+      "exampleOutputs": [
+        {
+          "path": "./example.html",
+          "title": "Soft Blue Admin — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Soft Blue Admin — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Soft Blue Admin — Form"
+        },
+        {
+          "path": "./assets/charts.html",
+          "title": "Soft Blue Admin — Charts"
+        },
+        {
+          "path": "./assets/settings.html",
+          "title": "Soft Blue Admin — Settings"
+        },
+        {
+          "path": "./assets/login.html",
+          "title": "Soft Blue Admin — Login"
+        },
+        {
+          "path": "./assets/register.html",
+          "title": "Soft Blue Admin — Register"
+        },
+        {
+          "path": "./assets/error.html",
+          "title": "Soft Blue Admin — 404"
+        },
+        {
+          "path": "./assets/email.html",
+          "title": "Soft Blue Admin — Email"
+        },
+        {
+          "path": "./assets/chat.html",
+          "title": "Soft Blue Admin — Chat"
+        }
+      ]
+    },
+    "context": {
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ],
+      "designSystem": {
+        "primary": true
+      },
+      "craft": [
+        "typographic-rhythm",
+        "laws-of-ux"
+      ],
+      "assets": [
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/charts.html",
+        "./assets/settings.html",
+        "./assets/login.html",
+        "./assets/register.html",
+        "./assets/error.html",
+        "./assets/email.html",
+        "./assets/chat.html",
+        "./assets/template.html",
+        "./references/layouts.md"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ],
+    "provenance": {
+      "template": "Mazer",
+      "url": "https://themewagon.github.io/mazer/"
+    }
+  }
+}

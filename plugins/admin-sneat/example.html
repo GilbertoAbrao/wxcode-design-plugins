@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Console — Dashboard</title>
+<style>
+:root {
+  --accent:        #696cff;
+  --accent-hover:  #5a5dd6;
+  --accent-dim:    rgba(105,108,255,.12);
+  --canvas:        #f5f5f9;
+  --surface:       #ffffff;
+  --border:        #e4e6e8;
+  --text-primary:  #333240;
+  --text-body:     #646e78;
+  --text-muted:    #8a9099;
+  --shadow-sm:     0 2px 6px rgba(67,89,113,.12);
+  --shadow-md:     0 4px 16px rgba(67,89,113,.15);
+  --radius-card:   6px;
+  --radius-pill:   20px;
+  --radius-input:  6px;
+  --state-success: #71dd37;
+  --state-warning: #ffab00;
+  --state-danger:  #ff3e1d;
+  --state-info:    #03c3ec;
+  --state-secondary:#8592a3;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.5;background:var(--canvas);color:var(--text-body);display:flex;flex-direction:column;min-height:100vh}
+
+/* Navbar */
+.navbar{position:fixed;top:0;left:0;right:0;height:60px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:100;box-shadow:var(--shadow-sm)}
+.navbar-brand{display:flex;align-items:center;gap:8px;text-decoration:none;width:236px}
+.navbar-brand svg{flex-shrink:0}
+.navbar-brand span{font-weight:700;font-size:18px;color:var(--text-primary);letter-spacing:-.02em}
+.navbar-search{flex:1;max-width:320px;position:relative}
+.navbar-search input{width:100%;padding:8px 12px 8px 36px;border:1px solid var(--border);border-radius:var(--radius-input);font-size:14px;color:var(--text-body);background:var(--canvas);outline:none;transition:.18s}
+.navbar-search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.navbar-search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted)}
+.navbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.icon-btn{width:38px;height:38px;border-radius:50%;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-body);transition:.18s;position:relative}
+.icon-btn:hover{background:var(--canvas)}
+.badge-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--state-danger);border:2px solid var(--surface)}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;cursor:pointer;border:2px solid var(--accent)}
+
+/* Sidebar */
+.sidebar{position:fixed;top:60px;left:0;width:260px;bottom:0;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:16px 0}
+.nav-section-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);padding:16px 24px 6px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 20px;cursor:pointer;color:var(--text-body);text-decoration:none;border-radius:6px;margin:1px 12px;font-size:14px;font-weight:500;transition:.18s}
+.nav-item:hover{background:var(--canvas);color:var(--text-primary)}
+.nav-item.active{background:var(--accent-dim);color:var(--accent)}
+.nav-item svg{flex-shrink:0;opacity:.8}
+.nav-item.active svg{opacity:1}
+.nav-badge{margin-left:auto;font-size:11px;font-weight:600;padding:2px 8px;border-radius:var(--radius-pill);background:var(--accent-dim);color:var(--accent)}
+
+/* Main content */
+.main{margin-left:260px;margin-top:60px;padding:24px;min-height:calc(100vh - 60px)}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.page-title{font-size:20px;font-weight:700;color:var(--text-primary)}
+.page-subtitle{font-size:13px;color:var(--text-muted);margin-top:2px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:var(--radius-input);font-size:14px;font-weight:500;border:none;cursor:pointer;transition:.18s;text-decoration:none}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.btn-ghost:hover{background:var(--accent-dim)}
+
+/* KPI tiles */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-bottom:24px}
+.kpi-card{background:var(--surface);border-radius:var(--radius-card);border:1px solid var(--border);box-shadow:var(--shadow-sm);padding:20px 24px;display:flex;align-items:flex-start;gap:16px}
+.kpi-icon{width:44px;height:44px;border-radius:var(--radius-card);background:var(--accent-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent)}
+.kpi-icon.success{background:rgba(113,221,55,.12);color:var(--state-success)}
+.kpi-icon.warning{background:rgba(255,171,0,.12);color:var(--state-warning)}
+.kpi-icon.info{background:rgba(3,195,236,.12);color:var(--state-info)}
+.kpi-body{}
+.kpi-value{font-size:24px;font-weight:700;color:var(--text-primary);font-variant-numeric:tabular-nums;line-height:1.2}
+.kpi-label{font-size:13px;color:var(--text-muted);margin-top:2px}
+.kpi-delta{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:var(--radius-pill);margin-top:6px}
+.kpi-delta.up{background:rgba(113,221,55,.12);color:#59b027}
+.kpi-delta.down{background:rgba(255,62,29,.12);color:#d63515}
+
+/* Grid row */
+.grid-2-1{display:grid;grid-template-columns:2fr 1fr;gap:24px;margin-bottom:24px}
+.grid-1-2{display:grid;grid-template-columns:1fr 2fr;gap:24px;margin-bottom:24px}
+.card{background:var(--surface);border-radius:var(--radius-card);border:1px solid var(--border);box-shadow:var(--shadow-sm)}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px 0}
+.card-title{font-size:14px;font-weight:600;color:var(--text-primary);text-transform:uppercase;letter-spacing:.05em}
+.card-subtitle{font-size:12px;color:var(--text-muted);margin-top:2px}
+.card-body{padding:16px 24px 20px}
+
+/* Chart — SVG area chart */
+.chart-wrap{padding:16px 24px 20px;position:relative}
+.chart-legend{display:flex;gap:20px;margin-bottom:12px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted)}
+.legend-dot{width:10px;height:10px;border-radius:50%}
+svg.area-chart{width:100%;display:block;overflow:visible}
+
+/* Donut chart */
+.donut-wrap{display:flex;flex-direction:column;align-items:center;padding:20px 24px}
+.donut-legend{width:100%;margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.donut-legend-row{display:flex;align-items:center;justify-content:space-between;font-size:13px}
+.donut-legend-label{display:flex;align-items:center;gap:8px;color:var(--text-body)}
+.donut-legend-bar{width:8px;height:8px;border-radius:2px}
+.donut-legend-pct{font-weight:600;color:var(--text-primary);font-variant-numeric:tabular-nums}
+
+/* Recent records mini-panel */
+.mini-table{width:100%;border-collapse:collapse}
+.mini-table th{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);padding:10px 12px;border-bottom:1px solid var(--border);text-align:left}
+.mini-table td{padding:12px 12px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text-body)}
+.mini-table tr:last-child td{border-bottom:none}
+.cell-avatar{display:flex;align-items:center;gap:10px}
+.avatar-sm{width:32px;height:32px;border-radius:50%;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0}
+.av-green{background:rgba(113,221,55,.15);color:#59b027}
+.av-amber{background:rgba(255,171,0,.12);color:#c48500}
+.av-cyan{background:rgba(3,195,236,.12);color:var(--state-info)}
+.av-pink{background:rgba(255,62,29,.1);color:var(--state-danger)}
+.cell-name{font-weight:500;color:var(--text-primary);font-size:13px}
+.cell-sub{font-size:12px;color:var(--text-muted)}
+.pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:var(--radius-pill);font-size:12px;font-weight:600}
+.pill-success{background:rgba(113,221,55,.15);color:#4b9e22}
+.pill-warning{background:rgba(255,171,0,.15);color:#b07a00}
+.pill-danger{background:rgba(255,62,29,.12);color:#c02e14}
+.pill-info{background:rgba(3,195,236,.12);color:#0296b7}
+.pill-secondary{background:rgba(133,146,163,.12);color:var(--state-secondary)}
+
+/* Full-width table */
+.table-card{background:var(--surface);border-radius:var(--radius-card);border:1px solid var(--border);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:24px}
+.table-header{display:flex;align-items:center;gap:12px;padding:18px 24px;border-bottom:1px solid var(--border)}
+.table-title{font-size:14px;font-weight:600;color:var(--text-primary);text-transform:uppercase;letter-spacing:.05em;margin-right:auto}
+.table-search{position:relative}
+.table-search input{padding:7px 12px 7px 32px;border:1px solid var(--border);border-radius:var(--radius-input);font-size:13px;color:var(--text-body);outline:none;background:var(--canvas);width:200px;transition:.18s}
+.table-search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.table-search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text-muted)}
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);padding:12px 16px;border-bottom:1px solid var(--border);text-align:left;background:var(--surface);white-space:nowrap}
+.data-table td{padding:13px 16px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text-body);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:#f8f8fb}
+.mono{font-family:"Courier New",monospace;font-size:12px;color:var(--text-muted)}
+.table-footer{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-top:1px solid var(--border);font-size:13px;color:var(--text-muted)}
+.pager{display:flex;align-items:center;gap:4px}
+.pager-btn{width:30px;height:30px;border-radius:var(--radius-input);border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:var(--text-body);transition:.18s}
+.pager-btn:hover{background:var(--canvas);border-color:var(--accent);color:var(--accent)}
+.pager-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <a class="navbar-brand" href="#">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+      <rect width="28" height="28" rx="6" fill="var(--accent)"/>
+      <rect x="6" y="6" width="7" height="7" rx="2" fill="#fff"/>
+      <rect x="15" y="6" width="7" height="7" rx="2" fill="rgba(255,255,255,.5)"/>
+      <rect x="6" y="15" width="7" height="7" rx="2" fill="rgba(255,255,255,.5)"/>
+      <rect x="15" y="15" width="7" height="7" rx="2" fill="#fff"/>
+    </svg>
+    <span>AppPanel</span>
+  </a>
+  <div class="navbar-search">
+    <svg class="navbar-search-icon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+      <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/>
+    </svg>
+    <input type="text" placeholder="Search…" aria-label="Search">
+  </div>
+  <div class="navbar-actions">
+    <button class="icon-btn" title="Notifications" aria-label="Notifications">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span class="badge-dot"></span>
+    </button>
+    <button class="icon-btn" title="Messages" aria-label="Messages">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+    </button>
+    <div class="avatar" title="Account">AS</div>
+  </div>
+</nav>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="nav-section-label">Main</div>
+  <a class="nav-item active" href="#">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+      <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+    </svg>
+    Dashboard
+  </a>
+  <a class="nav-item" href="#">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+      <circle cx="9" cy="7" r="4"/>
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+    Entities
+    <span class="nav-badge">12</span>
+  </a>
+  <a class="nav-item" href="#">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+    </svg>
+    Records
+  </a>
+  <a class="nav-item" href="#">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="2" y="3" width="20" height="14" rx="2"/>
+      <line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+    </svg>
+    Reports
+  </a>
+  <div class="nav-section-label">Management</div>
+  <a class="nav-item" href="#">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+    </svg>
+    Activity
+  </a>
+  <a class="nav-item" href="#">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+    </svg>
+    Integrations
+  </a>
+  <div class="nav-section-label">Account</div>
+  <a class="nav-item" href="#">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+    </svg>
+    Settings
+  </a>
+</aside>
+
+<!-- Main content -->
+<main class="main">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Analytics Overview</div>
+      <div class="page-subtitle">Last 30 days · Updated just now</div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-ghost">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        Export
+      </button>
+      <button class="btn btn-primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Record
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI tiles -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </div>
+      <div class="kpi-body">
+        <div class="kpi-value">12,480</div>
+        <div class="kpi-label">Active Accounts</div>
+        <div class="kpi-delta up">▲ 4.2% vs last month</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon success">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        </svg>
+      </div>
+      <div class="kpi-body">
+        <div class="kpi-value">$94,320</div>
+        <div class="kpi-label">Monthly Revenue</div>
+        <div class="kpi-delta up">▲ 8.7% vs last month</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon warning">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
+        </svg>
+      </div>
+      <div class="kpi-body">
+        <div class="kpi-value">3.1%</div>
+        <div class="kpi-label">Churn Rate</div>
+        <div class="kpi-delta down">▼ 0.9% vs last month</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon info">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+      </div>
+      <div class="kpi-body">
+        <div class="kpi-value">$7.56</div>
+        <div class="kpi-label">Avg Revenue / User</div>
+        <div class="kpi-delta up">▲ 1.3% vs last month</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart row -->
+  <div class="grid-2-1">
+    <!-- Area chart -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Revenue Over Time</div>
+          <div class="card-subtitle">New MRR vs Expansion MRR · last 12 months</div>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-legend">
+          <span class="legend-item"><span class="legend-dot" style="background:var(--accent)"></span>New MRR</span>
+          <span class="legend-item"><span class="legend-dot" style="background:var(--state-info)"></span>Expansion</span>
+        </div>
+        <svg class="area-chart" viewBox="0 0 600 160" preserveAspectRatio="none" style="height:160px">
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="var(--accent)" stop-opacity=".2"/>
+              <stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/>
+            </linearGradient>
+            <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="var(--state-info)" stop-opacity=".15"/>
+              <stop offset="100%" stop-color="var(--state-info)" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <!-- grid lines -->
+          <line x1="0" y1="40" x2="600" y2="40" stroke="#e4e6e8" stroke-dasharray="4 4"/>
+          <line x1="0" y1="80" x2="600" y2="80" stroke="#e4e6e8" stroke-dasharray="4 4"/>
+          <line x1="0" y1="120" x2="600" y2="120" stroke="#e4e6e8" stroke-dasharray="4 4"/>
+          <!-- area 1 -->
+          <path d="M0,120 L50,100 L100,85 L150,90 L200,70 L250,60 L300,55 L350,45 L400,40 L450,35 L500,30 L550,25 L600,20 L600,155 L0,155 Z" fill="url(#g1)"/>
+          <polyline points="0,120 50,100 100,85 150,90 200,70 250,60 300,55 350,45 400,40 450,35 500,30 550,25 600,20" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+          <!-- area 2 -->
+          <path d="M0,140 L50,130 L100,125 L150,120 L200,115 L250,108 L300,100 L350,95 L400,88 L450,82 L500,78 L550,72 L600,68 L600,155 L0,155 Z" fill="url(#g2)"/>
+          <polyline points="0,140 50,130 100,125 150,120 200,115 250,108 300,100 350,95 400,88 450,82 500,78 550,72 600,68" fill="none" stroke="var(--state-info)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+          <!-- axis labels -->
+          <text x="0" y="155" font-size="10" fill="#8a9099" font-family="inherit">Jan</text>
+          <text x="95" y="155" font-size="10" fill="#8a9099" font-family="inherit">Mar</text>
+          <text x="195" y="155" font-size="10" fill="#8a9099" font-family="inherit">May</text>
+          <text x="295" y="155" font-size="10" fill="#8a9099" font-family="inherit">Jul</text>
+          <text x="395" y="155" font-size="10" fill="#8a9099" font-family="inherit">Sep</text>
+          <text x="545" y="155" font-size="10" fill="#8a9099" font-family="inherit">Dec</text>
+        </svg>
+      </div>
+    </div>
+    <!-- Donut chart -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Plan Distribution</div>
+          <div class="card-subtitle">By active accounts</div>
+        </div>
+      </div>
+      <div class="donut-wrap">
+        <svg width="140" height="140" viewBox="0 0 140 140">
+          <!-- donut segments (simple arcs via stroke-dasharray) -->
+          <circle cx="70" cy="70" r="52" fill="none" stroke="#e4e6e8" stroke-width="22"/>
+          <!-- Pro 48% -->
+          <circle cx="70" cy="70" r="52" fill="none" stroke="var(--accent)" stroke-width="22"
+            stroke-dasharray="156 170" stroke-dashoffset="0" transform="rotate(-90 70 70)"/>
+          <!-- Starter 33% -->
+          <circle cx="70" cy="70" r="52" fill="none" stroke="var(--state-info)" stroke-width="22"
+            stroke-dasharray="107 219" stroke-dashoffset="-156" transform="rotate(-90 70 70)"/>
+          <!-- Free 19% -->
+          <circle cx="70" cy="70" r="52" fill="none" stroke="var(--state-warning)" stroke-width="22"
+            stroke-dasharray="62 264" stroke-dashoffset="-263" transform="rotate(-90 70 70)"/>
+          <text x="70" y="66" text-anchor="middle" font-size="18" font-weight="700" fill="var(--text-primary)" font-family="inherit">48%</text>
+          <text x="70" y="82" text-anchor="middle" font-size="11" fill="var(--text-muted)" font-family="inherit">Pro</text>
+        </svg>
+        <div class="donut-legend">
+          <div class="donut-legend-row">
+            <span class="donut-legend-label"><span class="donut-legend-bar" style="background:var(--accent)"></span>Pro</span>
+            <span class="donut-legend-pct">48%</span>
+          </div>
+          <div class="donut-legend-row">
+            <span class="donut-legend-label"><span class="donut-legend-bar" style="background:var(--state-info)"></span>Starter</span>
+            <span class="donut-legend-pct">33%</span>
+          </div>
+          <div class="donut-legend-row">
+            <span class="donut-legend-label"><span class="donut-legend-bar" style="background:var(--state-warning)"></span>Free</span>
+            <span class="donut-legend-pct">19%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Second row: mini stats + recent records -->
+  <div class="grid-1-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Quick Stats</div>
+      </div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:16px;margin-top:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:var(--radius-card);background:var(--canvas)">
+          <span style="font-size:13px;color:var(--text-body)">New this week</span>
+          <span style="font-size:15px;font-weight:700;color:var(--text-primary);font-variant-numeric:tabular-nums">+348</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:var(--radius-card);background:var(--canvas)">
+          <span style="font-size:13px;color:var(--text-body)">Pending review</span>
+          <span style="font-size:15px;font-weight:700;color:var(--state-warning);font-variant-numeric:tabular-nums">14</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:var(--radius-card);background:var(--canvas)">
+          <span style="font-size:13px;color:var(--text-body)">Overdue</span>
+          <span style="font-size:15px;font-weight:700;color:var(--state-danger);font-variant-numeric:tabular-nums">3</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:var(--radius-card);background:var(--canvas)">
+          <span style="font-size:13px;color:var(--text-body)">Completed today</span>
+          <span style="font-size:15px;font-weight:700;color:var(--state-success);font-variant-numeric:tabular-nums">127</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Recent Additions</div>
+      </div>
+      <div style="padding:0 0 8px">
+        <table class="mini-table">
+          <thead>
+            <tr>
+              <th>Account</th>
+              <th>Plan</th>
+              <th>Revenue</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="cell-avatar"><div class="avatar-sm">AB</div><div><div class="cell-name">Acme Corp</div><div class="cell-sub">acme@example.com</div></div></div></td>
+              <td>Pro</td>
+              <td style="font-variant-numeric:tabular-nums">$420</td>
+              <td><span class="pill pill-success">Active</span></td>
+            </tr>
+            <tr>
+              <td><div class="cell-avatar"><div class="avatar-sm av-green">LT</div><div><div class="cell-name">Luma Tech</div><div class="cell-sub">hello@luma.io</div></div></div></td>
+              <td>Starter</td>
+              <td style="font-variant-numeric:tabular-nums">$99</td>
+              <td><span class="pill pill-info">Trialing</span></td>
+            </tr>
+            <tr>
+              <td><div class="cell-avatar"><div class="avatar-sm av-amber">FX</div><div><div class="cell-name">FlexSoft</div><div class="cell-sub">ops@flexsoft.co</div></div></div></td>
+              <td>Pro</td>
+              <td style="font-variant-numeric:tabular-nums">$840</td>
+              <td><span class="pill pill-warning">Paused</span></td>
+            </tr>
+            <tr>
+              <td><div class="cell-avatar"><div class="avatar-sm av-cyan">NK</div><div><div class="cell-name">NovakLabs</div><div class="cell-sub">team@novak.dev</div></div></div></td>
+              <td>Pro</td>
+              <td style="font-variant-numeric:tabular-nums">$420</td>
+              <td><span class="pill pill-success">Active</span></td>
+            </tr>
+            <tr>
+              <td><div class="cell-avatar"><div class="avatar-sm av-pink">BR</div><div><div class="cell-name">Bronto Inc</div><div class="cell-sub">billing@bronto.net</div></div></div></td>
+              <td>Free</td>
+              <td style="font-variant-numeric:tabular-nums">$0</td>
+              <td><span class="pill pill-danger">Cancelled</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full-width records table -->
+  <div class="table-card">
+    <div class="table-header">
+      <span class="table-title">All Records</span>
+      <div class="table-search">
+        <svg class="table-search-icon" width="13" height="13" viewBox="0 0 16 16" fill="var(--text-muted)">
+          <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/>
+        </svg>
+        <input type="text" placeholder="Search records…" aria-label="Search records">
+      </div>
+      <button class="btn btn-primary" style="padding:8px 16px;font-size:13px">+ Add</button>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width:40px"><input type="checkbox" aria-label="Select all"></th>
+          <th>ID</th>
+          <th>Account</th>
+          <th>Plan</th>
+          <th>Status</th>
+          <th style="text-align:right">MRR</th>
+          <th>Next Billing</th>
+          <th style="width:40px"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><input type="checkbox" aria-label="Select"></td>
+          <td><span class="mono">#5001</span></td>
+          <td><div class="cell-avatar"><div class="avatar-sm">AC</div><div><div class="cell-name">Acme Corp</div><div class="cell-sub">acme@example.com</div></div></div></td>
+          <td>Pro</td>
+          <td><span class="pill pill-success">Active</span></td>
+          <td style="text-align:right;font-variant-numeric:tabular-nums">$420</td>
+          <td>Jul 1, 2026</td>
+          <td><button class="icon-btn" style="width:28px;height:28px" title="Actions">⋯</button></td>
+        </tr>
+        <tr>
+          <td><input type="checkbox" aria-label="Select"></td>
+          <td><span class="mono">#5002</span></td>
+          <td><div class="cell-avatar"><div class="avatar-sm av-green">LT</div><div><div class="cell-name">Luma Tech</div><div class="cell-sub">hello@luma.io</div></div></div></td>
+          <td>Starter</td>
+          <td><span class="pill pill-info">Trialing</span></td>
+          <td style="text-align:right;font-variant-numeric:tabular-nums">$99</td>
+          <td>Jun 22, 2026</td>
+          <td><button class="icon-btn" style="width:28px;height:28px" title="Actions">⋯</button></td>
+        </tr>
+        <tr>
+          <td><input type="checkbox" aria-label="Select"></td>
+          <td><span class="mono">#5003</span></td>
+          <td><div class="cell-avatar"><div class="avatar-sm av-amber">FX</div><div><div class="cell-name">FlexSoft</div><div class="cell-sub">ops@flexsoft.co</div></div></div></td>
+          <td>Pro</td>
+          <td><span class="pill pill-warning">Paused</span></td>
+          <td style="text-align:right;font-variant-numeric:tabular-nums">$840</td>
+          <td>Jul 15, 2026</td>
+          <td><button class="icon-btn" style="width:28px;height:28px" title="Actions">⋯</button></td>
+        </tr>
+        <tr>
+          <td><input type="checkbox" aria-label="Select"></td>
+          <td><span class="mono">#5004</span></td>
+          <td><div class="cell-avatar"><div class="avatar-sm av-cyan">NK</div><div><div class="cell-name">NovakLabs</div><div class="cell-sub">team@novak.dev</div></div></div></td>
+          <td>Pro</td>
+          <td><span class="pill pill-success">Active</span></td>
+          <td style="text-align:right;font-variant-numeric:tabular-nums">$420</td>
+          <td>Aug 1, 2026</td>
+          <td><button class="icon-btn" style="width:28px;height:28px" title="Actions">⋯</button></td>
+        </tr>
+        <tr>
+          <td><input type="checkbox" aria-label="Select"></td>
+          <td><span class="mono">#5005</span></td>
+          <td><div class="cell-avatar"><div class="avatar-sm av-pink">BR</div><div><div class="cell-name">Bronto Inc</div><div class="cell-sub">billing@bronto.net</div></div></div></td>
+          <td>Free</td>
+          <td><span class="pill pill-danger">Cancelled</span></td>
+          <td style="text-align:right;font-variant-numeric:tabular-nums">$0</td>
+          <td>—</td>
+          <td><button class="icon-btn" style="width:28px;height:28px" title="Actions">⋯</button></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="table-footer">
+      <span>Showing 1–5 of 248 records</span>
+      <div class="pager">
+        <button class="pager-btn">‹</button>
+        <button class="pager-btn active">1</button>
+        <button class="pager-btn">2</button>
+        <button class="pager-btn">3</button>
+        <span style="padding:0 4px;color:var(--text-muted)">…</span>
+        <button class="pager-btn">50</button>
+        <button class="pager-btn">›</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

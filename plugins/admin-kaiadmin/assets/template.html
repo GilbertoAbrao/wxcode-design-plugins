@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Screen — Console</title>
+<style>
+/* ── Azure Rail Admin Token Seed ─────────────────────────────────────── */
+:root {
+  /* Canvas */
+  --page-bg: #f5f7fd;
+
+  /* Sidebar */
+  --sidebar-bg: #1a2035;
+  --sidebar-text: #a9b7d0;
+  --sidebar-active-bg: #1572e8;
+  --sidebar-active-text: #ffffff;
+  --sidebar-hover-bg: rgba(255,255,255,.08);
+
+  /* Cards */
+  --card-bg: #ffffff;
+  --card-radius: 10px;
+  --card-shadow: 0 1px 4px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
+
+  /* Accent */
+  --accent: #1572e8;
+  --accent-hover: #1260c4;
+  --accent-light: rgba(21,114,232,.12);
+
+  /* Text */
+  --text-primary: #444444;
+  --text-body: #5a5a5a;
+  --text-muted: #9daec5;
+
+  /* Borders */
+  --border: #ebecec;
+  --border-focus: #1572e8;
+
+  /* Header */
+  --header-bg: #ffffff;
+  --header-height: 60px;
+
+  /* Status tokens */
+  --state-success: #31ce36;
+  --state-success-bg: rgba(49,206,54,.13);
+  --state-warning: #ffad46;
+  --state-warning-bg: rgba(255,173,70,.13);
+  --state-danger: #f25961;
+  --state-danger-bg: rgba(242,89,97,.13);
+  --state-info: #48abf7;
+  --state-info-bg: rgba(72,171,247,.13);
+  --state-secondary: #6c757d;
+  --state-secondary-bg: rgba(108,117,125,.13);
+
+  /* Typography */
+  --font: "Public Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+  --font-size-base: 14px;
+
+  /* Spacing */
+  --sidebar-width: 260px;
+  --content-padding: 24px;
+  --grid-gap: 20px;
+}
+
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  font-size: var(--font-size-base);
+  color: var(--text-body);
+  background: var(--page-bg);
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── Sidebar shell ───────────────────────────────────────────────────── */
+.sidebar {
+  width: var(--sidebar-width);
+  min-height: 100vh;
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 200;
+}
+
+.sidebar-logo {
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+.sidebar-logo-text {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  margin-left: 10px;
+}
+
+.nav { flex: 1; padding: 12px 0; overflow-y: auto; }
+
+.nav-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  color: rgba(169,183,208,.5);
+  padding: 16px 20px 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  color: var(--sidebar-text);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .15s, color .15s;
+}
+
+.nav-item:hover { background: var(--sidebar-hover-bg); color: #fff; }
+
+.nav-item.active {
+  background: var(--sidebar-active-bg);
+  color: var(--sidebar-active-text);
+  border-radius: 6px;
+  margin: 0 10px;
+  padding: 10px;
+}
+
+.sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255,255,255,.06);
+}
+
+/* ── Main wrapper ────────────────────────────────────────────────────── */
+.main-wrap {
+  margin-left: var(--sidebar-width);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  flex: 1;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────── */
+.header {
+  height: var(--header-height);
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--content-padding);
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* ── Content area ────────────────────────────────────────────────────── */
+.content {
+  padding: var(--content-padding);
+  flex: 1;
+}
+
+/* ── Card ────────────────────────────────────────────────────────────── */
+.card {
+  background: var(--card-bg);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  padding: 20px;
+}
+
+.card-title { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+
+/* ── Buttons ─────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 5px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-family: var(--font);
+  transition: background .15s;
+}
+
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text-body); }
+.btn-ghost:hover { background: #f0f2fa; }
+
+/* ── Status pills ────────────────────────────────────────────────────── */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 10px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pill-success  { background: var(--state-success-bg);   color: var(--state-success); }
+.pill-warning  { background: var(--state-warning-bg);   color: var(--state-warning); }
+.pill-danger   { background: var(--state-danger-bg);    color: var(--state-danger); }
+.pill-info     { background: var(--state-info-bg);      color: var(--state-info); }
+.pill-secondary{ background: var(--state-secondary-bg); color: var(--state-secondary); }
+
+/* ── Form primitives ─────────────────────────────────────────────────── */
+.label { display: block; font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+.required { color: var(--state-danger); }
+.input, .select, .textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--text-primary);
+  background: #fff;
+  outline: none;
+  transition: border-color .15s;
+}
+.input:focus, .select:focus, .textarea:focus { border-color: var(--border-focus); }
+.input.error, .select.error { border-color: var(--state-danger); background: rgba(242,89,97,.04); }
+.input.valid { border-color: var(--state-success); }
+.helper { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+.error-msg { font-size: 11px; color: var(--state-danger); margin-top: 4px; }
+
+/* ── Table ───────────────────────────────────────────────────────────── */
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  padding: 10px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--text-muted);
+  background: #f8f9fe;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+tbody tr { border-bottom: 1px solid var(--border); transition: background .12s; }
+tbody tr:hover { background: #f8f9fe; }
+td { padding: 12px 16px; font-size: 13.5px; color: var(--text-body); vertical-align: middle; }
+.td-mono { font-family: "Courier New", monospace; font-size: 12px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<!-- ── Sidebar ──────────────────────────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <!-- Replace with brand mark SVG -->
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+      <rect width="28" height="28" rx="6" fill="var(--accent)"/>
+      <path d="M7 14h14M14 7v14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+    <div class="sidebar-logo-text">App Name</div>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-label">Section</div>
+    <!-- Repeat .nav-item for each nav link; add .active to the current page -->
+    <a class="nav-item active" href="#">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Nav item
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <!-- User chip: avatar initials + name + role -->
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:34px;height:34px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700">AB</div>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:#fff">User Name</div>
+        <div style="font-size:11px;color:var(--sidebar-text)">Role</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ── Main ─────────────────────────────────────────────────────────── -->
+<div class="main-wrap">
+
+  <!-- Header -->
+  <header class="header">
+    <div style="font-size:15px;font-weight:600;color:var(--text-primary);flex:1">Page title</div>
+    <!-- Search, icon buttons, avatar go here -->
+  </header>
+
+  <!-- Content -->
+  <div class="content">
+    <!-- Page header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+      <div>
+        <div style="font-size:20px;font-weight:700;color:var(--text-primary)">Section Title</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-top:2px">Subtitle or breadcrumb</div>
+      </div>
+      <button class="btn btn-primary">Primary action</button>
+    </div>
+
+    <!-- Drop .card blocks here; use CSS grid for multi-column layouts -->
+    <div class="card">
+      <div class="card-title">Card title</div>
+      <!-- Card body -->
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

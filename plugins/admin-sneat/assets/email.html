@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Console — Email</title>
+<style>
+:root {
+  --accent:        #696cff;
+  --accent-hover:  #5a5dd6;
+  --accent-dim:    rgba(105,108,255,.12);
+  --canvas:        #f5f5f9;
+  --surface:       #ffffff;
+  --border:        #e4e6e8;
+  --text-primary:  #333240;
+  --text-body:     #646e78;
+  --text-muted:    #8a9099;
+  --shadow-sm:     0 2px 6px rgba(67,89,113,.12);
+  --radius-card:   6px;
+  --radius-input:  6px;
+  --state-success: #71dd37;
+  --state-danger:  #ff3e1d;
+  --state-warning: #ffab00;
+  --state-info:    #03c3ec;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;line-height:1.5;background:var(--canvas);color:var(--text-body);display:flex;flex-direction:column;min-height:100vh}
+.navbar{position:fixed;top:0;left:0;right:0;height:60px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:100;box-shadow:var(--shadow-sm)}
+.navbar-brand{display:flex;align-items:center;gap:8px;width:236px}
+.navbar-brand span{font-weight:700;font-size:18px;color:var(--text-primary)}
+.navbar-search{flex:1;max-width:320px;position:relative}
+.navbar-search input{width:100%;padding:8px 12px 8px 36px;border:1px solid var(--border);border-radius:var(--radius-input);font-size:14px;color:var(--text-body);background:var(--canvas);outline:none}
+.navbar-search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted)}
+.navbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.icon-btn{width:38px;height:38px;border-radius:50%;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-body);position:relative}
+.badge-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--state-danger);border:2px solid var(--surface)}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;border:2px solid var(--accent)}
+.sidebar{position:fixed;top:60px;left:0;width:260px;bottom:0;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:16px 0}
+.nav-section-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);padding:16px 24px 6px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 20px;cursor:pointer;color:var(--text-body);text-decoration:none;border-radius:6px;margin:1px 12px;font-size:14px;font-weight:500;transition:.18s}
+.nav-item:hover{background:var(--canvas)}
+.nav-item.active{background:var(--accent-dim);color:var(--accent)}
+.nav-badge{margin-left:auto;font-size:11px;font-weight:700;min-width:20px;height:20px;border-radius:10px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;padding:0 5px}
+
+/* Email layout: sidebar + list + detail */
+.email-wrap{margin-left:260px;margin-top:60px;display:flex;height:calc(100vh - 60px);overflow:hidden}
+
+/* Folder sidebar */
+.folder-sidebar{width:200px;border-right:1px solid var(--border);background:var(--surface);overflow-y:auto;flex-shrink:0}
+.folder-section-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);padding:16px 16px 6px}
+.folder-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;color:var(--text-body);font-size:13px;font-weight:500;border-radius:6px;margin:1px 8px;transition:.18s}
+.folder-item:hover{background:var(--canvas)}
+.folder-item.active{background:var(--accent-dim);color:var(--accent)}
+.folder-count{margin-left:auto;font-size:11px;font-weight:700;color:var(--accent)}
+.compose-btn{margin:16px 12px 8px;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;border-radius:var(--radius-card);background:var(--accent);color:#fff;font-size:13px;font-weight:600;border:none;cursor:pointer;width:calc(100% - 24px);transition:.18s}
+.compose-btn:hover{background:var(--accent-hover)}
+
+/* Message list */
+.msg-list{width:320px;border-right:1px solid var(--border);background:var(--surface);overflow-y:auto;flex-shrink:0}
+.msg-list-toolbar{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border)}
+.msg-search{flex:1;position:relative}
+.msg-search input{width:100%;padding:7px 10px 7px 30px;border:1px solid var(--border);border-radius:var(--radius-input);font-size:13px;background:var(--canvas);outline:none;color:var(--text-body)}
+.msg-search-icon{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--text-muted)}
+.msg-item{display:flex;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:.18s}
+.msg-item:hover{background:var(--canvas)}
+.msg-item.active{background:var(--accent-dim)}
+.msg-item.unread .msg-subject{font-weight:700;color:var(--text-primary)}
+.msg-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.msg-av-accent{background:var(--accent-dim);color:var(--accent)}
+.msg-av-green{background:rgba(113,221,55,.15);color:#4b9e22}
+.msg-av-amber{background:rgba(255,171,0,.12);color:#c48500}
+.msg-av-cyan{background:rgba(3,195,236,.12);color:var(--state-info)}
+.msg-body{flex:1;min-width:0}
+.msg-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px}
+.msg-sender{font-size:13px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+.msg-time{font-size:11px;color:var(--text-muted);flex-shrink:0}
+.msg-subject{font-size:12px;color:var(--text-body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.msg-preview{font-size:12px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.unread-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:4px}
+
+/* Message detail */
+.msg-detail{flex:1;overflow-y:auto;background:var(--surface)}
+.msg-detail-toolbar{display:flex;align-items:center;gap:8px;padding:12px 20px;border-bottom:1px solid var(--border)}
+.tool-btn{display:flex;align-items:center;gap:6px;padding:7px 12px;border:1px solid var(--border);border-radius:var(--radius-input);background:var(--surface);cursor:pointer;font-size:13px;color:var(--text-body);font-family:inherit;transition:.18s}
+.tool-btn:hover{border-color:var(--accent);color:var(--accent)}
+.tool-btn.danger:hover{border-color:var(--state-danger);color:var(--state-danger)}
+.msg-detail-head{padding:24px 24px 16px;border-bottom:1px solid var(--border)}
+.msg-detail-subject{font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:12px}
+.msg-detail-meta{display:flex;align-items:center;gap:12px}
+.msg-detail-avatar{width:40px;height:40px;border-radius:50%;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex-shrink:0}
+.msg-detail-from{font-size:13px;font-weight:600;color:var(--text-primary)}
+.msg-detail-addr{font-size:12px;color:var(--text-muted)}
+.msg-detail-date{margin-left:auto;font-size:12px;color:var(--text-muted)}
+.msg-detail-body{padding:24px;font-size:14px;color:var(--text-body);line-height:1.8;max-width:680px}
+.msg-detail-body p{margin-bottom:14px}
+.msg-detail-body p:last-child{margin-bottom:0}
+.msg-detail-sig{margin-top:24px;padding-top:16px;border-top:1px solid var(--border);font-size:13px;color:var(--text-muted)}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-brand">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="var(--accent)"/><rect x="6" y="6" width="7" height="7" rx="2" fill="#fff"/><rect x="15" y="6" width="7" height="7" rx="2" fill="rgba(255,255,255,.5)"/><rect x="6" y="15" width="7" height="7" rx="2" fill="rgba(255,255,255,.5)"/><rect x="15" y="15" width="7" height="7" rx="2" fill="#fff"/></svg>
+    <span>AppPanel</span>
+  </div>
+  <div class="navbar-search">
+    <svg class="navbar-search-icon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/></svg>
+    <input type="text" placeholder="Search…" aria-label="Search">
+  </div>
+  <div class="navbar-actions">
+    <button class="icon-btn" style="position:relative" title="Notifications">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="badge-dot"></span>
+    </button>
+    <div class="avatar">AS</div>
+  </div>
+</nav>
+
+<aside class="sidebar">
+  <div class="nav-section-label">Main</div>
+  <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+  <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Records</a>
+  <a class="nav-item active" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Email<span class="nav-badge">24</span></a>
+  <div class="nav-section-label">Account</div>
+  <a class="nav-item" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg>Settings</a>
+</aside>
+
+<div class="email-wrap">
+  <!-- Folder list -->
+  <div class="folder-sidebar">
+    <button class="compose-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Compose
+    </button>
+    <div class="folder-section-label">Mailbox</div>
+    <a class="folder-item active" href="#">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      Inbox <span class="folder-count">24</span>
+    </a>
+    <a class="folder-item" href="#">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      Sent
+    </a>
+    <a class="folder-item" href="#">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+      Drafts <span class="folder-count" style="color:var(--text-muted)">3</span>
+    </a>
+    <a class="folder-item" href="#">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+      Trash
+    </a>
+    <a class="folder-item" href="#">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+      Spam
+    </a>
+  </div>
+
+  <!-- Message list -->
+  <div class="msg-list">
+    <div class="msg-list-toolbar">
+      <div class="msg-search">
+        <svg class="msg-search-icon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/></svg>
+        <input type="text" placeholder="Search inbox…" aria-label="Search messages">
+      </div>
+    </div>
+
+    <div class="msg-item active unread">
+      <div class="msg-avatar msg-av-accent">JD</div>
+      <div class="msg-body">
+        <div class="msg-header"><span class="msg-sender">Jordan Davis</span><span class="msg-time">10:42 AM</span></div>
+        <div class="msg-subject">Re: Q2 Growth Package renewal</div>
+        <div class="msg-preview">Just checking in on the proposal we sent over last…</div>
+      </div>
+      <div class="unread-dot"></div>
+    </div>
+
+    <div class="msg-item unread">
+      <div class="msg-avatar msg-av-green">SR</div>
+      <div class="msg-body">
+        <div class="msg-header"><span class="msg-sender">Sam Rivera</span><span class="msg-time">9:15 AM</span></div>
+        <div class="msg-subject">Luma Tech — onboarding complete ✓</div>
+        <div class="msg-preview">Hi Alex, the team has successfully set up their…</div>
+      </div>
+      <div class="unread-dot"></div>
+    </div>
+
+    <div class="msg-item">
+      <div class="msg-avatar msg-av-amber">FX</div>
+      <div class="msg-body">
+        <div class="msg-header"><span class="msg-sender">FlexSoft Support</span><span class="msg-time">Yesterday</span></div>
+        <div class="msg-subject">Account paused — action required</div>
+        <div class="msg-preview">Your subscription has been paused due to a billing…</div>
+      </div>
+    </div>
+
+    <div class="msg-item">
+      <div class="msg-avatar msg-av-cyan">NK</div>
+      <div class="msg-body">
+        <div class="msg-header"><span class="msg-sender">NovakLabs</span><span class="msg-time">Yesterday</span></div>
+        <div class="msg-subject">Invoice #INV-2026-0041 is ready</div>
+        <div class="msg-preview">Your invoice for the month of June is now available…</div>
+      </div>
+    </div>
+
+    <div class="msg-item">
+      <div class="msg-avatar msg-av-accent">AS</div>
+      <div class="msg-body">
+        <div class="msg-header"><span class="msg-sender">Billing Alerts</span><span class="msg-time">Jun 1</span></div>
+        <div class="msg-subject">Trial ending in 3 days — Acme Corp</div>
+        <div class="msg-preview">This is a reminder that Acme Corp's trial period…</div>
+      </div>
+    </div>
+
+    <div class="msg-item">
+      <div class="msg-avatar" style="background:rgba(133,146,163,.12);color:var(--text-muted)">GX</div>
+      <div class="msg-body">
+        <div class="msg-header"><span class="msg-sender">Globex Corp</span><span class="msg-time">May 30</span></div>
+        <div class="msg-subject">Enterprise plan inquiry</div>
+        <div class="msg-preview">Hello, we're evaluating your enterprise plan and…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message detail -->
+  <div class="msg-detail">
+    <div class="msg-detail-toolbar">
+      <button class="tool-btn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h10a8 8 0 0 1 8 8v2M3 10l6 6m-6-6l6-6"/></svg>
+        Reply
+      </button>
+      <button class="tool-btn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10H11a8 8 0 0 0-8 8v2M21 10l-6 6m6-6l-6-6"/></svg>
+        Forward
+      </button>
+      <button class="tool-btn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Mark Unread
+      </button>
+      <button class="tool-btn danger" style="margin-left:auto">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+        Delete
+      </button>
+    </div>
+
+    <div class="msg-detail-head">
+      <div class="msg-detail-subject">Re: Q2 Growth Package renewal</div>
+      <div class="msg-detail-meta">
+        <div class="msg-detail-avatar">JD</div>
+        <div>
+          <div class="msg-detail-from">Jordan Davis</div>
+          <div class="msg-detail-addr">jordan@acme.com → alex@company.io</div>
+        </div>
+        <div class="msg-detail-date">Today at 10:42 AM</div>
+      </div>
+    </div>
+
+    <div class="msg-detail-body">
+      <p>Hi Alex,</p>
+      <p>Just circling back on the Growth Package renewal proposal you sent over last Thursday. Our finance team has had a chance to review the pricing and we're very close to signing off.</p>
+      <p>We'd love to schedule a 30-minute call this week to finalize the contract terms and discuss the onboarding timeline. Would Thursday at 2pm ET or Friday at 10am ET work for you?</p>
+      <p>Also — any chance we could get a brief walkthrough of the new analytics module that was mentioned in the latest release notes? The team is particularly interested in the custom reporting features.</p>
+      <p>Looking forward to getting this across the line. Acme has been incredibly happy with the platform and this renewal is a no-brainer for us.</p>
+      <div class="msg-detail-sig">
+        Best regards,<br>
+        <strong>Jordan Davis</strong><br>
+        Head of Operations · Acme Corp<br>
+        jordan@acme.com · +1 (555) 123-4567
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

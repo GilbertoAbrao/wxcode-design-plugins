@@ -1,0 +1,106 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "wxcode-admin-sneat",
+  "title": "Indigo SaaS Admin",
+  "version": "0.1.0",
+  "description": "Clean light-mode SaaS admin aesthetic: #f5f5f9 page canvas, white (#fff) card surfaces, indigo accent (#696cff), Public Sans type, 6px card radius, soft shadows, and muted body text (#646e78). Archetype = sticky top navbar (app title + search + notification + avatar) + left sidebar (nav groups with icons) + KPI stat tiles + mixed-width grid of charts and tables + paginated records table with status pills, plus list, form, settings, auth, error, email, and calendar screens.",
+  "license": "MIT",
+  "author": {
+    "name": "WXCode",
+    "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+  },
+  "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-sneat",
+  "tags": [
+    "wxcode-plugin",
+    "wxcode",
+    "first-party",
+    "prototype",
+    "operations",
+    "web",
+    "admin",
+    "light-mode",
+    "indigo-accent",
+    "soft-shadow",
+    "saas-admin",
+    "clean",
+    "sidebar-nav"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "prototype",
+    "scenario": "operations",
+    "surface": "web",
+    "preview": {
+      "type": "html",
+      "entry": "./example.html"
+    },
+    "useCase": {
+      "query": {
+        "en": "Apply this clean light-mode SaaS admin aesthetic to my domain — indigo accent, white cards, soft shadows, sidebar nav, KPI stat tiles, charts and a records table with status pills.",
+        "zh-CN": "将这个简洁亮色 SaaS 管理后台风格应用到我的领域：靛蓝强调色、白色卡片、柔和阴影、侧栏导航、KPI 统计卡片、图表及带状态标签的记录表。"
+      },
+      "exampleOutputs": [
+        { "path": "./example.html",           "title": "Admin Console — Dashboard" },
+        { "path": "./assets/dashboard.html",  "title": "Admin Console — Dashboard" },
+        { "path": "./assets/dashboard-crm.html", "title": "Admin Console — Dashboard CRM" },
+        { "path": "./assets/list.html",       "title": "Admin Console — List" },
+        { "path": "./assets/form.html",       "title": "Admin Console — Form" },
+        { "path": "./assets/settings.html",   "title": "Admin Console — Settings" },
+        { "path": "./assets/login.html",      "title": "Admin Console — Login" },
+        { "path": "./assets/register.html",   "title": "Admin Console — Register" },
+        { "path": "./assets/error.html",      "title": "Admin Console — 404 Error" },
+        { "path": "./assets/email.html",      "title": "Admin Console — Email" },
+        { "path": "./assets/calendar.html",   "title": "Admin Console — Calendar" }
+      ]
+    },
+    "context": {
+      "skills": [
+        { "path": "./SKILL.md" }
+      ],
+      "designSystem": {
+        "primary": true
+      },
+      "craft": [
+        "typographic-rhythm",
+        "laws-of-ux"
+      ],
+      "assets": [
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/dashboard-crm.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/settings.html",
+        "./assets/login.html",
+        "./assets/register.html",
+        "./assets/error.html",
+        "./assets/email.html",
+        "./assets/calendar.html",
+        "./assets/template.html",
+        "./references/layouts.md"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": ["file-write", "live-artifact"]
+        }
+      ]
+    },
+    "capabilities": ["prompt:inject", "fs:write"],
+    "provenance": {
+      "template": "Sneat",
+      "url": "https://demos.themeselection.com/sneat-bootstrap-html-admin-template-free/html/"
+    }
+  }
+}

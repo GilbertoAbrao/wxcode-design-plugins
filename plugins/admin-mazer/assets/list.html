@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Projects List — Admin Console</title>
+<style>
+:root{
+  --bg:#f2f7ff;--card:#fff;--sidebar-hover:#f0f4ff;--input-bg:#f8faff;
+  --border:#e0e6ed;--divider:#eef1f6;
+  --text-body:#25396f;--text-secondary:#6b7ea8;--text-muted:#9daec8;--text-inv:#fff;
+  --primary:#435ebe;--primary-hover:#3a52aa;--primary-soft:#eef1fb;
+  --success:#28c76f;--success-soft:#e6f9ef;
+  --warn:#ff9f43;--warn-soft:#fff4e5;
+  --danger:#ea5455;--danger-soft:#fce8e8;
+  --info:#00cfe8;--info-soft:#e0f9fc;
+  --neutral:#82868b;--neutral-soft:#f0f0f0;
+  --sidebar-w:260px;--topbar-h:60px;
+  --radius-card:11px;--radius-btn:8px;--radius-pill:20px;
+  --shadow-card:0 4px 24px rgba(67,94,190,.08);
+  --shadow-sidebar:2px 0 8px rgba(67,94,190,.06);
+  --transition:.18s ease;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Nunito","Segoe UI",system-ui,sans-serif;font-size:14px;
+  color:var(--text-body);background:var(--bg);display:flex;min-height:100vh}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+ul{list-style:none}
+input,select{font-family:inherit}
+
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);height:100vh;
+  position:sticky;top:0;background:var(--card);
+  box-shadow:var(--shadow-sidebar);overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-brand{height:var(--topbar-h);display:flex;align-items:center;gap:10px;
+  padding:0 20px;border-bottom:1px solid var(--border)}
+.brand-icon{width:34px;height:34px;border-radius:8px;background:var(--primary);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-name{font-size:17px;font-weight:700}
+.nav-section{padding:16px 0 4px}
+.nav-label{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;
+  color:var(--text-muted);padding:0 20px 6px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:9px 20px;
+  font-size:13px;font-weight:600;color:var(--text-secondary);
+  transition:var(--transition);position:relative;cursor:pointer}
+.nav-item:hover{background:var(--sidebar-hover);color:var(--text-body)}
+.nav-item.active{background:var(--primary-soft);color:var(--primary)}
+.nav-item.active::before{content:'';position:absolute;left:0;top:0;bottom:0;
+  width:3px;background:var(--primary);border-radius:0 2px 2px 0}
+.nav-icon{width:18px;height:18px;flex-shrink:0;opacity:.75}
+.nav-item.active .nav-icon{opacity:1}
+.sidebar-footer{margin-top:auto;padding:16px 20px;border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:10px}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--primary-soft);
+  border:2px solid var(--primary);display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:var(--primary);flex-shrink:0}
+.sidebar-user-name{font-size:13px;font-weight:700}
+.sidebar-user-role{font-size:11px;color:var(--text-muted)}
+
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{height:var(--topbar-h);background:var(--card);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;padding:0 24px;position:sticky;top:0;z-index:10}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-secondary)}
+.breadcrumb-sep{color:var(--text-muted)}
+.breadcrumb-active{font-weight:700;color:var(--text-body)}
+.topbar-spacer{flex:1}
+.search-pill{display:flex;align-items:center;gap:8px;background:var(--input-bg);
+  border:1px solid var(--border);border-radius:var(--radius-pill);
+  padding:6px 14px;font-size:13px;color:var(--text-muted)}
+.icon-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;color:var(--text-secondary);transition:var(--transition);position:relative}
+.icon-btn:hover{background:var(--sidebar-hover)}
+.notif-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;
+  background:var(--danger);border:2px solid var(--card)}
+.top-avatar{width:36px;height:36px;border-radius:50%;background:var(--primary);
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;cursor:pointer}
+
+.content{flex:1;padding:24px;display:flex;flex-direction:column;gap:20px}
+.page-header{display:flex;align-items:center;justify-content:space-between}
+.page-title{font-size:22px;font-weight:700}
+.page-sub{font-size:13px;color:var(--text-secondary);margin-top:2px}
+.btn-primary{background:var(--primary);color:#fff;padding:8px 18px;
+  border-radius:var(--radius-btn);font-size:13px;font-weight:600;transition:var(--transition)}
+.btn-primary:hover{background:var(--primary-hover)}
+.btn-ghost{background:transparent;color:var(--primary);padding:7px 16px;
+  border:1px solid var(--primary);border-radius:var(--radius-btn);
+  font-size:13px;font-weight:600;transition:var(--transition)}
+.btn-ghost:hover{background:var(--primary-soft)}
+
+.filters-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.search-input{display:flex;align-items:center;gap:8px;background:var(--card);
+  border:1px solid var(--border);border-radius:var(--radius-btn);padding:8px 14px;
+  font-size:13px;flex:1;max-width:320px;color:var(--text-body)}
+.search-input input{border:none;outline:none;background:none;font-size:13px;
+  color:var(--text-body);width:100%;font-family:inherit}
+.chip{display:flex;align-items:center;gap:6px;padding:6px 14px;
+  border-radius:var(--radius-pill);font-size:12px;font-weight:700;
+  cursor:pointer;transition:var(--transition);border:2px solid transparent}
+.chip.neutral{background:var(--card);border-color:var(--border);color:var(--text-secondary)}
+.chip.active-chip{background:var(--primary-soft);border-color:var(--primary);color:var(--primary)}
+.select-filter{background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius-btn);padding:7px 12px;font-size:13px;
+  color:var(--text-secondary);font-weight:600;outline:none;cursor:pointer}
+.count-label{margin-left:auto;font-size:13px;color:var(--text-secondary);font-weight:600}
+
+.card{background:var(--card);border-radius:var(--radius-card);
+  box-shadow:var(--shadow-card);padding:20px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{padding:10px 14px;text-align:left;font-size:11px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);
+  border-bottom:2px solid var(--divider);white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--divider);transition:var(--transition)}
+tbody tr:hover{background:var(--sidebar-hover)}
+tbody td{padding:11px 14px;vertical-align:middle}
+.cell-name{font-weight:600;color:var(--text-body)}
+.cell-sub{font-size:12px;color:var(--text-secondary)}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;
+  border-radius:var(--radius-pill);font-size:11px;font-weight:700}
+.badge.success{background:var(--success-soft);color:var(--success)}
+.badge.warn{background:var(--warn-soft);color:var(--warn)}
+.badge.danger{background:var(--danger-soft);color:var(--danger)}
+.badge.neutral{background:var(--neutral-soft);color:var(--neutral)}
+.badge.info{background:var(--info-soft);color:var(--info)}
+.progress-bar{height:6px;border-radius:3px;background:var(--divider);width:80px}
+.progress-fill{height:100%;border-radius:3px;background:var(--primary)}
+.row-action{padding:5px;border-radius:6px;color:var(--text-secondary);
+  transition:var(--transition);cursor:pointer}
+.row-action:hover{background:var(--sidebar-hover);color:var(--primary)}
+input[type=checkbox]{width:15px;height:15px;accent-color:var(--primary);cursor:pointer}
+.pager{display:flex;align-items:center;justify-content:space-between;
+  margin-top:16px;font-size:13px;color:var(--text-secondary)}
+.pager-btns{display:flex;gap:6px}
+.pager-btn{padding:5px 12px;border-radius:6px;border:1px solid var(--border);
+  font-size:13px;font-weight:600;color:var(--text-secondary);
+  background:var(--card);transition:var(--transition);cursor:pointer}
+.pager-btn:hover{border-color:var(--primary);color:var(--primary)}
+.pager-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+    </div>
+    <span class="brand-name">Vantage</span>
+  </div>
+  <nav>
+    <div class="nav-section">
+      <div class="nav-label">Overview</div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Work</div>
+      <div class="nav-item active">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        Projects
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Tasks
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        Milestones
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">People</div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        Team
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Clients
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">System</div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        Settings
+      </div>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="avatar">JD</div>
+    <div>
+      <div class="sidebar-user-name">Jordan Davis</div>
+      <div class="sidebar-user-role">Administrator</div>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="breadcrumb">
+      <span>Home</span>
+      <span class="breadcrumb-sep">/</span>
+      <span>Work</span>
+      <span class="breadcrumb-sep">/</span>
+      <span class="breadcrumb-active">Projects</span>
+    </div>
+    <div class="topbar-spacer"></div>
+    <div class="search-pill">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Search…
+    </div>
+    <button class="icon-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="notif-dot"></span>
+    </button>
+    <div class="top-avatar">JD</div>
+  </header>
+
+  <div class="content">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Projects</div>
+        <div class="page-sub">79 projects across all teams</div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn-ghost">Export CSV</button>
+        <button class="btn-primary">+ New Project</button>
+      </div>
+    </div>
+
+    <div class="filters-bar">
+      <div class="search-input">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search projects…">
+      </div>
+      <div class="chip active-chip">All <span style="background:var(--primary);color:#fff;padding:1px 7px;border-radius:10px;font-size:11px;margin-left:2px">79</span></div>
+      <div class="chip neutral">Active <span style="background:var(--success-soft);color:var(--success);padding:1px 7px;border-radius:10px;font-size:11px;margin-left:2px">24</span></div>
+      <div class="chip neutral">At Risk <span style="background:var(--warn-soft);color:var(--warn);padding:1px 7px;border-radius:10px;font-size:11px;margin-left:2px">5</span></div>
+      <div class="chip neutral">Delayed <span style="background:var(--danger-soft);color:var(--danger);padding:1px 7px;border-radius:10px;font-size:11px;margin-left:2px">3</span></div>
+      <select class="select-filter">
+        <option>All Teams</option>
+        <option>Design</option>
+        <option>Engineering</option>
+        <option>Marketing</option>
+        <option>Product</option>
+      </select>
+      <select class="select-filter">
+        <option>All Priorities</option>
+        <option>High</option>
+        <option>Medium</option>
+        <option>Low</option>
+      </select>
+      <span class="count-label">Showing 1–10 of 79</span>
+    </div>
+
+    <div class="card" style="padding:0">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:32px"><input type="checkbox"></th>
+              <th>Project</th>
+              <th>Lead</th>
+              <th>Team</th>
+              <th>Priority</th>
+              <th>Due Date</th>
+              <th>Progress</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td><div class="cell-name">Brand Refresh 2025</div><div class="cell-sub">8 tasks · 2 milestones</div></td>
+              <td>Alex Chen</td>
+              <td>Design</td>
+              <td><span class="badge danger">High</span></td>
+              <td>Jul 15, 2025</td>
+              <td><div class="progress-bar"><div class="progress-fill" style="width:78%"></div></div><div style="font-size:11px;color:var(--text-muted);margin-top:3px">78%</div></td>
+              <td><span class="badge success">Active</span></td>
+              <td><button class="row-action"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td><div class="cell-name">Platform Migration</div><div class="cell-sub">24 tasks · 5 milestones</div></td>
+              <td>Sam Lee</td>
+              <td>Engineering</td>
+              <td><span class="badge danger">High</span></td>
+              <td>Aug 30, 2025</td>
+              <td><div class="progress-bar"><div class="progress-fill" style="width:45%;background:var(--warn)"></div></div><div style="font-size:11px;color:var(--text-muted);margin-top:3px">45%</div></td>
+              <td><span class="badge warn">At Risk</span></td>
+              <td><button class="row-action"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td><div class="cell-name">Q3 Marketing Campaign</div><div class="cell-sub">12 tasks · 3 milestones</div></td>
+              <td>Maya Rodriguez</td>
+              <td>Marketing</td>
+              <td><span class="badge warn">Medium</span></td>
+              <td>Jul 31, 2025</td>
+              <td><div class="progress-bar"><div class="progress-fill" style="width:62%"></div></div><div style="font-size:11px;color:var(--text-muted);margin-top:3px">62%</div></td>
+              <td><span class="badge success">Active</span></td>
+              <td><button class="row-action"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td><div class="cell-name">Client Portal v2</div><div class="cell-sub">18 tasks · 4 milestones</div></td>
+              <td>Jordan Kim</td>
+              <td>Product</td>
+              <td><span class="badge danger">High</span></td>
+              <td>Jun 30, 2025</td>
+              <td><div class="progress-bar"><div class="progress-fill" style="width:28%;background:var(--danger)"></div></div><div style="font-size:11px;color:var(--text-muted);margin-top:3px">28%</div></td>
+              <td><span class="badge danger">Delayed</span></td>
+              <td><button class="row-action"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td><div class="cell-name">Annual Report Design</div><div class="cell-sub">6 tasks · 1 milestone</div></td>
+              <td>Priya Nair</td>
+              <td>Design</td>
+              <td><span class="badge neutral">Low</span></td>
+              <td>Sep 15, 2025</td>
+              <td><div class="progress-bar"><div class="progress-fill" style="width:100%;background:var(--neutral)"></div></div><div style="font-size:11px;color:var(--text-muted);margin-top:3px">100%</div></td>
+              <td><span class="badge neutral">Completed</span></td>
+              <td><button class="row-action"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td><div class="cell-name">API Gateway Overhaul</div><div class="cell-sub">31 tasks · 6 milestones</div></td>
+              <td>Carlos Vega</td>
+              <td>Engineering</td>
+              <td><span class="badge danger">High</span></td>
+              <td>Oct 01, 2025</td>
+              <td><div class="progress-bar"><div class="progress-fill" style="width:19%"></div></div><div style="font-size:11px;color:var(--text-muted);margin-top:3px">19%</div></td>
+              <td><span class="badge success">Active</span></td>
+              <td><button class="row-action"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td><div class="cell-name">Employee Handbook Update</div><div class="cell-sub">9 tasks · 2 milestones</div></td>
+              <td>Yuki Tanaka</td>
+              <td>HR</td>
+              <td><span class="badge neutral">Low</span></td>
+              <td>Aug 01, 2025</td>
+              <td><div class="progress-bar"><div class="progress-fill" style="width:55%"></div></div><div style="font-size:11px;color:var(--text-muted);margin-top:3px">55%</div></td>
+              <td><span class="badge success">Active</span></td>
+              <td><button class="row-action"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pager" style="padding:16px 20px">
+        <span>Showing 7 of 79 projects</span>
+        <div class="pager-btns">
+          <button class="pager-btn">‹ Prev</button>
+          <button class="pager-btn active">1</button>
+          <button class="pager-btn">2</button>
+          <button class="pager-btn">3</button>
+          <button class="pager-btn">…</button>
+          <button class="pager-btn">8</button>
+          <button class="pager-btn">Next ›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,134 @@
+{
+  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "wxcode-admin-darkpan",
+  "title": "Onyx Sharp Admin",
+  "version": "0.1.0",
+  "description": "Midnight-black admin aesthetic: pure-black canvas (#000000), deep charcoal panels (#191c24), teal accent (#009688), muted slate body text (#6c7293), hairline borders (#2a2e38), Open Sans type, and zero-radius sharp corners throughout. Archetype = collapsible icon sidebar + top header bar + KPI metric tiles + data tables with teal status pills + form screens with inline validation. A crisp, zero-radius dark panel system suited for high-information operational dashboards.",
+  "license": "MIT",
+  "author": {
+    "name": "WXCode",
+    "url": "https://github.com/GilbertoAbrao/wxcode-design-plugins"
+  },
+  "homepage": "https://github.com/GilbertoAbrao/wxcode-design-plugins/tree/main/plugins/admin-darkpan",
+  "tags": [
+    "wxcode-plugin",
+    "wxcode",
+    "first-party",
+    "prototype",
+    "operations",
+    "web",
+    "admin",
+    "dark-mode",
+    "midnight-black",
+    "teal-accent",
+    "sharp-corners",
+    "data-dense",
+    "enterprise",
+    "zero-radius"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "prototype",
+    "scenario": "operations",
+    "surface": "web",
+    "preview": {
+      "type": "html",
+      "entry": "./example.html"
+    },
+    "useCase": {
+      "query": {
+        "en": "Apply this midnight-black sharp-corner admin aesthetic to my domain — pure-black canvas, teal accent, collapsible icon sidebar, KPI metric tiles, dense data tables with status pills, plus list, form, auth, error, and settings screens.",
+        "zh-CN": "将这个午夜黑尖角管理风格应用到我的领域：纯黑底色、青色强调、可折叠图标侧边栏、KPI 指标卡、带状态标签的密集数据表格，以及列表、表单、认证、错误和设置页面。"
+      },
+      "exampleOutputs": [
+        {
+          "path": "./example.html",
+          "title": "Admin Console — Dashboard"
+        },
+        {
+          "path": "./assets/list.html",
+          "title": "Admin Console — List"
+        },
+        {
+          "path": "./assets/form.html",
+          "title": "Admin Console — Form"
+        },
+        {
+          "path": "./assets/charts.html",
+          "title": "Admin Console — Charts"
+        },
+        {
+          "path": "./assets/widgets.html",
+          "title": "Admin Console — Widgets"
+        },
+        {
+          "path": "./assets/signin.html",
+          "title": "Admin Console — Sign In"
+        },
+        {
+          "path": "./assets/signup.html",
+          "title": "Admin Console — Sign Up"
+        },
+        {
+          "path": "./assets/error.html",
+          "title": "Admin Console — 404"
+        }
+      ]
+    },
+    "context": {
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ],
+      "designSystem": {
+        "primary": true
+      },
+      "craft": [
+        "pixel-discipline",
+        "state-coverage"
+      ],
+      "assets": [
+        "./example.html",
+        "./assets/dashboard.html",
+        "./assets/list.html",
+        "./assets/form.html",
+        "./assets/charts.html",
+        "./assets/widgets.html",
+        "./assets/signin.html",
+        "./assets/signup.html",
+        "./assets/error.html",
+        "./assets/template.html",
+        "./references/layouts.md"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ],
+    "provenance": {
+      "template": "DarkPan",
+      "url": "https://themewagon.github.io/darkpan/"
+    }
+  }
+}
