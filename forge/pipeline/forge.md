@@ -262,27 +262,42 @@ slug = lowercase(reference.name)
 ### What the plugin folder contains
 
 Unlike the legacy single-`example.html` shape, every forged plugin ships a
-**meta-free multi-screen example set** so the agent imitating it has a clean
-pattern for every screen type (AUTHORING.md rules 5 & 6):
+**meta-free, theme-discovered example set** so the agent imitating it has a clean
+pattern for every screen type (AUTHORING.md rules 5 & 6). The set is a
+**representative selection of the theme's page archetypes — intelligently chosen,
+capped at 10 example HTML files** — not a fixed CRUD-4. From a harvest run the set
+is the `example_pages` list the distill scout selected (Phase 2b of harvest.md);
+from a pure-brief forge run with no discovered inventory, the set is the
+CRUD-admin floor below. Relevance over count: a focused theme ships exactly its
+relevant screens, never padded to 10.
 
 ```
 <target>/
   open-design.json          # manifest (anatomy below)
   SKILL.md                  # two-layer authoring standard (anatomy below)
-  example.html              # marketplace thumbnail = the dashboard screen
-  assets/
-    dashboard.html          # the example set (meta-free, in the plugin's skin)
-    list.html
-    form.html               # domain rules shown as INLINE validation, not panels
-    detail.html             # include when the archetype implies a record detail
+  example.html              # marketplace thumbnail = the dashboard/overview screen
+  assets/                   # one meta-free screen per SELECTED discovered page (≤10):
+    dashboard.html          #   CRUD-admin floor (dashboard + list + form [+ detail])
+    list.html               #   when the archetype is CRUD-admin, PLUS the theme's
+    form.html               #   domain rules shown as INLINE validation, not panels
+    detail.html             #   discovered archetypes the scout selected, e.g.:
+    login.html              #   auth (login + register/forgot/lock the theme ships)
+    error-404.html          #   error/empty states (404/500/maintenance/empty)
+    settings.html           #   settings / profile
+    <signature>.html        #   the theme's signature/showcase pages
+    <screen>-rtl.html       #   an RTL variant of a key screen IF the theme ships RTL
     template.html           # a seed skeleton: tokens + shell, no domain content
   references/
     layouts.md              # paste-ready section/screen skeletons (domain-neutral)
 ```
 
-`example.html` is the same screen as `assets/dashboard.html` (or a copy) so the
-marketplace thumbnail stays a single screen, while `od.useCase.exampleOutputs[]`
-and `od.context.assets[]` list the full set.
+The `assets/` filenames above are illustrative — the actual files are one per
+`example_pages` entry (or per CRUD-floor screen when there is no discovered
+inventory), HARD-CAPPED at 10 example HTML files (`template.html` is a seed, not
+counted toward the 10). `example.html` is the same screen as
+`assets/dashboard.html` (or a copy) so the marketplace thumbnail stays a single
+screen (`od.preview.entry`), while `od.useCase.exampleOutputs[]` and
+`od.context.assets[]` list the full discovered set.
 
 ### Build agent prompt template
 
@@ -341,23 +356,38 @@ FILE 1 — <target>/open-design.json
         "en": "Apply this <visual-style> <archetype> aesthetic to my domain",
         "zh-CN": "将这个 <visual-style> 风格应用到我的领域：<same prompt>"
       },
+      # exampleOutputs lists the FULL theme-discovered example set — one entry per
+      # SELECTED discovered page (from the curated entry's `example_pages`), capped
+      # at 10. The first entry is always the dashboard/overview (= example.html).
+      # When there is no discovered inventory, fall back to the CRUD-admin floor
+      # (dashboard + list + form [+ detail]). Add auth/error/settings/signature/RTL
+      # entries that the theme actually ships. Do NOT pad to 10.
       "exampleOutputs": [
         { "path": "./example.html", "title": "<Title> — Dashboard" },
         { "path": "./assets/list.html", "title": "<Title> — List" },
         { "path": "./assets/form.html", "title": "<Title> — Form" },
         { "path": "./assets/detail.html", "title": "<Title> — Detail" }
+        # ...one more per remaining selected discovered page, e.g.:
+        # { "path": "./assets/login.html",     "title": "<Title> — Login" },
+        # { "path": "./assets/error-404.html", "title": "<Title> — 404" },
+        # { "path": "./assets/settings.html",  "title": "<Title> — Settings" },
+        # { "path": "./assets/<signature>.html","title": "<Title> — <Signature>" }
+        # (≤10 example HTML files total — relevance over count)
       ]
     },
     "context": {
       "skills": [{ "path": "./SKILL.md" }],
       "designSystem": { "primary": true },
       "craft": [<pick 1-2 from: pixel-discipline, typographic-rhythm, state-coverage, laws-of-ux>],
+      # assets[] = example.html + EVERY selected discovered screen in assets/ (the
+      # same ≤10 set as exampleOutputs) + template.html + references/layouts.md.
       "assets": [
         "./example.html",
         "./assets/dashboard.html",
         "./assets/list.html",
         "./assets/form.html",
         "./assets/detail.html",
+        # ...one ./assets/<page>.html per remaining selected discovered page (≤10 screens total)
         "./assets/template.html",
         "./references/layouts.md"
       ]
@@ -368,7 +398,9 @@ FILE 1 — <target>/open-design.json
     "capabilities": ["prompt:inject", "fs:write"]
   }
 }
-# (Omit the detail.html entries if the archetype has no record-detail screen.)
+# (Omit the detail.html entries if the archetype has no record-detail screen.
+#  Add an entry for each additional SELECTED discovered page; never exceed 10
+#  example HTML files; never pad to 10 if the theme ships fewer relevant pages.)
 
 ------------------------------------------------------------------
 FILE 2 — <target>/SKILL.md   (TWO-LAYER AUTHORING STANDARD)
@@ -443,8 +475,9 @@ illustrative. Map each archetype slot to a real example entity/metric/screen.>
    metrics, status states, record columns, form fields + rules, detail fields)
    from the KB + prompt. Standalone: use the Example instantiation above.
 3. Build each screen in the Visual language + Layout archetype above, imitating
-   the example set in assets/ (dashboard, list, form, detail) — fresh content for
-   the real domain, NOT the example labels.
+   the example set in assets/ (the theme-discovered screens — dashboard/list/form/
+   detail plus any auth/error/settings/signature/RTL screens this plugin ships) —
+   fresh content for the real domain, NOT the example labels.
 4. Express domain rules as INLINE field validation (required marks, helper text,
    inline errors). Never render rules/checklist/validation-status/build-note
    panels or designer/demo controls.
@@ -470,10 +503,22 @@ FILE 3 — <target>/example.html
 - Target 5KB - 30KB unless the design genuinely needs more.
 
 ------------------------------------------------------------------
-FILE 4 — <target>/assets/{dashboard,list,form,detail}.html   (the EXAMPLE SET)
+FILE 4 — <target>/assets/*.html   (the THEME-DISCOVERED EXAMPLE SET, ≤10)
 ------------------------------------------------------------------
-Emit a META-FREE multi-screen example set, all in the SAME visual language +
-layout archetype:
+Emit a META-FREE example set, all in the SAME visual language + layout archetype.
+The set is the theme's REPRESENTATIVE page archetypes — one original screen per
+SELECTED discovered page — HARD-CAPPED at 10 example HTML files. Relevance over
+count: build exactly the relevant screens the theme ships; do NOT pad to 10.
+
+WHICH SCREENS TO BUILD:
+- If the curated entry has an `example_pages` list (from a harvest run): build one
+  original screen per entry, mapping each `slot`/`archetype` to a screen in this
+  skin. Cap at 10; never add a page not in `example_pages`.
+- If there is NO `example_pages` (a pure-brief forge run with no discovered
+  inventory): build the CRUD-admin FLOOR — dashboard + list + form (+ detail when
+  the archetype implies one).
+
+CRUD-admin FLOOR (always present when the archetype is CRUD-admin):
 - dashboard.html — KPI tiles + status board + side panel (same as example.html)
 - list.html      — the records table archetype with status pills + filters
 - form.html      — a record form. Domain rules appear as INLINE VALIDATION:
@@ -482,11 +527,22 @@ layout archetype:
                    validation-status summary panel anywhere.
 - detail.html    — a record detail (header + meta grid + related list). Omit only
                    if the archetype genuinely has no detail screen.
+ADDITIONAL discovered archetypes (build the ones in `example_pages`, in this skin):
+- auth      — login (+ register / forgot / lock the theme ships). A meta-free auth
+              form: branded panel + inline-validated fields, no demo controls.
+- error/empty — 404 / 500 / maintenance / empty-state: a finished error screen in
+              the skin (illustration/code + message + primary action), no caveats.
+- settings/profile — sectioned settings or a profile screen (inline-validated).
+- signature — the theme's distinctive page (analytics board, kanban, calendar,
+              pricing, etc.) re-skinned as a finished screen.
+- rtl variant — an RTL version of a key screen ONLY if `example_pages` includes one
+              (the theme ships RTL): set `dir="rtl"` and mirror the layout.
 HARD RULES for every screen (AUTHORING.md rule 6):
 - These are FINISHED product screens. No build/implementation notes, no
   "depends on backend" caveats, no todo/checklist panels, no validation-status
   summaries, no designer/demo controls.
 - Same single-file inline-CSS discipline as example.html.
+- NEVER exceed 10 example HTML files (template.html is a seed, not counted).
 
 ------------------------------------------------------------------
 FILE 5 — <target>/assets/template.html
@@ -547,7 +603,9 @@ for plugin_dir in <new dirs>; do
   #    Enforces: aesthetic-only frontmatter/manifest description, the four
   #    required AUTHORITATIVE headings, domain-neutral Workflow, the fenced
   #    illustrative-only Example instantiation, no build-meta in any example
-  #    HTML, and the multi-screen example set (warn if single-screen).
+  #    HTML, and the theme-discovered example set (warn only if single-screen —
+  #    the lint does NOT require all 10 and does NOT penalize a focused set below
+  #    the cap; relevance over count, 10 is a hard cap not a floor).
   node forge/tools/lint-plugin.mjs "$plugin_dir"
 done
 ```
@@ -558,8 +616,10 @@ Re-dispatch policy:
   agent for that slug with the failure log (the JSON error / the malformed-file
   name / the verbatim `VIOLATION:` lines) embedded in the prompt.
 - A `WARNING:` from the linter (e.g. single-screen) does not block on its own, but
-  the build template above always ships the full example set, so a faithful
-  instantiation should not warn.
+  the build template above always ships the theme-discovered example set (at least
+  the CRUD-admin floor), so a faithful instantiation should not warn. The lint does
+  not require all 10 screens — relevance over count — so a focused set below the cap
+  is not a warning.
 - **Cap at 2 retries per plugin.** A plugin still failing after 2 retries is
   dropped from this run and listed in the report as needs-human — never shipped.
 
@@ -911,8 +971,8 @@ Daemon: <running (restarted) | started | stopped (user declined) |
   unknown — run `pnpm tools-dev` manually | n/a (marketplace mode)>.
 
 Next:
-  - open each example screen (example.html + assets/{list,form,detail}.html) in a
-    browser to spot-check
+  - open each example screen (example.html + every assets/*.html in the
+    theme-discovered set) in a browser to spot-check
   - if the daemon was restarted while a browser tab was open, refresh the tab to
     see the new "Example prompts" cards
   - if push was aborted/rejected: review `git log` and decide whether to open a PR
@@ -935,7 +995,7 @@ Next:
 | `lint-plugin.mjs` reports a missing/unmarked AUTHORITATIVE heading | Re-dispatch with the verbatim violation and the four-heading template |
 | `lint-plugin.mjs` reports "extract … from the brief" | Re-dispatch reminding the Workflow must extract "THIS domain's equivalent of the archetype slots", not domain fields |
 | `lint-plugin.mjs` reports build-meta in example HTML | Re-dispatch reminding rule 6: no rules/checklist/validation-status/build-note panels; rules become inline field validation |
-| `lint-plugin.mjs` WARNS single-screen | The build template ships the full set; if it warned, the agent dropped a screen — re-dispatch to emit dashboard + list + form (+ detail) |
+| `lint-plugin.mjs` WARNS single-screen | The build template ships the theme-discovered set; if it warned, the agent shipped a lone screen — re-dispatch to emit the selected `example_pages` set (or the CRUD-admin floor: dashboard + list + form [+ detail] when there is no discovered inventory). Do not pad to 10 — relevance over count |
 | Plugin still failing lint after 2 retries | Drop from this run, list as needs-human in the report — never ship a failing plugin |
 | `output_repo/plugins/_official/examples` doesn't exist (bundled) | This is not an open-design repo — stop and tell the user |
 | Slug collision with existing plugin | Append `-2`, `-3`, ... do not overwrite |
@@ -962,11 +1022,11 @@ evolves, update the manifest anatomy in §3 — the daemon is the source of trut
 this spec is a generator that must stay in sync.
 
 The **authoring convention** (the aesthetic/semantic two-layer `SKILL.md` split,
-the meta-free example set, the AUTHORITATIVE headings) is owned by
-`forge/AUTHORING.md`, and is enforced by `forge/tools/lint-plugin.mjs`. The §3 build
-template above is the encoding of that standard; if `AUTHORING.md` or the linter
-change, re-sync the template and re-run the §4 lint gate against a faithful
-instantiation.
+the meta-free, theme-discovered example set — up to 10 relevance-selected screens,
+the AUTHORITATIVE headings) is owned by `forge/AUTHORING.md`, and is enforced by
+`forge/tools/lint-plugin.mjs`. The §3 build template above is the encoding of that
+standard; if `AUTHORING.md` or the linter change, re-sync the template and re-run
+the §4 lint gate against a faithful instantiation.
 
 The build template in §3 is **shared**: `forge/pipeline/harvest.md` reuses it for
 its build/verify/catalog/commit half. Do not re-solve the aesthetic/semantic split

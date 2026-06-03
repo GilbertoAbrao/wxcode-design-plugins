@@ -70,21 +70,48 @@ instantiation below."
 <artifact identifier="<slug>" type="text/html" title="<Title>">...
 ```
 
-## Example screens — ship a meta-free CRUD set (not just a dashboard)
+## Example screens — ship a meta-free, theme-discovered set (up to 10)
 
 A dashboard alone is not enough reference. With only one screen, the agent
 improvises the rest (forms, lists) and pads them with invented "rules" /
 "checklist" / build-status panels. Ship a small, meta-free example set so the
 agent has a clean pattern to imitate for every screen type.
 
-- **Minimum set:** dashboard + list + form (+ detail when the archetype implies
-  one), all in the plugin's visual language and layout archetype.
+The example set is **not a fixed CRUD-4**. It is a **representative set of the
+theme's page archetypes — intelligently selected, capped at 10 example HTML
+files** — so the plugin reflects what the reference theme actually ships, not a
+generic admin skeleton. Relevance over count: a focused theme that only ships a
+dashboard + a couple of CRUD screens should ship exactly those; do NOT pad to 10.
+
+- **CRUD-admin floor (still expected when the archetype is CRUD-admin):**
+  a dashboard/overview + at least one list + one form + one detail, all in the
+  plugin's visual language and layout archetype. This floor is the minimum for a
+  CRUD-admin theme; the rest of the set is theme-discovered.
+- **Add the archetypes the theme actually showcases (selected, not exhaustive):**
+  - **Auth screens** — login, plus any register / forgot-password / lock screen
+    the theme ships.
+  - **Error / empty states** — any of 404 / 500 / maintenance / empty-state the
+    theme ships (include at least one when present).
+  - **Settings / profile** — account/settings/profile screens when the theme has
+    them.
+  - **Signature / showcase pages** — the theme's distinctive pages (e.g. an
+    analytics board, a kanban, a calendar, a pricing/landing page) — whatever the
+    theme leads with.
+  - **RTL variant** — an RTL version of a key screen **only when the theme
+    demonstrates RTL** (do not invent an RTL variant for an LTR-only theme).
+- **Hard cap: 10 example HTML files per theme.** Selection is relevance-based.
+  When the discovered inventory exceeds 10, keep the most representative subset
+  (the CRUD-admin floor first, then login, an error state, settings, and the
+  theme's signature pages) and drop the rest — never silently truncate; the
+  harvest pipeline logs which pages were chosen vs skipped (see
+  `pipeline/harvest.md`).
 - **Where:** bundle them as `od.context.assets[]` (OD stages them into the run as
   reference) plus a `references/layouts.md` with paste-ready section/screen
   skeletons and an `assets/template.html` seed. `od.preview.entry` stays a single
-  screen for the marketplace thumbnail; `od.useCase.exampleOutputs[]` lists the
-  set. The manifest already allows arrays here (`manifest.ts`: `exampleOutputs`,
-  `assets` are both arrays).
+  screen (the dashboard/overview) for the marketplace thumbnail;
+  `od.useCase.exampleOutputs[]` lists the full discovered set. The manifest
+  already allows arrays here (`manifest.ts`: `exampleOutputs`, `assets` are both
+  arrays).
 - **Rules as validation, not panels:** the example *form* must express domain
   rules as inline field validation — required marks, helper text, inline errors —
   NOT as a "rules"/"checklist" summary panel. This teaches the agent "a rule
@@ -111,8 +138,12 @@ clean pattern, the directive *forbids* the meta — together they kill the leak.
 4. **Frontmatter carries no domain semantics.** `description`, `triggers`, and
    `example_prompt` describe style, not industry. Domain words belong only inside
    the fenced Example instantiation.
-5. **Ship a meta-free multi-screen example set** (dashboard + list + form
-   [+ detail]), not a single dashboard — see "Example screens" above.
+5. **Ship a meta-free, theme-discovered example set** — a representative set of
+   the theme's page archetypes (CRUD-admin floor of dashboard + list + form
+   [+ detail] when relevant, plus auth / error-state / settings / signature /
+   RTL screens the theme actually ships), intelligently selected and capped at
+   **10** example HTML files. Relevance over count, never a single dashboard —
+   see "Example screens" above.
 6. **No build/design metadata as UI.** No example screen — and no output the plugin
    guides — may render rules/checklist/validation-status/build-note panels or
    designer/demo controls. Domain rules become inline field validation.
@@ -158,9 +189,12 @@ A plugin FAILS lint if any of these hold:
   the domain-neutral archetype-slot phrasing.
 - `## Example instantiation` is not fenced/labeled as illustrative-only.
 - The plugin ships only one example screen (no `references/layouts.md` and fewer
-  than two screens in `assets/`) — a compliant admin plugin ships the CRUD set
-  (dashboard + list + form). (Warn-level for now; promote to fail once the 40 are
-  retrofitted.)
+  than two screens in `assets/`) — a compliant admin plugin ships at least the
+  CRUD-admin floor (dashboard + list + form), and richer themes ship up to 10
+  theme-discovered screens. (Warn-level for now; promote to fail once the 40 are
+  retrofitted.) The single-screen warning is the only count check: the lint does
+  NOT require all 10 screens and does NOT warn on a focused set below 10 —
+  relevance over count. The 10 is a hard *cap*, never a floor.
 - Any example screen contains build/design metadata as UI — heuristic match on
   `/checklist|depends on (the )?backend|valida(ç|c)(ã|a)o ativa|regras ativas|build report|status de valida/i`
   in the example HTML.
