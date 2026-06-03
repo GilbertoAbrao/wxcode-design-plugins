@@ -75,6 +75,54 @@ test('domain words in manifest description fail', () => {
   assert.ok(r.violations.some(v => /description/i.test(v)));
 });
 
+test('provenance theme name leaking into example HTML fails', () => {
+  // Harvested plugin: the source theme name (od.provenance.template) MUST NOT
+  // surface as visible product copy / <title> / brand text.
+  const manifest = {
+    description: 'Dark industrial admin aesthetic.',
+    od: { provenance: { template: 'Sneat' } },
+  };
+  const r = lintPlugin(COMPLIANT, manifest, {
+    exampleHtml: ['<title>Sneat Admin — Email</title>'],
+  });
+  assert.equal(r.ok, false);
+  assert.ok(
+    r.violations.some((v) => /Sneat/i.test(v) && /example html/i.test(v)),
+    `expected a violation naming the theme on screen; got: ${r.violations.join('; ')}`,
+  );
+});
+
+test('provenance set but theme name absent from example HTML passes', () => {
+  // SAME compliant fixture + provenance, but the example HTML is generically
+  // named — no leak, so it must still pass.
+  const manifest = {
+    description: 'Dark industrial admin aesthetic.',
+    od: { provenance: { template: 'Sneat' } },
+  };
+  const r = lintPlugin(COMPLIANT, manifest, {
+    exampleHtml: ['<title>Admin — Email</title>'],
+  });
+  assert.equal(r.ok, true, r.violations.join('; '));
+});
+
+test('multi-word provenance matches despaced/case-variant brand text', () => {
+  // "Kai Admin" provenance must catch "KaiAdmin" (despaced) and any case.
+  const manifest = {
+    description: 'Dark industrial admin aesthetic.',
+    od: { provenance: { template: 'Kai Admin' } },
+  };
+  const leaked = lintPlugin(COMPLIANT, manifest, {
+    exampleHtml: ['<title>KaiAdmin — Dashboard</title>'],
+  });
+  assert.equal(leaked.ok, false);
+  assert.ok(leaked.violations.some((v) => /kai\s*admin/i.test(v) && /example html/i.test(v)));
+
+  const lower = lintPlugin(COMPLIANT, manifest, {
+    exampleHtml: ['<h1 class="brand">kaiadmin</h1>'],
+  });
+  assert.equal(lower.ok, false);
+});
+
 test('build-meta in example HTML fails', () => {
   const html = '<section class="panel"><h2>Regras ativas</h2><p>Persistência real depende do backend</p></section>';
   const r = lintPlugin(COMPLIANT, { description: 'Dark industrial admin aesthetic.' }, { exampleHtml: [html] });

@@ -325,6 +325,15 @@ through to its report, with these harvest-specific bindings:
    - Build the look from the entry's `design_tokens` (exact palette/fonts/scale as
      `:root` CSS custom properties) — ORIGINAL markup, no copying (IP guardrail).
    - Add `od.provenance = { template, url }` from the entry's `provenance`.
+   - **No theme/plugin name as brand (IP + de-brand guardrail).** The harvested
+     THEME name (`od.provenance.template`, e.g. "Sneat"/"DarkPan"/"Kai Admin") and
+     the plugin name/slug must **NEVER** appear ON SCREEN — not in `<title>`, brand/
+     logo text, page headers, `aria-label`s, nav labels, or any visible copy. Name
+     the example product **GENERICALLY** ("Admin", "Console", a neutral domain
+     placeholder), never after the template/theme. Shipping `<title>Sneat Admin —
+     Email</title>` is a leak. The linter now ENFORCES this: it reads
+     `od.provenance.template` and FAILS the build if that name (any case, spaced or
+     despaced) appears in any example HTML. A leaked name is a re-dispatch, not a warning.
    - Emit one original meta-free screen per `example_pages` entry (the theme-
      discovered selected set, capped at 10) instead of the fixed CRUD-4. The
      CRUD-admin floor still applies when relevant. `od.preview.entry` stays the

@@ -541,6 +541,13 @@ HARD RULES for every screen (AUTHORING.md rule 6):
 - These are FINISHED product screens. No build/implementation notes, no
   "depends on backend" caveats, no todo/checklist panels, no validation-status
   summaries, no designer/demo controls.
+- NO theme/plugin name as brand. The source THEME name (`od.provenance.template`,
+  e.g. "Sneat"/"DarkPan"/"Kai Admin") and the plugin name/slug must NEVER appear
+  ON SCREEN — not in `<title>`, brand/logo text, page headers, `aria-label`s, nav
+  labels, or any visible copy. Name the example product GENERICALLY ("Admin",
+  "Console", a neutral domain placeholder), never after the template/theme. The
+  linter ENFORCES this via `od.provenance.template`: a leaked name (any case,
+  spaced or despaced) FAILS the build. `<title>Sneat Admin — Email</title>` is a leak.
 - Same single-file inline-CSS discipline as example.html.
 - NEVER exceed 10 example HTML files (template.html is a seed, not counted).
 
@@ -995,6 +1002,7 @@ Next:
 | `lint-plugin.mjs` reports a missing/unmarked AUTHORITATIVE heading | Re-dispatch with the verbatim violation and the four-heading template |
 | `lint-plugin.mjs` reports "extract … from the brief" | Re-dispatch reminding the Workflow must extract "THIS domain's equivalent of the archetype slots", not domain fields |
 | `lint-plugin.mjs` reports build-meta in example HTML | Re-dispatch reminding rule 6: no rules/checklist/validation-status/build-note panels; rules become inline field validation |
+| `lint-plugin.mjs` reports the theme/plugin name appears in example HTML | Re-dispatch reminding the source THEME name (`od.provenance.template`) and the plugin name/slug must NEVER appear on screen — `<title>`, brand/logo, headers, aria-labels, copy; name the example product GENERICALLY ("Admin"/"Console"/neutral placeholder), never after the template |
 | `lint-plugin.mjs` WARNS single-screen | The build template ships the theme-discovered set; if it warned, the agent shipped a lone screen — re-dispatch to emit the selected `example_pages` set (or the CRUD-admin floor: dashboard + list + form [+ detail] when there is no discovered inventory). Do not pad to 10 — relevance over count |
 | Plugin still failing lint after 2 retries | Drop from this run, list as needs-human in the report — never ship a failing plugin |
 | `output_repo/plugins/_official/examples` doesn't exist (bundled) | This is not an open-design repo — stop and tell the user |

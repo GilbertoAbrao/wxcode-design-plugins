@@ -143,6 +143,30 @@ function parseFrontmatter(frontmatter) {
   return { triggers, description };
 }
 
+/** Escape regex metacharacters in a literal string. */
+function escapeRegex(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * Build a case-insensitive, word-boundary regex that catches the harvested
+ * theme/plugin name however it surfaces in example HTML:
+ *   - spaced ("Kai Admin"), despaced ("KaiAdmin") and whitespace-flexed in between,
+ *   - any case ("DARKPAN", "darkpan", "DarkPan").
+ * Returns null for empty/whitespace-only input.
+ */
+export function buildProvenanceLeakRegex(template) {
+  const name = String(template ?? '').trim();
+  if (!name) return null;
+  // Split into word tokens; rebuild with optional whitespace between them so
+  // "Kai Admin" matches "Kai Admin" / "KaiAdmin" / "Kai  Admin".
+  const tokens = name.split(/\s+/).filter(Boolean).map(escapeRegex);
+  if (tokens.length === 0) return null;
+  const core = tokens.join('\\s*');
+  // \b on either side keeps it surgical (no false hit inside a longer word).
+  return new RegExp(`\\b${core}\\b`, 'i');
+}
+
 /** First matching BANNED_DOMAIN regex source-term for a string, or null. */
 function matchBanned(value) {
   if (!value) return null;
@@ -238,6 +262,25 @@ export function lintPlugin(skillMd, manifest = {}, files = {}) {
         'example HTML renders build/design metadata as on-screen UI (rules panel / validation-status / build note); domain rules must become inline field validation',
       );
       break;
+    }
+  }
+
+  // No-plugin-name-as-brand — the harvested theme name (od.provenance.template)
+  // must never surface as visible product copy / <title> / brand text. Scoped
+  // strictly to THIS plugin's own provenance term, so generic/domain words are
+  // never false-positives.
+  const provTpl = manifest?.od?.provenance?.template;
+  if (typeof provTpl === 'string' && provTpl.trim()) {
+    const provRx = buildProvenanceLeakRegex(provTpl);
+    if (provRx) {
+      for (const html of files?.exampleHtml ?? []) {
+        if (provRx.test(String(html))) {
+          violations.push(
+            `theme/plugin name "${provTpl.trim()}" appears in example HTML — name the product generically, not after the template (no <title>, brand/logo text, headers, aria-labels, or copy carrying the source theme name)`,
+          );
+          break;
+        }
+      }
     }
   }
 

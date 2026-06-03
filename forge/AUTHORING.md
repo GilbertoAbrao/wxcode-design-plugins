@@ -120,6 +120,12 @@ dashboard + a couple of CRUD screens should ship exactly those; do NOT pad to 10
   summaries, build/implementation notes, "depends on backend" caveats,
   todo/checklist panels, or designer/demo controls. The examples are finished
   product screens.
+- **No theme/plugin name as brand:** the source THEME name
+  (`od.provenance.template`, e.g. "Sneat"/"DarkPan"/"Kai Admin") and the plugin
+  name/slug must NEVER appear on screen — `<title>`, brand/logo text, headers,
+  `aria-label`s, or copy. Name the example product GENERICALLY ("Admin",
+  "Console", a neutral domain placeholder). The linter enforces this via
+  `od.provenance.template` (see rule 7).
 
 These are reference context — the agent imitates the patterns and builds fresh
 screens for the real domain; they are not injected verbatim into the output. This
@@ -147,6 +153,13 @@ clean pattern, the directive *forbids* the meta — together they kill the leak.
 6. **No build/design metadata as UI.** No example screen — and no output the plugin
    guides — may render rules/checklist/validation-status/build-note panels or
    designer/demo controls. Domain rules become inline field validation.
+7. **No plugin/theme name as brand.** The harvested source THEME name
+   (`od.provenance.template`) and the plugin name/slug must NEVER appear ON SCREEN —
+   not in `<title>`, brand/logo text, page headers, `aria-label`s, or any visible
+   copy. Name the example product GENERICALLY ("Admin", "Console", a neutral domain
+   placeholder), never after the template/theme. `lint-plugin.mjs` enforces this:
+   when `od.provenance.template` is set, the example HTML must not contain that name
+   (any case, spaced or despaced).
 
 ## Worked example: `admin-forge-mes`
 
