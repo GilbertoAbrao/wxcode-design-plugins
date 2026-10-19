@@ -1,3 +1,5 @@
+@AGENTS.md
+
 ## User-documentation context
 
 The User-Documentation manager reviews merged product pull-request diffs,
